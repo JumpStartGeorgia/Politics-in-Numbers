@@ -1,0 +1,27 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: $footer-height;
+}
+
+.app-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: #f8f8f8;
+  padding: 7px 20px 0;
+  color: #4f4f4f;
+  height: $footer-height;
+}
+
+  .app-footer-left {
+    float: left;
+    margin: 0;
+  }
+
+  .app-footer-right {
+    float: right;
+  }

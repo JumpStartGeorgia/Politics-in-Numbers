@@ -1,0 +1,24 @@
+---
+ka:
+  devise:
+    mailer:
+      reset_password_instructions:
+        did_not_request_note: If you didn't request this, please ignore this email.
+        hello_email: Hello %{email}!
+        introduction: Someone has requested a link to change your password. You can do this through the link below.
+        password_will_not_change: Your password won't change until you access the link above and create a new one.
+    passwords:
+      edit:
+        change_your_password: Change your password
+        confirm_new_password: Confirm new password
+        new_password: New password
+      new:
+        send_reset_password_instructions: Send me reset password instructions
+    registrations:
+      edit:
+        current_password: Current password
+        hints:
+          current_password_required: we need your current password to confirm your changes
+          leave_password_blank: leave blank if you don't want to change it
+        password: Password
+        password_confirmation: Password confirmation

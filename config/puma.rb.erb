@@ -1,0 +1,16 @@
+#!/usr/bin/env puma
+
+directory "<%= full_current_path %>"
+rackup "<%= full_current_path %>/config.ru"
+environment "<%= rails_env %>"
+
+pidfile "<%= puma_pid %>"
+state_path "<%= puma_state %>"
+activate_control_app "unix://<%= pumactl_socket %>"
+
+stdout_redirect "<%= puma_error_log %>", "<%= puma_access_log %>", true
+
+threads <%= puma_thread_count_min %>,<%= puma_thread_count_max %>
+
+bind "unix://<%= puma_socket %>"
+workers <%= puma_worker_count %>

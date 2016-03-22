@@ -1,0 +1,21 @@
+<%- model_class = User -%>
+<% page_title t('.title',
+                user_model_name: t('activerecord.models.user', count: 1),
+                user_email: @user.email) %>
+
+<div class='actions'>
+  <%= view_all_button(@user) %>
+  <%= edit_button(@user, edit_admin_user_path) if can? :edit, @user %>
+  <%= destroy_button(@user, admin_user_path) if can? :destroy, @user %>
+</div>
+
+<dl class='dl-horizontal'>
+  <dt><strong><%= model_class.human_attribute_name(:email) %>:</strong></dt>
+  <dd><%= @user.email %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:created_at) %>:</strong></dt>
+  <dd><%= @user.created_at %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:last_sign_in_at) %>:</strong></dt>
+  <dd><%= @user.last_sign_in_at %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:role_id) %>:</strong></dt>
+  <dd><%= @user.role.name %></dd>
+</dl>

@@ -1,0 +1,19 @@
+// This file sets mixins containing the media queries used in this project's
+// CSS. In order to be absolutely clear which mixins refer to media queries,
+// include the prefix 'media-' in all the mixin names.
+//
+// For example, the following creates a media query for small screens:
+//
+// @mixin media-small {
+//   @media (max-width: 385px) {
+//     @content;
+//   }
+// }
+//
+// The above media query mixin can be called in SCSS like this:
+//
+// .container {
+//   @include media-small {
+//     color: green;
+//   }
+// }

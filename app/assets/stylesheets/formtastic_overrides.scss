@@ -1,0 +1,14 @@
+// Increase padding inside inputs
+.formtastic input {
+  padding: 6px 12px;
+}
+
+// Add breathing space below check box input
+div.field {
+  margin-bottom: 10px;
+}
+
+// Add breathing space below form
+form.formtastic {
+  margin-bottom: 15px;
+}

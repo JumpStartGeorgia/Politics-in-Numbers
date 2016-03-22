@@ -1,0 +1,24 @@
+<%= semantic_form_for [:admin, @user] do |f| %>
+  <%= f.semantic_errors *f.object.errors.keys %>
+  <%= f.inputs do %>
+    <%= f.input :email %>
+    <%= f.input :password %>
+    <%= f.input :role,
+                as: :select,
+                include_blank: false,
+                collection: current_user.manageable_roles %>
+  <% end %>
+
+  <%= f.actions do %>
+    <%= f.action :submit,
+                 as: :input,
+                 label: if @user.new_record?
+                          t('shared.actions.with_obj.create',
+                            obj: t('activerecord.models.user', count: 1))
+                        else
+                          t('shared.actions.with_obj.update',
+                            obj: t('activerecord.models.user', count: 1))
+                        end,
+                 button_html: { class: 'btn btn-success' } %>
+  <% end %>
+<% end %>

@@ -1,0 +1,27 @@
+.language-switcher-container {
+  margin-top: 15px;
+}
+
+.language-switcher {
+  padding-left: 10px;
+  list-style-type: none;
+}
+
+  .language-switcher-item {
+    display: inline-block;
+
+    *display: inline; /* this fix is needed for IE7- */
+    zoom: 1; /* this is also needed for IE7 */
+  }
+
+  .language-switcher-item::after {
+    content: ' / '
+  }
+
+  .language-switcher-item:last-child::after {
+    content: ''
+  }
+
+    .language-switcher-item-link.is-active {
+      font-weight: bold;
+    }

@@ -1,0 +1,12 @@
+# ---
+en:
+  activerecord:
+    attributes:
+      user:
+        email: Email
+        password: Password
+        role: Role
+    models:
+      user:
+        one: User
+        other: Users

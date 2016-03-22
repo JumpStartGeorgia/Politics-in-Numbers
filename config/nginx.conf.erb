@@ -1,0 +1,117 @@
+upstream puma_<%= application %> {
+  server unix:<%= puma_socket %> fail_timeout=0;
+}
+
+server {
+  listen 80;
+
+  server_name <%= web_url %> www.<%= web_url %>;
+  root <%= full_current_path %>/public;
+  try_files $uri/index.html $uri @puma_<%= application %>;
+
+  # config to not allow the browser to render the page inside an frame or iframe
+  # and avoid clickjacking http://en.wikipedia.org/wiki/Clickjacking
+  # if you need to allow [i]frames, you can use SAMEORIGIN or even set an uri with ALLOW-FROM uri
+  # https://developer.mozilla.org/en-US/docs/HTTP/X-Frame-Options
+  add_header X-Frame-Options DENY;
+
+  ###########################################
+  ###########################################
+  #### the following settings are taken from https://gist.github.com/plentz/6737338 & https://mattbrictson.com/a-better-way-to-ssl
+
+  # do not send the nginx version number in error pages and Server header
+  server_tokens off;
+
+  # control buffer overflow attacks
+  # https://www.acunetix.com/blog/articles/nginx-server-security-hardening-configuration-1/
+  client_body_buffer_size 10k;
+  client_header_buffer_size 1k;
+  client_max_body_size 8m;
+  large_client_header_buffers 2 1k;
+
+  # when serving user-supplied content, include a X-Content-Type-Options: nosniff header along with the Content-Type: header,
+  # to disable content-type sniffing on some browsers.
+  # https://www.owasp.org/index.php/List_of_useful_HTTP_headers
+  # currently suppoorted in IE > 8 http://blogs.msdn.com/b/ie/archive/2008/09/02/ie8-security-part-vi-beta-2-update.aspx
+  # http://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx
+  # "soon" on Firefox https://bugzilla.mozilla.org/show_bug.cgi?id=471020
+  add_header X-Content-Type-Options nosniff;
+
+  # This header enables the Cross-site scripting (XSS) filter built into most recent web browsers.
+  # It is usually enabled by default anyway, so the role of this header is to re-enable the filter for
+  # this particular website if it was disabled by the user.
+  # https://www.owasp.org/index.php/List_of_useful_HTTP_headers
+  add_header X-XSS-Protection "1; mode=block";
+
+  ###########################################
+  ###########################################
+
+
+  # set timeouts to improve performance
+  # https://www.digitalocean.com/community/tutorials/how-to-optimize-nginx-configuration
+  client_body_timeout 12;
+  client_header_timeout 12;
+  keepalive_timeout 15;
+  send_timeout 10;
+
+  # allow nginx to zip files to reduce bandwidth
+  # https://www.digitalocean.com/community/tutorials/how-to-optimize-nginx-configuration
+  gzip             on;
+  gzip_comp_level  2;
+  gzip_min_length  1000;
+  gzip_proxied     expired no-cache no-store private auth;
+  gzip_types       text/plain application/x-javascript text/xml text/css application/xml;
+
+  error_page 500 502 504 /500.html;
+  error_page 503 @503;
+
+  location @puma_<%= application %> {
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+    proxy_pass http://puma_<%= application %>;
+    access_log <%= full_shared_path %>/log/nginx.access.log;
+    error_log <%= full_shared_path %>/log/nginx.error.log;
+  }
+
+  location ~ ^/(assets|images|javascripts|stylesheets|system)/ {
+    gzip_static on;
+    expires max;
+    add_header Cache-Control public;
+  }
+
+  location = /50x.html {
+    root html;
+  }
+
+  location = /404.html {
+    root html;
+  }
+
+  if ($request_method !~ ^(GET|HEAD|PUT|POST|DELETE)$ ){
+    return 405;
+  }
+
+  ###########################################
+  # Maintenance
+
+  # Rename public/maintenance_disabled.html to public/maintenance.html
+  # to make all site requests redirect to the maintenance page.
+  location @503 {
+    error_page 405 = /maintenance.html;
+    if (-f $document_root/maintenance.html) {
+      rewrite ^(.*)$ /maintenance.html break;
+    }
+    rewrite ^(.*)$ /503.html break;
+  }
+
+  if (-f $document_root/maintenance.html) {
+    return 503;
+  }
+
+  ###########################################
+
+  location ~ \.(php|html)$ {
+    return 405;
+  }
+}

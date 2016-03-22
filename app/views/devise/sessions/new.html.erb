@@ -1,0 +1,27 @@
+<% page_title t('shared.actions.log_in') %>
+
+<%= semantic_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+  <%= f.inputs do %>
+    <%= f.input :email, as: :email, input_html: { autofocus: true } %>
+    <%= f.input :password, as: :password %>
+
+    <% if devise_mapping.rememberable? -%>
+      <div class="field">
+        <%= f.check_box :remember_me %>
+        <%= f.label :remember_me %>
+      </div>
+    <% end -%>
+  <% end %>
+
+  <%= f.actions do %>
+    <%= f.action :submit,
+                 label: t('shared.actions.log_in'),
+                 button_html: { class: 'btn btn-success' } %>
+  <% end %>
+<% end %>
+
+<%- if devise_mapping.recoverable? %>
+  <%= link_to t('shared.prompts.forgot_password'),
+              new_password_path(resource_name),
+              class: 'btn btn-primary' %>
+<% end -%>

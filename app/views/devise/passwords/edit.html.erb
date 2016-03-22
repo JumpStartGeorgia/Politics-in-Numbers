@@ -1,0 +1,25 @@
+<% page_title t('.change_your_password') %>
+
+<%= semantic_form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+  <%= devise_error_messages! %>
+  <%= f.hidden_field :reset_password_token %>
+
+  <%= f.inputs do %>
+    <%= f.input :password,
+                as: :password,
+                label: t('.new_password') %>
+    <%= f.input :password_confirmation,
+                as: :password,
+                label: t('.confirm_new_password') %>
+  <% end %>
+
+  <%= f.actions do %>
+    <%= f.action :submit,
+                 label: t('shared.actions.change_my_password'),
+                 button_html: { class: 'btn btn-success' } %>
+  <% end %>
+<% end %>
+
+<%= link_to t('shared.actions.log_in'),
+    new_session_path(resource_name),
+    class: 'btn btn-primary' %>

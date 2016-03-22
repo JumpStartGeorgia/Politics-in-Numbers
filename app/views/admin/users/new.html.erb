@@ -1,0 +1,11 @@
+<%- model_class = User -%>
+<% page_title t('shared.actions.with_obj.new',
+                obj: t('activerecord.models.user', count: 1)) %>
+
+<% if user_signed_in? %>
+  <div class='actions'>
+    <%= view_all_button(@user) %>
+  </div>
+<% end %>
+
+<%= render partial: 'form' %>

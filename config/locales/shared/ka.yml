@@ -1,0 +1,37 @@
+---
+ka:
+  shared:
+    actions:
+      change_my_password: Change my password
+      destroy: Delete
+      edit: Edit
+      log_in: Log in
+      view: View
+      with_obj:
+        cancel: Cancel %{obj}
+        create: Create %{obj}
+        destroy: Delete %{obj}
+        edit: Edit %{obj}
+        new: New %{obj}
+        update: Update %{obj}
+        view: View %{obj}
+        view_all: View All %{obj}
+    common:
+      account: Account
+      actions: Actions
+      jumpstart:
+        slogan: JumpStart Georgia - We communicate data better!
+      name: Rails-ის დასაწყისი მოდელი
+    locale:
+      short:
+        en: En
+        ka: "ქა"
+    msgs:
+      does_not_exist: You tried to access a page that does not exist.
+      not_authorized: You are not authorized to view that page.
+      success_created: "%{obj} was successfully created."
+      success_destroyed: "%{obj} was successfully destroyed."
+      success_updated: "%{obj} was successfully updated."
+    prompts:
+      confirm: Are you sure?
+      forgot_password: Forgot your password?
