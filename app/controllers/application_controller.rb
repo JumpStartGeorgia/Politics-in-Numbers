@@ -39,4 +39,8 @@ class ApplicationController < ActionController::Base
     redirect_to redirect_path,
                 notice: t('shared.msgs.does_not_exist')
   end
+  def d(obj)
+    @p << obj
+    @p << nil
+  end
 end

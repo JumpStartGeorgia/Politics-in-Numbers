@@ -14,10 +14,10 @@
                  as: :input,
                  label: if @user.new_record?
                           t('shared.actions.with_obj.create',
-                            obj: t('activerecord.models.user', count: 1))
+                            obj: t('mongoid.models.user', count: 1))
                         else
                           t('shared.actions.with_obj.update',
-                            obj: t('activerecord.models.user', count: 1))
+                            obj: t('mongoid.models.user', count: 1))
                         end,
                  button_html: { class: 'btn btn-success' } %>
   <% end %>

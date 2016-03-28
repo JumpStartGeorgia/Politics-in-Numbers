@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
     root 'root#index'
     get '/about' => 'root#about'
+    get '/read' => 'root#read'
 
     # handles /en/fake/path/whatever
     get '*path', to: redirect("/#{I18n.default_locale}")

@@ -60,7 +60,7 @@ module Admin
         format.html do
           redirect_to users_url,
                       notice: t('shared.msgs.success_destroyed',
-                                obj: t('activerecord.models.user', count: 1))
+                                obj: t('mongoid.models.user', count: 1))
         end
       end
     end
@@ -86,7 +86,7 @@ module Admin
       format.html do
         redirect_to [:admin, @user],
                     notice: t('shared.msgs.success_created',
-                              obj: t('activerecord.models.user', count: 1))
+                              obj: t('mongoid.models.user', count: 1))
       end
     end
     private :redirect_to_created_user
@@ -96,7 +96,7 @@ module Admin
         format.html do
           redirect_to [:admin, @user],
                       notice: t('shared.msgs.success_updated',
-                                obj: t('activerecord.models.user', count: 1))
+                                obj: t('mongoid.models.user', count: 1))
         end
       else
         format.html { render :edit }
@@ -109,7 +109,7 @@ module Admin
         format.html do
           redirect_to [:admin, @user],
                       notice: t('shared.msgs.success_updated',
-                                obj: t('activerecord.models.user', count: 1))
+                                obj: t('mongoid.models.user', count: 1))
         end
       else
         format.html { render :edit }

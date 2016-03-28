@@ -4,7 +4,7 @@ require 'rails'
 # Pick the frameworks you want:
 require 'active_model/railtie'
 require 'active_job/railtie'
-require 'active_record/railtie'
+#require 'active_record/railtie'
 require 'action_controller/railtie'
 require 'action_mailer/railtie'
 require 'action_view/railtie'
@@ -38,6 +38,10 @@ module StarterTemplate
     config.i18n.available_locales = [:en, :ka]
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
+    #config.active_record.raise_in_transactional_callbacks = true
+
+    config.generators do |g|
+      g.orm :mongoid
+    end
   end
 end

@@ -6,8 +6,8 @@ source 'https://rubygems.org'
 # The framework! :)
 gem 'rails', '4.2.2'
 
-# Connection to MySql database
-gem 'mysql2', '~> 0.3.18'
+# Connection to Mongodb database
+gem "mongoid", "~> 4.0.0"
 
 # SCSS parsing in asset pipeline
 gem 'sass-rails', '~> 5.0'
@@ -68,6 +68,9 @@ gem 'google-analytics-turbolinks', '~> 0.0.4'
 
 # Sends email when exception or error is thrown
 gem 'exception_notification', '~> 4.1', '>= 4.1.1'
+
+# Work with xlsx files
+gem "rubyXL"
 
 group :development do
   # Silences assets-related logging

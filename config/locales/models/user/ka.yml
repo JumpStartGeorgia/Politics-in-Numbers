@@ -1,6 +1,6 @@
 ---
 ka:
-  activerecord:
+  mongoid:
     attributes:
       user:
         email: Email
