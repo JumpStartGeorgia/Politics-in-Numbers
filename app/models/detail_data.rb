@@ -4,6 +4,7 @@ class DetailData
   include Mongoid::Timestamps
 
   embedded_in :party_data
+  #belongs_to :note
 
   field :table, type: Array
   field :detail_id, type: BSON::ObjectId
