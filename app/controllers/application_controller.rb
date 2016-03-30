@@ -43,4 +43,27 @@ class ApplicationController < ActionController::Base
     @p << obj
     @p << nil
   end
+  def worksheet_to_table(worksheet)
+    table = []
+    worksheet.each { |row|
+      row_data = []
+      if row 
+        row.cells.each { |cell|
+          row_data.push(cell && cell.value.present? ? "#{cell.value}#{cell.value.class}" : "empty")
+          d(cell.formula.inspect) if cell && cell.value.present? && cell.value == 40731.56
+        }
+      else
+        row_data.push("empty")
+      end
+      table.push << row_data
+
+    }
+    @tables << table
+  end
+  def get_sheet_id(sheet_name)
+    sheet_name.gsub! 'ფორმა', ''
+    sheet_name.gsub! 'N', ''
+    sheet_name.gsub! ' ', ''
+    return sheet_name
+  end
 end

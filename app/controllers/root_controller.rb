@@ -16,20 +16,28 @@ class RootController < ApplicationController
     }
     #raise RuntimeError, "#{files.join(', ')}"
 
-    sheets = ["ფორმა N1", "ფორმა N2", "ფორმა N3" , "ფორმა N4", "ფორმა N4.1", "ფორმა N4.2", "ფორმა N4.3", "ფორმა 4.4", "ფორმა N5", "ფორმა N5.1", "ფორმა N6", "ფორმა N6.1", "ფორმა N7", "ფორმა N8", "ფორმა N 8.1", "ფორმა N9", "ფორმა N9.1", "ფორმა N9.2", "ფორმა 9.3", "ფორმა 9.4", "ფორმა 9.5", "ფორმა 9.6", "ფორმა N 9.7", "ფორმა N9.7.1", "Validation"]
-    sheets_abbr = ["FF1", "FF2", "FF3", "FF4" , "FF4.1" , "FF4.2" , "FF4.3" , "FF4.4" , "FF5" , "FF5.1" , "FF6" , "FF6.1" , "FF7", "FF8", "FF8.1" , "FF9" , "FF9.1" , "FF9.2" , "FF9.3", "FF9.4" , "FF9.5", "FF9.6", "FF9.7", "FF9.7.1" , "V"]
+    # sheets = ["ფორმა N1", "ფორმა N2", "ფორმა N3" , "ფორმა N4", "ფორმა N4.1", "ფორმა N4.2", "ფორმა N4.3", "ფორმა 4.4", "ფორმა N5", "ფორმა N5.1",  "ფორმა N5.2",  "ფორმა N5.3", "ფორმა N5.4", "ფორმა N6", "ფორმა N6.1", "ფორმა N7", "ფორმა N8", "ფორმა N 8.1", "ფორმა N9", "ფორმა N9.1", "ფორმა N9.2", "ფორმა N9.3", "ფორმა N9.4", "ფორმა N9.5", "ფორმა N9.6", "ფორმა N9.7", "ფორმა N9.7.1", "Validation"]
+    sheets = ["1", "2", "3", "4" , "4.1" , "4.2" , "4.3" , "4.4" , "5" , "5.1" , "5.2" , "5.3" , "5.4", "5.5", "6" , "6.1" , "7", "8", "8.1" , "9" , "9.1" , "9.2" , "9.3", "9.4" , "9.5", "9.6", "9.7", "9.7.1" , "Validation"]
+    sheets_abbr = ["FF1", "FF2", "FF3", "FF4" , "FF4.1" , "FF4.2" , "FF4.3" , "FF4.4" , "FF5" , "FF5.1" , "FF5.2" , "FF5.3" , "FF5.4" , "FF5.5" , "FF6" , "FF6.1" , "FF7", "FF8", "FF8.1" , "FF9" , "FF9.1" , "FF9.2" , "FF9.3", "FF9.4" , "FF9.5", "FF9.6", "FF9.7", "FF9.7.1" , "V"]
     files.each{|f|
     
       workbook = RubyXL::Parser.parse(f)
       missed_sheets = []
       extra_sheets = []
       workbook_sheets = []
+      workbook_sheets_map = {}
       error = false
 
       workbook.worksheets.each_with_index { |w, wi|
-        extra_sheets << w.sheet_name if !sheets.include? w.sheet_name
+        sheet_id = get_sheet_id(w.sheet_name)
         workbook_sheets << w.sheet_name
+        if sheet_id != "Validation"
+          extra_sheets << w.sheet_name if !sheets.include? sheet_id
+          workbook_sheets_map["FF#{sheet_id}"] = wi
+        end
       }
+      # d(workbook_sheets_map.inspect)
+
       sheets.each_with_index { |w, wi|
         missed_sheets << w if !workbook_sheets.include? w
       }
@@ -94,9 +102,15 @@ class RootController < ApplicationController
         #   d(cells_value)
         # }
         flag = false
+        @tables = []
         Detail.each{|item|
           #d(item.title)
-          worksheet = workbook[item.orig_code]
+          
+          #worksheet = workbook[item.orig_code]
+          worksheet = workbook[workbook_sheets_map[item.code]]
+          #d("#{workbook_sheets_map[item.code]}#{workbook_sheets_map}#{item.code}")
+          #next
+          #worksheet_to_table(worksheet)
 
           header = worksheet[item.header_row-1] && worksheet[item.header_row-1].cells
           ln = header.length
@@ -121,23 +135,41 @@ class RootController < ApplicationController
           end
           content_index = item.content_row-1
           row = worksheet[content_index] && worksheet[content_index].cells
+          terms = {}
+          item.terminators.each{|r| 
+            terms[r.field_index] = [] if !terms.key?(r.field_index)
+            terms[r.field_index] << r.term
+          }
+          d(terms.inspect)
           while(row)  
-            stop = true
+            stop = false
             rr = []
-            row.each_with_index {|cell, cell_index|
+            has_value = false
+            row.each_with_index {|cell, cell_index| 
+              # if whole row is empty skip
+              # skip field
               if cell_index < item.fields_count
-                rr.push(cell && cell.value.present? ? cell.value : 'nil')
-                stop = false if stop && cell && cell.value.present?
+                if cell && cell.value.present?
+                  break if cell_index == 0 && cell.value == "..." 
+                  #d("#{terms.key?(cell_index+1)}>#{cell.value}<>#{terms[cell_index+1]}<#{cell.value==terms[cell_index+1]}")
+                  (stop = true; break;) if terms.key?(cell_index+1) && terms[cell_index+1].include?(cell.value)
+                  rr.push(cell.value)
+                  has_value = true
+                else                  
+                  rr.push('nil')
+                end
               end
             }
-            # test if first row has ...
-            # test on sul
-            # test on empty values except skip
             if stop 
               d("Stopped here")
               break
             end
-            d("#{rr.join('; ')}")
+
+            if has_value
+              d("#{rr.join('; ')}")
+            else
+              #d("empty line")
+            end
             content_index += 1
             row = worksheet[content_index] && worksheet[content_index].cells
           end
@@ -147,7 +179,16 @@ class RootController < ApplicationController
             d("Fix previous detail form before moving forward")
             break
           end
-          #d(worksheet_header) 
+     
+        }
+      end
+      d("Time elapsed #{(Time.now - start).round(2)} seconds")
+    }
+  end
+
+end
+
+     #d(worksheet_header) 
           # worksheet_header && worksheet_header.each{|cell|
           #   d(cell && cell.value)
           # }
@@ -173,7 +214,7 @@ class RootController < ApplicationController
   # field :fields_count, type: Integer
   # field :fields_to_skip, type: Array, default: []
   # field :footer, type: Integer, default: 0
-        }
+      #  }
         # workbook.worksheets.each_with_index do |worksheet, wi|
         #   (break;) if wi != 0
 
@@ -191,10 +232,3 @@ class RootController < ApplicationController
         #   }
         #   @p << "Worksheet is #{worksheet.sheet_name}"      
         #end
-      end
-      d("Time elapsed #{(Time.now - start).round(2)} seconds")
-    }
-  end
-
-end
-

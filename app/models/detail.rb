@@ -5,6 +5,7 @@ class Detail < CustomTranslation
 
   embeds_many :notes
   embeds_many :detail_schemas
+  embeds_many :terminators
 
   field :code, type: String
   field :orig_code, type: String
