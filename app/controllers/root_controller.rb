@@ -7,20 +7,26 @@ class RootController < ApplicationController
   end
 
   def read
+    lg = Logger.new File.new('log/skipped.log', 'w')
+    lg.formatter = Logger::Formatter.new
     @p = []
     start = Time.now
     upload_path = Rails.public_path.join("upload")
     files = []
     Dir.entries(upload_path).each {|f| 
-      files << "#{upload_path}/#{f}" if File.file? "#{upload_path}/#{f}"
+      files << "#{upload_path}/#{f}" if File.file?("#{upload_path}/#{f}") && f != ".gitkeep"
     }
     #raise RuntimeError, "#{files.join(', ')}"
 
     # sheets = ["ფორმა N1", "ფორმა N2", "ფორმა N3" , "ფორმა N4", "ფორმა N4.1", "ფორმა N4.2", "ფორმა N4.3", "ფორმა 4.4", "ფორმა N5", "ფორმა N5.1",  "ფორმა N5.2",  "ფორმა N5.3", "ფორმა N5.4", "ფორმა N6", "ფორმა N6.1", "ფორმა N7", "ფორმა N8", "ფორმა N 8.1", "ფორმა N9", "ფორმა N9.1", "ფორმა N9.2", "ფორმა N9.3", "ფორმა N9.4", "ფორმა N9.5", "ფორმა N9.6", "ფორმა N9.7", "ფორმა N9.7.1", "Validation"]
     sheets = ["1", "2", "3", "4" , "4.1" , "4.2" , "4.3" , "4.4" , "5" , "5.1" , "5.2" , "5.3" , "5.4", "5.5", "6" , "6.1" , "7", "8", "8.1" , "9" , "9.1" , "9.2" , "9.3", "9.4" , "9.5", "9.6", "9.7", "9.7.1" , "Validation"]
     sheets_abbr = ["FF1", "FF2", "FF3", "FF4" , "FF4.1" , "FF4.2" , "FF4.3" , "FF4.4" , "FF5" , "FF5.1" , "FF5.2" , "FF5.3" , "FF5.4" , "FF5.5" , "FF6" , "FF6.1" , "FF7", "FF8", "FF8.1" , "FF9" , "FF9.1" , "FF9.2" , "FF9.3", "FF9.4" , "FF9.5", "FF9.6", "FF9.7", "FF9.7.1" , "V"]
-    files.each{|f|
-    
+    files.each_with_index{|f,f_i|
+      start_partial = Time.now
+      #break if f_i == 1
+      #next if !f.include? "/11.2015.xlsx"
+      d("#{f}")
+      lg.info "#{f}"
       workbook = RubyXL::Parser.parse(f)
       missed_sheets = []
       extra_sheets = []
@@ -45,7 +51,7 @@ class RootController < ApplicationController
       # puts "0000"
       # puts extra_sheets.inspect
       if missed_sheets.present? || extra_sheets.present?
-        error = true
+        #error = true
         d("This sheets should be in file: #{missed_sheets.join(",")}") if missed_sheets.present?
         d("This sheets shouldn't be in file: #{extra_sheets.join(",")}") if extra_sheets.present?
       end
@@ -104,23 +110,28 @@ class RootController < ApplicationController
         flag = false
         @tables = []
         Detail.each{|item|
-          #d(item.title)
-          
-          #worksheet = workbook[item.orig_code]
+          schemas = item.detail_schemas.order_by(order: 1)
+          required = []
+          defaults = []
+          schemas.each do |sch|
+            required << sch.required
+            defaults << sch.default_value
+          end
+          cnt = item.fields_count
+
           worksheet = workbook[workbook_sheets_map[item.code]]
-          #d("#{workbook_sheets_map[item.code]}#{workbook_sheets_map}#{item.code}")
-          #next
+          (lg.info "missing sheet"; next;) if worksheet.nil?
           #worksheet_to_table(worksheet)
 
           header = worksheet[item.header_row-1] && worksheet[item.header_row-1].cells
           ln = header.length
-          d(ln)
+          
           if ln > 0
-            item.detail_schemas.each_with_index {|field, field_index|
+            schemas.each_with_index {|field, field_index|
               if field_index < ln 
                 cell = header[field_index] && header[field_index].value
                 if field.orig_title == cell
-                  d("Passed #{field.orig_title}")
+                  # header cell is good
                 else
                   d("Unexpected detail header title should be #{field.orig_title} is #{cell}  for #{item.orig_code}")
                   flag = true
@@ -133,45 +144,114 @@ class RootController < ApplicationController
               end
             }
           end
-          content_index = item.content_row-1
-          row = worksheet[content_index] && worksheet[content_index].cells
+
+          break if flag
+
+          row_index = item.content_row-1
+          row = worksheet[row_index] && worksheet[row_index].cells
+
           terms = {}
           item.terminators.each{|r| 
             terms[r.field_index] = [] if !terms.key?(r.field_index)
             terms[r.field_index] << r.term
           }
-          d(terms.inspect)
+
+          d("Header is valid! Terms are: #{terms.values.join(' | ')}")
+
+
+    
+
+
           while(row)  
-            stop = false
-            rr = []
-            has_value = false
-            row.each_with_index {|cell, cell_index| 
-              # if whole row is empty skip
-              # skip field
-              if cell_index < item.fields_count
-                if cell && cell.value.present?
-                  break if cell_index == 0 && cell.value == "..." 
-                  #d("#{terms.key?(cell_index+1)}>#{cell.value}<>#{terms[cell_index+1]}<#{cell.value==terms[cell_index+1]}")
-                  (stop = true; break;) if terms.key?(cell_index+1) && terms[cell_index+1].include?(cell.value)
-                  rr.push(cell.value)
-                  has_value = true
-                else                  
-                  rr.push('nil')
-                end
-              end
-            }
-            if stop 
-              d("Stopped here")
-              break
+            
+            # rr = []
+            # rr_log = []
+            # has_value = false
+
+            cells = Array.new(cnt, nil)
+            row.each_with_index do |c, c_i| 
+              cells[c_i] = c.value if c_i < cnt && c && c.value.present?
             end
 
-            if has_value
-              d("#{rr.join('; ')}")
-            else
-              #d("empty line")
+            or_state = 0
+            good_row = true
+            stop_row = false
+            required.each_with_index do |r, r_i|
+              good_cell = r_i < cells.length && cells[r_i].present?
+              good_cell = false if good_cell && r_i == 0 && cells[r_i] == "..."
+
+              # d("------------------------")
+              # d(cells.inspect)
+              # d(terms.inspect)
+              # d(r_i)
+              # d("here")
+              # d(terms[r_i+1].inspect)
+              # d(cells[r_i].inspect)
+              # d(terms.key?(r_i+1) && terms[r_i+1].any?{ |t| cells[r_i].to_s.include?(t)})
+              # lg.info terms[r_i+1].inspect
+
+              (stop_row = true; good_row = false; break;) if good_cell && terms.key?(r_i+1) && terms[r_i+1].any? { |t| cells[r_i].to_s.include?(t) }
+              # 11.2015 not stopping
+              if r == :and
+                (good_row = false;) if !good_cell
+              elsif r == :or
+                or_state += 1 if good_cell
+              else
+
+              end
             end
-            content_index += 1
-            row = worksheet[content_index] && worksheet[content_index].cells
+            good_row = false if or_state == 0
+
+            if stop_row
+              lg.info "stop row #{cells.join('; ')}"
+              break
+            else  
+              if good_row
+                cells.each_with_index do |r, r_i|
+                  cells[r_i] = defaults[r_i] if r.nil? && defaults[r_i].present?
+                end
+                d("#{cells.join('; ')}")
+                #put default if needed
+              else
+                lg.info "bad row #{cells.join('; ')}"
+              end
+            end
+            
+            # row.each_with_index {|cell, cell_index| 
+            #   # if whole row is empty skip
+            #   # skip field
+            #   # ask what todo with 4.1
+            #   # gitignore upload folder
+            #   if cell_index < item.fields_count
+            #     if cell && cell.value.present?
+            #       rr_log.push(cell.value)
+            #       break if cell_index == 0 && cell.value == "..." 
+            #       #d("#{terms.key?(cell_index+1)}>#{cell.value}<>#{terms[cell_index+1]}<#{cell.value==terms[cell_index+1]}")
+            #       (stop = true; break;) if terms.key?(cell_index+1) && terms[cell_index+1].include?(cell.value)
+            #       rr.push(cell.value)
+            #       has_value = true
+            #     else  
+            #       rr_log.push(nil)                
+            #       rr.push('nil')
+            #     end
+            #   end
+            # }
+            # if !has_value
+            #   lg.info "#{rr_log.join('; ')}"
+            # end
+            # if stop 
+            #   d("Stopped here")
+            #   break
+            # end
+
+            # if has_value
+            #   d("#{rr.join('; ')}")
+            # else
+            #   # lg.info "#{rr_log.join('; ')}"
+            #   #d("empty line")
+            # end
+            row_index += 1
+            row = worksheet[row_index] && worksheet[row_index].cells
           end
           if !flag 
 
@@ -182,10 +262,11 @@ class RootController < ApplicationController
      
         }
       end
-      d("Time elapsed #{(Time.now - start).round(2)} seconds")
+      d("Time elapsed #{(Time.now - start_partial).round(2)} seconds")
     }
+    lg.close
+    d("Time elapsed #{(Time.now - start).round(2)} seconds")
   end
-
 end
 
      #d(worksheet_header) 

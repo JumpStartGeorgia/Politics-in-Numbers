@@ -6,10 +6,55 @@
 # roles.each do |role|
 #   Role.find_or_create_by(name: role)
 # end
+# 
+I18n.locale = :ka
+destroy_mode = true
+if destroy_mode
+  puts "Destroy phase ----------------------"
+  puts "  party data"
+  Party.destroy_all
+  puts "  period data"
+  Period.destroy_all
+  puts "  detail and its schema, with all embed documents"
+  Detail.destroy_all
+  puts "Destroy phase end ------------------"
+end
 
+parties_data = [
+  { name_translations: { ka: 'ქართული ოცნება' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ნაციონალური მოძრაობა' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'კონსერვატიული პარტია' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'მრეწველობა გადაარჩენს საქართველოს' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'რესპუბლიკური პარტია' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ჩვენი საქართველო - თავისუფალი დემოკრატები' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ეროვნული ფორუმი' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ქრისტიან-კონსერვატიული პარტია' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'დემოკრატიული მოძრაობა' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'პატრიოტთა ალიანსი' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ლეიბორისტული პარტია' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'საქართველოს გზა' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ედპ' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'თავისუფალი საქართველო' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ახალი მემარჯვენეები' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'სამოქალაქო ალიანსი' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'სახალხო პარტია' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'საზოგადოება "ივერია"' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ახალი პოლიტიკური ცენტრი "გირჩი"' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'განახლებული საქართველოსთვის' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ჩერნოვეცკის პარტია' }, summary_translations: { ka: ''}},
+  { name_translations: { ka: 'ბურჭულაძის ფონდი' }, summary_translations: { ka: ''}}
+  #{ name_translations: { ka: '' }, summary_translations: { ka: ''}}
+]
 
+periods_data = [
+  # type 'annual' 'election' 
+  { type: 'annual', start_date: '01.01.2012', end_date: '31.01.2012', title_translations: { ka: "2012" }, description_translations: { ka: "2012 description" }},
+  { type: 'annual', start_date: '01.01.2013', end_date: '31.01.2013', title_translations: { ka: "2013" }, description_translations: { ka: "2013 description" }},
+  { type: 'annual', start_date: '01.01.2014', end_date: '31.01.2014', title_translations: { ka: "2014" }, description_translations: { ka: "2014 description" }},
+  { type: 'annual', start_date: '01.01.2015', end_date: '31.01.2015', title_translations: { ka: "2015" }, description_translations: { ka: "2015 description" }}
+  #{ type: 'election', start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "2015 election" }, description_translations: { ka: "2015 election description" }}
+]
 
-puts "Creating categories and it/'s subcategories"
 cats = [
   {
     title: "Income", cells: "FF2/C9+FF3/C9", simple: 1
@@ -17,10 +62,8 @@ cats = [
 ]
 
 
-puts "Destroying detail and its schema, with all embed documents"
-Detail.destroy_all
 
-puts "Creating detail and its schema"
+
 #1, 4.1, 4.2, 4.3, 4.4, 5.1, 5.2, 5.3, 5.4, 6.1, 8.1, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7 
 details_data = [
   #{ code: "FF1", orig_code: "ფორმა N1", title_translations: { ka: "საწევრო შენატანები და შემოწირულებები" }, header_row: 8, content_row: 10, fields_count: 12, fields_to_skip: [1] },
@@ -56,10 +99,10 @@ detail_schemas_data = [
   #   { field_type: "String", order: 11, output_order: 11, orig_title: "დამატებითი ინფორმაცია", title_translations: { ka: "დამატებითი ინფორმაცია" }}
   # ],
   [
-    { field_type: "String", order: 1, output_order: 1, orig_title: "N", title_translations: { ka: "N" }},
-    { field_type: "String", order: 2, output_order: 2, orig_title: "ხარჯის კლასიფიკაცია ბუნებისა და შინაარსის მიხედვით", title_translations: { ka: "ხარჯის კლასიფიკაცია ბუნებისა და შინაარსის მიხედვით" }},
-    { field_type: "Float", order: 3, output_order: 3, orig_title: "ფაქტობრივი ხარჯი", title_translations: { ka: "ფაქტობრივი ხარჯი" }, footer: :sum, note: [2]},
-    { field_type: "Float", order: 4, output_order: 4, orig_title: "საკასო ხარჯი", title_translations: { ka: "საკასო ხარჯი" }, footer: :sum, note: [2]}
+    { field_type: "String", required: :and, order: 1, output_order: 1, orig_title: "N", title_translations: { ka: "N" }},
+    { field_type: "String", required: :and, order: 2, output_order: 2, orig_title: "ხარჯის კლასიფიკაცია ბუნებისა და შინაარსის მიხედვით", title_translations: { ka: "ხარჯის კლასიფიკაცია ბუნებისა და შინაარსის მიხედვით" }},
+    { field_type: "Float", required: :or, default_value: 0, order: 3, output_order: 3, orig_title: "ფაქტობრივი ხარჯი", title_translations: { ka: "ფაქტობრივი ხარჯი" }, footer: :sum, note: [2]},
+    { field_type: "Float", required: :or, default_value: 0, order: 4, output_order: 4, orig_title: "საკასო ხარჯი", title_translations: { ka: "საკასო ხარჯი" }, footer: :sum, note: [2]}
   ]
 ]
 
@@ -86,15 +129,36 @@ terminators_data = [
   # ],
   [
     { term: "სულ**", field_index: 2 },
+    { term: "სულ **", field_index: 2 },
     { term: "* ფორმა N4.1", field_index: 1 }
   ]
 ]
+
+# -----------------------------------------------------------------
+# # -----------------------------------------------------------------
 
 # cats.each{|d,i|
 #   Category.create!(d) #.map { |k, v| [k.to_s, v.to_s] }.to_h
 #   puts "Category #{d[:title]} was added"
 # }
+puts "Creating phase ----------------------"
 
+puts "  Party meta data"
+parties_data.each_with_index do |d,i|
+  party = Party.create!(d)
+  puts "    #{party.name} was added"
+end
+
+puts "  Period meta data"
+periods_data.each_with_index do |d,i|
+  d[:start_date] = Date.strptime(d[:start_date], "%d.%m.%Y")
+  d[:end_date] = Date.strptime(d[:end_date], "%d.%m.%Y")
+
+  period = Period.create!(d)
+  puts "    #{period.type} #{period.title} was added"  
+end
+
+puts "  Party data"
 details_data.each_with_index{|d,i|
   notes = d.delete(:note)
   
@@ -121,3 +185,12 @@ details_data.each_with_index{|d,i|
   detail.save!
   puts "Detail #{detail.title} was added"
 }
+
+
+
+  # begin
+  #   period.valid?
+  #   puts period.errors.inspect
+  # rescue Exception=>e
+  #   puts e.inspect    
+  # end

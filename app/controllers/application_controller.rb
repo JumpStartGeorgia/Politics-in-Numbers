@@ -66,4 +66,7 @@ class ApplicationController < ActionController::Base
     sheet_name.gsub! ' ', ''
     return sheet_name
   end
+  # def log(msg)    
+  #     Rails.logger.debug("\033[44;37m#{'*'*80}\n    #{DateTime.now.strftime('%d/%m/%Y %H:%M')}#{msg.to_s.rjust(56)}\n#{'*'*80}\033[0;37m")
+  # end
 end
