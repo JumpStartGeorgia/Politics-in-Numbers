@@ -6,7 +6,7 @@
 # roles.each do |role|
 #   Role.find_or_create_by(name: role)
 # end
-# 
+#
 I18n.locale = :ka
 destroy_mode = true
 if destroy_mode
@@ -47,7 +47,7 @@ parties_data = [
 ]
 
 periods_data = [
-  # type 'annual' 'election' 
+  # type 'annual' 'election'
   { type: 'annual', start_date: '01.01.2012', end_date: '31.01.2012', title_translations: { ka: "2012" }, description_translations: { ka: "2012 description" }},
   { type: 'annual', start_date: '01.01.2013', end_date: '31.01.2013', title_translations: { ka: "2013" }, description_translations: { ka: "2013 description" }},
   { type: 'annual', start_date: '01.01.2014', end_date: '31.01.2014', title_translations: { ka: "2014" }, description_translations: { ka: "2014 description" }},
@@ -64,11 +64,11 @@ cats = [
 
 
 
-#1, 4.1, 4.2, 4.3, 4.4, 5.1, 5.2, 5.3, 5.4, 6.1, 8.1, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7 
+#1, 4.1, 4.2, 4.3, 4.4, 5.1, 5.2, 5.3, 5.4, 6.1, 8.1, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7
 details_data = [
   #{ code: "FF1", orig_code: "ფორმა N1", title_translations: { ka: "საწევრო შენატანები და შემოწირულებები" }, header_row: 8, content_row: 10, fields_count: 12, fields_to_skip: [1] },
-  { code: "FF4.1", orig_code: "ფორმა N4.1", title_translations: { ka: "სხვადასხვა ხარჯებისა და სხვა დანარჩენი საქონლისა და მომსახურების" }, header_row: 9, content_row: 10, fields_count: 4, footer: 1, note: [1] }#,
-  # { code: "FF4.2", title_translations: { ka: "ხელფასები, პრემიები" }},
+  { code: "FF4.1", orig_code: "ფორმა N4.1", header_row: 9, content_row: 10, fields_count: 4, footer: 1, note: [1], title_translations: { ka: "სხვადასხვა ხარჯებისა და სხვა დანარჩენი საქონლისა და მომსახურების" } },
+  { code: "FF4.2", orig_code: "ფორმა N4.2", header_row: 8, content_row: 9, fields_count: 9, footer: 1, note: [1], title_translations: { ka: "ხელფასები, პრემიები" }}#,
   # { code: "FF4.3", title_translations: { ka: "მივლინებები" }},
   # { code: "FF4.4", title_translations: { ka: "სხვა განაცემები ფიზიკურ პირებზე (ხელფასის და პრემიის გარდა)" }},
   # { code: "FF5.1", title_translations: { ka: "სხვადასხვა ხარჯებისა და სხვა დანარჩენი საქონლისა და მომსახურების" }},
@@ -83,6 +83,7 @@ details_data = [
   # { code: "FF9.7", title_translations: { ka: "ვალდებულებების რეესტრი" }},
   # { code: "FF9.7.1", title_translations: { ka: "საარჩევნო პერიოდში აღებული სესხი/კრედიტი" }}
 ]
+
 detail_schemas_data = [
   # [
   #   { field_type: "String", order: 1, output_order: 1, orig_title: "N", title_translations: { ka: "N" }, skip: true },
@@ -99,10 +100,21 @@ detail_schemas_data = [
   #   { field_type: "String", order: 11, output_order: 11, orig_title: "დამატებითი ინფორმაცია", title_translations: { ka: "დამატებითი ინფორმაცია" }}
   # ],
   [
-    { field_type: "String", required: :and, order: 1, output_order: 1, orig_title: "N", title_translations: { ka: "N" }},
-    { field_type: "String", required: :and, order: 2, output_order: 2, orig_title: "ხარჯის კლასიფიკაცია ბუნებისა და შინაარსის მიხედვით", title_translations: { ka: "ხარჯის კლასიფიკაცია ბუნებისა და შინაარსის მიხედვით" }},
-    { field_type: "Float", required: :or, default_value: 0, order: 3, output_order: 3, orig_title: "ფაქტობრივი ხარჯი", title_translations: { ka: "ფაქტობრივი ხარჯი" }, footer: :sum, note: [2]},
-    { field_type: "Float", required: :or, default_value: 0, order: 4, output_order: 4, orig_title: "საკასო ხარჯი", title_translations: { ka: "საკასო ხარჯი" }, footer: :sum, note: [2]}
+    { field_type: "String", order: 1, output_order: -1, orig_title: "N", title_translations: { ka: "N" }},
+    { field_type: "String", default_value: "დაუზუსტებელი", order: 2, output_order: 2, orig_title: "ხარჯის კლასიფიკაცია ბუნებისა და შინაარსის მიხედვით", title_translations: { ka: "ხარჯის კლასიფიკაცია ბუნებისა და შინაარსის მიხედვით" }}, # this is required but has default
+    { field_type: "Float", default_value: 0, order: 3, output_order: -3, orig_title: "ფაქტობრივი ხარჯი", footer: :sum, note: [2], title_translations: { ka: "ფაქტობრივი ხარჯი" }},
+    { field_type: "Float", required: :and, default_value: 0, order: 4, output_order: 4, orig_title: "საკასო ხარჯი", footer: :sum, note: [2], title_translations: { ka: "საკასო ხარჯი" }}
+  ],
+  [
+    { field_type: "String", order: 1, output_order: -1, skip: true, orig_title: "N", title_translations: { ka: "N" }},
+    { field_type: "String", order: 2, output_order: 2, orig_title: "სახელი", title_translations: { ka: "სახელი" }},
+    { field_type: "String", order: 3, output_order: 3, orig_title: "გვარი", title_translations: { ka: "გვარი" }},
+    { field_type: "String", order: 4, output_order: 4, orig_title: "პირადი ნომერი", title_translations: { ka: "პირადი ნომერი" }},
+    { field_type: "String", order: 5, output_order: 5, orig_title: "პოზიცია", title_translations: { ka: "პოზიცია" }},
+    { field_type: "String", order: 6, output_order: 6, orig_title: "განაცემის ტიპი", title_translations: { ka: "განაცემის ტიპი" }},
+    { field_type: "Float", order: 7, output_order: 7, orig_title: "ფაქტობრივი ხარჯი", footer: :sum, title_translations: { ka: "ფაქტობრივი ხარჯი" }},
+    { field_type: "Float", order: 8, output_order: 8, orig_title: "საკასო ხარჯი", footer: :sum,  title_translations: { ka: "საკასო ხარჯი" }},
+    { field_type: "Float", order: 9, output_order: 9, orig_title: "გადახდის წყაროსთან დაკავებული საშემოსავლო გადასახადი", footer: :sum, title_translations: { ka: "გადახდის წყაროსთან დაკავებული საშემოსავლო გადასახადი" }}
   ]
 ]
 
@@ -116,10 +128,13 @@ notes_data = [
   [
     { star: 1, text_translations: { ka: "* ფორმა N4.1 ივსება მხოლოდ იმ შემთხვევებში, თუ ფორმა N4 ში წარმოდგენილი სხვადასხდა ხარჯები (1.6.4), სხვა დანარჩენი საქონლისა და მომსახურების (1.2.15)  ფაქტიური და საკასო ხარჯის მოცულობა ცალ ცალკე ან ერთად აღებული აღემატება ამავე ფორმის  N1.2 ან N1.6 მუხლების შესაბამისი მნიშვნელობების 5%-ს ან 1,000 ლარს." }},
     { star: 2, text_translations: { ka: "ჯამური მაჩვენებლები უნდა ედრებოდეს ფორმა N4-ში წარმოდგენილ N 1.2.15 და N1.6.4 მუხლების შესაბამის მნიშვნელობათა ჯამს." }}
+  ],
+  [
+    { star: 1, text_translations: { ka: "* ჯამური მაჩვენებლები უნდა ედრებოდეს ფორმა N4-ში და N5-ში წარმოდგენილი N 1.1.1 და N1.1.2 მუხლების შესაბამის მნიშვნელობათა ჯამს." }}
   ]
 ]
 
-    
+
 terminators_data = [
   # [ # ** is not used
   #   { star: 1, text_translations: { ka: "შემოსავლის ტიპი-ს ველში იწერება: ფულადი შემოწირულება, არაფულადი შემოწირულება, საწევრო შენატანი." }},
@@ -131,7 +146,13 @@ terminators_data = [
     { term: "სულ**", field_index: 2 },
     { term: "სულ **", field_index: 2 },
     { term: "* ფორმა N4.1", field_index: 1 }
+  ],
+  [
+    { term: "სულ:*", field_index: 6 },
+    { term: "* ჯამური მაჩვენებლები", field_index: 1 },
+    { term: "ხელმოწერები:", field_index: 1 }
   ]
+
 ]
 
 # -----------------------------------------------------------------
@@ -155,32 +176,32 @@ periods_data.each_with_index do |d,i|
   d[:end_date] = Date.strptime(d[:end_date], "%d.%m.%Y")
 
   period = Period.create!(d)
-  puts "    #{period.type} #{period.title} was added"  
+  puts "    #{period.type} #{period.title} was added"
 end
 
 puts "  Party data"
 details_data.each_with_index{|d,i|
   notes = d.delete(:note)
-  
+
   detail = Detail.new(d)
   if notes.present?
     detail.notes.concat( notes.map{|r| Note.new(notes_data[i].select{|rr| rr[:star] == r}.first) } )
   end
 
   # putting detail schema
-  detail_schemas_data[i].each {|dd| 
+  detail_schemas_data[i].each {|dd|
     notes = dd.delete(:note)
     schema = DetailSchema.new(dd)
     if notes.present?
       schema.notes.concat( notes.map{|r| Note.new(notes_data[i].select{|rr| rr[:star] == r}.first) } )
-    end  
+    end
 
-    detail.detail_schemas << schema  
+    detail.detail_schemas << schema
   }
 
   # putting terminators to detail
   terminators_data[i].each {|dd| detail.terminators << Terminator.new(dd) }
-  
+
 
   detail.save!
   puts "Detail #{detail.title} was added"
@@ -192,5 +213,5 @@ details_data.each_with_index{|d,i|
   #   period.valid?
   #   puts period.errors.inspect
   # rescue Exception=>e
-  #   puts e.inspect    
+  #   puts e.inspect
   # end

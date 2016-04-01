@@ -47,7 +47,7 @@ class ApplicationController < ActionController::Base
     table = []
     worksheet.each { |row|
       row_data = []
-      if row 
+      if row
         row.cells.each { |cell|
           row_data.push(cell && cell.value.present? ? "#{cell.value}#{cell.value.class}" : "empty")
           d(cell.formula.inspect) if cell && cell.value.present? && cell.value == 40731.56
@@ -61,12 +61,12 @@ class ApplicationController < ActionController::Base
     @tables << table
   end
   def get_sheet_id(sheet_name)
-    sheet_name.gsub! 'ფორმა', ''
-    sheet_name.gsub! 'N', ''
-    sheet_name.gsub! ' ', ''
-    return sheet_name
+    tmp = sheet_name.gsub 'ფორმა', ''
+    tmp.gsub! 'N', ''
+    tmp.gsub! ' ', ''
+    tmp
   end
-  # def log(msg)    
+  # def log(msg)
   #     Rails.logger.debug("\033[44;37m#{'*'*80}\n    #{DateTime.now.strftime('%d/%m/%Y %H:%M')}#{msg.to_s.rjust(56)}\n#{'*'*80}\033[0;37m")
   # end
 end
