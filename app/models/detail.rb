@@ -13,7 +13,6 @@ class Detail < CustomTranslation
   field :header_row, type: Integer
   field :content_row, type: Integer
   field :fields_count, type: Integer
-  field :fields_to_skip, type: Array, default: []
   # field :required_fields, type: Hash
   field :footer, type: Integer, default: 0
 

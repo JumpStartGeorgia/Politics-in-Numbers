@@ -28,8 +28,9 @@ class RootController < ApplicationController
     #raise RuntimeError, "#{files.join(', ')}"
 
     # sheets = ["ფორმა N1", "ფორმა N2", "ფორმა N3" , "ფორმა N4", "ფორმა N4.1", "ფორმა N4.2", "ფორმა N4.3", "ფორმა 4.4", "ფორმა N5", "ფორმა N5.1",  "ფორმა N5.2",  "ფორმა N5.3", "ფორმა N5.4", "ფორმა N6", "ფორმა N6.1", "ფორმა N7", "ფორმა N8", "ფორმა N 8.1", "ფორმა N9", "ფორმა N9.1", "ფორმა N9.2", "ფორმა N9.3", "ფორმა N9.4", "ფორმა N9.5", "ფორმა N9.6", "ფორმა N9.7", "ფორმა N9.7.1", "Validation"]
-    sheets = ["1", "2", "3", "4" , "4.1" , "4.2" , "4.3" , "4.4" , "5" , "5.1" , "5.2" , "5.3" , "5.4", "5.5", "6" , "6.1" , "7", "8", "8.1" , "9" , "9.1" , "9.2" , "9.3", "9.4" , "9.5", "9.6", "9.7", "9.7.1", "9.8", "Validation"]
-    sheets_abbr = ["FF1", "FF2", "FF3", "FF4" , "FF4.1" , "FF4.2" , "FF4.3" , "FF4.4" , "FF5" , "FF5.1" , "FF5.2" , "FF5.3" , "FF5.4" , "FF5.5" , "FF6" , "FF6.1" , "FF7", "FF8", "FF8.1" , "FF9" , "FF9.1" , "FF9.2" , "FF9.3", "FF9.4" , "FF9.5", "FF9.6", "FF9.7", "FF9.7.1", "9.8", "V"]
+    # 9.71 = 9.8
+    sheets = ["1", "2", "3", "4" , "4.1" , "4.2" , "4.3" , "4.4" , "5" , "5.1" , "5.2" , "5.3" , "5.4", "5.5", "6" , "6.1" , "7", "8", "8.1" , "9" , "9.1" , "9.2" , "9.3", "9.4" , "9.5", "9.6", "9.7", "9.7.1",  "Validation"]
+    sheets_abbr = ["FF1", "FF2", "FF3", "FF4" , "FF4.1" , "FF4.2" , "FF4.3" , "FF4.4" , "FF5" , "FF5.1" , "FF5.2" , "FF5.3" , "FF5.4" , "FF5.5" , "FF6" , "FF6.1" , "FF7", "FF8", "FF8.1" , "FF9" , "FF9.1" , "FF9.2" , "FF9.3", "FF9.4" , "FF9.5", "FF9.6", "FF9.7", "FF9.7.1", "V"]
     files.each_with_index{|f,f_i|
       start_partial = Time.now
       #break if f_i == 2
@@ -122,7 +123,7 @@ class RootController < ApplicationController
         flag = false
         @tables = []
         Detail.each{|item|
-          next if item.code != "FF4.1"
+          next if item.code != "FF1"
           schemas = item.detail_schemas.order_by(order: 1)
           required = []
           has_required_or = false
@@ -239,39 +240,7 @@ class RootController < ApplicationController
               end
             end
 
-            # row.each_with_index {|cell, cell_index|
-            #   # if whole row is empty skip
-            #   # skip field
-            #   # ask what todo with 4.1
-            #   # gitignore upload folder
-            #   if cell_index < item.fields_count
-            #     if cell && cell.value.present?
-            #       rr_log.push(cell.value)
-            #       break if cell_index == 0 && cell.value == "..."
-            #       #d("#{terms.key?(cell_index+1)}>#{cell.value}<>#{terms[cell_index+1]}<#{cell.value==terms[cell_index+1]}")
-            #       (stop = true; break;) if terms.key?(cell_index+1) && terms[cell_index+1].include?(cell.value)
-            #       rr.push(cell.value)
-            #       has_value = true
-            #     else
-            #       rr_log.push(nil)
-            #       rr.push('nil')
-            #     end
-            #   end
-            # }
-            # if !has_value
-            #   lg.info "#{rr_log.join('; ')}"
-            # end
-            # if stop
-            #   d("Stopped here")
-            #   break
-            # end
 
-            # if has_value
-            #   d("#{rr.join('; ')}")
-            # else
-            #   # lg.info "#{rr_log.join('; ')}"
-            #   #d("empty line")
-            # end
             row_index += 1
             row = worksheet[row_index] && worksheet[row_index].cells
           end
@@ -292,47 +261,18 @@ class RootController < ApplicationController
   end
 end
 
-     #d(worksheet_header)
-          # worksheet_header && worksheet_header.each{|cell|
-          #   d(cell && cell.value)
-          # }
-          # tmp = workbook[item.orig_code][address[0]][address[1]]
-          #     val = tmp.present? ? tmp.value.to_f : 0.0
-          #     if ind == 0
-          #       cells_value = val if ind == 0
-          #     else
-          #       oper = operations[ind-1]
-          #       if oper == "+"
-          #         cells_value = cells_value + val
-          #       elsif oper = "-"
-          #         cells_value = cells_value - val
-          #       end
-          #     end
-
-
-  #               field :code, type: String
-  # field :orig_code, type: String
-  # field :title, type: String, localize: true
-  # field :header_row, type: Integer
-  # field :content_row, type: Integer
-  # field :fields_count, type: Integer
-  # field :fields_to_skip, type: Array, default: []
-  # field :footer, type: Integer, default: 0
-      #  }
-        # workbook.worksheets.each_with_index do |worksheet, wi|
-        #   (break;) if wi != 0
-
-        #   worksheet.each_with_index { |row, ri|
-        #     @p << ri
-        #     if ri < 7
-        #       @p << "header"
-        #     else
-        #       row && row.cells.each { |cell|
-        #         val = cell && cell.value
-        #         @p << val
-        #       }
-        #       break
-        #     end
-        #   }
-        #   @p << "Worksheet is #{worksheet.sheet_name}"
-        #end
+# worksheet_header && worksheet_header.each{|cell|
+#   d(cell && cell.value)
+# }
+# tmp = workbook[item.orig_code][address[0]][address[1]]
+#     val = tmp.present? ? tmp.value.to_f : 0.0
+#     if ind == 0
+#       cells_value = val if ind == 0
+#     else
+#       oper = operations[ind-1]
+#       if oper == "+"
+#         cells_value = cells_value + val
+#       elsif oper = "-"
+#         cells_value = cells_value - val
+#       end
+#     end
