@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     root 'root#index'
     get '/about' => 'root#about'
     get '/read' => 'root#read'
+    get '/read_details' => 'root#read_details'
     get '/read_donors' => 'root#read_donors'
 
     # handles /en/fake/path/whatever
