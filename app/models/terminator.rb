@@ -5,6 +5,7 @@ class Terminator
   include Mongoid::Timestamps
 
   embedded_in :detail
+  embedded_in :donor
 
   field :term, type: String
   field :field_index, type: Integer

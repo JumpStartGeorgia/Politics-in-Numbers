@@ -21,30 +21,54 @@ if destroy_mode
 end
 
 parties_data = [
-  { name_translations: { ka: 'ქართული ოცნება' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ნაციონალური მოძრაობა' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'კონსერვატიული პარტია' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'მრეწველობა გადაარჩენს საქართველოს' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'რესპუბლიკური პარტია' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ჩვენი საქართველო - თავისუფალი დემოკრატები' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ეროვნული ფორუმი' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ქრისტიან-კონსერვატიული პარტია' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'დემოკრატიული მოძრაობა' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'პატრიოტთა ალიანსი' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ლეიბორისტული პარტია' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'საქართველოს გზა' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ედპ' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'თავისუფალი საქართველო' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ახალი მემარჯვენეები' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'სამოქალაქო ალიანსი' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'სახალხო პარტია' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'საზოგადოება "ივერია"' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ახალი პოლიტიკური ცენტრი "გირჩი"' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'განახლებული საქართველოსთვის' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ჩერნოვეცკის პარტია' }, summary_translations: { ka: ''}},
-  { name_translations: { ka: 'ბურჭულაძის ფონდი' }, summary_translations: { ka: ''}}
+  # { name_translations: { ka: 'ქართული ოცნება' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ნაციონალური მოძრაობა' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'კონსერვატიული პარტია' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'მრეწველობა გადაარჩენს საქართველოს' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'რესპუბლიკური პარტია' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ჩვენი საქართველო - თავისუფალი დემოკრატები' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ეროვნული ფორუმი' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ქრისტიან-კონსერვატიული პარტია' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'დემოკრატიული მოძრაობა' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'პატრიოტთა ალიანსი' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ლეიბორისტული პარტია' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'საქართველოს გზა' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ედპ' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'თავისუფალი საქართველო' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ახალი მემარჯვენეები' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'სამოქალაქო ალიანსი' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'სახალხო პარტია' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'საზოგადოება "ივერია"' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ახალი პოლიტიკური ცენტრი "გირჩი"' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'განახლებული საქართველოსთვის' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ჩერნოვეცკის პარტია' }, summary_translations: { ka: ''}},
+  # { name_translations: { ka: 'ბურჭულაძის ფონდი' }, summary_translations: { ka: ''}}
   #{ name_translations: { ka: '' }, summary_translations: { ka: ''}}
 ]
+
+  up_path = Rails.public_path.join("upload")
+  workbook = RubyXL::Parser.parse("#{up_path}/parties.xlsx")
+
+  workbook[0].each_with_index { |row, row_i|
+    if row && row.cells
+      cells = Array.new(3, nil)
+      row.cells.each_with_index do |c, c_i|
+        if c && c.value.present?
+          cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
+        end
+      end
+      tmp = { name_translations: { ka: '' }, title_translations: { ka: '' }, summary_translations: { ka: ''}}
+      tmp[:tmp_id] = cells[0] if cells[0].present?
+      tmp[:title_translations][:ka] = cells[1].present? ? cells[1] : cells[2]
+      tmp[:name_translations][:ka] = cells[2]
+
+      parties_data << tmp
+    end
+  }
+
+puts parties_data.inspect
+
+
 
 periods_data = [
   # type 'annual' 'election'
@@ -229,7 +253,7 @@ detail_schemas_data = [
     { field_type: "String", order: 3, output_order: 3, orig_title: "მიზანი", title_translations: { ka: "მიზანი" }},
     { field_type: "String", order: 4, output_order: 4, orig_title: "აქტივობის განხორციელების პერიოდი", title_translations: { ka: "აქტივობის განხორციელების პერიოდი" }},
     { field_type: "Float", order: 5, output_order: 5, orig_title: "აქტივობის მონაწილე მოხალისეთა რაოდენობა", title_translations: { ka: "აქტივობის მონაწილე მოხალისეთა რაოდენობა" }},
-    { field_type: "Float", order: 6, output_order: 6, orig_title: "აქტივობაზე გახარჯული მატერიალური მარაგების მოცულობა", title_translations: { ka: "აქტივობაზე გახარჯული მატერიალური მარაგების მოცულობა" }},
+    { field_type: "Float", required: :and, order: 6, output_order: 6, orig_title: "აქტივობაზე გახარჯული მატერიალური მარაგების მოცულობა", title_translations: { ka: "აქტივობაზე გახარჯული მატერიალური მარაგების მოცულობა" }},
     { field_type: "String", order: 7, output_order: 7, orig_title: "შენიშვნა", title_translations: { ka: "შენიშვნა" }},
   ],
   [ # 9.4

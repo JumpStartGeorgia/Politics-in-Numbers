@@ -1,0 +1,16 @@
+<% page_title t 'shared.common.name' %>
+<%= debug @p %>
+
+<% @tables = @tables.present? ? @tables : [] %>
+<% @tables.each{|table| %>
+  <table border=1>
+  <% table.each{|row| %>
+    <tr>
+    <% row.each {|cell| %>
+      <td><%= cell %></td>
+    <% } %>
+    </tr>
+  <% } %>
+  </table>
+  <br/><hr><br/>
+<% } %>
