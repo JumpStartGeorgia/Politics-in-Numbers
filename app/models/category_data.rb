@@ -9,7 +9,7 @@ class CategoryData
   field :type, type: Integer
   field :value, type: Float
   field :category_id, type: BSON::ObjectId
-  validates_presence_of :type, :value, :category_id
+  validates_presence_of :value, :category_id
 
   def category
     Category.find(category_id)

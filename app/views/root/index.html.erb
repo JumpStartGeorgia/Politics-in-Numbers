@@ -1,1 +1,12 @@
 <% page_title t 'shared.common.name' %>
+<% I18n.locale = :en %>
+<%#= @parties.category_datas.inspect %>
+<%#= @categories[0].inspect %>
+<%= Category.tree_out.html_safe %>
+<ul>
+  <%# @categories.each do |cat| %>
+
+
+      <li><%#= cat.inspect %></li>
+  <%# end %>
+</ul>

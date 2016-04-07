@@ -40,7 +40,7 @@ class Party < CustomTranslation
     return name.strip
   end
 
-  def self.id_by_name(party_name)
+  def self.by_name(party_name)
     Party.where({name: Party.clean_name(party_name)}).first
   end
 end

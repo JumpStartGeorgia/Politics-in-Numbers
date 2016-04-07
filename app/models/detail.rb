@@ -21,4 +21,8 @@ class Detail < CustomTranslation
   def title
     get_translation(title_translations)
   end
+
+  def self.by_code(code)
+    Detail.where({code: code }).first
+  end
 end

@@ -9,6 +9,8 @@
 #
 I18n.locale = :ka
 destroy_mode = true
+up_path = Rails.public_path.join("upload")
+
 if destroy_mode
   puts "Destroy phase ----------------------"
   puts "  party data"
@@ -17,56 +19,91 @@ if destroy_mode
   Period.destroy_all
   puts "  detail and its schema, with all embed documents"
   Detail.destroy_all
+  puts "  category data"
+  Category.destroy_all
   puts "Destroy phase end ------------------"
 end
 
-parties_data = [
-  # { name_translations: { ka: 'ქართული ოცნება' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ნაციონალური მოძრაობა' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'კონსერვატიული პარტია' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'მრეწველობა გადაარჩენს საქართველოს' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'რესპუბლიკური პარტია' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ჩვენი საქართველო - თავისუფალი დემოკრატები' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ეროვნული ფორუმი' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ქრისტიან-კონსერვატიული პარტია' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'დემოკრატიული მოძრაობა' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'პატრიოტთა ალიანსი' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ლეიბორისტული პარტია' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'საქართველოს გზა' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ედპ' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'თავისუფალი საქართველო' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ახალი მემარჯვენეები' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'სამოქალაქო ალიანსი' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'სახალხო პარტია' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'საზოგადოება "ივერია"' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ახალი პოლიტიკური ცენტრი "გირჩი"' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'განახლებული საქართველოსთვის' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ჩერნოვეცკის პარტია' }, summary_translations: { ka: ''}},
-  # { name_translations: { ka: 'ბურჭულაძის ფონდი' }, summary_translations: { ka: ''}}
-  #{ name_translations: { ka: '' }, summary_translations: { ka: ''}}
-]
-
-  up_path = Rails.public_path.join("upload")
-  workbook = RubyXL::Parser.parse("#{up_path}/parties.xlsx")
-
-  workbook[0].each_with_index { |row, row_i|
-    if row && row.cells
-      cells = Array.new(3, nil)
-      row.cells.each_with_index do |c, c_i|
-        if c && c.value.present?
-          cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
-        end
+categories_data = [] # TODO give order for all categories same as reading from file
+workbook = RubyXL::Parser.parse("#{up_path}/categories.xlsx")
+cat_id = 1
+level = 0
+plevel = 0 # previous level
+parenting = [nil, nil, nil, nil, nil, nil]
+parent_id = nil
+pparent_id = nil
+workbook[0].each_with_index { |row, row_i|
+  next if row_i == 0
+  if row && row.cells
+    cells = Array.new(9, nil) # Level0  Level1  Level2  Level3  Level4  Level5  Cells Codes Details
+    row.cells.each_with_index do |c, c_i|
+      if c && c.value.present?
+        cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
       end
-      tmp = { name_translations: { ka: '' }, title_translations: { ka: '' }, summary_translations: { ka: ''}}
-      tmp[:tmp_id] = cells[0] if cells[0].present?
-      tmp[:title_translations][:ka] = cells[1].present? ? cells[1] : cells[2]
-      tmp[:name_translations][:ka] = cells[2]
-
-      parties_data << tmp
     end
-  }
 
-puts parties_data.inspect
+    has_level = false
+    (0..5).step(1) { |lvl|
+      if cells[lvl].present?
+        #plevel = level if level != plevel
+        level = lvl
+        #puts "#{level} - #{cells[lvl]}"
+        has_level = true
+      end
+    }
+    next if !has_level
+
+    if level == 0
+      #plevel = 0
+      parenting[0] = cat_id
+    end
+    parenting[level] = cat_id# if plevel < level
+    parent_id = parenting[level-1].present? && level != 0 ? parenting[level-1] : nil
+
+    cls = [nil, nil]
+    if cells[6].present?
+      cls = cells[6].strip.split("/")
+      (puts "Form or Cell is empty"; exit) if cls.length != 2
+    else
+      (puts "Form/Cell is empty"; exit) if level != 0
+    end
+
+    if cells[7].present?
+      cd = cells[7].to_s.strip
+    else
+      (puts "Code is empty";) if level != 0
+    end
+    dt = cells[8].present? ? cells[8] : nil
+    tmp = { tmp_id: cat_id, virtual: (level == 0 ? true : false), level: level, parent_id: parent_id, form: cls[0], cell: cls[1], code: cd, title_translations: { en: cells[level].strip }, detail_id: dt}
+    #puts "#{' '*2*level} #{parent_id} #{cells[level]} #{cat_id} #{cls} #{cd} #{(level == 0 ? true : false)}"
+
+    categories_data << tmp
+
+    cat_id += 1
+  end
+}
+#puts categories_data.inspect
+
+
+parties_data = []
+workbook = RubyXL::Parser.parse("#{up_path}/parties.xlsx")
+workbook[0].each_with_index { |row, row_i|
+  if row && row.cells
+    cells = Array.new(3, nil)
+    row.cells.each_with_index do |c, c_i|
+      if c && c.value.present?
+        cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
+      end
+    end
+    tmp = { name_translations: { ka: '' }, title_translations: { ka: '' }, summary_translations: { ka: ''}}
+    tmp[:tmp_id] = cells[0] if cells[0].present?
+    tmp[:title_translations][:ka] = cells[1].present? ? cells[1] : cells[2]
+    tmp[:name_translations][:ka] = cells[2]
+
+    parties_data << tmp
+  end
+}
+#puts parties_data.inspect
 
 
 
@@ -79,11 +116,7 @@ periods_data = [
   #{ type: 'election', start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "2015 election" }, description_translations: { ka: "2015 election description" }}
 ]
 
-cats = [
-  {
-    title: "Income", cells: "FF2/C9+FF3/C9", simple: 1
-  }
-]
+# 2, 4, 4.1, 4.2, 4.3, 4.4, 6, 6.1 not in election period
 
 
 details_data = [
@@ -98,7 +131,9 @@ details_data = [
   { code: "FF5.4", orig_code: "ფორმა N5.4", header_row: 8, content_row: 9, fields_count: 8, footer: 1, note: [1], title_translations: { ka: "სხვა განაცემები ფიზიკურ პირებზე (ხელფასის და პრემიის გარდა)" }},
   { code: "FF5.5", orig_code: "ფორმა N5.5", header_row: 9, content_row: 10, fields_count: 12, footer: 1, note: [4], title_translations: { ka: "რეკლამის ხარჯი" }},
   { code: "FF6.1", orig_code: "ფორმა N6.1", header_row: 9, content_row: 10, fields_count: 4, footer: 1, note: [1, 2], title_translations: { ka: "სსიპ 'საარჩევნო სისტემების განვითარების, რეფორმებისა და სწავლების ცენტრიდან' მიღებული  სახსრებით გაწეული სხვა ხარჯების" }},
+  #{ code: "FF8", orig_code: "ფორმა N8", header_row: 8, content_row: 10, fields_count: 7, footer: 1, title_translations: { ka: "ნაღდი ფულით განხორციელებულ სალაროს ოპერაციათა რეესტრი" }},
   { code: "FF8.1", orig_code: "ფორმა N8.1", header_row: 8, content_row: 10, fields_count: 7, footer: 1, title_translations: { ka: "ნაღდი ფულით განხორციელებულ სალაროს ოპერაციათა რეესტრი" }},
+  #{ code: "FF9", orig_code: "ფორმა N9", header_row: 7, content_row: 9, fields_count: 8, footer: 0, title_translations: { ka: "შენობა-ნაგებობების რეესტრი" }},
   { code: "FF9.1", orig_code: "ფორმა N9.1", header_row: 7, content_row: 9, fields_count: 8, footer: 0, title_translations: { ka: "შენობა-ნაგებობების რეესტრი" }},
   { code: "FF9.2", orig_code: "ფორმა N9.2", header_row: 7, content_row: 9, fields_count: 9, footer: 0,  title_translations: { ka: "სატრანსპორტო საშუალებების რეესტრი" }},
   { code: "FF9.3", orig_code: "ფორმა N9.3", header_row: 7, content_row: 9, fields_count: 7, footer: 0, title_translations: { ka: "მოხალისეთა აქტივობების რეესტრი" }},
@@ -478,56 +513,61 @@ terminators_data = [
 # -----------------------------------------------------------------
 # # -----------------------------------------------------------------
 
-# cats.each{|d,i|
-#   Category.create!(d) #.map { |k, v| [k.to_s, v.to_s] }.to_h
-#   puts "Category #{d[:title]} was added"
-# }
+
 puts "Creating phase ----------------------"
 
-puts "  Party meta data"
-parties_data.each_with_index do |d,i|
-  party = Party.create!(d)
-  puts "    #{party.name} was added"
-end
-
-puts "  Period meta data"
-periods_data.each_with_index do |d,i|
-  d[:start_date] = Date.strptime(d[:start_date], "%d.%m.%Y")
-  d[:end_date] = Date.strptime(d[:end_date], "%d.%m.%Y")
-
-  period = Period.create!(d)
-  puts "    #{period.type} #{period.title} was added"
-end
-
-puts "  Party data"
-details_data.each_with_index{|d,i|
-  notes = d.delete(:note)
-
-  detail = Detail.new(d)
-  if notes.present?
-    detail.notes.concat( notes.map{|r| Note.new(notes_data[i].select{|rr| rr[:star] == r}.first) } )
+  puts "  Party meta data"
+  parties_data.each_with_index do |d,i|
+    party = Party.create!(d)
+    puts "    #{party.name} was added"
   end
 
-  # putting detail schema
-  detail_schemas_data[i].each {|dd|
-    notes = dd.delete(:note)
-    schema = DetailSchema.new(dd)
+  puts "  Period meta data"
+  periods_data.each_with_index do |d,i|
+    d[:start_date] = Date.strptime(d[:start_date], "%d.%m.%Y")
+    d[:end_date] = Date.strptime(d[:end_date], "%d.%m.%Y")
+
+    period = Period.create!(d)
+    puts "    #{period.type} #{period.title} was added"
+  end
+
+  puts "  Party data"
+  details_data.each_with_index{ |d,i|
+    notes = d.delete(:note)
+
+    detail = Detail.new(d)
     if notes.present?
-      schema.notes.concat( notes.map{|r| Note.new(notes_data[i].select{|rr| rr[:star] == r}.first) } )
+      detail.notes.concat( notes.map{|r| Note.new(notes_data[i].select{|rr| rr[:star] == r}.first) } )
     end
 
-    detail.detail_schemas << schema
+    # putting detail schema
+    detail_schemas_data[i].each {|dd|
+      notes = dd.delete(:note)
+      schema = DetailSchema.new(dd)
+      if notes.present?
+        schema.notes.concat( notes.map{|r| Note.new(notes_data[i].select{|rr| rr[:star] == r}.first) } )
+      end
+
+      detail.detail_schemas << schema
+    }
+
+    # putting terminators to detail
+    terminators_data[i].each {|dd| detail.terminators << Terminator.new(dd) } if terminators_data[i].present?
+
+
+    detail.save!
+    puts "Detail #{detail.title} was added"
   }
 
-  # putting terminators to detail
-  terminators_data[i].each {|dd| detail.terminators << Terminator.new(dd) } if terminators_data[i].present?
+  puts "  Category data"
+  categories_data.each_with_index do |d,i|
+    puts d[:detail_id] if ["FF9", "FF8"].include?(d[:detail_id])
 
+    d[:detail_id] = Detail.by_code(d[:detail_id])._id if (d[:detail_id].present? && !["FF9", "FF8"].include?(d[:detail_id]))
 
-  detail.save!
-  puts "Detail #{detail.title} was added"
-}
-
-
+    cat = Category.create!(d)
+    puts "    Category '#{cat.title_translations[:en]}' was added"
+  end
 
   # begin
   #   period.valid?
