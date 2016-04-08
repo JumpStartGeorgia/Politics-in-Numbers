@@ -2,11 +2,12 @@
 <% I18n.locale = :en %>
 <%#= @parties.category_datas.inspect %>
 <%#= @categories[0].inspect %>
-<%= Category.tree_out.html_safe %>
-<ul>
+<%= Category.tree_out(true).html_safe %>
+<%= Category.tree_out(false).html_safe %>
+
   <%# @categories.each do |cat| %>
 
 
-      <li><%#= cat.inspect %></li>
+     <%#= cat.inspect %>
   <%# end %>
-</ul>
+

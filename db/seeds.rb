@@ -7,6 +7,11 @@
 #   Role.find_or_create_by(name: role)
 # end
 #
+
+def is_numeric?(obj)
+   obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
+end
+
 I18n.locale = :ka
 destroy_mode = true
 up_path = Rails.public_path.join("upload")
@@ -25,17 +30,19 @@ if destroy_mode
 end
 
 categories_data = [] # TODO give order for all categories same as reading from file
+virtuals_data = []
 workbook = RubyXL::Parser.parse("#{up_path}/categories.xlsx")
 cat_id = 1
 level = 0
 plevel = 0 # previous level
 parenting = [nil, nil, nil, nil, nil, nil]
+orders = [0, 0, 0, 0, 0, 0]
 parent_id = nil
 pparent_id = nil
 workbook[0].each_with_index { |row, row_i|
   next if row_i == 0
   if row && row.cells
-    cells = Array.new(9, nil) # Level0  Level1  Level2  Level3  Level4  Level5  Cells Codes Details
+    cells = Array.new(10, nil) # Level0  Level1  Level2  Level3  Level4  Level5  Cells Codes Details Virtual
     row.cells.each_with_index do |c, c_i|
       if c && c.value.present?
         cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
@@ -46,7 +53,13 @@ workbook[0].each_with_index { |row, row_i|
     (0..5).step(1) { |lvl|
       if cells[lvl].present?
         #plevel = level if level != plevel
+        if lvl > level
+          orders[lvl] = 1
+        else
+          orders[lvl] += 1
+        end
         level = lvl
+
         #puts "#{level} - #{cells[lvl]}"
         has_level = true
       end
@@ -74,14 +87,20 @@ workbook[0].each_with_index { |row, row_i|
       (puts "Code is empty";) if level != 0
     end
     dt = cells[8].present? ? cells[8] : nil
-    tmp = { tmp_id: cat_id, virtual: (level == 0 ? true : false), level: level, parent_id: parent_id, form: cls[0], cell: cls[1], code: cd, title_translations: { en: cells[level].strip }, detail_id: dt}
+    tmp = { tmp_id: cat_id, virtual: (level == 0 ? true : false), level: level, parent_id: parent_id, form: cls[0], cell: cls[1], code: cd, title_translations: { en: cells[level].strip }, detail_id: dt, order: orders[level]}
     #puts "#{' '*2*level} #{parent_id} #{cells[level]} #{cat_id} #{cls} #{cd} #{(level == 0 ? true : false)}"
-
     categories_data << tmp
+    if cells[9].present? && is_numeric?(cells[9])
+      vrt = tmp.clone
+      vrt[:virtual_id] = cells[9]
+      virtuals_data <<  vrt
+    end
 
     cat_id += 1
   end
 }
+#puts virtuals_data.inspect
+
 #puts categories_data.inspect
 
 
@@ -561,12 +580,52 @@ puts "Creating phase ----------------------"
 
   puts "  Category data"
   categories_data.each_with_index do |d,i|
-    puts d[:detail_id] if ["FF9", "FF8"].include?(d[:detail_id])
+    tmp_id = d.delete(:tmp_id)
+
+    #puts d[:detail_id] if ["FF9", "FF8"].include?(d[:detail_id])
 
     d[:detail_id] = Detail.by_code(d[:detail_id])._id if (d[:detail_id].present? && !["FF9", "FF8"].include?(d[:detail_id]))
 
     cat = Category.create!(d)
+    categories_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
+    virtuals_data.each {|r|
+      if r[:tmp_id] == tmp_id
+        r[:cat_id] = cat._id
+      end
+      if d[:level] == 0 && r[:parent_id] == tmp_id
+        r[:parent_id] = cat._id
+      end
+    }
+
     puts "    Category '#{cat.title_translations[:en]}' was added"
+  end
+
+  puts "  Virtual Category data"
+  virtuals_data.each_with_index do |d,d_i|
+    tmp_id = d.delete(:tmp_id)
+    #puts d[:detail_id] if ["FF9", "FF8"].include?(d[:detail_id])
+    if !d[:used] && d[:level] != 0
+      d[:virtual] = true
+      d[:cell] = nil
+      d[:code] = nil
+      d[:virtual_ids] = [d[:cat_id]]
+      titles = [d[:title_translations][:en]]
+      virtuals_data.each_with_index {|dd,dd_i|
+        if !dd[:used] && dd_i != d_i && d[:virtual_id] == dd[:virtual_id]
+          titles << dd[:title_translations][:en]
+          d[:virtual_ids] << dd[:cat_id]
+          dd[:used] = true
+        end
+      }
+      d[:title_translations][:en] = titles.uniq.join(" & ")
+      d[:detail_id] = Detail.by_code(d[:detail_id])._id if (d[:detail_id].present? && !["FF9", "FF8"].include?(d[:detail_id]))
+
+      cat = Category.create!(d.except(:used, :cat_id, :virtual_id))
+      virtuals_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
+
+      puts "    Virtual Category '#{d[:title_translations][:en]}' was added"
+    end
+    d[:used] = true
   end
 
   # begin
