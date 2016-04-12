@@ -36,15 +36,25 @@ class Category < CustomTranslation
     get_translation(description_translations)
   end
 
-  def self.tree_out(vir = false)
+  def self.tree_out(vir = false, select = false, id = "categories-list")
     list = tree(vir)
-    out = "<ul>"
-    list.each { |item|
-      out += "<li order='#{item[:c].order}'>#{item[:c].title}"
-      out += sub_tree_out(item[:sub]) if item[:sub].present?
-      out += "</li>"
-    }
-    out += "</ul>"
+
+    if select
+      out = "<select id=#{id}>"
+      list.each { |item|
+        out += "<option order='#{item[:c].order}'>#{item[:c].title}</option>"
+        out += sub_tree_out(item[:sub], select) if item[:sub].present?
+      }
+      out += "</select>"
+    else
+      out = "<ul id='#{id}'>"
+      list.each { |item|
+        out += "<li order='#{item[:c].order}'>#{item[:c].title}"
+        out += sub_tree_out(item[:sub], select) if item[:sub].present?
+        out += "</li>"
+      }
+      out += "</ul>"
+    end
   end
   def self.tree(vir = false)
     cats = Category.all
@@ -67,19 +77,24 @@ class Category < CustomTranslation
   end
 
 
-  def self.sub_tree_out(sub)
+  def self.sub_tree_out(sub, select)
     list = sub
     out = ""
     if list.present?
-      out = "<ul>"
-      list.each { |item|
-        out += "<li order='#{item[:c].order}'>#{item[:c].title}"
-        if item[:sub].present?
-          out += sub_tree_out(item[:sub])
-        end
-        out += "</li>"
-      }
-      out += "</ul>"
+      if select
+        list.each { |item|
+          out += "<option order='#{item[:c].order}' data-level='#{item[:c].level}'>#{item[:c].title}</option>"
+          out += sub_tree_out(item[:sub], select) if item[:sub].present?
+        }
+      else
+        out = "<ul>"
+        list.each { |item|
+          out += "<li order='#{item[:c].order}' class='#{item[:c].level}'>#{item[:c].title}"
+          out += sub_tree_out(item[:sub], select) if item[:sub].present?
+          out += "</li>"
+        }
+        out += "</ul>"
+      end
     end
     out
   end

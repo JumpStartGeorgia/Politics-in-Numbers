@@ -7,6 +7,7 @@ en:
       edit: Edit
       log_in: Log in
       view: View
+      view_all: View All
       with_obj:
         cancel: Cancel %{obj}
         create: Create %{obj}

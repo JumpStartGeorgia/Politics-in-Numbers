@@ -1,0 +1,44 @@
+form.tabbed-translation-form{
+  .tabbed-translation-fields{
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+  }
+
+  .tab-content .tab-pane{
+    margin-bottom: 20px;
+    padding: 10px 15px 0;
+    border-left: 1px solid #dddddd;
+  }
+
+  fieldset > div.input:last-of-type{
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .select2-container{
+    display: block !important;
+  }
+
+  select {
+    max-width: 72%;
+    /* hide options that are not needed */
+    option.hide{
+      display: none;
+    }
+  }
+
+  label span.default-translation-text{
+    font-weight: normal;
+    font-size: 12px;
+  }
+
+}
+
+.tabbed-translation-show{
+  .tab-content .tab-pane{
+    marign-bottom: 20px;
+    padding: 10px 15px 0;
+    border-left: 1px solid #dddddd;
+  }
+}

@@ -7,6 +7,97 @@
 #   Role.find_or_create_by(name: role)
 # end
 #
+#####################
+## Languages
+#####################
+puts 'loading languages'
+if (Language.count == 0)
+  langs = [
+    ["af", "Afrikaans"],
+    ["sq", "shqipe"],
+    ["ar", "العربية‏"],
+    ["hy", "Հայերեն"],
+    ["az", "Azərbaycan­ılı"],
+    ["eu", "euskara"],
+    ["be", "Беларускі"],
+    ["bg", "български"],
+    ["ca", "català"],
+    ["hr", "hrvatski"],
+    ["cs", "čeština"],
+    ["da", "dansk"],
+    ["div", "ދިވެހިބަސް‏"],
+    ["nl", "Nederlands"],
+    ["en", "English"],
+    ["et", "eesti"],
+    ["fo", "føroyskt"],
+    ["fi", "suomi"],
+    ["fr", "français"],
+    ["gl", "galego"],
+    ["ka", "ქართული"],
+    ["de", "Deutsch"],
+    ["el", "ελληνικά"],
+    ["gu", "ગુજરાતી"],
+    ["he", "עברית‏"],
+    ["hi", "हिंदी"],
+    ["hu", "magyar"],
+    ["is", "íslenska"],
+    ["id", "Bahasa Indonesia"],
+    ["it", "italiano"],
+    ["ja", "日本語"],
+    ["kn", "ಕನ್ನಡ"],
+    ["kk", "Қазащb"],
+    ["sw", "Kiswahili"],
+    ["kok", "कोंकणी"],
+    ["ko", "한국어"],
+    ["ky", "Кыргыз"],
+    ["lv", "latviešu"],
+    ["lt", "lietuvių"],
+    ["mk", "македонски јазик"],
+    ["ms", "Bahasa Malaysia"],
+    ["mr", "मराठी"],
+    ["mn", "Монгол хэл"],
+    ["no", "norsk"],
+    ["fa", "فارسى‏"],
+    ["pl", "polski"],
+    ["pt", "Português"],
+    ["pa", "ਪੰਜਾਬੀ"],
+    ["ro", "română"],
+    ["ru", "русский"],
+    ["sa", "संस्कृत"],
+    ["sr", "srpski"],
+    ["sk", "slovenčina"],
+    ["sl", "slovenski"],
+    ["es", "español"],
+    ["sv", "svenska"],
+    ["syr", "ܣܘܪܝܝܐ‏"],
+    ["ta", "தமிழ்"],
+    ["tt", "Татар"],
+    ["te", "తెలుగు"],
+    ["th", "ไทย"],
+    ["tr", "Türkçe"],
+    ["uk", "україньска"],
+    ["ur", "اُردو‏"],
+    ["uz", "U'zbek"],
+    ["vi", "Tiếng Việt"],
+    ["zh-TW", "繁體中文"],
+    ["zh-CN", "简体中文"]
+  ]
+
+  langs = langs.map{|x| {locale: x[0], name: x[1]}}
+  Language.collection.insert(langs)
+end
+
+## Create app user and api key
+#####################
+email = 'application@mail.com'
+if User.where(email: email).count == 0
+  puts 'Creating app user and api key'
+  #User.where(email: email).destroy
+  u = User.new(email: email, password: Devise.friendly_token[0,30], role: 0)#, is_user: false)
+  u.save(validate: false)
+  #u.api_keys.create
+end
+
 
 def is_numeric?(obj)
    obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
@@ -29,7 +120,7 @@ if destroy_mode
   puts "Destroy phase end ------------------"
 end
 
-categories_data = [] # TODO give order for all categories same as reading from file
+categories_data = []
 virtuals_data = []
 workbook = RubyXL::Parser.parse("#{up_path}/categories.xlsx")
 cat_id = 1

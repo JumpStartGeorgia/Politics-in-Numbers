@@ -9,6 +9,9 @@ gem 'rails', '4.2.2'
 # Connection to Mongodb database
 gem "mongoid", "~> 4.0.0"
 
+# Mongoid URL slug or permalink generator
+gem 'mongoid-slug', '~> 5.0.0'
+
 # SCSS parsing in asset pipeline
 gem 'sass-rails', '~> 5.0'
 
@@ -19,7 +22,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'jquery-rails', '~> 4.0.3'
 
 # Uses caching to improve performance for internal page changes
-gem 'turbolinks', '~> 2.5.3'
+#gem 'turbolinks', '~> 2.5.3'
 
 # JSON creation
 gem 'jbuilder', '~> 2.0'
@@ -28,7 +31,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'dotenv-rails', '~> 2.0.0'
 
 # Makes compatibility easier for jQuery and turbolinks
-gem 'jquery-turbolinks', '~> 2.1.0'
+#gem 'jquery-turbolinks', '~> 2.1.0'
 
 # Makes jQuery UI (like jQuery datepicker) available
 gem 'jquery-ui-rails', '~> 5.0.3'
@@ -43,7 +46,7 @@ gem 'therubyracer', '~> 0.12.1'
 gem 'less-rails', '~> 2.7.0'
 
 # Bootstrap JS and various bootstrap-related generators/helpers
-gem 'twitter-bootstrap-rails', '~> 3.2.0'
+gem 'twitter-bootstrap-rails', '~> 3.2.2'
 
 # Use formtastic to generate bootstrap-styled forms
 gem 'formtastic-bootstrap', '~> 3.1.0'
@@ -68,6 +71,9 @@ gem 'google-analytics-turbolinks', '~> 0.0.4'
 
 # Sends email when exception or error is thrown
 gem 'exception_notification', '~> 4.1', '>= 4.1.1'
+
+# Select2 is a jQuery based replacement for select boxes.
+gem 'select2-rails', '~> 4.0', '>= 4.0.1.1'
 
 # Work with xlsx files
 gem "rubyXL"

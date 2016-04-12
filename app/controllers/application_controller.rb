@@ -30,6 +30,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # def valid_role?(role)
+  #   redirect_to root_path, :notice => t('app.msgs.not_authorized') if !current_user || !current_user.role?(role)
+  # end
+
   def not_authorized
     redirect_to :back, alert: t('shared.msgs.not_authorized')
   rescue ActionController::RedirectBackError
@@ -41,6 +45,19 @@ class ApplicationController < ActionController::Base
     redirect_to redirect_path,
                 notice: t('shared.msgs.does_not_exist')
   end
+
+  def set_tabbed_translation_form_settings(tinymce_template='default')
+    @languages = Language.sorted
+    #@css.push('tabbed_translation_form.css')
+    #@js.push('tabbed_translation_form.js')
+    #gon.tinymce_options = Hash[TinyMCE::Rails.configuration[tinymce_template].options.map{|(k,v)| [k.to_s,v.class == Array ? v.join(',') : v]}]
+
+    # if tinymce_template != 'default'
+    #   @css.push('shCore.css')
+    #   @js.push('shCore.js', 'shBrushJScript.js')
+    # end
+  end
+
   def d(obj)
     @p << obj
     @p << nil

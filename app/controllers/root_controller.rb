@@ -383,12 +383,12 @@ class RootController < ApplicationController
     headers_map = ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
 
     Donor.destroy_all
-
+    donors = []
     files.each_with_index{|f,f_i|
       start_partial = Time.now
       d("#{f}")
       #next if f_i != 0
-      # next if !f.include? "/2014.xlsx"
+      next if !f.include? "/2014.xlsx"
 
       workbook = RubyXL::Parser.parse(f)
 
@@ -410,30 +410,45 @@ class RootController < ApplicationController
           else
             begin
               break if cells[1].nil?
+
+              p = Party.by_name(cells[6])
+              #lg.info p.class == Party
+              # lg.info "#{cells[6]} #{p.inspect}"
+              if p.class == Party
+                #lg.info "good"
+              else
+                if !donors.include?(cells[6])
+                  donors << cells[6]
+                end
+              end
               # d(cells[6])
               # p =
               # d(p.inspect)
-              Donor.create!({
-                give_date: cells[1],
-                first_name: cells[2],
-                last_name: cells[3],
-                tin: cells[4],
-                amount: cells[5],
-                party_id: Party.by_name(cells[6])._id,
-                comment: cells[7]
-              })
+              # Donor.create!({
+              #   give_date: cells[1],
+              #   first_name: cells[2],
+              #   last_name: cells[3],
+              #   tin: cells[4],
+              #   amount: cells[5],
+              #   party_id: Party.by_name(cells[6])._id,
+              #   comment: cells[7]
+              # })
+
             rescue Exception => e
               d("#{cells.inspect}exception --------------------- #{e.inspect}")
               # d(cells.inspect)
             end
           end
         end
-        lgg.info cells
+        #lgg.info cells
       }
       d("Header is missing, file is corrupted") if is_header
 
 
       d("Time elapsed #{(Time.now - start_partial).round(2)} seconds")
+    }
+    donors.each {|r|
+      lg.info "#{r} #{Party.is_initiative(r)}"
     }
     lg.close
     d("Time elapsed #{(Time.now - start).round(2)} seconds")

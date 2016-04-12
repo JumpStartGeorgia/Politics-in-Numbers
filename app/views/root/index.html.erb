@@ -2,8 +2,8 @@
 <% I18n.locale = :en %>
 <%#= @parties.category_datas.inspect %>
 <%#= @categories[0].inspect %>
-<%= Category.tree_out(true).html_safe %>
-<%= Category.tree_out(false).html_safe %>
+<%= Category.tree_out(true, true, "categories-list").html_safe %>
+<%#= Category.tree_out(false).html_safe %>
 
   <%# @categories.each do |cat| %>
 
@@ -11,3 +11,26 @@
      <%#= cat.inspect %>
   <%# end %>
 
+<script>
+$( "#categories-list" ).select2({
+    theme: "bootstrap",
+    templateSelection: function(data, container){
+       console.log(data, container);
+       return data.text;
+    },
+    templateResult: function(result, container){
+       console.log(result, container);
+       $(container).addClass("level-" + $(result.element).attr("data-level"));
+       return result.text;
+    }
+});
+// function format(state) {
+//     if (!state.id) return state.text; // optgroup
+//     return "<img class='flag' src='images/flags/" + state.id.toLowerCase() + ".png'/>" + state.text;
+// }
+// $("#e4").select2({
+//     formatResult: format,
+//     formatSelection: format,
+//     escapeMarkup: function(m) { return m; }
+// });
+</script>

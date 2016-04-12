@@ -10,3 +10,8 @@ en:
       user:
         one: User
         other: Users
+      party:
+        one: Party
+        other: Parties
+      admin:
+        one: Admin Section

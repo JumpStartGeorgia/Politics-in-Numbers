@@ -8,6 +8,10 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 /*
  *= require formtastic
  *= require formtastic-bootstrap
+
+ *= require select2
+ *= require select2-bootstrap
+
  */
 
 @charset 'UTF-8';
@@ -27,3 +31,6 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 @import 'components/language_switcher';
 @import 'components/loading_indicator';
 @import 'components/primary_header';
+@import 'components/categories-list';
+@import 'components/admin';
+@import 'components/tabbed_translation_form';

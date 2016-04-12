@@ -12,9 +12,10 @@ Rails.application.routes.draw do
                  unlocks: 'users/unlocks'
                },
                constraints: { format: :html }
-
+    match '/admin', :to => 'admin#index', :as => :admin, :via => :get
     namespace :admin do
-      resources :users, constraints: { format: :html }
+      resources :users#, constraints: { format: :html }
+      resources :parties # , constraints: { format: :html }
     end
 
     root 'root#index'

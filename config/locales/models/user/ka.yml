@@ -1,4 +1,4 @@
----
+# ---
 ka:
   mongoid:
     attributes:
@@ -10,3 +10,8 @@ ka:
       user:
         one: User
         other: Users
+      party:
+        one: Party
+        other: Parties
+      admin:
+        one: Admin Section

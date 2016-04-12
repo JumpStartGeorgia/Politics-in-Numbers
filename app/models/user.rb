@@ -11,9 +11,44 @@ class User
          :trackable,
          :validatable
 
-  belongs_to :role
+
+  ROLES = { :user => 0, :manager => 66, :admin => 99 }
+
+  field :role,  :type => Integer, :default => 0
   # Email already required by devise
-  validates :role, presence: true
+  # validates :role, presence: true
+
+  ## Database authenticatable
+  field :email,              :type => String, :default => ""
+  field :encrypted_password, :type => String, :default => ""
+
+  ## Recoverable
+  field :reset_password_token,   :type => String
+  field :reset_password_sent_at, :type => Time
+
+  ## Rememberable
+  field :remember_created_at, :type => Time
+
+  ## Trackable
+  field :sign_in_count,      :type => Integer, :default => 0
+  field :current_sign_in_at, :type => Time
+  field :last_sign_in_at,    :type => Time
+  field :current_sign_in_ip, :type => String
+  field :last_sign_in_ip,    :type => String
+
+
+  # indexes
+  index({ :email => 1}, { background: true})
+
+  # use role inheritence
+  # - a role with a larger number can do everything that smaller numbers can do
+  def role?(base_role)
+    puts "#{base_role} #{ROLES[base_role].class} #{self.role.class}"
+    if base_role && ROLES.keys.index(base_role)
+      return ROLES[base_role] <= self.role
+    end
+    return false
+  end
 
   def is?(requested_role)
     if role

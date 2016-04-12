@@ -1,0 +1,35 @@
+<%- model_class = Party -%>
+<% title t '.title', :default => model_class.model_name.human(:count => 2) %>
+
+<div class="form-group form-group-admin-buttons">
+  <%= links_for(model_class, :admin, [:pre, :new]) %>
+</div>
+<table class="table table-striped display">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:title) %></th>
+      <th><%= model_class.human_attribute_name(:slug) %></th>
+      <th><%= model_class.human_attribute_name(:summary) %></th>
+      <th><%= model_class.human_attribute_name(:color) %></th>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td><%= item.title %></td>
+        <td><%= item.slug %></td>
+        <td><%= item.summary %></td>
+        <td><%= item.color %></td>
+        <td><%= item.name %></td>
+        <td>
+          <div class="btn-group btn-group-sm" role="group" aria-label="...">
+            <%= links_for(item, :admin, [:view, :edit, :destroy]) %>
+          </div>
+
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

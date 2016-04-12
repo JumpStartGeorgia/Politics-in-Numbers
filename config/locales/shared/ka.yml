@@ -7,6 +7,8 @@ ka:
       edit: Edit
       log_in: Log in
       view: View
+      view_all: View All
+      new: New
       with_obj:
         cancel: Cancel %{obj}
         create: Create %{obj}

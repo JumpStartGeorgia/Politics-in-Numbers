@@ -16,7 +16,7 @@
 // turbolinks last. Put other libraries in the marked area in the middle.
 //
 //= require jquery
-//= require jquery.turbolinks
+// require jquery.turbolinks
 //= require jquery_ujs
 
 ////////////////////////////////////////
@@ -40,5 +40,5 @@
 
 ////////////////////////////////////////
 
-//= require turbolinks
-//= require google-analytics-turbolinks
+// require turbolinks
+// require google-analytics-turbolinks

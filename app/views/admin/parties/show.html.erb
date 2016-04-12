@@ -1,0 +1,19 @@
+<%- model_class = Party -%>
+<% title t '.title', :default => model_class.model_name.human %>
+
+
+<div class="form-group form-group-admin-buttons">
+  <%= links_for(@item, :admin, [:pre, :view_all, :edit, :destroy]) %>
+  <%#= link_it(:admin, [], t("helpers.links.admin"),t('helpers.links.view')) %>
+  <%#= link_it(model_class, [:admin], t("helpers.links.back")) %>
+  <%#= link_to_edit(@item, [:admin]) %>
+  <%#= link_to_destroy(@item, [:admin]) %>
+</div>
+<%
+  fields = [:title, :summary, :slug, :color, :name]
+  fields.each { |f|
+%>
+    <p><strong><%= model_class.human_attribute_name(f) %>: </strong><%= @item.send(f) %></p>
+<%
+  }
+%>
