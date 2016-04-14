@@ -1,29 +1,46 @@
 # Party class - meta information about parties
-class Party < CustomTranslation
+class Party# < CustomTranslation
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Slug
 
   #has_many :party_data
+  TYPES = [:party, :initiative]
 
+  field :name, type: String
   field :title, type: String, localize: true
-  field :name, type: String, localize: true
-  field :summary, type: String, localize: true
-  field :color, type: String
+  field :description, type: String, localize: true
+  field :color, type: String, default: "##{SecureRandom.hex(3)}"
   field :tmp_id, type: Integer
   field :type, type: Integer, default: 0 # 0 - party, 1 - initiative
   slug :title, history: true, localize: true # rake mongoid_slug:set this is not working
 
-  def title
-    get_translation(title_translations)
-  end
+  validate :validate_translations
+  validates_presence_of :color, :type, :name
+  # def title
+  #   get_translation(title_translations)
+  # end
 
-  def name
-    get_translation(name_translations)
-  end
+  # # def name
+  # #   get_translation(name_translations)
+  # # end
 
-  def summary
-    get_translation(summary_translations)
+  # def description
+  #   get_translation(description_translations)
+  # end
+
+  def validate_translations
+    default = I18n.default_locale
+    locales = [:ka, :en, :ru]
+    [title_translations, description_translations, _slugs_translations].each{|f|
+      f.delete_if{|k,v| !v.present? }
+      if f[default].blank?
+        errors.add(:base, I18n.t('errors.messages.translation_default_lang',
+          field_name: self.class.human_attribute_name(f),
+          language: Language.name_by_locale(I18n.default_locale),
+          msg: I18n.t('errors.messages.blank')) )
+      end
+    }
   end
 
   def self.clean_name(name)
@@ -73,5 +90,13 @@ class Party < CustomTranslation
       is_initiative = true if party_name.include?(d)
     }
     is_initiative
+  end
+
+  def self.types
+    col = {}
+    TYPES.each_with_index{|d, i|
+      col[I18n.t("mongoid.options.party.type.#{d}")] = i
+    }
+    col
   end
 end

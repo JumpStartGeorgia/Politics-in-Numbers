@@ -1,14 +1,16 @@
 form.tabbed-translation-form{
   .tabbed-translation-fields{
     margin-top: 20px;
-    border-top: 1px solid #eee;
+    border:0;
     padding-top: 20px;
   }
-
   .tab-content .tab-pane{
     margin-bottom: 20px;
     padding: 10px 15px 0;
     border-left: 1px solid #dddddd;
+    border-right: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    border-radius: 0 0 4px 4px;
   }
 
   fieldset > div.input:last-of-type{

@@ -68,9 +68,9 @@ class Admin::PartiesController < ApplicationController
   # PUT /parties/1.json
   def update
     @item = Party.find(params[:id])
-
+    puts "---------------------#{_params.inspect}-----------"
     respond_to do |format|
-      if @item.update_attributes(params[:party])
+      if @item.update_attributes(_params)
         format.html { redirect_to admin_parties_path, flash: {success:  t('app.msgs.success_updated', :obj => t('mongoid.models.party.one'))} }
         format.json { head :no_content }
       else
@@ -93,4 +93,17 @@ class Admin::PartiesController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  private
+    def _params
+      pars = params.clone
+      puts "=================================#{pars}"
+      default = I18n.default_locale
+      locales = [:ka, :en, :ru]
+      [:title_translations, :description_translations, :_slugs_translations].each{|f|
+        pars[:party][f].delete_if{|k,v| !v.present? }
+      }
+
+      pars.require(:party).permit(:_id, :id, :title, :type, :color, :name, :tmp_id, title_translations: [:ka, :en, :ru], description_translations: [:ka, :en, :ru], _slugs_translations: [:ka, :en, :ru])
+    end
 end

@@ -85,6 +85,15 @@ class ApplicationController < ActionController::Base
     tmp.gsub! ' ', ''
     tmp
   end
+
+  def deep_present(parent, tree)
+    p = parent
+    tree.each {|d|
+      p = p[d].present? ? p[d] : nil
+      break if p.nil?
+    }
+    p
+  end
   # def log(msg)
   #     Rails.logger.debug("\033[44;37m#{'*'*80}\n    #{DateTime.now.strftime('%d/%m/%Y %H:%M')}#{msg.to_s.rjust(56)}\n#{'*'*80}\033[0;37m")
   # end

@@ -1,4 +1,3 @@
-# ---
 en:
   mongoid:
     attributes:
@@ -6,6 +5,13 @@ en:
         email: Email
         password: Password
         role: Role
+      party:
+        title: Title
+        type: Type
+        description: Description
+        slug: Permalink
+        color: Color for charts
+        name: Original name
     models:
       user:
         one: User
@@ -15,3 +21,16 @@ en:
         other: Parties
       admin:
         one: Admin Section
+    hints:
+      party:
+        title: Party Title
+        type: "Type: Party or Initiative"
+        description: Party description for party summary page
+        slug: Party Permalink
+        color: Party color for charts
+        name: "Original party name, that is used while processing uploaded files"
+    options:
+      party:
+        type:
+          party: Party
+          initiative: Initiative

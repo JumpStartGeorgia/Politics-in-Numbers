@@ -67,7 +67,7 @@ gem 'font-awesome-sass', '~> 4.4.0'
 gem 'puma', '~> 2.11.1'
 
 # sends updates to google analytics when turbolinks changes page
-gem 'google-analytics-turbolinks', '~> 0.0.4'
+#gem 'google-analytics-turbolinks', '~> 0.0.4'
 
 # Sends email when exception or error is thrown
 gem 'exception_notification', '~> 4.1', '>= 4.1.1'
@@ -102,6 +102,7 @@ group :development do
 
   # Export and import locale files to work with translators
   gem 'locales_export_import', '~> 0.4.2'
+
 end
 
 group :test do

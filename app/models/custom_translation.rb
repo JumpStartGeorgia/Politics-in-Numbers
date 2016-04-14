@@ -62,17 +62,9 @@ class CustomTranslation
   # - object: reference to the mongoid field that has translations (e.g., self.title_translations)
   # - locale: what locale to get translation for; defaults to self.current_locale
   # - fallback_locale: indicates which fallback locale should be used in case the locale param does not have a translation value
-  def get_translation(object, locale=self.current_locale, fallback_locale=self.default_language)
-    fallback_locale ||= I18n.default_locale
-    locale = I18n.locale
-    orig_locale = I18n.locale
-    I18n.locale = locale.to_sym
-    # puts "---> for #{caller_locations(1,1)[0].label}, locale = #{I18n.locale}, fallback = #{fallback_locale}"
+  def get_translation(object)
     text = object[I18n.locale.to_s]
-    text = object[fallback_locale.to_s] if text.blank?
-
-    I18n.locale = orig_locale
-
+    text = object[I18n.default_locale] if text.blank?
     return text
   end
 

@@ -35,8 +35,10 @@
 //= require twitter/bootstrap/collapse
 //= require twitter/bootstrap/carousel
 //= require twitter/bootstrap/affix
-
-//= require_tree .
+//= require select2
+//= require admin
+//
+// require_tree .
 
 ////////////////////////////////////////
 

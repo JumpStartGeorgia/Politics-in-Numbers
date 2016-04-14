@@ -42,8 +42,8 @@ class Language
 
 
   # for the provided locale, get the name of the language
-  def self.get_name(locale)
-    x = only(:name).where(:locale => locale).first
-    return x.name if x.present?
+  def self.name_by_locale(locale)
+    x = where(:locale => locale).first
+    return x.present? ? x.name : locale
   end
 end

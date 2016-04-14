@@ -10,7 +10,7 @@
   <%#= link_to_destroy(@item, [:admin]) %>
 </div>
 <%
-  fields = [:title, :summary, :slug, :color, :name]
+  fields = [:title, :type, :description, :slug, :color, :name]
   fields.each { |f|
 %>
     <p><strong><%= model_class.human_attribute_name(f) %>: </strong><%= @item.send(f) %></p>

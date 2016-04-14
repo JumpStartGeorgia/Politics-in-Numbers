@@ -9,6 +9,8 @@ ka:
       view: View
       view_all: View All
       new: New
+      reset: Reset
+      cancel: Cancel
       with_obj:
         cancel: Cancel %{obj}
         create: Create %{obj}
@@ -21,6 +23,8 @@ ka:
     common:
       account: Account
       actions: Actions
+      default_text: "ძირითადი ტექსტი"
+      default_url: "ძირითადი URL"
       jumpstart:
         slogan: JumpStart Georgia - We communicate data better!
       name: Rails-ის დასაწყისი მოდელი

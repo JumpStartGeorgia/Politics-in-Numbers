@@ -11,4 +11,10 @@ class AdminController < ApplicationController
     end
   end
 
+  def permalink
+    str = params[:for_string]
+    unique = Mongoid::Slug::UniqueSlug.new(Party.new).find_unique(str) if str.present?
+    render json: { permalink: unique }
+  end
+
 end

@@ -7,80 +7,42 @@
 #   Role.find_or_create_by(name: role)
 # end
 #
+
+
+
+def is_numeric?(obj)
+   obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
+end
+
+I18n.locale = :ka
+destroy_mode = true
+up_path = Rails.public_path.join("upload")
+
+if destroy_mode
+  puts "Destroy phase ----------------------"
+  puts "  languages"
+  Language.destroy_all
+  puts "  party data"
+  Party.destroy_all
+  puts "  period data"
+  Period.destroy_all
+  puts "  detail and its schema, with all embed documents"
+  Detail.destroy_all
+  puts "  category data"
+  Category.destroy_all
+  puts "Destroy phase end ------------------"
+end
+
+
 #####################
 ## Languages
 #####################
 puts 'loading languages'
 if (Language.count == 0)
   langs = [
-    ["af", "Afrikaans"],
-    ["sq", "shqipe"],
-    ["ar", "العربية‏"],
-    ["hy", "Հայերեն"],
-    ["az", "Azərbaycan­ılı"],
-    ["eu", "euskara"],
-    ["be", "Беларускі"],
-    ["bg", "български"],
-    ["ca", "català"],
-    ["hr", "hrvatski"],
-    ["cs", "čeština"],
-    ["da", "dansk"],
-    ["div", "ދިވެހިބަސް‏"],
-    ["nl", "Nederlands"],
-    ["en", "English"],
-    ["et", "eesti"],
-    ["fo", "føroyskt"],
-    ["fi", "suomi"],
-    ["fr", "français"],
-    ["gl", "galego"],
     ["ka", "ქართული"],
-    ["de", "Deutsch"],
-    ["el", "ελληνικά"],
-    ["gu", "ગુજરાતી"],
-    ["he", "עברית‏"],
-    ["hi", "हिंदी"],
-    ["hu", "magyar"],
-    ["is", "íslenska"],
-    ["id", "Bahasa Indonesia"],
-    ["it", "italiano"],
-    ["ja", "日本語"],
-    ["kn", "ಕನ್ನಡ"],
-    ["kk", "Қазащb"],
-    ["sw", "Kiswahili"],
-    ["kok", "कोंकणी"],
-    ["ko", "한국어"],
-    ["ky", "Кыргыз"],
-    ["lv", "latviešu"],
-    ["lt", "lietuvių"],
-    ["mk", "македонски јазик"],
-    ["ms", "Bahasa Malaysia"],
-    ["mr", "मराठी"],
-    ["mn", "Монгол хэл"],
-    ["no", "norsk"],
-    ["fa", "فارسى‏"],
-    ["pl", "polski"],
-    ["pt", "Português"],
-    ["pa", "ਪੰਜਾਬੀ"],
-    ["ro", "română"],
-    ["ru", "русский"],
-    ["sa", "संस्कृत"],
-    ["sr", "srpski"],
-    ["sk", "slovenčina"],
-    ["sl", "slovenski"],
-    ["es", "español"],
-    ["sv", "svenska"],
-    ["syr", "ܣܘܪܝܝܐ‏"],
-    ["ta", "தமிழ்"],
-    ["tt", "Татар"],
-    ["te", "తెలుగు"],
-    ["th", "ไทย"],
-    ["tr", "Türkçe"],
-    ["uk", "україньска"],
-    ["ur", "اُردو‏"],
-    ["uz", "U'zbek"],
-    ["vi", "Tiếng Việt"],
-    ["zh-TW", "繁體中文"],
-    ["zh-CN", "简体中文"]
+    ["en", "English"],
+    ["ru", "Русский"]
   ]
 
   langs = langs.map{|x| {locale: x[0], name: x[1]}}
@@ -99,41 +61,19 @@ if User.where(email: email).count == 0
 end
 
 
-def is_numeric?(obj)
-   obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
-end
-
-I18n.locale = :ka
-destroy_mode = true
-up_path = Rails.public_path.join("upload")
-
-if destroy_mode
-  puts "Destroy phase ----------------------"
-  puts "  party data"
-  Party.destroy_all
-  puts "  period data"
-  Period.destroy_all
-  puts "  detail and its schema, with all embed documents"
-  Detail.destroy_all
-  puts "  category data"
-  Category.destroy_all
-  puts "Destroy phase end ------------------"
-end
-
+puts "Gather category data"
+categories_cell = []
 categories_data = []
-virtuals_data = []
 workbook = RubyXL::Parser.parse("#{up_path}/categories.xlsx")
 cat_id = 1
 level = 0
-plevel = 0 # previous level
-parenting = [nil, nil, nil, nil, nil, nil]
+parenting = [nil, nil, nil, nil, nil]
 orders = [0, 0, 0, 0, 0, 0]
 parent_id = nil
-pparent_id = nil
 workbook[0].each_with_index { |row, row_i|
   next if row_i == 0
   if row && row.cells
-    cells = Array.new(10, nil) # Level0  Level1  Level2  Level3  Level4  Level5  Cells Codes Details Virtual
+    cells = Array.new(9, nil) # Level0  Level1  Level2  Level3  Level4  Cells Codes Details Short
     row.cells.each_with_index do |c, c_i|
       if c && c.value.present?
         cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
@@ -141,58 +81,94 @@ workbook[0].each_with_index { |row, row_i|
     end
 
     has_level = false
-    (0..5).step(1) { |lvl|
+    (0..4).step(1) { |lvl|
       if cells[lvl].present?
-        #plevel = level if level != plevel
         if lvl > level
           orders[lvl] = 1
         else
           orders[lvl] += 1
         end
         level = lvl
-
-        #puts "#{level} - #{cells[lvl]}"
         has_level = true
       end
     }
     next if !has_level
 
-    if level == 0
-      #plevel = 0
-      parenting[0] = cat_id
-    end
-    parenting[level] = cat_id# if plevel < level
+    parenting[0] = cat_id if level == 0
+
+    parenting[level] = cat_id
     parent_id = parenting[level-1].present? && level != 0 ? parenting[level-1] : nil
 
-    cls = [nil, nil]
-    if cells[6].present?
-      cls = cells[6].strip.split("/")
-      (puts "Form or Cell is empty"; exit) if cls.length != 2
-    else
-      (puts "Form/Cell is empty"; exit) if level != 0
-    end
+    forms_and_cells = Category.parse_formula(cells[5])
+    (puts "Form or Cell or Both are empty"; exit) if forms_and_cells.nil?
 
-    if cells[7].present?
-      cd = cells[7].to_s.strip
-    else
-      (puts "Code is empty";) if level != 0
-    end
-    dt = cells[8].present? ? cells[8] : nil
-    tmp = { tmp_id: cat_id, virtual: (level == 0 ? true : false), level: level, parent_id: parent_id, form: cls[0], cell: cls[1], code: cd, title_translations: { en: cells[level].strip }, detail_id: dt, order: orders[level]}
-    #puts "#{' '*2*level} #{parent_id} #{cells[level]} #{cat_id} #{cls} #{cd} #{(level == 0 ? true : false)}"
+    codes = Category.parse_codes(cells[6])
+    (puts "Code is empty";) if codes.nil?
+
+    dt = cells[7].present? ? cells[7] : nil
+    tmp = { tmp_id: cat_id, virtual: false, level: level, parent_id: parent_id, forms: forms_and_cells[0], cells: forms_and_cells[1], codes: codes, title_translations: { en: cells[level].strip }, detail_id: dt, order: orders[level]}
+    categories_cell << (cells << cat_id)
     categories_data << tmp
-    if cells[9].present? && is_numeric?(cells[9])
-      vrt = tmp.clone
-      vrt[:virtual_id] = cells[9]
-      virtuals_data <<  vrt
-    end
-
     cat_id += 1
   end
 }
-#puts virtuals_data.inspect
 
-#puts categories_data.inspect
+puts "Gather virtual category data"
+virtuals_data = []
+cat_id = 1
+level = 0
+parenting = [nil, nil]
+orders = [0, 0]
+parent_id = nil
+others = []
+categories_cell.each_with_index { |cells, row_i|
+    next if !(cells[8].present? && is_numeric?(cells[8]))
+    virt = cells[8]
+    (others << cells[9]; next; ) if virt == 99
+
+    val = ""
+    has_level = false
+    (0..4).step(1) { |lvl|
+      if cells[lvl].present?
+        val = cells[lvl]
+        if lvl == 0
+          if row_i != 0
+            virtuals_data << { tmp_id: cat_id, virtual: true, complex: true, level: 1, parent_id: parenting[0], virtual_ids: others, title_translations: { en: "Other" }, order: orders[1]+1}
+            cat_id += 1
+          end
+          others = []
+          orders[0] += 1
+          orders[1] = 0
+          level = 0
+        else
+          orders[1] += 1 if lvl >= level
+          level = 1
+        end
+        has_level = true
+      end
+    }
+    next if !has_level
+
+
+    parenting[level] = cat_id
+    parent_id = parenting[level-1].present? && level != 0 ? parenting[level-1] : nil
+
+    forms_and_cells = Category.parse_formula(cells[5])
+    (puts "Form or Cell or Both are empty"; exit) if forms_and_cells.nil?
+
+    codes = Category.parse_codes(cells[6])
+    (puts "Code is empty";) if codes.nil?
+
+    dt = cells[7].present? ? cells[7] : nil
+    tmp = { tmp_id: cat_id, virtual: true, level: level, parent_id: parent_id, virtual_ids: [cells[9]], title_translations: { en: val.strip }, detail_id: dt, order: orders[level]}
+    virtuals_data << tmp
+    cat_id += 1
+}
+virtuals_data << { tmp_id: cat_id, virtual: true, complex: true, level: 1, parent_id: parenting[0], forms: nil, cells: nil, title_translations: { en: "Other" }, order: orders[1]+1, virtual_ids: others} if others.present?
+# virtuals_data.each {|r|
+#   puts "#{'  '*r[:level]}#{r[:title_translations][:en]} #{r[:tmp_id]} #{r[:parent_id]} #{r[:order]} #{r[:virtual_ids].inspect}"
+# }
+
 
 
 parties_data = []
@@ -205,10 +181,10 @@ workbook[0].each_with_index { |row, row_i|
         cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
       end
     end
-    tmp = { name_translations: { ka: '' }, title_translations: { ka: '' }, summary_translations: { ka: ''}}
+    tmp = { name: "", title_translations: { ka: '' }, description_translations: { ka: ''}}
     tmp[:tmp_id] = cells[0] if cells[0].present?
     tmp[:title_translations][:ka] = cells[1].present? ? cells[1] : cells[2]
-    tmp[:name_translations][:ka] = cells[2]
+    tmp[:name] = cells[2]
 
     parties_data << tmp
   end
@@ -225,9 +201,6 @@ periods_data = [
   { type: 'annual', start_date: '01.01.2015', end_date: '31.01.2015', title_translations: { ka: "2015" }, description_translations: { ka: "2015 description" }}
   #{ type: 'election', start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "2015 election" }, description_translations: { ka: "2015 election description" }}
 ]
-
-# 2, 4, 4.1, 4.2, 4.3, 4.4, 6, 6.1 not in election period
-
 
 details_data = [
   { code: "FF1", orig_code: "ფორმა N1", header_row: 8, content_row: 10, fields_count: 13, footer: 0, title_translations: { ka: "საწევრო შენატანები და შემოწირულებები" }},
@@ -523,7 +496,6 @@ notes_data = [
   [ ] # 9.7.1
 ]
 
-
 terminators_data = [
   [ # 1
     { term: "სულ", field_index: 1 },
@@ -680,11 +652,9 @@ puts "Creating phase ----------------------"
     cat = Category.create!(d)
     categories_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
     virtuals_data.each {|r|
-      if r[:tmp_id] == tmp_id
-        r[:cat_id] = cat._id
-      end
-      if d[:level] == 0 && r[:parent_id] == tmp_id
-        r[:parent_id] = cat._id
+      ind = r[:virtual_ids].index(tmp_id)
+      if ind.present?
+        r[:virtual_ids][ind] = cat._id
       end
     }
 
@@ -694,30 +664,10 @@ puts "Creating phase ----------------------"
   puts "  Virtual Category data"
   virtuals_data.each_with_index do |d,d_i|
     tmp_id = d.delete(:tmp_id)
-    #puts d[:detail_id] if ["FF9", "FF8"].include?(d[:detail_id])
-    if !d[:used] && d[:level] != 0
-      d[:virtual] = true
-      d[:cell] = nil
-      d[:code] = nil
-      d[:virtual_ids] = [d[:cat_id]]
-      titles = [d[:title_translations][:en]]
-      virtuals_data.each_with_index {|dd,dd_i|
-        if !dd[:used] && dd_i != d_i && d[:virtual_id] == dd[:virtual_id]
-          titles << dd[:title_translations][:en]
-          d[:virtual_ids] << dd[:cat_id]
-          dd[:used] = true
-        end
-      }
-      d[:title_translations][:en] = titles.uniq.join(" & ")
-      d[:detail_id] = Detail.by_code(d[:detail_id])._id if (d[:detail_id].present? && !["FF9", "FF8"].include?(d[:detail_id]))
-
-      cat = Category.create!(d.except(:used, :cat_id, :virtual_id))
-      virtuals_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
-
-      puts "    Virtual Category '#{d[:title_translations][:en]}' was added"
-    end
-    d[:used] = true
-  end
+    cat = Category.create!(d)
+    virtuals_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
+    puts "    Virtual Category '#{d[:title_translations][:en]} #{d[:virtual_ids].inspect}' was added"
+ end
 
   # begin
   #   period.valid?

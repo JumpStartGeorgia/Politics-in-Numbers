@@ -10,8 +10,7 @@ module ApplicationHelper
   # type: text, url, etc - whatever is needed to make 'tabbed_translation_form.default_xxx' work
   # IMPORTANT - html_safe must be called on the return value
   def show_default_text(text, type='text')
-    key = "tabbed_translation_form.default_#{type}"
-    "<span class='default-translation-text'> (#{t(key)}: #{text})</span>"
+    text.present? ? "<span class='default-translation-text'> (#{t("shared.common.default_#{type}")}: #{text})</span>" : ""
   end
 
 end

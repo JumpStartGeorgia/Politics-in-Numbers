@@ -8,6 +8,9 @@ en:
       log_in: Log in
       view: View
       view_all: View All
+      new: New
+      reset: Reset
+      cancel: Cancel
       with_obj:
         cancel: Cancel %{obj}
         create: Create %{obj}
@@ -20,6 +23,8 @@ en:
     common:
       account: Account
       actions: Actions
+      default_text: Default Text
+      default_url: Default URL
       jumpstart:
         slogan: JumpStart Georgia - We communicate data better!
       name: Rails Starter Template

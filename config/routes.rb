@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  match '/permalink', :to => 'admin#permalink', :as => :permalink, :via => :get, constraints: {format: :json}
   scope ':locale', locale: /#{I18n.available_locales.join("|")}/ do
     post '/users', to: 'users#create'
 
@@ -13,9 +14,10 @@ Rails.application.routes.draw do
                },
                constraints: { format: :html }
     match '/admin', :to => 'admin#index', :as => :admin, :via => :get
+
     namespace :admin do
       resources :users#, constraints: { format: :html }
-      resources :parties # , constraints: { format: :html }
+      resources :parties
     end
 
     root 'root#index'

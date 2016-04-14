@@ -10,7 +10,15 @@
     <% if Rails.env.production? %>
       <%= render partial: 'application/google_analytics' %>
     <% end %>
+    <script type="text/javascript">
+      I18n = {
+        defaultLocale: "<%= I18n.default_locale %>",
+        locale: "<%= I18n.locale %>",
+        available_locales: "<%= I18n.available_locales.map{|x| x.to_s}.join(',') %>".split(',')
+      }
+    </script>
 
+    <%= javascript_include_tag "application" %>
   </body>
 
 </html>

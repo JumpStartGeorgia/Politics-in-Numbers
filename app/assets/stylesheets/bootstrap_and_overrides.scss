@@ -68,3 +68,12 @@ $gray-light: lighten($gray-base, 70%);
    url('../assets/glyphicons-halflings-regular.ttf') format('truetype'),
    url('../assets/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
  }
+
+.radio_buttons {
+  .radio {
+    padding-left:10px;
+  }
+}
+.radio {
+  margin-left: 20px;
+}

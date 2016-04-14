@@ -8,8 +8,9 @@
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:title) %></th>
+      <th><%= model_class.human_attribute_name(:description) %></th>
+      <th><%= model_class.human_attribute_name(:type) %></th>
       <th><%= model_class.human_attribute_name(:slug) %></th>
-      <th><%= model_class.human_attribute_name(:summary) %></th>
       <th><%= model_class.human_attribute_name(:color) %></th>
       <th><%= model_class.human_attribute_name(:name) %></th>
       <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
@@ -19,8 +20,9 @@
     <% @items.each do |item| %>
       <tr>
         <td><%= item.title %></td>
+        <td><%= item.description %></td>
+        <td><%= item.type %></td>
         <td><%= item.slug %></td>
-        <td><%= item.summary %></td>
         <td><%= item.color %></td>
         <td><%= item.name %></td>
         <td>

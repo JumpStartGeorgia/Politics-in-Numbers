@@ -10,6 +10,7 @@ class RootController < ApplicationController
   end
 
   def read
+    I18n.locale = :en
     PartyData.destroy_all
     start = Time.now
     @p = []
@@ -17,7 +18,7 @@ class RootController < ApplicationController
     sheets = ["1", "2", "3", "4" , "4.1" , "4.2" , "4.3" , "4.4" , "5" , "5.1" , "5.2" , "5.3" , "5.4", "5.5", "6" , "6.1" , "7", "8", "8.1" , "9" , "9.1" , "9.2" , "9.3", "9.4" , "9.5", "9.6", "9.7", "9.7.1",  "Validation"] # 9.71 = 9.8
     sheets_abbr = ["FF1", "FF2", "FF3", "FF4" , "FF4.1" , "FF4.2" , "FF4.3" , "FF4.4" , "FF5" , "FF5.1" , "FF5.2" , "FF5.3" , "FF5.4" , "FF5.5" , "FF6" , "FF6.1" , "FF7", "FF8", "FF8.1" , "FF9" , "FF9.1" , "FF9.2" , "FF9.3", "FF9.4" , "FF9.5", "FF9.6", "FF9.7", "FF9.7.1", "V"]
 
-    lg = Logger.new File.new('log/skipped.log', 'w')
+    lg = Logger.new File.new('log/bad_category.log', 'w')
     lg.formatter = proc do |severity, datetime, progname, msg|
       "#{msg}\n"
     end
@@ -33,7 +34,7 @@ class RootController < ApplicationController
     files.each_with_index{|f,f_i|
 
       start_partial = Time.now
-      break if f_i == 1
+      #break if f_i == 1
       #next if !f.include? "/8.2015.xlsx"
       d("#{f}")
       lg.info "#{f}"
@@ -72,26 +73,67 @@ class RootController < ApplicationController
         missed_sheets << w if !workbook_sheets.include? w
       }
 
-      Category.each {|item|
+      Category.each { |item|
         if !item.virtual
-          form = item.form
-          cell = item.cell
-          if sheets_abbr.include? form
-            abbr_index = sheets_abbr.index(form)
-            address = RubyXL::Reference.ref2ind(cell)
-            val = workbook[workbook_sheets_map[form]][address[0]][address[1]]
-            val = val.present? ? val.value.to_f : 0.0
+          val = 0
+          item.forms.each_with_index { |form, form_i|
+            puts
+            cell = item.cells[form_i]
+            code = item.codes && item.codes[form_i]
+            if sheets_abbr.include? form
+              abbr_index = sheets_abbr.index(form)
+              address = RubyXL::Reference.ref2ind(cell)
+              is_code = true
+              if code.present?
+                cd = deep_present(workbook, [workbook_sheets_map[form], address[0], 0])
+                cd = cd.present? ? cd.value.to_s : ""
+                if code != cd
+                  lg.info("#{item.title}/#{form}/#{cell}/#{code} but is #{cd}")
+                  is_code = false
+                end
+              end
+              if is_code
+                lg.info "good"
+                val_tmp = deep_present(workbook, [workbook_sheets_map[form], address[0], address[1]])
+                val += val_tmp.present? ? val_tmp.value.to_f : 0.0
+              end
 
-            party_data.category_datas << CategoryData.new({ type: nil, value: val, category_id: item._id })
-            #lg.info "#{form}#{cell}#{val}"
-          else
-            d("Missing form #{form}")
-          end
+              #lg.info "#{form}#{cell}#{val}"
+            else
+              lg.info("Missing form #{form}")
+            end
+          }
+          party_data.category_datas << CategoryData.new({ type: nil, value: val, category_id: item._id })
         end
       }
+      # Category.each { |item|
+      #   if item.virtual
+      #     val = 0
+      #     item.virtual_ids.each{ |id|
+      #       #d(party_data.category_datas.length)
+      #     }
+      #     # forms.each { |form, form_i|
+      #     #   cell = cells[form_i]
+      #     #   code = codes[form_i]
+      #     #   if sheets_abbr.include? form
+      #     #     abbr_index = sheets_abbr.index(form)
+      #     #     address = RubyXL::Reference.ref2ind(cell)
+      #     #     val_tmp = workbook[workbook_sheets_map[form]][address[0]][address[1]]
+      #     #     val += val_tmp.present? ? val_tmp.value.to_f : 0.0
+
+
+      #     #     #lg.info "#{form}#{cell}#{val}"
+      #     #   else
+      #     #     d("Missing form #{form}")
+      #     #   end
+      #     # }
+      #     # party_data.category_datas << CategoryData.new({ type: nil, value: val, category_id: item._id })
+      #   end
+      # }
       # calculate main virtual category
 
       Detail.each{ |item|
+        next
         table = []
         next if item.code != "FF4.1"
         schemas = item.detail_schemas.order_by(order: 1)

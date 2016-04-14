@@ -5,7 +5,6 @@ class Category < CustomTranslation
 
   # has_many :category_data
 
-  field :code, type: String
   field :title, type: String, localize: true
   field :description, type: String, localize: true
   field :level, type: Integer
@@ -13,9 +12,11 @@ class Category < CustomTranslation
   field :detail_id, type: BSON::ObjectId
   field :virtual_ids, type: Array # Array of categories that are summed up of BSON::ObjectId type
   field :virtual, type: Boolean, default: false
+  field :complex, type: Boolean, default: false # If virtual and consist of multiple categories then true
   #field :simple, type: Boolean, default: false
-  field :form, type: String
-  field :cell, type: String
+  field :forms, type: Array
+  field :cells, type: Array
+  field :codes, type: Array
   field :languages, type: Array
   field :default_language, type: String
   #field :tmp_id, type: Integer
@@ -28,7 +29,6 @@ class Category < CustomTranslation
   index simple: 1
 
   def title
-    puts get_translation(title_translations)
     get_translation(title_translations)
   end
 
@@ -59,7 +59,7 @@ class Category < CustomTranslation
   def self.tree(vir = false)
     cats = Category.all
     list = []
-    cats.where({level: 0}).order_by(order: :asc).each{ |cat| list << { c: cat, sub: sub_tree(cat.id, 1, vir) } }
+    cats.where({level: 0, virtual: vir}).order_by(order: :asc).each{ |cat| list << { c: cat, sub: sub_tree(cat.id, 1, vir) } }
     list
   end
 
@@ -97,6 +97,27 @@ class Category < CustomTranslation
       end
     end
     out
+  end
+
+  def self.parse_formula(formula)
+    t = nil
+    if formula.present?
+      fs = formula.strip.split("&")
+      forms = []
+      cells = []
+      fs.each { |r|
+        cls = r.split("/")
+        return nil if cls.length != 2
+        forms << cls[0]
+        cells << cls[1]
+      }
+      t = [forms, cells]
+    end
+    t
+  end
+
+  def self.parse_codes(codes)
+    codes.present? ? codes.to_s.strip.split(",") : nil
   end
 
 end
