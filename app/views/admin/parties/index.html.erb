@@ -21,7 +21,7 @@
       <tr>
         <td><%= item.title %></td>
         <td><%= item.description %></td>
-        <td><%= item.type %></td>
+        <td><%= t("mongoid.shared.options.party.type.#{model_class::TYPES[item.type]}") %></td>
         <td><%= item.slug %></td>
         <td><%= item.color %></td>
         <td><%= item.name %></td>

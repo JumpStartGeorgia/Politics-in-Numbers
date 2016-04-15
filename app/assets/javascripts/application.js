@@ -35,6 +35,7 @@
 //= require twitter/bootstrap/collapse
 //= require twitter/bootstrap/carousel
 //= require twitter/bootstrap/affix
+//= require util
 //= require select2
 //= require admin
 //

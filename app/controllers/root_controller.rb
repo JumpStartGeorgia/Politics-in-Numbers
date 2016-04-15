@@ -2,7 +2,7 @@
 class RootController < ApplicationController
   def index
     # @categories = Category.tree_out
-
+    #raise "Blah"
     @parties = PartyData.first
   end
 

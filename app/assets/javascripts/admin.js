@@ -1,17 +1,22 @@
-function permalink (str) {
+/*global $, chrome*/
+/*eslint no-console: "allow"*/
+
+function permalink (str, receiver) {
  $.ajax({
     dataType: "json",
     url: "/permalink",
     data: {"for_string": str},
-    success:  function (data,sec) {
-      console.log(data.permalink);
-      // permalink to it's place
+    success:  function (data) {
+      $(receiver).val(data.permalink ? data.permalink : "");
     }
   });
 }
-permalink("Вфошщыва ");
 
 
+$(".permalink-trigger").on("change keyup paste click", debounce(function() {
+  var t = $(this);
+  permalink(t.val(), t.attr("data-permalink-receiver"));
+}));
 
 
 $( "#categories-list" ).select2({

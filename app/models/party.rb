@@ -4,6 +4,9 @@ class Party# < CustomTranslation
   include Mongoid::Timestamps
   include Mongoid::Slug
 
+  # before_update :check_changed_attributes
+
+
   #has_many :party_data
   TYPES = [:party, :initiative]
 
@@ -29,11 +32,17 @@ class Party# < CustomTranslation
   #   get_translation(description_translations)
   # end
 
+  def check_changed_attributes
+    puts "***************************"
+    puts "***************************#{changes.inspect}" if self._slugs_translations?
+  end
+
   def validate_translations
     default = I18n.default_locale
     locales = [:ka, :en, :ru]
+    puts "validating --------------------------------#{_slugs_translations.inspect}"
     [title_translations, description_translations, _slugs_translations].each{|f|
-      f.delete_if{|k,v| !v.present? }
+      #f.delete_if{|k,v| !v.present? }
       if f[default].blank?
         errors.add(:base, I18n.t('errors.messages.translation_default_lang',
           field_name: self.class.human_attribute_name(f),

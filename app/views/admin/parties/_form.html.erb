@@ -31,7 +31,7 @@
               hint = t(hint_key + 'title')
               hint << show_default_text(@item.title_translations[default_locale]) if index > 0
             %>
-            <%= translation.input locale, hint: hint.html_safe, label: label %>
+            <%= translation.input locale, hint: hint.html_safe, label: label, input_html: { class: "permalink-trigger", "data-permalink-receiver" => ".permalink-receiver-#{locale}"} %>
           <% end %>
 
           <%= f.fields_for :description_translations, OpenStruct.new(f.object.description_translations) do |translation| %>
@@ -49,7 +49,7 @@
               hint = t(hint_key + 'slug')
               hint << show_default_text(@item._slugs_translations[default_locale][0]) if index > 0
             %>
-            <%= translation.input locale, hint: hint.html_safe, label: label %>
+            <%= translation.input locale, hint: hint.html_safe, label: label , input_html: { class: "permalink-receiver-#{locale}" }%>
           <% end %>
             <%#= f.input :slug, hint: t(hint_key + 'slug') %>
         </div>
