@@ -6,6 +6,20 @@
 }
 abbr[title], abbr[data-original-title] {
   border: 0;
-  padding-left: 2px;
+  padding-left: 2px 4px 2px 2px;
   color: #FF6C6C;
+}
+.available-locales-box {
+  position:relative;
+}
+.available-locales {
+  display:inline-block;
+  position:absolute;
+  top:0px;
+  right:0px;
+}
+.available-locales span {
+  padding: 2px 4px 2px 2px;
+  font-size: 11px;
+  color: #929292;
 }

@@ -10,6 +10,7 @@ en:
         type: Type
         description: Description
         slug: Permalink
+        permalink: Permalink
         color: Color for charts
         name: Original name
     models:
@@ -27,6 +28,7 @@ en:
         type: "Type: Party or Initiative"
         description: Party description for party summary page
         slug: Party Permalink
+        permalink: Party Permalink
         color: Party color for charts
         name: "Original party name, that is used while processing uploaded files"
     options:

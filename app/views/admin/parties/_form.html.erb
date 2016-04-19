@@ -43,15 +43,15 @@
               <%= translation.input locale, :as => :text, rows: 10, hint: hint.html_safe, label: label,
                   :input_html => { class: "tinymce" } %>
             <% end %>
-            <%= f.fields_for :_slugs_translations, OpenStruct.new(f.object._slugs_translations) do |translation| %>
+            <%= f.fields_for :permalink_translations, OpenStruct.new(f.object.permalink_translations) do |translation| %>
             <%
-              label = t(label_key + 'slug')
-              hint = t(hint_key + 'slug')
-              hint << show_default_text(@item._slugs_translations[default_locale][0]) if index > 0
+              label = t(label_key + 'permalink')
+              hint = t(hint_key + 'permalink')
+              hint << show_default_text(@item._slugs_translations[default_locale].last) if index > 0 && @item._slugs_translations[default_locale].present?
             %>
-            <%= translation.input locale, hint: hint.html_safe, label: label , input_html: { class: "permalink-receiver-#{locale}" }%>
+            <%= translation.input locale, hint: hint.html_safe, label: label , input_html: { value: get_slug(@item, locale), class: "permalink-receiver-#{locale}" }%>
           <% end %>
-            <%#= f.input :slug, hint: t(hint_key + 'slug') %>
+            <%#= f.input :permalink, hint: t(hint_key + 'permalink') %>
         </div>
       <% end %>
     </div>
@@ -60,9 +60,9 @@
 
   <%= f.inputs do %>
     <%= f.input :type, :as => :radio, :collection => Party.types %>
-    <%= f.input :color, input_html: { class: "colorpicker" } %>
+    <%= f.label :color %>
+    <%= f.color_field :color, class: "colorpicker" %>
     <%= f.input :name, hint: t(hint_key + 'name') %>
-
   <% end %>
 
 

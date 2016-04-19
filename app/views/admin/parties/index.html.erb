@@ -4,7 +4,8 @@
 <div class="form-group form-group-admin-buttons">
   <%= links_for(model_class, :admin, [:pre, :new]) %>
 </div>
-<table class="table table-striped display">
+<div class="table-responsive">
+  <table class="table table-bordered table-hover">
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:title) %></th>
@@ -19,8 +20,8 @@
   <tbody>
     <% @items.each do |item| %>
       <tr>
-        <td><%= item.title %></td>
-        <td><%= item.description %></td>
+        <td class="available-locales-box"><%= "#{item.title} #{existence_translations(item, :title)}".html_safe %></td>
+        <td class="available-locales-box"><%= "#{item.description} #{existence_translations(item, :description)}".html_safe %></td>
         <td><%= t("mongoid.shared.options.party.type.#{model_class::TYPES[item.type]}") %></td>
         <td><%= item.slug %></td>
         <td><%= item.color %></td>

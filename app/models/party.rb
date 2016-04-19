@@ -4,7 +4,7 @@ class Party# < CustomTranslation
   include Mongoid::Timestamps
   include Mongoid::Slug
 
-  # before_update :check_changed_attributes
+  #before_update :check_changed_attributes
 
 
   #has_many :party_data
@@ -16,7 +16,18 @@ class Party# < CustomTranslation
   field :color, type: String, default: "##{SecureRandom.hex(3)}"
   field :tmp_id, type: Integer
   field :type, type: Integer, default: 0 # 0 - party, 1 - initiative
-  slug :title, history: true, localize: true # rake mongoid_slug:set this is not working
+  field :permalink, type: String, localize: true
+  slug :permalink, :title, history: true, localize: true do |d|
+    puts "------------#{d.inspect}"
+    if d.permalink_changed?
+      d.permalink.to_url
+    elsif d.title_changed?
+      d.title.to_url
+    else
+      d.id.to_s
+    end
+  end
+  # rake mongoid_slug:set this is not working
 
   validate :validate_translations
   validates_presence_of :color, :type, :name
@@ -32,16 +43,16 @@ class Party# < CustomTranslation
   #   get_translation(description_translations)
   # end
 
-  def check_changed_attributes
-    puts "***************************"
-    puts "***************************#{changes.inspect}" if self._slugs_translations?
-  end
+  # def check_changed_attributes
+  #   puts "***************************"
+  #   puts "***************************#{changes.inspect}" if _slugs?
+  # end
 
   def validate_translations
     default = I18n.default_locale
     locales = [:ka, :en, :ru]
-    puts "validating --------------------------------#{_slugs_translations.inspect}"
-    [title_translations, description_translations, _slugs_translations].each{|f|
+#    puts "validating --------------------------------#{_slugs_translations.inspect}"
+    [title_translations, description_translations].each{|f|
       #f.delete_if{|k,v| !v.present? }
       if f[default].blank?
         errors.add(:base, I18n.t('errors.messages.translation_default_lang',
@@ -72,7 +83,7 @@ class Party# < CustomTranslation
   end
 
   def self.sorted
-    order_by([[:title, :asc]])
+    order_by([[:title, :asc]]).limit(3)
   end
 
   # def self.by_permalink(permalink)
@@ -107,5 +118,13 @@ class Party# < CustomTranslation
       col[I18n.t("mongoid.options.party.type.#{d}")] = i
     }
     col
+  end
+
+  def self.is_type(tp)
+    begin
+      tp.to_i < TYPES.length
+    rescue
+      false
+    end
   end
 end

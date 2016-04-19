@@ -153,6 +153,9 @@ group :development, :test do
 
   # Ruby code style
   gem 'rubocop', '~> 0.35.0'
+
+  # Add ability to show exception info using os notification system and open file with error in your editor on specific line.
+   gem 'exception_notification_extension', :git => 'git@github.com:JumpStartGeorgia/exception_notification_extension.git'
 end
 
 #####################################################################

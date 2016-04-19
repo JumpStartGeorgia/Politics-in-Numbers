@@ -77,3 +77,17 @@ $gray-light: lighten($gray-base, 70%);
 .radio {
   margin-left: 20px;
 }
+.radio_buttons.inline {
+  .radio {
+    display:inline-block;
+  }
+}
+input[type='color'] {
+  border: 0 !important;
+  padding: 0px !important;
+  margin: 0px !important;
+  background-color: white !important;
+  width: 26px !important;
+  height: 29px !important;
+  outline:none !important;
+}

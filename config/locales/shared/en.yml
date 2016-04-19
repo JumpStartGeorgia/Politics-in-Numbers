@@ -11,6 +11,7 @@ en:
       new: New
       reset: Reset
       cancel: Cancel
+      save: Save
       with_obj:
         cancel: Cancel %{obj}
         create: Create %{obj}

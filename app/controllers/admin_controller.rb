@@ -12,9 +12,21 @@ class AdminController < ApplicationController
   end
 
   def permalink
-    str = params[:for_string]
-    unique = Mongoid::Slug::UniqueSlug.new(Party.new).find_unique(str) if str.present?
-    render json: { permalink: unique }
+    value = params[:value]
+    locale = params[:locale]
+    locales = I18n.available_locales
+    perm = nil
+    #object = params[:object].present?
+    if value.present? && locale.present? && locales.include?(locale.to_sym)
+      begin
+        orig_locale = I18n.locale
+        I18n.locale = locale
+        perm = Mongoid::Slug::UniqueSlug.new(Party.new).find_unique(value) if value.present?
+      ensure
+        I18n.locale = orig_locale
+      end
+    end
+    render json: { permalink: perm }
   end
 
 end

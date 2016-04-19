@@ -12,5 +12,14 @@ module ApplicationHelper
   def show_default_text(text, type='text')
     text.present? ? "<span class='default-translation-text'> (#{t("shared.common.default_#{type}")}: #{text})</span>" : ""
   end
+  def get_slug(obj, locale)
+    return obj._slugs_translations[locale].last if obj._slugs_translations.present? && obj._slugs_translations[locale].present?
+  end
+  def existence_translations(obj, field)
+    ls = []
+    #locales = I18n.available_locales.map(&:to_s)
+    field_locales = obj.send("#{field}_translations").keys.map{|k|"#{k.upcase}"}
+    "<div class='available-locales'><span>#{field_locales.join(' | ')}</span></div>"
+  end
 
 end

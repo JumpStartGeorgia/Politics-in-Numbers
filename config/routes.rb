@@ -17,7 +17,12 @@ Rails.application.routes.draw do
 
     namespace :admin do
       resources :users#, constraints: { format: :html }
-      resources :parties
+      resources :parties do
+        collection do
+          get 'bulk'
+          post 'bulk_update'
+        end
+      end
     end
 
     root 'root#index'

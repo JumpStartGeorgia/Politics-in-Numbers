@@ -1,9 +1,10 @@
 # Non-resource pages
 class RootController < ApplicationController
   def index
+    puts "--------------------------#{bulk_update_admin_parties_path}"
+    #raise "dsf"
     # @categories = Category.tree_out
-    #raise "Blah"
-    @parties = PartyData.first
+    #@parties = PartyData.first
   end
 
   def about

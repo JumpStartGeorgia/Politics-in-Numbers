@@ -71,7 +71,7 @@ module ActionsHelper
     actions.each { |a|
       if a == :pre
         text = t("mongoid.models.#{path.to_s}", count: 1)
-        links += link_to text, [path], class: 'btn btn-default', title: text
+        links += link_to text, [path], title: text
       elsif a == :view_all
         text = t('shared.actions.view_all', obj: model_name )
         links += link_to text, [path] + [obj.class], class: 'btn btn-default', title: text

@@ -1,0 +1,45 @@
+<%- model_class = Party -%>
+<% title t '.title', :default => t('helpers.titles.edit', :model => model_class.model_name.human,
+                                 :default => "Bulk #{model_class.model_name.human}") %>
+<div class="form-group form-group-admin-buttons">
+  <%= links_for(@items[0], :admin, [:view_all]) %>
+</div>
+
+
+<%= form_tag bulk_update_admin_parties_path do %>
+
+<div class="table-responsive">
+  <table class="table table-bordered table-hover">
+    <thead class="thead-inverse">
+      <tr>
+        <th><%= model_class.human_attribute_name(:title) %></th>
+        <th><%= model_class.human_attribute_name(:type) %></th>
+        <!-- <th><%#= model_class.human_attribute_name(:color) %></th> -->
+        <!-- <th><%#= model_class.human_attribute_name(:name) %></th> -->
+      </tr>
+    </thead>
+    <tbody>
+      <% @items.each do |item| %>
+        <%= semantic_fields_for "parties[]", item do |f| %>
+          <%#= f.error_messages %>
+        <tr>
+          <td><%= f.object.title %></td>
+          <td><%= f.input :type, :as => :radio, :collection => Party.types, label: false, :wrapper_html => { :class => "inline" }  %></td>
+          <!-- <td><%#= f.color_field :color, label: false, class: "colorpicker" %> -->
+          <!-- <td><%#= f.input :name, label: false %></td> -->
+        </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+  <div class="form-group">
+    <input type="submit" name="commit" value="<%= t('shared.actions.save') %>" class="btn btn-primary">
+    <input type="reset" name="reset" value="<%= t('shared.actions.reset') %>" class="btn btn-warning">
+    <a class="btn btn-warning" href="<%= admin_parties_path %>"><%= t('shared.actions.cancel') %></a>
+  </div>
+<% end %>
+
+
+
+
