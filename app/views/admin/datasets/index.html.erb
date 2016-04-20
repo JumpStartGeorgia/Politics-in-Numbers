@@ -1,0 +1,31 @@
+<% title t '.title', :default => @model.model_name.human(:count => 2) %>
+
+<div class="form-group form-group-admin-buttons">
+  <%= links_for(@model, :admin, [:pre, :new]) %>
+</div>
+<div class="table-responsive">
+  <table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th><%= @model.human_attribute_name(:party_id) %></th>
+      <th><%= @model.human_attribute_name(:period_id) %></th>
+      <th><%= @model.human_attribute_name(:source_id) %></th>
+      <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td><%= item.party.name %></td>
+        <td><%= item.period.title %></td>
+        <td><%= item.source.path %></td>
+        <td>
+          <div class="btn-group btn-group-sm" role="group" aria-label="...">
+            <%= links_for(item, :admin, [:view, :edit, :destroy]) %>
+          </div>
+
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

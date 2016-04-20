@@ -1,6 +1,6 @@
 # DetailSchema class describes xlsx files
 # specific column meta data
-class DetailSchema < CustomTranslation
+class DetailSchema
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -19,8 +19,4 @@ class DetailSchema < CustomTranslation
 
   validates_presence_of :title, :order, :output_order
   validates_inclusion_of :required, in: [:and, :or, :nil]
-
-  def title
-    get_translation(title_translations)
-  end
 end

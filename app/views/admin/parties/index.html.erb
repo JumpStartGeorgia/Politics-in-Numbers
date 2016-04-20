@@ -1,19 +1,18 @@
-<%- model_class = Party -%>
-<% title t '.title', :default => model_class.model_name.human(:count => 2) %>
+<% title t '.title', :default => @model.model_name.human(:count => 2) %>
 
 <div class="form-group form-group-admin-buttons">
-  <%= links_for(model_class, :admin, [:pre, :new]) %>
+  <%= links_for(@model, :admin, [:pre, :new]) %>
 </div>
 <div class="table-responsive">
   <table class="table table-bordered table-hover">
   <thead>
     <tr>
-      <th><%= model_class.human_attribute_name(:title) %></th>
-      <th><%= model_class.human_attribute_name(:description) %></th>
-      <th><%= model_class.human_attribute_name(:type) %></th>
-      <th><%= model_class.human_attribute_name(:slug) %></th>
-      <th><%= model_class.human_attribute_name(:color) %></th>
-      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= @model.human_attribute_name(:title) %></th>
+      <th><%= @model.human_attribute_name(:description) %></th>
+      <th><%= @model.human_attribute_name(:type) %></th>
+      <th><%= @model.human_attribute_name(:slug) %></th>
+      <th><%= @model.human_attribute_name(:color) %></th>
+      <th><%= @model.human_attribute_name(:name) %></th>
       <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
@@ -22,7 +21,7 @@
       <tr>
         <td class="available-locales-box"><%= "#{item.title} #{existence_translations(item, :title)}".html_safe %></td>
         <td class="available-locales-box"><%= "#{item.description} #{existence_translations(item, :description)}".html_safe %></td>
-        <td><%= t("mongoid.shared.options.party.type.#{model_class::TYPES[item.type]}") %></td>
+        <td><%= t("mongoid.shared.options.party.type.#{@model::TYPES[item.type]}") %></td>
         <td><%= item.slug %></td>
         <td><%= item.color %></td>
         <td><%= item.name %></td>

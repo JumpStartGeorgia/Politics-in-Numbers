@@ -17,6 +17,7 @@ Rails.application.routes.draw do
 
     namespace :admin do
       resources :users#, constraints: { format: :html }
+      resources :datasets
       resources :parties do
         collection do
           get 'bulk'

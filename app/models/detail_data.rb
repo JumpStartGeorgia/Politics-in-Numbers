@@ -1,10 +1,10 @@
 # DetailData class - trace party detail data
-# It is embed in PartyData class, meta data is taken from Detail class
+# It is embed in Dataset class, meta data is taken from Detail class
 class DetailData
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :party_data
+  embedded_in :dataset
   # belongs_to :note
 
   field :table, type: Array

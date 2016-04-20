@@ -1,7 +1,7 @@
 <% title t '.title', :default => t('helpers.titles.new', :model => @model.model_name.human,
                                  :default => "New #{@model.model_name.human}") %>
 <div class="form-group form-group-admin-buttons">
-  <%= links_for(@item, :admin, [:view_all, :pre]) %>
+  <%= links_for(@item, :admin, [:pre, :view_all]) %>
 </div>
 
 <%= render :partial => 'form' %>

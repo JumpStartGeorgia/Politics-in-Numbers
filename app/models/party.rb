@@ -1,5 +1,5 @@
 # Party class - meta information about parties
-class Party# < CustomTranslation
+class Party
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Slug
@@ -7,7 +7,7 @@ class Party# < CustomTranslation
   #before_update :check_changed_attributes
 
 
-  #has_many :party_data
+  #has_many :datasets
   TYPES = [:party, :initiative]
 
   field :name, type: String
@@ -18,7 +18,6 @@ class Party# < CustomTranslation
   field :type, type: Integer, default: 0 # 0 - party, 1 - initiative
   field :permalink, type: String, localize: true
   slug :permalink, :title, history: true, localize: true do |d|
-    puts "------------#{d.inspect}"
     if d.permalink_changed?
       d.permalink.to_url
     elsif d.title_changed?
@@ -30,19 +29,8 @@ class Party# < CustomTranslation
   # rake mongoid_slug:set this is not working
 
   validate :validate_translations
-  validates_presence_of :color, :type, :name
-  # def title
-  #   get_translation(title_translations)
-  # end
-
-  # # def name
-  # #   get_translation(name_translations)
-  # # end
-
-  # def description
-  #   get_translation(description_translations)
-  # end
-
+  validates_presence_of :color, :name
+  validates_inclusion_of :type, in: [0, 1]
   # def check_changed_attributes
   #   puts "***************************"
   #   puts "***************************#{changes.inspect}" if _slugs?
@@ -52,13 +40,12 @@ class Party# < CustomTranslation
     default = I18n.default_locale
     locales = [:ka, :en, :ru]
 #    puts "validating --------------------------------#{_slugs_translations.inspect}"
-    [title_translations, description_translations].each{|f|
+    ["title_translations", "description_translations"].each{|f|
       #f.delete_if{|k,v| !v.present? }
-      if f[default].blank?
-        errors.add(:base, I18n.t('errors.messages.translation_default_lang',
-          field_name: self.class.human_attribute_name(f),
-          language: Language.name_by_locale(I18n.default_locale),
-          msg: I18n.t('errors.messages.blank')) )
+      if self.send(f)[default].blank?
+        errors.add(:base, I18n.t('mongoid.errors.messages.validations.default_translation_missing',
+          field: self.class.human_attribute_name(f),
+          lang: Language.name_by_locale(default)))
       end
     }
   end
@@ -83,9 +70,16 @@ class Party# < CustomTranslation
   end
 
   def self.sorted
-    order_by([[:title, :asc]]).limit(3)
+    order_by([[:title, :asc]])#.limit(3)
   end
 
+  def self.list
+    where({type: 0}).sorted.map{|t| [t.title, t.id]}
+  end
+
+  def self.full_list
+    sorted.map{|t| [t.title, t.id]}
+  end
   # def self.by_permalink(permalink)
   #   find_by(permalink: permalink)
   # end

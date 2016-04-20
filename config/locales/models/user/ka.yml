@@ -7,12 +7,18 @@ ka:
         role: Role
       party:
         title: Title
+        title_translations: Title
         type: Type
         description: Description
+        description_translations: Description
         slug: Permalink
         permalink: Permalink
         color: Color for charts
         name: Original name
+      dataset:
+        party_id: Party
+        period_id: Period
+        source_id: Source
     models:
       user:
         one: User
@@ -20,6 +26,9 @@ ka:
       party:
         one: Party
         other: Parties
+      dataset:
+        one: Party Data
+        other: Party Data
       admin:
         one: Admin Section
     hints:

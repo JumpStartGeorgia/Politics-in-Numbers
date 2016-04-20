@@ -1,5 +1,5 @@
 # Category class - trace party categories and sub categories
-class Category
+class Job
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -27,6 +27,7 @@ class Category
   index title: 1
   index parent_id: 1
   index simple: 1
+
 
   def self.tree_out(vir = false, select = false, id = "categories-list")
     list = tree(vir)

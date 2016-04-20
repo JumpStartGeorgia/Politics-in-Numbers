@@ -74,10 +74,11 @@ module ActionsHelper
         links += link_to text, [path], title: text
       elsif a == :view_all
         text = t('shared.actions.view_all', obj: model_name )
-        links += link_to text, [path] + [obj.class], class: 'btn btn-default', title: text
+        puts "--------------------------#{([path] + [obj.class]).inspect}"
+        links += link_to text, [path] + [obj], class: 'btn btn-default', title: text
       elsif ["new", "view", "edit", "destroy"].include?(a.to_s)
         text = t("shared.actions.#{a}", obj: model_name )
-        links += link_to text, [:new, path, model_key], :title => text, :class => 'btn btn-primary' if a == :new
+        links += link_to text, [:new, path, obj.model_name.singular_route_key], :title => text, :class => 'btn btn-primary' if a == :new
         links += link_to text, [path, obj], :title => text, :class => 'btn btn-info' if a == :view
         links += link_to text, [:edit, path, obj], :title => text, :class => 'btn btn-warning' if a == :edit
         links += link_to text, [path, obj], :method => 'delete', :data => { :confirm =>  t('shared.prompts.confirm') },

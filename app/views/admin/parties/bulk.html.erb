@@ -1,6 +1,5 @@
-<%- model_class = Party -%>
-<% title t '.title', :default => t('helpers.titles.edit', :model => model_class.model_name.human,
-                                 :default => "Bulk #{model_class.model_name.human}") %>
+<% title t '.title', :default => t('helpers.titles.edit', :model => @model.model_name.human,
+                                 :default => "Bulk #{@model.model_name.human}") %>
 <div class="form-group form-group-admin-buttons">
   <%= links_for(@items[0], :admin, [:view_all]) %>
 </div>
@@ -12,10 +11,10 @@
   <table class="table table-bordered table-hover">
     <thead class="thead-inverse">
       <tr>
-        <th><%= model_class.human_attribute_name(:title) %></th>
-        <th><%= model_class.human_attribute_name(:type) %></th>
-        <!-- <th><%#= model_class.human_attribute_name(:color) %></th> -->
-        <!-- <th><%#= model_class.human_attribute_name(:name) %></th> -->
+        <th><%= @model.human_attribute_name(:title) %></th>
+        <th><%= @model.human_attribute_name(:type) %></th>
+        <!-- <th><%#= @model.human_attribute_name(:color) %></th> -->
+        <!-- <th><%#= @model.human_attribute_name(:name) %></th> -->
       </tr>
     </thead>
     <tbody>

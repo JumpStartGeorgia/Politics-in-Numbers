@@ -1,5 +1,5 @@
 # Note class - for detail and detail_schema classes to keep notes
-class Note < CustomTranslation
+class Note
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -9,7 +9,4 @@ class Note < CustomTranslation
   field :text, type: String, localize: true
 
   validates_presence_of :star, :text
-  def text
-    get_translation(text_translations)
-  end
 end

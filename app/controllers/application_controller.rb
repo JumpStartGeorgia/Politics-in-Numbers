@@ -35,7 +35,8 @@ class ApplicationController < ActionController::Base
   # end
 
   def not_authorized
-    redirect_to :back, alert: t('shared.msgs.not_authorized')
+    puts "-------------------------sdf-"
+    redirect_to new_user_session, alert: t('shared.msgs.not_authorized')
   rescue ActionController::RedirectBackError
     redirect_to root_path
   end

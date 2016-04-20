@@ -1,10 +1,10 @@
 # Trace party categories and sub categories data
-# It is embed in PartyData class, meta data is taken from Category class
+# It is embed in Dataset class, meta data is taken from Category class
 class CategoryData
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embedded_in :party_data
+  embedded_in :dataset
 
   field :type, type: Integer
   field :value, type: Float

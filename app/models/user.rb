@@ -11,12 +11,9 @@ class User
          :trackable,
          :validatable
 
+  belongs_to :role
 
-  ROLES = { :user => 0, :manager => 66, :admin => 99 }
-
-  field :role,  :type => Integer, :default => 0
-  # Email already required by devise
-  # validates :role, presence: true
+  validates :role, presence: true
 
   ## Database authenticatable
   field :email,              :type => String, :default => ""
@@ -39,16 +36,7 @@ class User
 
   # indexes
   index({ :email => 1}, { background: true})
-
-  # use role inheritence
-  # - a role with a larger number can do everything that smaller numbers can do
-  def role?(base_role)
-    puts "#{base_role} #{ROLES[base_role].class} #{self.role.class}"
-    if base_role && ROLES.keys.index(base_role)
-      return ROLES[base_role] <= self.role
-    end
-    return false
-  end
+  index({ :role_id => 1}, { background: true})
 
   def is?(requested_role)
     if role

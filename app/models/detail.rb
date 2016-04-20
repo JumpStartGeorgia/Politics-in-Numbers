@@ -1,5 +1,5 @@
 # Detail class describes xlsx files specific sheet meta data
-class Detail < CustomTranslation
+class Detail
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -17,10 +17,6 @@ class Detail < CustomTranslation
   field :footer, type: Integer, default: 0
 
   validates_presence_of :code, :header_row, :content_row, :fields_count
-
-  def title
-    get_translation(title_translations)
-  end
 
   def self.by_code(code)
     Detail.where({code: code }).first

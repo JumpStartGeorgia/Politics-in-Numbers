@@ -1,18 +1,16 @@
 # Non-resource pages
 class RootController < ApplicationController
   def index
-    puts "--------------------------#{bulk_update_admin_parties_path}"
-    #raise "dsf"
+    puts "--------------------------#{new_user_session_path}"
     # @categories = Category.tree_out
-    #@parties = PartyData.first
+    #@parties = Dataset.first
   end
-
   def about
   end
 
   def read
     I18n.locale = :en
-    PartyData.destroy_all
+    Dataset.destroy_all
     start = Time.now
     @p = []
     upload_path = Rails.public_path.join("upload/annual")
@@ -21,6 +19,7 @@ class RootController < ApplicationController
 
     lg = Logger.new File.new('log/bad_category.log', 'w')
     lg.formatter = proc do |severity, datetime, progname, msg|
+
       "#{msg}\n"
     end
 
@@ -43,11 +42,11 @@ class RootController < ApplicationController
       tmp_id = filenames[f_i].split(".")
       prt = Party.where(tmp_id: tmp_id[0])
       per = Period.where(start_date: Date.strptime("01.01.#{tmp_id[1]}", "%d.%m.%Y"))
-      party_data = nil
+      dataset = nil
       if prt.present? && per.present?
         party_id = prt.first._id
         period_id = per.first._id
-        party_data = PartyData.new({party_id: party_id, period_id: period_id })
+        dataset = Dataset.new({party_id: party_id, period_id: period_id })
         #d "#{party_id} - #{period_id}"
       else
         d("File #{filenames[f_i]}, Party for id #{tmp_id[0]} is missing") if prt.first.nil?
@@ -104,14 +103,14 @@ class RootController < ApplicationController
               lg.info("Missing form #{form}")
             end
           }
-          party_data.category_datas << CategoryData.new({ type: nil, value: val, category_id: item._id })
+          dataset.category_datas << CategoryData.new({ type: nil, value: val, category_id: item._id })
         end
       }
       # Category.each { |item|
       #   if item.virtual
       #     val = 0
       #     item.virtual_ids.each{ |id|
-      #       #d(party_data.category_datas.length)
+      #       #d(dataset.category_datas.length)
       #     }
       #     # forms.each { |form, form_i|
       #     #   cell = cells[form_i]
@@ -128,7 +127,7 @@ class RootController < ApplicationController
       #     #     d("Missing form #{form}")
       #     #   end
       #     # }
-      #     # party_data.category_datas << CategoryData.new({ type: nil, value: val, category_id: item._id })
+      #     # dataset.category_datas << CategoryData.new({ type: nil, value: val, category_id: item._id })
       #   end
       # }
       # calculate main virtual category
@@ -232,13 +231,13 @@ class RootController < ApplicationController
         else
           dd = DetailData.new({ table: table, detail_id: item._id }) if table.present?
           lg.info dd.inspect
-          party_data.detail_datas << dd
+          dataset.detail_datas << dd
         end
       }
 
 
       d("Time elapsed #{(Time.now - start_partial).round(2)} seconds")
-      party_data.save!
+      dataset.save!
     }
     lg.close
     d("Time elapsed #{(Time.now - start).round(2)} seconds")

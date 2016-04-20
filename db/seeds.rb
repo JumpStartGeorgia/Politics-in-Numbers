@@ -2,13 +2,10 @@
 # with its default values. The data can then be loaded with the rake db:seed
 # (or created alongside the db with db:setup).
 
-# roles = %w(super_admin site_admin content_manager)
-# roles.each do |role|
-#   Role.find_or_create_by(name: role)
-# end
-#
-
-
+roles = %w(super_admin site_admin content_manager)
+roles.each do |role|
+  Role.find_or_create_by(name: role)
+end
 
 def is_numeric?(obj)
    obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
@@ -55,7 +52,7 @@ email = 'application@mail.com'
 if User.where(email: email).count == 0
   puts 'Creating app user and api key'
   #User.where(email: email).destroy
-  u = User.new(email: email, password: Devise.friendly_token[0,30], role: 0)#, is_user: false)
+  u = User.new(email: email, password: Devise.friendly_token[0,30], role_id: 0)#, is_user: false)
   u.save(validate: false)
   #u.api_keys.create
 end
@@ -181,9 +178,10 @@ workbook[0].each_with_index { |row, row_i|
         cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
       end
     end
-    tmp = { name: "", title_translations: { ka: '' }, description_translations: { ka: ''}}
+    tmp = { }
     tmp[:tmp_id] = cells[0] if cells[0].present?
-    tmp[:title_translations][:ka] = cells[1].present? ? cells[1] : cells[2]
+    tmp[:title] = cells[1].present? ? cells[1] : cells[2]
+    tmp[:description] = "პარტია #{cells[1].present? ? cells[1] : cells[2]}"
     tmp[:name] = cells[2]
 
     parties_data << tmp
@@ -195,10 +193,10 @@ workbook[0].each_with_index { |row, row_i|
 
 periods_data = [
   # type 'annual' 'election'
-  { type: 'annual', start_date: '01.01.2012', end_date: '31.01.2012', title_translations: { ka: "2012" }, description_translations: { ka: "2012 description" }},
-  { type: 'annual', start_date: '01.01.2013', end_date: '31.01.2013', title_translations: { ka: "2013" }, description_translations: { ka: "2013 description" }},
-  { type: 'annual', start_date: '01.01.2014', end_date: '31.01.2014', title_translations: { ka: "2014" }, description_translations: { ka: "2014 description" }},
-  { type: 'annual', start_date: '01.01.2015', end_date: '31.01.2015', title_translations: { ka: "2015" }, description_translations: { ka: "2015 description" }}
+  { type: Period.type_is(:annual), start_date: '01.01.2012', end_date: '31.01.2012', title_translations: { ka: "2012" }, description_translations: { ka: "2012 description" }},
+  { type: Period.type_is(:annual), start_date: '01.01.2013', end_date: '31.01.2013', title_translations: { ka: "2013" }, description_translations: { ka: "2013 description" }},
+  { type: Period.type_is(:annual), start_date: '01.01.2014', end_date: '31.01.2014', title_translations: { ka: "2014" }, description_translations: { ka: "2014 description" }},
+  { type: Period.type_is(:annual), start_date: '01.01.2015', end_date: '31.01.2015', title_translations: { ka: "2015" }, description_translations: { ka: "2015 description" }}
   #{ type: 'election', start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "2015 election" }, description_translations: { ka: "2015 election description" }}
 ]
 
@@ -599,6 +597,7 @@ terminators_data = [
 puts "Creating phase ----------------------"
 
   puts "  Party meta data"
+  I18n.locale = :ka
   parties_data.each_with_index do |d,i|
     party = Party.create!(d)
     puts "    #{party.name} was added"
@@ -666,7 +665,7 @@ puts "Creating phase ----------------------"
     tmp_id = d.delete(:tmp_id)
     cat = Category.create!(d)
     virtuals_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
-    puts "    Virtual Category '#{d[:title_translations][:en]} #{d[:virtual_ids].inspect}' was added"
+    puts "    Virtual Category '#{d[:title_translations][:en]}' was added" #{d[:virtual_ids].inspect}
  end
 
   # begin

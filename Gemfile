@@ -12,6 +12,9 @@ gem "mongoid", "~> 4.0.0"
 # Mongoid URL slug or permalink generator
 gem 'mongoid-slug', '~> 5.0.0'
 
+# Integrate Paperclip into Mongoid.
+gem "mongoid-paperclip", :require => "mongoid_paperclip"
+
 # SCSS parsing in asset pipeline
 gem 'sass-rails', '~> 5.0'
 

@@ -14,3 +14,7 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym 'RESTful'
 # end
+# Add new inflection rules using the following format
+# ActiveSupport::Inflector.inflections do |inflect|
+#   inflect.irregular 'data', 'data'
+# end

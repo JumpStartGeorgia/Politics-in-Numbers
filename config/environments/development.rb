@@ -69,7 +69,7 @@ Rails.application.configure do
   # },
   :editor => {
     :editor => "subl",
-    :on => false,
-    :timeout => 5000
+    :on => true,
+    :timeout => 6000
   }
 end
