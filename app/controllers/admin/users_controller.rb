@@ -2,9 +2,9 @@ module Admin
   # Controls user resource actions
   class UsersController < ApplicationController
     before_action :set_user, only: [:show, :edit, :update, :destroy]
-    authorize_resource, only: [:new]
+    authorize_resource
 
-    before_action :authorize_role_param, only: [:update, :new]
+    before_action :authorize_role_param, only: [:update]
 
     # GET /users
     # GET /users.json

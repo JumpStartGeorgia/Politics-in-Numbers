@@ -22,30 +22,54 @@ class ApplicationController < ActionController::Base
   ##############################################
   # Authorization #
 
+
   rescue_from CanCan::AccessDenied do |_exception|
     if user_signed_in?
-      not_authorized
+      not_authorized(root_path(locale: I18n.locale))
     else
-      not_found
+      not_authorized
     end
   end
 
-  # def valid_role?(role)
-  #   redirect_to root_path, :notice => t('shared.msgs.not_authorized') if !current_user || !current_user.role?(role)
-  # end
-
-  def not_authorized
-    puts "-------------------------sdf-"
-    redirect_to new_user_session, alert: t('shared.msgs.not_authorized')
+  def not_authorized(redirect_path = new_user_session_path)
+    redirect_to redirect_path, alert: t('shared.msgs.not_authorized')
   rescue ActionController::RedirectBackError
-    redirect_to root_path
+    redirect_to root_path(locale: I18n.locale)
   end
 
-  def not_found(redirect_path = root_path)
+  def not_found(redirect_path = root_path(locale: I18n.locale))
     Rails.logger.debug('Not found redirect')
     redirect_to redirect_path,
                 notice: t('shared.msgs.does_not_exist')
   end
+
+
+
+
+  # rescue_from CanCan::AccessDenied do |_exception|
+  #   if user_signed_in?
+  #     not_authorized
+  #   else
+  #     not_found
+  #   end
+  # end
+
+  # # def valid_role?(role)
+  # #   redirect_to root_path, :notice => t('shared.msgs.not_authorized') if !current_user || !current_user.role?(role)
+  # # end
+
+  # def not_authorized
+  #   puts "-------------------------sdf-"
+  #   redirect_to new_user_session, alert: t('shared.msgs.not_authorized')
+  # rescue ActionController::RedirectBackError
+  #   redirect_to root_path
+  # end
+
+  # def not_found(redirect_path = root_path)
+  #   Rails.logger.debug('Not found redirect')
+  #   redirect_to redirect_path,
+  #               notice: t('shared.msgs.does_not_exist')
+  # end
 
   def set_tabbed_translation_form_settings(tinymce_template='default')
     @languages = Language.sorted
@@ -94,6 +118,11 @@ class ApplicationController < ActionController::Base
       break if p.nil?
     }
     p
+  end
+
+  def job(type, related_ids)
+    related_ids = [related_ids] if !related_ids.is_a? Array
+    Job.create!({ type: Job::TYPES.index(type), user_id: current_user._id, related_ids: related_ids})
   end
   # def log(msg)
   #     Rails.logger.debug("\033[44;37m#{'*'*80}\n    #{DateTime.now.strftime('%d/%m/%Y %H:%M')}#{msg.to_s.rjust(56)}\n#{'*'*80}\033[0;37m")

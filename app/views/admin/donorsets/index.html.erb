@@ -12,8 +12,6 @@
   <table class="table table-bordered table-hover">
     <thead>
       <tr>
-        <th><%= @model.human_attribute_name(:party_id) %></th>
-        <th><%= @model.human_attribute_name(:period_id) %></th>
         <th><%= @model.human_attribute_name(:source) %></th>
         <th><%= @model.human_attribute_name(:state) %></th>
         <th><%= @model.human_attribute_name(:updated_at) %></th>
@@ -23,8 +21,6 @@
     <tbody>
       <% @items.each do |item| %>
         <tr>
-          <td><%= item.party.name %></td>
-          <td><%= item.period.title %></td>
           <td><%= item.source_file_name %></td>
           <td><%= item.current_state %></td>
           <td><%= item.updated_at %></td>

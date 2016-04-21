@@ -45,5 +45,7 @@ module StarterTemplate
     config.generators do |g|
       g.orm :mongoid
     end
+
+    config.active_job.queue_adapter = :delayed_job
   end
 end

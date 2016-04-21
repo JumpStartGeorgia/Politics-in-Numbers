@@ -1,12 +1,9 @@
 class Admin::DatasetsController < ApplicationController
-  # before_filter :authenticate_user!
-  # before_filter do |controller_instance|
-  #   controller_instance.send(:valid_role?, @site_admin_role)
-  # end
+  authorize_resource
   before_filter do @model = Dataset; end
 
-  # GET /parties
-  # GET /parties.json
+  # GET /datasets
+  # GET /datasets.json
   def index
     @items = @model.sorted
 
@@ -16,8 +13,8 @@ class Admin::DatasetsController < ApplicationController
     end
   end
 
-  # GET /parties/1
-  # GET /parties/1.json
+  # GET /datasets/1
+  # GET /datasets/1.json
   def show
     @item = @model.find(params[:id])
 
@@ -27,8 +24,8 @@ class Admin::DatasetsController < ApplicationController
     end
   end
 
-  # GET /parties/new
-  # GET /parties/new.json
+  # GET /datasets/new
+  # GET /datasets/new.json
   def new
     @item = @model.new
 
@@ -38,21 +35,22 @@ class Admin::DatasetsController < ApplicationController
     end
   end
 
-  # GET /parties/1/edit
+  # GET /datasets/1/edit
   def edit
     @item = @model.find(params[:id])
 
     set_tabbed_translation_form_settings
   end
 
-  # POST /parties
-  # POST /parties.json
+  # POST /datasets
+  # POST /datasets.json
   def create
-    @item = @model.new(params[:party])
+    @item = @model.new(_params)
 
     respond_to do |format|
       if @item.save
-        format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_created', :obj => t('mongoid.models.party.one'))} }
+        job(:process_dataset, @item._id)
+        format.html { redirect_to admin_datasets_path, flash: {success:  t('shared.msgs.success_created', :obj => t('mongoid.models.dataset.one'))} }
         format.json { render json: @item, status: :created, location: @item }
       else
         set_tabbed_translation_form_settings
@@ -63,15 +61,15 @@ class Admin::DatasetsController < ApplicationController
     end
   end
 
-  # PUT /parties/1
-  # PUT /parties/1.json
+  # PUT /datasets/1
+  # PUT /datasets/1.json
   def update
     @item = @model.find(params[:id])
     puts "---------------------#{_params.inspect}---------#{@item.inspect}--"
     respond_to do |format|
       if @item.update_attributes(_params)
         puts "good-----------------------------------____#{@item.errors.inspect}_"
-        format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.party.one'))} }
+        format.html { redirect_to admin_datasets_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.dataset.one'))} }
         format.json { head :no_content }
       else
         puts "bad-----------------------------------____#{@item.errors.inspect}_"
@@ -84,14 +82,14 @@ class Admin::DatasetsController < ApplicationController
   end
 
 
-  # DELETE /parties/1
-  # DELETE /parties/1.json
+  # DELETE /datasets/1
+  # DELETE /datasets/1.json
   def destroy
-    @item = Party.find(params[:id])
+    @item = @model.find(params[:id])
     @item.destroy
 
     respond_to do |format|
-      format.html { redirect_to admin_parties_url, flash: {success:  t('shared.msgs.success_deleted', :obj => t('mongoid.models.party.one'))} }
+      format.html { redirect_to admin_datasets_url, flash: {success:  t('shared.msgs.success_destroyed', :obj => t('mongoid.models.dataset.one'))} }
       format.json { head :no_content }
     end
   end
@@ -99,14 +97,6 @@ class Admin::DatasetsController < ApplicationController
   private
     def _params
       pars = params.clone
-      #puts "=================================#{pars}"
-      default = I18n.default_locale
-      locales = [:ka, :en, :ru]
-      [:title_translations, :description_translations, :permalink_translations].each{|f|
-        pars[:party][f].delete_if{|k,v| !v.present? }
-      }
-      # sls = pars[:party][:_slugs_translations];
-      # sls.each{|k,v| sls[k] = [v] }
-      pars.require(:party).permit(:_id, :id, :title, :type, :color, :name, :tmp_id, title_translations: [:ka, :en, :ru], description_translations: [:ka, :en, :ru], permalink_translations: [:ka, :en, :ru])
+      pars.require(:dataset).permit(:id, :party_id, :period_id, :source)
     end
 end

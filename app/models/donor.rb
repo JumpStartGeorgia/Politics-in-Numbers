@@ -15,4 +15,7 @@ class Donor
 
   validates_presence_of :first_name, :last_name, :tin, :amount, :party_id, :give_date
 
+  def self.sorted
+    order_by([[:give_date, :desc], [:first_name, :asc], [:last_name, :asc]])
+  end
 end

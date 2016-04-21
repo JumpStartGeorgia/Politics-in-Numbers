@@ -30,7 +30,7 @@
           <td><%= item.updated_at %></td>
           <td>
             <div class="btn-group btn-group-sm" role="group" aria-label="...">
-              <%= links_for(item, :admin, [:destroy]) %>
+              <%= links_for(item, :admin, [:view, :edit, :destroy]) %>
             </div>
 
           </td>

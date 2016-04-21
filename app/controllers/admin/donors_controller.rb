@@ -1,119 +1,102 @@
-module Admin
-  # Controls user resource actions
-  class UsersController < ApplicationController
-    before_action :set_user, only: [:show, :edit, :update, :destroy]
-    authorize_resource
+class Admin::DonorsController < ApplicationController
+  authorize_resource
+  before_filter do @model = Donor; end
 
-    before_action :authorize_role_param, only: [:update]
+  # GET /donors
+  # GET /donors.json
+  def index
+    @items = @model.sorted
 
-    # GET /users
-    # GET /users.json
-    def index
-      @users = User.all.includes(:role).order(:email)
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @items }
     end
+  end
 
-    # GET /users/1
-    # GET /users/1.json
-    def show
+  # GET /donors/1
+  # GET /donors/1.json
+  def show
+    @item = @model.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @item }
     end
+  end
 
-    # GET /users/new
-    def new
-      @user = User.new
+  # GET /donors/new
+  # GET /donors/new.json
+  def new
+    @item = @model.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json { render json: @item }
     end
+  end
 
-    # GET /users/1/edit
-    def edit
-    end
+  # GET /donors/1/edit
+  def edit
+    @item = @model.find(params[:id])
 
-    # POST /users
-    # POST /users.json
-    def create
-      @user = User.new(user_params)
+    set_tabbed_translation_form_settings
+  end
 
-      respond_to do |format|
-        if @user.save
-          redirect_to_created_user(format)
-        else
-          format.html { render :new }
-        end
-      end
-    end
+  # POST /donors
+  # POST /donors.json
+  def create
+    @item = @model.new(_params)
 
-    # PATCH/PUT /users/1
-    # PATCH/PUT /users/1.json
-    def update
-      respond_to do |format|
-        if user_params[:password].present?
-          update_user_with_password(format)
-        else
-          update_user_without_password(format)
-        end
-      end
-    end
-
-    # DELETE /users/1
-    # DELETE /users/1.json
-    def destroy
-      @user.destroy
-      respond_to do |format|
-        format.html do
-          redirect_to users_url,
-                      notice: t('shared.msgs.success_destroyed',
-                                obj: t('mongoid.models.user', count: 1))
-        end
-      end
-    end
-
-    private
-
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
-    end
-
-    # Never trust parameters from the scary internet, only allow the
-    # white list through.
-    def user_params
-      params.require(:user).permit(:email, :password, :role_id)
-    end
-
-    def authorize_role_param
-      not_authorized if cannot? :create, User.new(user_params)
-    end
-
-    def redirect_to_created_user(format)
-      format.html do
-        redirect_to [:admin, @user],
-                    notice: t('shared.msgs.success_created',
-                              obj: t('mongoid.models.user', count: 1))
-      end
-    end
-    private :redirect_to_created_user
-
-    def update_user_with_password(format)
-      if @user.update(user_params)
-        format.html do
-          redirect_to [:admin, @user],
-                      notice: t('shared.msgs.success_updated',
-                                obj: t('mongoid.models.user', count: 1))
-        end
+    respond_to do |format|
+      if @item.save
+        job(:process_donor, @item._id)
+        format.html { redirect_to admin_donors_path, flash: {success:  t('shared.msgs.success_created', :obj => t('mongoid.models.donor.one'))} }
+        format.json { render json: @item, status: :created, location: @item }
       else
-        format.html { render :edit }
-      end
-    end
-    private :update_user_with_password
+        set_tabbed_translation_form_settings
 
-    def update_user_without_password(format)
-      if @user.update_without_password(user_params)
-        format.html do
-          redirect_to [:admin, @user],
-                      notice: t('shared.msgs.success_updated',
-                                obj: t('mongoid.models.user', count: 1))
-        end
-      else
-        format.html { render :edit }
+        format.html { render action: "new" }
+        format.json { render json: @item.errors, status: :unprocessable_entity }
       end
     end
   end
+
+  # PUT /donors/1
+  # PUT /donors/1.json
+  def update
+    @item = @model.find(params[:id])
+    puts "---------------------#{_params.inspect}---------#{@item.inspect}--"
+    respond_to do |format|
+      if @item.update_attributes(_params)
+        puts "good-----------------------------------____#{@item.errors.inspect}_"
+        format.html { redirect_to admin_donors_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.donor.one'))} }
+        format.json { head :no_content }
+      else
+        puts "bad-----------------------------------____#{@item.errors.inspect}_"
+        set_tabbed_translation_form_settings
+
+        format.html { render action: "edit" }
+        format.json { render json: @item.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+
+  # DELETE /donors/1
+  # DELETE /donors/1.json
+  def destroy
+    @item = @model.find(params[:id])
+    @item.destroy
+
+    respond_to do |format|
+      format.html { redirect_to admin_donors_url, flash: {success:  t('shared.msgs.success_destroyed', :obj => t('mongoid.models.donor.one'))} }
+      format.json { head :no_content }
+    end
+  end
+
+  private
+    def _params
+      pars = params.clone
+      pars.require(:donor).permit(:id, :party_id, :period_id, :source)
+    end
 end

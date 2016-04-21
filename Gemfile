@@ -15,6 +15,9 @@ gem 'mongoid-slug', '~> 5.0.0'
 # Integrate Paperclip into Mongoid.
 gem "mongoid-paperclip", :require => "mongoid_paperclip"
 
+# Delayed::Job (or DJ) encapsulates the common pattern of asynchronously executing longer tasks in the background.
+gem 'delayed_job_mongoid'
+
 # SCSS parsing in asset pipeline
 gem 'sass-rails', '~> 5.0'
 

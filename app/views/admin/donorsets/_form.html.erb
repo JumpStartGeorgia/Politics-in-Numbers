@@ -1,0 +1,17 @@
+<%= semantic_form_for([:admin, @item]) do |f| %>
+  <%= f.semantic_errors *f.object.errors.keys %>
+
+  <%= f.inputs class: "row" do %>
+    <%= f.input :source, :as => :file, hint: true, input_html: { accept: ".xlsx" }, :wrapper_html => { :class =>"col-md-12" } %>
+  <% end %>
+
+  <div class="form-group" style="margin-top: 20px;">
+    <%= f.submit nil, :class => 'btn btn-primary' %>
+    <%= f.submit t('shared.actions.reset'), :class => 'btn btn-warning', :type => :reset, :name => :reset %>
+    <%= link_to t('shared.actions.cancel'), admin_donorsets_path, :class => 'btn btn-warning' %>
+  </div>
+<% end %>
+
+
+
+

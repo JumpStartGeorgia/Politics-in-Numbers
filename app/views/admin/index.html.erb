@@ -1,10 +1,10 @@
-<%# title t('.title') %>
-
-  <% if true || current_user.role? :admin %>
+<% title t('.title') %>
+  <% if current_user.is? :super_admin %>
      <div class="col-sm-12">
       <ul class="standard">
         <li><%= link_to t('.parties'), admin_parties_path %></li>
         <li><%= link_to t('.datasets'), admin_datasets_path %></li>
+        <li><%= link_to t('.donorsets'), admin_donorsets_path %></li>
         <!-- <li><%#= link_to t('.page_contents'), admin_page_contents_path %></li> -->
         <!-- <li><%#= link_to t('.users'), admin_users_path %></li> -->
       </ul>

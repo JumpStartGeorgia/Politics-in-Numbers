@@ -1,5 +1,7 @@
 ka:
   mongoid:
+    common:
+      updated_at: &updated_at Update Date
     attributes:
       user:
         email: Email
@@ -16,9 +18,21 @@ ka:
         color: Color for charts
         name: Original name
       dataset:
-        party_id: Party
-        period_id: Period
-        source_id: Source
+        party_id: &party Party
+        period_id: &period Period
+        source: &source Source
+        state: &state State
+        updated_at: *updated_at
+        party_name: *party
+        period_name: *period
+        current_state: *state
+        source_file_name: *source
+      donorsets:
+        source: *source
+        state: *state
+        updated_at: *updated_at
+        current_state: *state
+        source_file_name: *source
     models:
       user:
         one: User
@@ -27,10 +41,29 @@ ka:
         one: Party
         other: Parties
       dataset:
-        one: Party Data
-        other: Party Data
+        one: Dataset
+        other: Dataset
+      donorset:
+        one: Donor data
+        other: Donor data
       admin:
         one: Admin Section
+    options:
+      party:
+        type:
+          party: Party
+          initiative: Initiative
+      dataset:
+        state:
+          pending: &pending Pending
+          processed: &processed Processed
+          discontinued: &discontinued Discontinued
+      donorset:
+        state:
+          pending: *pending
+          processed: *processed
+          discontinued: *discontinued
+  formtastic:
     hints:
       party:
         title: Party Title
@@ -40,8 +73,36 @@ ka:
         permalink: Party Permalink
         color: Party color for charts
         name: "Original party name, that is used while processing uploaded files"
-    options:
-      party:
-        type:
-          party: Party
-          initiative: Initiative
+      dataset:
+        party_id: Choose party that is associated with uploading file
+        period_id: Choose period that is associated with uploading file
+        source: Select spreadsheet file
+      donorset:
+        source: Select spreadsheet file
+
+# en:
+#     formtastic:
+#       titles:
+#         post_details: "Post details"
+#       labels:
+#         post:
+#           title: "Your Title"
+#           body: "Write something..."
+#           edit:
+#             title: "Edit title"
+#       hints:
+#         post:
+#           title: "Choose a good title for your post."
+#           body: "Write something inspiring here."
+#       placeholders:
+#         post:
+#           title: "Title your post"
+#           slug: "Leave blank for an automatically generated slug"
+#         user:
+#           email: "you@yours.com"
+#       actions:
+#         create: "Create my %{model}"
+#         update: "Save changes"
+#         reset: "Reset form"
+#         cancel: "Cancel and go back"
+#         dummie: "Launch!"

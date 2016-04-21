@@ -1,5 +1,7 @@
 en:
   mongoid:
+    common:
+      updated_at: &updated_at Update Date
     attributes:
       user:
         email: Email
@@ -16,9 +18,21 @@ en:
         color: Color for charts
         name: Original name
       dataset:
-        party_id: Party
-        period_id: Period
-        source: Source1
+        party_id: &party Party
+        period_id: &period Period
+        source: &source Source
+        state: &state State
+        updated_at: *updated_at
+        party_name: *party
+        period_name: *period
+        current_state: *state
+        source_file_name: *source
+      donorsets:
+        source: *source
+        state: *state
+        updated_at: *updated_at
+        current_state: *state
+        source_file_name: *source
     models:
       user:
         one: User
@@ -27,8 +41,11 @@ en:
         one: Party
         other: Parties
       dataset:
-        one: Party Data
-        other: Party Data
+        one: Dataset
+        other: Dataset
+      donorset:
+        one: Donor data
+        other: Donor data
       admin:
         one: Admin Section
     options:
@@ -36,6 +53,16 @@ en:
         type:
           party: Party
           initiative: Initiative
+      dataset:
+        state:
+          pending: &pending Pending
+          processed: &processed Processed
+          discontinued: &discontinued Discontinued
+      donorset:
+        state:
+          pending: *pending
+          processed: *processed
+          discontinued: *discontinued
   formtastic:
     hints:
       party:
@@ -49,6 +76,8 @@ en:
       dataset:
         party_id: Choose party that is associated with uploading file
         period_id: Choose period that is associated with uploading file
+        source: Select spreadsheet file
+      donorset:
         source: Select spreadsheet file
 
 # en:

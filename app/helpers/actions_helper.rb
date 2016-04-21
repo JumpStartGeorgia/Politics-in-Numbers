@@ -74,8 +74,8 @@ module ActionsHelper
         links += link_to text, [path], title: text
       elsif a == :view_all
         text = t('shared.actions.view_all', obj: model_name )
-        puts "--------------------------#{([path] + [obj.class]).inspect}"
-        links += link_to text, [path] + [obj], class: 'btn btn-default', title: text
+        links += " / " if links.present?
+        links += link_to text, [path] + [obj], title: text
       elsif ["new", "view", "edit", "destroy"].include?(a.to_s)
         text = t("shared.actions.#{a}", obj: model_name )
         links += link_to text, [:new, path, obj.model_name.singular_route_key], :title => text, :class => 'btn btn-primary' if a == :new

@@ -40,7 +40,7 @@ class User
 
   def is?(requested_role)
     if role
-      role.name == requested_role
+      role.name == requested_role.to_s
     else
       return false
     end

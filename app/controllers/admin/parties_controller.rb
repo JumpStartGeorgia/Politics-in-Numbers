@@ -1,9 +1,5 @@
 class Admin::PartiesController < ApplicationController
   authorize_resource
-  # before_filter :authenticate_user!
-  # before_filter do |controller_instance|
-  #   controller_instance.send(:valid_role?, @site_admin_role)
-  # end
   before_filter do @model = Party; end
 
   # GET /parties
@@ -134,7 +130,7 @@ class Admin::PartiesController < ApplicationController
     @item.destroy
 
     respond_to do |format|
-      format.html { redirect_to admin_parties_url, flash: {success:  t('shared.msgs.success_deleted', :obj => t('mongoid.models.party.one'))} }
+      format.html { redirect_to admin_parties_url, flash: {success:  t('shared.msgs.success_destroyed', :obj => t('mongoid.models.party.one'))} }
       format.json { head :no_content }
     end
   end

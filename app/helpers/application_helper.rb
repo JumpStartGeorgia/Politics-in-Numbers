@@ -21,5 +21,4 @@ module ApplicationHelper
     field_locales = obj.send("#{field}_translations").keys.map{|k|"#{k.upcase}"}
     "<div class='available-locales'><span>#{field_locales.join(' | ')}</span></div>"
   end
-
 end
