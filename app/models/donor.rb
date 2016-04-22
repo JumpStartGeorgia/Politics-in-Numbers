@@ -4,6 +4,7 @@ class Donor
   include Mongoid::Timestamps
 
   #embeds_many :terminators
+  embedded_in :donorset
 
   field :first_name, type: String
   field :last_name, type: String

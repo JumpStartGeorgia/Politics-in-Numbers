@@ -85,7 +85,7 @@ class Party
   # end
 
   def self.by_name(party_name)
-    puts "-------------------------party_name1----#{Party.clean_name(party_name)}"
+    #puts "-------------------------party_name1----#{Party.clean_name(party_name)}"
     Party.where({name: Party.clean_name(party_name)}).first
   end
 
@@ -120,5 +120,9 @@ class Party
     rescue
       false
     end
+  end
+
+  def self.type_is(tp)
+    TYPES.index(tp.to_sym)
   end
 end

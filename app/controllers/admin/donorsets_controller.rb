@@ -2,6 +2,15 @@ class Admin::DonorsetsController < ApplicationController
   authorize_resource
   before_filter do @model = Donorset; end
 
+  rescue_from ActionController::ParameterMissing do |e|
+    # You can even render a jbuilder template too!
+    if action_name == "create"
+      redirect_to new_admin_donorset_path, flash: { error: t('shared.msgs.missing_parameter') }#, status: :not_modified
+    else
+       render :nothing => true, :status => 400
+    end
+  end
+
   # GET /donorsets
   # GET /donorsets.json
   def index
@@ -31,8 +40,8 @@ class Admin::DonorsetsController < ApplicationController
 
     respond_to do |format|
       if @item.save
-        job(:process_donorset, @item._id)
-        format.html { redirect_to admin_donorsets_path, flash: {success:  t('shared.msgs.success_created', :obj => t('mongoid.models.donorset.one'))} }
+        #job(:process_donorset, @item._id)
+        format.html { redirect_to admin_donorsets_path, flash: {success:  t('shared.msgs.success_created_with_pending_job', :obj => t('mongoid.models.donorset.one'))} }
         format.json { render json: @item, status: :created, location: @item }
       else
         set_tabbed_translation_form_settings
