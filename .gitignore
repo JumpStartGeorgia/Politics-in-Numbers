@@ -19,3 +19,4 @@
 /public/upload
 # Temporary files often end with ~ character
 *~
+/sources/*
