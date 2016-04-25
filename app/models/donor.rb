@@ -19,4 +19,9 @@ class Donor
   def self.sorted
     order_by([[:give_date, :desc], [:first_name, :asc], [:last_name, :asc]])
   end
+
+  def party
+    p = Party.find(party_id)
+    p.present? ? p.title : "Unknown"
+  end
 end

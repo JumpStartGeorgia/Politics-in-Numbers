@@ -44,3 +44,7 @@ $( "#categories-list2" ).select2({
        return result.text;
     }
 });
+
+$(document).ready(function(){
+    $('.datatable').DataTable({ responsive: true });
+});

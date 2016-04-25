@@ -14,6 +14,14 @@ class Donorset
   #belongs_to :party
 
   field :state, type: Integer, default: 0 # 0 pending 1 processed 2 discontinued
+  field :del, type: Boolean, default: false
+
+  default_scope ->{ where(del: false) }
+
+#         Band.unscoped.where(name: "Depeche Mode")
+# Band.unscoped do
+#   Band.where(name: "Depeche Mode")
+# end
 
   has_mongoid_attached_file :source, :path => ':attachment/:id/:style.:extension'
 
@@ -26,8 +34,10 @@ class Donorset
   end
   def set_state(tp)
     st = STATES.index(tp.to_sym)
-    self.state = st if st.present?
-    self.save
+    if st.present?
+      self.state = st
+      self.save
+    end
   end
   def self.is_type(tp)
     begin
@@ -65,66 +75,81 @@ class Donorset
   end
 
   def process_job
-    lg = Delayed::Worker.logger
-    headers_map = ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
+    begin
+      puts "user infoooooooooooooooooooooo #{current_user.inspect}"
+      puts "-------------------------"
+      lg = Delayed::Worker.logger
+      headers_map = ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
 
-    missing_party = []
-    workbook = RubyXL::Parser.parse(source.path)
-    worksheet = workbook[0]
-    is_header = true
-
-    worksheet.each_with_index { |row, row_i|
-      if row && row.cells
-        cells = Array.new(headers_map.length, nil)
-        row.cells.each_with_index do |c, c_i|
-          if c && c.value.present?
-            cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
+      missing_parties = []
+      workbook = RubyXL::Parser.parse(source.path)
+      worksheet = workbook[0]
+      is_header = true
+      raise Exception.new("some")
+      worksheet.each_with_index { |row, row_i|
+        if row && row.cells
+          cells = Array.new(headers_map.length, nil)
+          row.cells.each_with_index do |c, c_i|
+            if c && c.value.present?
+              cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
+            end
           end
-        end
-        if is_header
-          if cells == headers_map
-            is_header = false
-          end
-        else
-          begin
+          if is_header
+            if cells == headers_map
+              is_header = false
+             # puts "-----------------#{cells.inspect}"
+            end
+          else
+            # puts "-----------------nil #{row_i}" if cells[1].nil?
             break if cells[1].nil?
-
             party = cells[6]
+            #lg.info "-----------------------------------#{party}"
             p = Party.by_name(party)
             if p.class != Party
+              #lg.info "-----------------------------------#{party} no party"
               clean_name = Party.clean_name(party)
-              p = Party.create!({ name: clean_name, title: clean_name, description: "პარტია #{clean_name}", tmp_id: -99, type: Party.type_is(:initiative) })
-              missing_party << p._id if !missing_party.include?(party)
+              missing_parties.each{|mp| (p = mp; break;) if mp.name == clean_name }
+              if p.class != Party
+                #lg.info "-----------------------------------#{party} no party saved"
+                #puts "It is not party second"
+                p = Party.new({ name: clean_name, title: clean_name, description: "საინიციატივო ჯგუფი #{clean_name}", tmp_id: -99, type: Party.type_is(:initiative) })
+
+                if p.valid?
+                  missing_parties << p
+                  #puts "Party creating"
+                  lg.info missing_parties.length
+                else
+                  raise Exception.new("Party '#{clean_name}', name is invalid check row #{row_i} in excel, and make sure it has party name")
+                end
+              else
+                #puts "Party was already created"
+              end
+            else
+              #puts "Party is there"
             end
 
-            d = Donor.new({ give_date: cells[1], first_name: cells[2],
+            self.donors << Donor.new({ give_date: cells[1], first_name: cells[2],
               last_name: cells[3], tin: cells[4], amount: cells[5],
               party_id: p._id, comment: cells[7] })
-
-            self.donors << d
-          rescue Exception => e
-            # d(cells.inspect)
           end
         end
-      end
-    }
-    begin
+      }
+
       if is_header
-        self.set_state(:discontinued)
-        # lg.info "Header is missing, file is corrupted"
+        raise Exception.new("Header in provided file is distinct, compare to expected one.")
       else
         self.save
+        missing_parties.each {|mp| mp.save }
         self.set_state(:processed)
-        missing_party.each {|r|
-          lg.info "#----------- {r} #{Party.is_initiative(r)}"
-        }
       end
+
     rescue Exception => e
       self.set_state(:discontinued)
+      Notification.about_donorset_creating_fail(e.message, current_user.id)
       #puts "-------------------------exception #{e.inspect}"
     end
   end
-  handle_asynchronously :process_job, :priority => 0
+  handle_asynchronously :process_job, :priority => 1
 
  # def self.states
  #    col = {}

@@ -58,7 +58,7 @@ class Dataset
   def process_job
 
   end
-  handle_asynchronously :process_job, :priority => 0
+  handle_asynchronously :process_job, :priority => 1
 
  # def self.states
  #    col = {}

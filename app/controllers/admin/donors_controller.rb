@@ -16,7 +16,7 @@ class Admin::DonorsController < ApplicationController
   # GET /donors/1
   # GET /donors/1.json
   def show
-    @item = @model.find(params[:id])
+    @item = @model.find(params[:id]).donors
 
     respond_to do |format|
       format.html # show.html.erb

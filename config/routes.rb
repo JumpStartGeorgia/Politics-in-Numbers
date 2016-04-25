@@ -18,7 +18,7 @@ Rails.application.routes.draw do
     namespace :admin do
       resources :users#, constraints: { format: :html }
       resources :datasets, only: [:index, :new, :create, :destroy]
-      resources :donorsets, only: [:index, :new, :create, :destroy]
+      resources :donorsets, only: [:index, :show, :new, :create, :destroy]
       resources :parties do
         collection do
           get 'bulk'

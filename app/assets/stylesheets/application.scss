@@ -6,16 +6,18 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 */
 
 /*
- *= require formtastic
- *= require formtastic-bootstrap
+  *= require formtastic
+  *= require formtastic-bootstrap
 
- *= require select2
- *= require select2-bootstrap
+  *= require select2
+  *= require select2-bootstrap
 
- */
+  require dataTables/jquery.dataTables
+  *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+  *= require dataTables/extras/dataTables.responsive
+*/
 
 @charset 'UTF-8';
-
 @import 'variables';
 @import 'media-queries';
 @import 'bootstrap_and_overrides';
@@ -34,3 +36,4 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 @import 'components/categories-list';
 @import 'components/admin';
 @import 'components/tabbed_translation_form';
+

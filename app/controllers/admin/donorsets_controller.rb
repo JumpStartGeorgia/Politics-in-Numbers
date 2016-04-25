@@ -22,6 +22,17 @@ class Admin::DonorsetsController < ApplicationController
     end
   end
 
+  # GET /donors/1
+  # GET /donors/1.json
+  def show
+    @items = @model.find(params[:id]).donors
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render json: @item }
+    end
+  end
+
   # GET /donorsets/new
   # GET /donorsets/new.json
   def new
@@ -40,6 +51,7 @@ class Admin::DonorsetsController < ApplicationController
 
     respond_to do |format|
       if @item.save
+        Job.donorset_file_process(@item._id, current_user._id)
         #job(:process_donorset, @item._id)
         format.html { redirect_to admin_donorsets_path, flash: {success:  t('shared.msgs.success_created_with_pending_job', :obj => t('mongoid.models.donorset.one'))} }
         format.json { render json: @item, status: :created, location: @item }

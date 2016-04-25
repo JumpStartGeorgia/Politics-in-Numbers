@@ -17,6 +17,14 @@ ka:
         permalink: Permalink
         color: Color for charts
         name: Original name
+      donor:
+        first_name: First name
+        last_name: Last name
+        tin: "Person #"
+        amount: Donated amount
+        party_id: Donation Target
+        give_date: Donation Date
+        comment: Comment
       dataset:
         party_id: &party Party
         period_id: &period Period
@@ -40,6 +48,9 @@ ka:
       party:
         one: Party
         other: Parties
+      donor:
+        one: Donor
+        other: Donors
       dataset:
         one: Dataset
         other: Dataset

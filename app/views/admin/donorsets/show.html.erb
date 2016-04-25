@@ -1,0 +1,66 @@
+<%- m = Donor %>
+<%= puts m.model_name.human(:count => 2) %>
+<%- title t '.title', :default => m.model_name.human(:count => 2) %>
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@model, :admin, [:pre, :view_all]) %>
+    <div class="pull-right"></div>
+  </div>
+</div>
+<div class="row"><hr/></div>
+
+<div class="">
+  <table class="table table-bordered table-hover table-responsive datatable">
+    <thead>
+      <tr>
+        <th><%= m.human_attribute_name(:first_name) %></th>
+        <th><%= m.human_attribute_name(:last_name) %></th>
+        <th><%= m.human_attribute_name(:tin) %></th>
+        <th><%= m.human_attribute_name(:amount) %></th>
+        <th><%= m.human_attribute_name(:party) %></th>
+        <th><%= m.human_attribute_name(:give_date) %></th>
+        <th><%= m.human_attribute_name(:comment) %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @items.each do |item| %>
+        <tr>
+          <td><%= item.first_name %></td>
+          <td><%= item.last_name %></td>
+          <td class="text-right"><%= item.tin %></td>
+          <td class="text-right"><%= item.amount %></td>
+          <td><%= item.party %></td>
+          <td class="text-center"><%= I18n.l(item.give_date, format: :default) %></td>
+          <td><%= item.comment %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+
+<%-
+  top_donors = {}
+  top_parties = {}
+  d = Donorset.last.donors
+  d.each{|t|
+    k = t.first_name + " " + t.last_name
+    if top_donors.key?(k)
+      top_donors[k] += t.amount
+    else
+      top_donors[k] = t.amount
+    end
+    k = t.party
+    if top_parties.key?(k)
+      top_parties[k] += t.amount
+    else
+      top_parties[k] = t.amount
+    end
+  }
+%>
+<%- top_donors.sort_by { |k,v| -v }[0..5].each{|k,v| %>
+  <%#= "#{k} #{v}\n" %></br>
+<%- } %>
+<%- top_parties.sort_by { |k,v| -v }[0..5].each{|k,v| %>
+  <%#= "#{k} #{v}\n" %></br>
+<%- } %>

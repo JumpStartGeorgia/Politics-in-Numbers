@@ -84,6 +84,9 @@ gem 'select2-rails', '~> 4.0', '>= 4.0.1.1'
 # Work with xlsx files
 gem "rubyXL"
 
+# jQuery DataTables plugin - provides all the basic DataTables files, and a few of the extras.
+gem 'jquery-datatables-rails', '~> 3.3.0'
+
 group :development do
   # Silences assets-related logging
   gem 'quiet_assets', '~> 1.0.3'

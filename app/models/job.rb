@@ -3,13 +3,16 @@ class Job
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  after_create :start_delayed_job
-  # has_many :category_data
-  TYPES = [:process_dataset]
-  field :type, type: Integer # process_dataset
-  field :user_id, type: BSON::ObjectId #
-  field :related_ids, type: Array
-  field :state, type: Integer, default: 0
+  # after_create :start_delayed_job
+  # # has_many :category_data
+  # TYPES = [:process_dataset]
+  # field :type, type: Integer # process_dataset
+  # field :user_id, type: BSON::ObjectId #
+  # field :related_ids, type: Array
+  # field :state, type: Integer, default: 0
+
+  def donorset_file_process
+  end
 
   def start_delayed_job
     puts "start--------------------------#{self.inspect}"
