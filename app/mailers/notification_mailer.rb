@@ -3,19 +3,19 @@ class NotificationMailer < ActionMailer::Base
   layout 'mailer'
   add_template_helper(ApplicationHelper)
 
-  def donorset(message)
-    @message = message
-#:bcc => message.bcc,
-    mail(:subject => message.subject)
+  # def donorset(message)
+  #   @message = message
+  #   #:bcc => message.bcc,
+  #   mail(:subject => message.subject)
+  # end
+
+  def about_donorset_file_process(msg)
+    puts "------------------------- #{msg.to_hash}"
+    @message = msg
+    mail(msg.to_hash.merge({:template_name => "common"})) if msg.valid?
   end
 
-  def about_donorset_creating_fail(msg, user_id)
-    if msg.present?
-      @message = Message.new(subject: "Donorset upload failed", message: msg, to: User.find(user_id).email) #email = "antarya@gmail.com"
-      mail(:subject => @message.subject)
-    end
-  end
-  handle_asynchronously :about_donorset_creating_fail, :priority => 0
+
   # def send_new_user(message)
   #   @message = message
 

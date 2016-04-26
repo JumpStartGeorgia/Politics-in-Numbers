@@ -5,14 +5,15 @@
 </div>
 
 
-<%= form_tag bulk_update_admin_parties_path do %>
+<%= form_tag bulk_update_admin_parties_path(id: @deffered.id) do %>
 
 <div class="table-responsive">
   <table class="table table-bordered table-hover">
     <thead class="thead-inverse">
       <tr>
         <th><%= @model.human_attribute_name(:title) %></th>
-        <th><%= @model.human_attribute_name(:type) %></th>
+        <th><%= @model.human_attribute_name(:type) %><div id="toggle_type" data-selector='parties[*][type]'><span>Toggle All   </span>
+        <label><input type="radio" name="toggle_type" value="0">Party</label><label><input type="radio" name="toggle_type" value="1">Iniative</label></div></th>
         <!-- <th><%#= @model.human_attribute_name(:color) %></th> -->
         <!-- <th><%#= @model.human_attribute_name(:name) %></th> -->
       </tr>

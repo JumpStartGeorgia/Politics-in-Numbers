@@ -13,6 +13,8 @@ class User
 
   belongs_to :role
 
+  embeds_many :deffereds
+
   validates :role, presence: true
 
   ## Database authenticatable
@@ -33,6 +35,7 @@ class User
   field :current_sign_in_ip, :type => String
   field :last_sign_in_ip,    :type => String
 
+  # field :has_defer, :type => Boolean, :default => false
 
   # indexes
   index({ :email => 1}, { background: true})
@@ -48,5 +51,9 @@ class User
 
   def manageable_roles
     Role.all.select { |role| Ability.new(self).can? :manage, role }
+  end
+
+  def self.admin_email
+    User.where(email: "application@mail.com").first.email
   end
 end

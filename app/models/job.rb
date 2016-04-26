@@ -1,141 +1,88 @@
-# Category class - trace party categories and sub categories
 class Job
-  include Mongoid::Document
-  include Mongoid::Timestamps
+  # Those are two &lt; symbols (the blog is screwing them up)
+  class << self
+    def _donorset_file_process(item_id, user_id)
+      begin
+        # puts "user infoooooooooooooooooooooo #{@donorset.inspect} #{@user.inspect}"
+        # puts "_method"
+        notifiers = [:user]
+        @donorset = Donorset.find(item_id)
+        @user = User.find(user_id)
 
-  # after_create :start_delayed_job
-  # # has_many :category_data
-  # TYPES = [:process_dataset]
-  # field :type, type: Integer # process_dataset
-  # field :user_id, type: BSON::ObjectId #
-  # field :related_ids, type: Array
-  # field :state, type: Integer, default: 0
+        (raise Exception.new("Donorset to process was not found, probably you request to delete it.");) if @donorset.nil?
+        (raise Exception.new("Operator not found, send to nowhere.");) if @user.nil?
 
-  def donorset_file_process
+        headers_map = ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
+
+        lg = Delayed::Worker.logger
+
+        workbook = RubyXL::Parser.parse(@donorset.source.path)
+        worksheet = workbook[0]
+        is_header = true
+        missing_parties = []
+        # raise Exception.new("some")
+        worksheet.each_with_index { |row, row_i|
+          if row && row.cells
+            cells = Array.new(headers_map.length, nil)
+            row.cells.each_with_index do |c, c_i|
+              if c && c.value.present?
+                cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
+              end
+            end
+            if is_header
+              is_header = false if cells == headers_map
+            else
+              break if cells[1].nil?
+              party = cells[6]
+              p = Party.by_name(party)
+              if p.class != Party
+                clean_name = Party.clean_name(party)
+                missing_parties.each{|mp| (p = mp; break;) if mp.name == clean_name }
+                if p.class != Party
+                  p = Party.new({ name: clean_name, title: clean_name, description: "საინიციატივო ჯგუფი #{clean_name}", tmp_id: -99, type: Party.type_is(:initiative) })
+                  if p.valid?
+                    missing_parties << p
+                  else
+                    raise Exception.new("Party '#{clean_name}', name is invalid check row #{row_i} in excel, and make sure it has party name")
+                  end
+                end
+              end
+              donor = Donor.new({ give_date: cells[1], first_name: cells[2],
+                last_name: cells[3], tin: cells[4], amount: cells[5],
+                party_id: p._id, comment: cells[7] })
+              puts "#{donor.errors.inspect}" if !donor.valid?
+              @donorset.donors << donor
+            end
+          end
+        }
+
+        if is_header
+          raise Exception.new("Header in provided file is distinct, compare to expected one #{headers_map}.")
+        else
+          # @donorset.save
+          if missing_parties.present?
+            missing_parties.each {|mp| mp.save; }
+            @user.deffereds << Deffered.new({ type: Deffered.type_is(:bulk_parties), user_id: @user._id, related_ids: missing_parties.map{|r| r._id }});
+            #puts "--------------------------#{@user.inspect}"
+            @user.save
+          end
+          puts "======================= point1"
+          @donorset.set_state(:processed)
+          puts "======================= point2"
+          Notifier.about_donorset_file_process("File #{@donorset.source_file_name} was successfully processed. To view processed data follow the <a href='#'>link</a>.", @user);
+          puts "======================= point3"
+        end
+
+      rescue Exception => e
+        @donorset.destroy if @donorset.present?
+        Notifier.about_donorset_file_process(e.message, @user);
+      end
+    end
+    handle_asynchronously :_donorset_file_process, :priority => 1
   end
 
-  def start_delayed_job
-    puts "start--------------------------#{self.inspect}"
-    jobber
-    self.state = 1
-    self.save
-    puts "end--------------------------#{self.inspect}"
+  # My importer as a class method
+  def self.donorset_file_process(item_id, user_id)
+    Job._donorset_file_process(item_id, user_id)
   end
-
-  def jobber
-    puts "start--------------------------#{self.inspect}"
-    puts "--------------------------jopper"
-    self.state = 2
-    self.save
-    puts "end--------------------------#{self.inspect}"
-  end
-  handle_asynchronously :jobber
-  # field :title, type: String, localize: true
-  # field :description, type: String, localize: true
-  # field :level, type: Integer
-  # field :parent_id, type: BSON::ObjectId
-  # field :detail_id, type: BSON::ObjectId
-  # field :virtual_ids, type: Array # Array of categories that are summed up of BSON::ObjectId type
-  # field :virtual, type: Boolean, default: false
-  # field :complex, type: Boolean, default: false # If virtual and consist of multiple categories then true
-  # #field :simple, type: Boolean, default: false
-  # field :forms, type: Array
-  # field :cells, type: Array
-  # field :codes, type: Array
-  # field :languages, type: Array
-  # field :default_language, type: String
-  # #field :tmp_id, type: Integer
-  # field :order, type: Integer
-
-
-  # index code: 1
-  # index title: 1
-  # index parent_id: 1
-  # index simple: 1
-
-
-  # def self.tree_out(vir = false, select = false, id = "categories-list")
-  #   list = tree(vir)
-
-  #   if select
-  #     out = "<select id=#{id}>"
-  #     list.each { |item|
-  #       out += "<option order='#{item[:c].order}'>#{item[:c].title}</option>"
-  #       out += sub_tree_out(item[:sub], select) if item[:sub].present?
-  #     }
-  #     out += "</select>"
-  #   else
-  #     out = "<ul id='#{id}'>"
-  #     list.each { |item|
-  #       out += "<li order='#{item[:c].order}'>#{item[:c].title}"
-  #       out += sub_tree_out(item[:sub], select) if item[:sub].present?
-  #       out += "</li>"
-  #     }
-  #     out += "</ul>"
-  #   end
-  # end
-  # def self.tree(vir = false)
-  #   cats = Category.all
-  #   list = []
-  #   cats.where({level: 0, virtual: vir}).order_by(order: :asc).each{ |cat| list << { c: cat, sub: sub_tree(cat.id, 1, vir) } }
-  #   list
-  # end
-
-  # private
-
-  # def self.sub_tree(par_id, lvl, vir = false)
-  #   # puts par_id
-  #   # puts lvl
-  #   list = nil
-  #   if lvl != 6
-  #     list = []
-  #     Category.where({level: lvl, parent_id: par_id, virtual: vir}).order_by(order: :asc).each{ |cat| list << { c: cat, sub: sub_tree(cat.id, lvl+1, vir)} }
-  #   end
-  #   list
-  # end
-
-
-  # def self.sub_tree_out(sub, select)
-  #   list = sub
-  #   out = ""
-  #   if list.present?
-  #     if select
-  #       list.each { |item|
-  #         out += "<option order='#{item[:c].order}' data-level='#{item[:c].level}'>#{item[:c].title}</option>"
-  #         out += sub_tree_out(item[:sub], select) if item[:sub].present?
-  #       }
-  #     else
-  #       out = "<ul>"
-  #       list.each { |item|
-  #         out += "<li order='#{item[:c].order}' class='#{item[:c].level}'>#{item[:c].title}"
-  #         out += sub_tree_out(item[:sub], select) if item[:sub].present?
-  #         out += "</li>"
-  #       }
-  #       out += "</ul>"
-  #     end
-  #   end
-  #   out
-  # end
-
-  # def self.parse_formula(formula)
-  #   t = nil
-  #   if formula.present?
-  #     fs = formula.strip.split("&")
-  #     forms = []
-  #     cells = []
-  #     fs.each { |r|
-  #       cls = r.split("/")
-  #       return nil if cls.length != 2
-  #       forms << cls[0]
-  #       cells << cls[1]
-  #     }
-  #     t = [forms, cells]
-  #   end
-  #   t
-  # end
-
-  # def self.parse_codes(codes)
-  #   codes.present? ? codes.to_s.strip.split(",") : nil
-  # end
-
 end

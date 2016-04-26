@@ -85,8 +85,8 @@ class Party
   # end
 
   def self.by_name(party_name)
-    #puts "-------------------------party_name1----#{Party.clean_name(party_name)}"
-    Party.where({name: Party.clean_name(party_name)}).first
+    party_name = Party.clean_name(party_name)
+    Party.or({ name: party_name }, { title: party_name }).first
   end
 
   def self.is_initiative(party_name)

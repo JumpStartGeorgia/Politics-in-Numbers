@@ -21,6 +21,7 @@ Rails.application.routes.draw do
       resources :donorsets, only: [:index, :show, :new, :create, :destroy]
       resources :parties do
         collection do
+          get 'deffered'
           get 'bulk'
           post 'bulk_update'
         end

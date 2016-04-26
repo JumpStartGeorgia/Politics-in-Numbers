@@ -82,11 +82,22 @@ class Admin::PartiesController < ApplicationController
     end
   end
 
-  def bulk(ids=[])
+  def deffered
+
+    # some fallback here
+  end
+  def bulk
+    @deffered = current_user.deffereds.find(params[:id])
+    #redirect_to bulk_admin_parties_path(ids: item.related_ids)
+    ids = @deffered.related_ids
+    puts "#{params.inspect}"
     if ids.kind_of?(Array)
+      puts "***************#{ids.inspect}"
       @items = @model.where(:id.in => ids)
+      puts "***************1"
     end
-    @items = @model.sorted
+    puts "***************2"
+
 
     respond_to do |format|
       format.html {
@@ -95,14 +106,14 @@ class Admin::PartiesController < ApplicationController
     end
   end
 
-    # PUT /parties/1
-  # PUT /parties/1.json
+    # POST /parties/1
+  # POST /parties/1.json
   def bulk_update
     # "parties"=>{"blah-ka"=>{"type"=>"0"}, "aleksi-shoshikelashvilis-amomrchevelta-sainiciativo-jgupi"=>{"type"=>"1"}, "i"=>{"type"=>"1"}},
     errors = {}
     has_error = false
     @items = []
-    _bulk_params.each { |k, v|
+    _bulk_params.parties.each { |k, v|
       party = @model.find(k)
       if party.present? && @model.is_type(v["type"])
         @items << party
@@ -156,6 +167,7 @@ class Admin::PartiesController < ApplicationController
       # sls = pars[:party][:_slugs_translations];
       # sls.each{|k,v| sls[k] = [v] }
       pars.require(:parties)#.tap do |whitelisted|
+      pars.require(:id)
       #  whitelisted[:other_stuff] = params[:registration][:other_stuff]
      # end
       #pars.require(:parties).permit(:_id, :id, :title, :type, :color, :name, :tmp_id, title_translations: [:ka, :en, :ru], description_translations: [:ka, :en, :ru], permalink_translations: [:ka, :en, :ru])

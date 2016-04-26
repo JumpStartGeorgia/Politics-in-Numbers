@@ -41,6 +41,7 @@ ka:
         updated_at: *updated_at
         current_state: *state
         source_file_name: *source
+        donors: Donors List
     models:
       user:
         one: User

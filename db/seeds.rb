@@ -57,6 +57,14 @@ if User.where(email: email).count == 0
   #u.api_keys.create
 end
 
+email = 'antarya@gmail.com'
+if User.where(email: email).count == 0
+  puts 'Creating antarya user'
+  #User.where(email: email).destroy
+  u = User.new(email: email, password: "rootroot1", role_id: Role.first._id)#, is_user: false)
+  u.save(validate: false)
+  #u.api_keys.create
+end
 
 puts "Gather category data"
 categories_cell = []

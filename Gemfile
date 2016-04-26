@@ -122,6 +122,9 @@ group :test do
   # Ex: expect(new_user).to have(1).error_on(:role)
   gem 'rspec-collection_matchers', '~> 1.1.2'
 
+  # Provides a collection of RSpec-compatible matchers that help to test Mongoid documents.
+  gem 'mongoid-rspec', '~> 2.1.0'
+
   # Easy data creation in tests
   gem 'factory_girl_rails', '~> 4.5.0'
 

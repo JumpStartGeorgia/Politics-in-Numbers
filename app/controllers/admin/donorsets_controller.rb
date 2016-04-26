@@ -51,6 +51,7 @@ class Admin::DonorsetsController < ApplicationController
 
     respond_to do |format|
       if @item.save
+        puts "--------------------------#{current_user.inspect}"
         Job.donorset_file_process(@item._id, current_user._id)
         #job(:process_donorset, @item._id)
         format.html { redirect_to admin_donorsets_path, flash: {success:  t('shared.msgs.success_created_with_pending_job', :obj => t('mongoid.models.donorset.one'))} }

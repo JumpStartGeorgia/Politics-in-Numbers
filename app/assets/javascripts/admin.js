@@ -47,4 +47,14 @@ $( "#categories-list2" ).select2({
 
 $(document).ready(function(){
     $('.datatable').DataTable({ responsive: true });
+     console.log("test");
+     $("input").click(function(){
+       console.log($(this).val());
+     });
+    $("#toggle_type input").change(function(){
+      var t = $(this), p = t.parent(), table = p.closest("table"), v = t.val();
+      table.find("input[type='radio'][value='"+v+"'][name$='][type]']").prop("checked", true);
+
+       // console.log($(this).val(), $("[name='" + p.attr("data-selector") + "']"));
+    })
 });

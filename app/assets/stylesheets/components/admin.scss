@@ -23,3 +23,13 @@ abbr[title], abbr[data-original-title] {
   font-size: 11px;
   color: #929292;
 }
+#toggle_type {
+  display:inline-block;
+  float:right;
+}
+#toggle_type label {
+  padding:0px 8px;
+}
+#toggle_type label input {
+  margin-right: 3px;
+}
