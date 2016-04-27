@@ -62,7 +62,7 @@ class Job
           # @donorset.save
           if missing_parties.present?
             missing_parties.each {|mp| mp.save; }
-            @user.deffereds << Deffered.new({ type: Deffered.type_is(:bulk_parties), user_id: @user._id, related_ids: missing_parties.map{|r| r._id }});
+            @user.deffereds << Deffered.new({ type: Deffered.type_is(:parties_type_correction), user_id: @user._id, related_ids: missing_parties.map{|r| r._id }});
             #puts "--------------------------#{@user.inspect}"
             @user.save
           end

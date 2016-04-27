@@ -82,54 +82,49 @@ class Admin::PartiesController < ApplicationController
     end
   end
 
-  def deffered
-
-    # some fallback here
-  end
   def bulk
     @deffered = current_user.deffereds.find(params[:id])
-    #redirect_to bulk_admin_parties_path(ids: item.related_ids)
-    ids = @deffered.related_ids
-    puts "#{params.inspect}"
-    if ids.kind_of?(Array)
-      puts "***************#{ids.inspect}"
+    if @deffered.nil?
+      redirect_to admin_parties_path, flash: { notice: "Your don't have deffered activies anymore." }
+    else
+      ids = @deffered.related_ids
       @items = @model.where(:id.in => ids)
-      puts "***************1"
-    end
-    puts "***************2"
 
-
-    respond_to do |format|
-      format.html {
-        redirect_to admin_parties_path  if !@items.present?
-      }
+      redirect_to admin_parties_path, flash: { notice: "Current deffered activity has no related objects to communicate with." } if @items.nil?
     end
   end
 
-    # POST /parties/1
-  # POST /parties/1.json
   def bulk_update
-    # "parties"=>{"blah-ka"=>{"type"=>"0"}, "aleksi-shoshikelashvilis-amomrchevelta-sainiciativo-jgupi"=>{"type"=>"1"}, "i"=>{"type"=>"1"}},
-    errors = {}
-    has_error = false
-    @items = []
-    _bulk_params.parties.each { |k, v|
-      party = @model.find(k)
-      if party.present? && @model.is_type(v["type"])
-        @items << party
-        if !party.update_attributes({ type: v["type"].to_i, description: "test_ka"})
-          errors[k] = { error: party.errors }
-          has_error = true
+    @deffered = current_user.deffereds.find(params[:id])
+    if @deffered.nil?
+      redirect_to admin_parties_path, flash: { notice: "Your don't have deffered activies anymore." }
+    else
+      related_ids = @deffered.related_ids
+      #@errs = []
+      has_error = false
+      @items = []
+
+      parties = _bulk_params["parties"]
+      parties.each { |k, v|
+        party = @model.find(k)
+
+        if party.present? && related_ids.include?(party._id)
+          if !party.update({ type: v["type"].to_i })
+            #@errs << { key: k, error: party.errors.full_messages }
+            has_error = true
+          end
+          @items << party
+        else
+          redirect_to bulk_admin_parties_path(@deffered.id), flash: { notice: "Your deffered activity is broken, or you are trying to brake this peace of code" }
         end
-      end
-    }
-    respond_to do |format|
-      if !has_error
-        format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.party.one'))} }
-        format.json { head :no_content }
-      else
-        format.html { render action: "bulk", flash: {success:  t('shared.msgs.unexpected_error')} }
-        format.json { render json: errors, status: :unprocessable_entity }
+      }
+
+      respond_to do |format|
+        if !has_error
+          format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.party.one'))} }
+        else
+          format.html { render 'bulk', id: @deffered.id, flash: {success:  t('shared.msgs.unexpected_error')} }
+        end
       end
     end
   end
@@ -160,16 +155,11 @@ class Admin::PartiesController < ApplicationController
       pars.require(:party).permit(:_id, :id, :title, :type, :color, :name, :tmp_id, title_translations: [:ka, :en, :ru], description_translations: [:ka, :en, :ru], permalink_translations: [:ka, :en, :ru])
     end
     def _bulk_params
-      pars = params.clone
-      #puts "=================================#{pars}"
-     # default = I18n.default_locale
-      #locales = [:ka, :en, :ru]
-      # sls = pars[:party][:_slugs_translations];
-      # sls.each{|k,v| sls[k] = [v] }
-      pars.require(:parties)#.tap do |whitelisted|
-      pars.require(:id)
-      #  whitelisted[:other_stuff] = params[:registration][:other_stuff]
-     # end
-      #pars.require(:parties).permit(:_id, :id, :title, :type, :color, :name, :tmp_id, title_translations: [:ka, :en, :ru], description_translations: [:ka, :en, :ru], permalink_translations: [:ka, :en, :ru])
+      #params.permit(:id).permit(:parties).permit!
+      # pars = params.clone
+      params.permit(:id, parties: {}).tap do |whitelisted|
+        whitelisted[:parties] = params[:parties]
+        whitelisted[:id] = params[:id]
+      end
     end
 end

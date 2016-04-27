@@ -1,18 +1,25 @@
 <% title t('.title') %>
   <% if current_user.is? :super_admin %>
-     <div class="col-sm-12">
-      <ul class="standard">
-        <li><%= link_to t('.parties'), admin_parties_path %></li>
-        <li><%= link_to t('.datasets'), admin_datasets_path %></li>
-        <li><%= link_to t('.donorsets'), admin_donorsets_path %></li>
-        <% if current_user.deffereds.present? %>
-          <% current_user.deffereds.each{ |c| %>
-            <li><%= link_to t('.deffereds'), bulk_admin_parties_path(id: c._id) %></li>
-          <% } %>
-        <% end %>
 
-        <!-- <li><%#= link_to t('.page_contents'), admin_page_contents_path %></li> -->
-        <!-- <li><%#= link_to t('.users'), admin_users_path %></li> -->
-      </ul>
-    </div>
   <% end %>
+
+<div class="panel panel-default">
+  <div class="panel-heading"><%= t('.available_actions') %></div>
+  <div class="panel-body">
+    <ul class="list-group">
+      <li class="list-group-item"><%= link_to t('.parties'), admin_parties_path %></li>
+      <li class="list-group-item"><%= link_to t('.datasets'), admin_datasets_path %></li>
+      <li class="list-group-item"><%= link_to t('.donorsets'), admin_donorsets_path %></li>
+      <% if current_user.deffereds.present? %>
+        <li class="list-group-item">
+          <%= link_to deffered_admin_users_path do %>
+            <%= t('.deffereds') %>
+            <span class="badge"><%= current_user.deffereds.length %></span>
+          <% end %>
+        </li>
+      <% end %>
+      <li class="list-group-item"><%= link_to t('.users'), admin_users_path %></li>
+      <!-- <li><%#= link_to t('.page_contents'), admin_page_contents_path %></li> -->
+    </ul>
+  </div>
+</div>

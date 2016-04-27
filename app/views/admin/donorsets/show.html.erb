@@ -9,7 +9,7 @@
 </div>
 <div class="row"><hr/></div>
 
-<div class="">
+<div>
   <table class="table table-bordered table-hover table-responsive datatable">
     <thead>
       <tr>
@@ -40,27 +40,27 @@
 
 
 <%-
-  top_donors = {}
-  top_parties = {}
-  d = Donorset.last.donors
-  d.each{|t|
-    k = t.first_name + " " + t.last_name
-    if top_donors.key?(k)
-      top_donors[k] += t.amount
-    else
-      top_donors[k] = t.amount
-    end
-    k = t.party
-    if top_parties.key?(k)
-      top_parties[k] += t.amount
-    else
-      top_parties[k] = t.amount
-    end
-  }
+  # top_donors = {}
+  # top_parties = {}
+  # d = Donorset.last.donors
+  # d.each{|t|
+  #   k = t.first_name + " " + t.last_name
+  #   if top_donors.key?(k)
+  #     top_donors[k] += t.amount
+  #   else
+  #     top_donors[k] = t.amount
+  #   end
+  #   k = t.party
+  #   if top_parties.key?(k)
+  #     top_parties[k] += t.amount
+  #   else
+  #     top_parties[k] = t.amount
+  #   end
+  # }
 %>
-<%- top_donors.sort_by { |k,v| -v }[0..5].each{|k,v| %>
+<%#- top_donors.sort_by { |k,v| -v }[0..5].each{|k,v| %>
   <%#= "#{k} #{v}\n" %></br>
-<%- } %>
-<%- top_parties.sort_by { |k,v| -v }[0..5].each{|k,v| %>
+<%#- } %>
+<%#- top_parties.sort_by { |k,v| -v }[0..5].each{|k,v| %>
   <%#= "#{k} #{v}\n" %></br>
-<%- } %>
+<%#- } %>

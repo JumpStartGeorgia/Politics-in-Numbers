@@ -7,9 +7,9 @@
 
 <%= form_tag bulk_update_admin_parties_path(id: @deffered.id) do %>
 
-<div class="table-responsive">
-  <table class="table table-bordered table-hover">
-    <thead class="thead-inverse">
+<div>
+  <table class="table table-bordered table-hover table-responsive datatable">
+    <thead>
       <tr>
         <th><%= @model.human_attribute_name(:title) %></th>
         <th><%= @model.human_attribute_name(:type) %><div id="toggle_type" data-selector='parties[*][type]'><span>Toggle All   </span>
@@ -21,7 +21,7 @@
     <tbody>
       <% @items.each do |item| %>
         <%= semantic_fields_for "parties[]", item do |f| %>
-          <%#= f.error_messages %>
+          <%#= @errs.inspect %>
         <tr>
           <td><%= f.object.title %></td>
           <td><%= f.input :type, :as => :radio, :collection => Party.types, label: false, :wrapper_html => { :class => "inline" }  %></td>

@@ -44,17 +44,38 @@ $( "#categories-list2" ).select2({
        return result.text;
     }
 });
-
+var datatable = null;
 $(document).ready(function(){
-    $('.datatable').DataTable({ responsive: true });
+    datatable = $('.datatable').DataTable({
+      responsive: true,
+      columnDefs: [
+        { targets: 'sorting_disabled', orderable: false }
+      ]
+      // fnHeaderCallback: function() {
+      //    console.log("here");
+      //   return $('th.no-sort').removeClass("sorting").off("click");
+      // }
+    });
+
+
+
      console.log("test");
      $("input").click(function(){
        console.log($(this).val());
      });
     $("#toggle_type input").change(function(){
-      var t = $(this), p = t.parent(), table = p.closest("table"), v = t.val();
-      table.find("input[type='radio'][value='"+v+"'][name$='][type]']").prop("checked", true);
+      var t = $(this), p = t.parent(), v = t.val();
+      //, table = p.closest("table"),
+      //rows = table.dataTable().$("tr", {"filter":"applied"});
 
-       // console.log($(this).val(), $("[name='" + p.attr("data-selector") + "']"));
-    })
+      //rows.find("input[type='radio'][value='"+v+"'][name$='][type]']").prop("checked", true);
+
+      var trs = $(datatable.$("tr", {"filter": "applied"}));
+      trs.find("td input[type='radio'][value!='"+v+"'][name$='][type]']").prop("checked", false);
+      trs.find("td input[type='radio'][value='"+v+"'][name$='][type]']").prop("checked", true); //.trigger("change");
+    });
+
+    $("#user-dropdown").click(function(){
+      $(this).find(".badge-notifier").removeClass("badge-notifier");
+    });
 });

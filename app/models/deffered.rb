@@ -4,7 +4,7 @@ class Deffered
 
   embedded_in :user
   # after_create :notify_user
-  TYPES = [:bulk_parties]
+  TYPES = [:parties_type_correction]
 
   field :type, type: Integer
   field :user_id, type: BSON::ObjectId
@@ -30,5 +30,7 @@ class Deffered
   def self.type_is(tp)
     TYPES.index(tp.to_sym)
   end
-
+  def current_type
+    I18n.t("mongoid.options.users.deffered.type.#{TYPES[type].to_s}")
+  end
 end

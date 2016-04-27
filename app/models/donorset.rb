@@ -69,7 +69,9 @@ class Donorset
   def current_state
     I18n.t("mongoid.options.donorset.state.#{STATES[state].to_s}")
   end
-
+  def current_state_sym
+    STATES[state].to_s
+  end
   # def before_process_job
   #   puts "------------------------Before preparation on donorset"
   #   process_job

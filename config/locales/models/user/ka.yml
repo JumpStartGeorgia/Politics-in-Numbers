@@ -58,6 +58,9 @@ ka:
       donorset:
         one: Donor data
         other: Donor data
+      deffered:
+        one: Deffered activity
+        other: Deffered activities
       admin:
         one: Admin Section
     options:
@@ -79,7 +82,7 @@ ka:
     hints:
       party:
         title: Party Title
-        type: "Type: Party or Initiative"
+        type: "Select: Party or Initiative"
         description: Party description for party summary page
         slug: Party Permalink
         permalink: Party Permalink
@@ -91,7 +94,6 @@ ka:
         source: Select spreadsheet file
       donorset:
         source: Select spreadsheet file
-
 # en:
 #     formtastic:
 #       titles:

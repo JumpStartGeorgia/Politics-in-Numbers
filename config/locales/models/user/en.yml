@@ -1,4 +1,11 @@
 en:
+  admin:
+    index:
+      parties: Parties
+      datasets: Datasets
+      donorsets: Donors Lists
+      deffereds: Deffered activities
+      available_actions: List of actions
   mongoid:
     common:
       updated_at: &updated_at Update Date
@@ -35,7 +42,7 @@ en:
         period_name: *period
         current_state: *state
         source_file_name: *source
-      donorsets:
+      donorset:
         source: *source
         state: *state
         updated_at: *updated_at
@@ -54,10 +61,13 @@ en:
         other: Donors
       dataset:
         one: Dataset
-        other: Dataset
+        other: Datasets
       donorset:
         one: Donor data
         other: Donor data
+      deffered:
+        one: Deffered activity
+        other: Deffered activities
       admin:
         one: Admin Section
     options:
@@ -75,11 +85,15 @@ en:
           pending: *pending
           processed: *processed
           discontinued: *discontinued
+      users:
+        deffered:
+          type:
+            parties_type_correction: Correct party type, after adding new donorset
   formtastic:
     hints:
       party:
         title: Party Title
-        type: "Type: Party or Initiative"
+        type: "Select: Party or Initiative"
         description: Party description for party summary page
         slug: Party Permalink
         permalink: Party Permalink
@@ -91,7 +105,6 @@ en:
         source: Select spreadsheet file
       donorset:
         source: Select spreadsheet file
-
 # en:
 #     formtastic:
 #       titles:

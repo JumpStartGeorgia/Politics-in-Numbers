@@ -15,13 +15,16 @@ Rails.application.routes.draw do
                constraints: { format: :html }
     match '/admin', :to => 'admin#index', :as => :admin, :via => :get
 
-    namespace :admin do
-      resources :users#, constraints: { format: :html }
-      resources :datasets, only: [:index, :new, :create, :destroy]
-      resources :donorsets, only: [:index, :show, :new, :create, :destroy]
-      resources :parties do
+    namespace :admin, :constraints => { format: :json } do
+      resources :users do
         collection do
           get 'deffered'
+        end
+      end#, constraints: { format: :html }
+      resources :datasets, only: [:index, :new, :create, :destroy]
+      resources :donorsets, only: [:index, :show, :new, :create, :destroy]
+      resources :parties, :constraints => { format: :json } do
+        collection do
           get 'bulk'
           post 'bulk_update'
         end

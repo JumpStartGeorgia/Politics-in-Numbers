@@ -12,6 +12,11 @@ module Admin
       @users = User.all.includes(:role).order(:email)
     end
 
+    def deffered
+      @items = current_user.deffereds
+      redirect_to admin_path if @items.empty?
+    end
+
     # GET /users/1
     # GET /users/1.json
     def show

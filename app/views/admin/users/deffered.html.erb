@@ -1,0 +1,5 @@
+<ul class="list-group">
+  <% @items.each{ |item| %>
+    <li class="list-group-item"><%= link_to item.current_type, bulk_admin_parties_path(id: item.id) %></li>
+  <% } %>
+</ul>

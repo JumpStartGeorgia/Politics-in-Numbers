@@ -65,6 +65,14 @@ class Party
     name.gsub!("- ","")
     name.gsub!("  ","")
     name.gsub!("\"","")
+    name.gsub!("სინიციატივო ჯგუფი","")
+    name.gsub!("საინიციატივო ჯგუფი","")
+    name.gsub!("საინიციატივოს ჯგუფი","")
+    name.gsub!("საინიციატიცო ჯგუფი","")
+    name.gsub!("საინიციაივო ჯგუფი","")
+    name.gsub!("საინიციტივო ჯგუფი","")
+    name.gsub!("საინციატივო ჯგუფი","")
+    name.gsub!("საინიციატივო","")
 
     return name.strip
   end
@@ -91,6 +99,7 @@ class Party
 
   def self.is_initiative(party_name)
     patterns = [
+      "სინიციატივო ჯგუფი",
       "საინიციატივო ჯგუფი",
       "საინიციატივოს ჯგუფი",
       "საინიციატიცო ჯგუფი",
