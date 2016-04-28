@@ -120,10 +120,10 @@ class ApplicationController < ActionController::Base
     p
   end
 
-  def job(type, related_ids)
-    related_ids = [related_ids] if !related_ids.is_a? Array
-    Job.create!({ type: Job::TYPES.index(type), user_id: current_user._id, related_ids: related_ids})
-  end
+  # def job(type, related_ids)
+  #   related_ids = [related_ids] if !related_ids.is_a? Array
+  #   Job.create!({ type: Job::TYPES.index(type), user_id: current_user._id, related_ids: related_ids})
+  # end
   # def log(msg)
   #     Rails.logger.debug("\033[44;37m#{'*'*80}\n    #{DateTime.now.strftime('%d/%m/%Y %H:%M')}#{msg.to_s.rjust(56)}\n#{'*'*80}\033[0;37m")
   # end

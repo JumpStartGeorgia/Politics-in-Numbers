@@ -13,6 +13,16 @@ class DetailData
   validates_presence_of :table, :detail_id
 
   def detail
-    Detail.find(detail_id)
+    @detail = Detail.find(category_id)
+
+  end
+
+  def detail_name
+    @detail = detail if @detail.nil?
+    if @detail.present?
+      @detail.title
+    else
+      I18n.t("shared.common.unknown")
+    end
   end
 end

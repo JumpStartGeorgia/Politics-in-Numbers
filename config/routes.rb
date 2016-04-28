@@ -14,16 +14,22 @@ Rails.application.routes.draw do
                },
                constraints: { format: :html }
     match '/admin', :to => 'admin#index', :as => :admin, :via => :get
-
-    namespace :admin, :constraints => { format: :json } do
+    #match '/admin/category', :to => 'admin#category', :as => :category, :via => :get
+    # TODO correct to be admin/category path
+    # resources :admin, :constraints => { format: :html } do
+    #   collection do
+    #     get 'category'
+    #   end
+    # end
+    namespace :admin, :constraints => { format: :html } do
       resources :users do
         collection do
           get 'deffered'
         end
-      end#, constraints: { format: :html }
-      resources :datasets, only: [:index, :new, :create, :destroy]
+      end
+      resources :datasets, only: [:index, :show, :new, :create, :destroy]
       resources :donorsets, only: [:index, :show, :new, :create, :destroy]
-      resources :parties, :constraints => { format: :json } do
+      resources :parties do
         collection do
           get 'bulk'
           post 'bulk_update'

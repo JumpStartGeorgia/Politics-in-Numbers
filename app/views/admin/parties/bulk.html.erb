@@ -1,8 +1,12 @@
 <% title t '.title', :default => t('helpers.titles.edit', :model => @model.model_name.human,
                                  :default => "Bulk #{@model.model_name.human}") %>
-<div class="form-group form-group-admin-buttons">
-  <%= links_for(@items[0], :admin, [:view_all]) %>
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@items[0], :admin, [:view_all]) %>
+    <div class="pull-right"></div>
+  </div>
 </div>
+<div class="row"><hr/></div>
 
 
 <%= form_tag bulk_update_admin_parties_path(id: @deffered.id) do %>

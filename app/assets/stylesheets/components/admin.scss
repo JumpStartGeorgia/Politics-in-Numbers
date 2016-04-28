@@ -80,3 +80,50 @@ abbr[title], abbr[data-original-title] {
     50% { opacity: 0.0; }
     100% { opacity: 1.0; }
 }
+
+.tree {
+  ul {
+    margin:0;
+    padding:0;
+    list-style:none;
+    ul {
+      padding:0 0 0 20px;
+    }
+  }
+  .box {
+    padding:2px 10px 2px 20px;
+    &:hover, label:hover {
+      background-color:#E6F6FF;
+      cursor:pointer;
+    }
+
+
+    &.inner {
+      background: url(/assets/toggle-small.png) no-repeat 0px 5px/16px;
+    }
+    &.inner:hover {
+      background:#E6F6FF url(/assets/toggle-small.png) no-repeat 0px 5px/16px;
+    }
+
+    &.inner.closed {
+      background: url(/assets/toggle-small-expand.png) no-repeat 0px 5px/16px;
+    }
+
+    &.inner.closed:hover {
+      background:#E6F6FF url(/assets/toggle-small-expand.png) no-repeat 0px 5px/16px;
+    }
+    &.inner.closed + ul {
+      display:none;
+    }
+  }
+
+  .info {
+    float:right;
+  }
+
+}
+.tab-content {
+  border: 1px solid #ddd;
+  border-top: 0;
+  padding: 6px 10px;
+}

@@ -26,6 +26,7 @@ ka:
       actions: Actions
       default_text: "ძირითადი ტექსტი"
       default_url: "ძირითადი URL"
+      unknown: Unknown
       jumpstart:
         slogan: JumpStart Georgia - We communicate data better!
       name: Rails-ის დასაწყისი მოდელი
@@ -44,3 +45,12 @@ ka:
     prompts:
       confirm: Are you sure?
       forgot_password: Forgot your password?
+  notifier:
+    job:
+      donorset_file_process:
+        donorset_not_found: "Donorset to process was not found, probably you request to delete it."
+        operator_not_found: "Operator not found, send to nowhere."
+        invalid_party_name: "Party '%{name}', name is invalid, check row %{row} in excel, and make sure it has party name"
+        unmatched_header: "Header in provided file is distinct, compare to expected one %{header}."
+        success: "File %{filename} was successfully processed. To view processed data follow the <a href='%{link}'>link</a>.%{missing_parties}"
+        missing_parties: "New parties were added, and you need to specify correct types <a href='%{link}'>link</a>"

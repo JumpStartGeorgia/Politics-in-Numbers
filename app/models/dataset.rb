@@ -5,19 +5,20 @@ class Dataset
   include Mongoid::Timestamps
   include Mongoid::Paperclip
 
-  after_create :before_process_job
 
-  STATES = [:pending, :processed, :discontinued]
+  STATES = [:pending, :processed, :discontinued]  # 0 pending 1 processed 2 discontinued
 
   embeds_many :category_datas
   embeds_many :detail_datas
-  #belongs_to :party
 
   field :party_id, type: BSON::ObjectId
   field :period_id, type: BSON::ObjectId
-  field :state, type: Integer, default: 0 # 0 pending 1 processed 2 discontinued
+  field :state, type: Integer, default: 0
+  field :del, type: Boolean, default: false
 
-  has_mongoid_attached_file :source, :path => ':attachment/:id/:style.:extension'
+  default_scope ->{ where(del: false) }
+
+  has_mongoid_attached_file :source, :path => ':rails_root/public/system/:class/:attachment/:id/:style.:extension'
 
 
   validates_presence_of :party_id, :period_id
@@ -50,34 +51,28 @@ class Dataset
     I18n.t("mongoid.options.dataset.state.#{STATES[state].to_s}")
   end
 
-  def before_process_job
-    put
-    delay_process_dataset
+  def current_state_sym
+    STATES[state].to_s
   end
 
-  def process_job
-
+  def set_state(st)
+    st = STATES.index(st.to_sym)
+    if st.present?
+      self.state = st
+      self.save
+    end
   end
-  handle_asynchronously :process_job, :priority => 1
 
- # def self.states
- #    col = {}
- #    STATES.each_with_index{|d, i|
- #      col[I18n.t("mongoid.options.dataset.type.#{d}")] = i
- #    }
- #    col
- #  end
+  def self.has_state(st)
+    begin
+      st.to_i < STATES.length
+    rescue
+      false
+    end
+  end
 
- #  def self.state_is(tp)
- #    STATES.index(tp.to_sym)
- #  end
-
- #  def self.is_state(tp)
- #    begin
- #      tp.to_i < STATES.length
- #    rescue
- #      false
- #    end
- #  end
+  def is_state(st)
+    self.state == STATES.index(st)
+  end
 
 end

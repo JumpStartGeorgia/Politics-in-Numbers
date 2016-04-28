@@ -66,14 +66,11 @@ class Admin::PartiesController < ApplicationController
   # PUT /parties/1.json
   def update
     @item = @model.find(params[:id])
-    puts "---------------------#{_params.inspect}---------#{@item.inspect}--"
     respond_to do |format|
       if @item.update_attributes(_params)
-        puts "good-----------------------------------____#{@item.errors.inspect}_"
         format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.party.one'))} }
         format.json { head :no_content }
       else
-        puts "bad-----------------------------------____#{@item.errors.inspect}_"
         set_tabbed_translation_form_settings
 
         format.html { render action: "edit" }
@@ -85,22 +82,21 @@ class Admin::PartiesController < ApplicationController
   def bulk
     @deffered = current_user.deffereds.find(params[:id])
     if @deffered.nil?
-      redirect_to admin_parties_path, flash: { notice: "Your don't have deffered activies anymore." }
+      redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.not_found") }
     else
       ids = @deffered.related_ids
       @items = @model.where(:id.in => ids)
 
-      redirect_to admin_parties_path, flash: { notice: "Current deffered activity has no related objects to communicate with." } if @items.nil?
+      redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.no_related_objects") } if @items.nil?
     end
   end
 
   def bulk_update
     @deffered = current_user.deffereds.find(params[:id])
     if @deffered.nil?
-      redirect_to admin_parties_path, flash: { notice: "Your don't have deffered activies anymore." }
+      redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.not_found") }
     else
       related_ids = @deffered.related_ids
-      #@errs = []
       has_error = false
       @items = []
 
@@ -110,20 +106,20 @@ class Admin::PartiesController < ApplicationController
 
         if party.present? && related_ids.include?(party._id)
           if !party.update({ type: v["type"].to_i })
-            #@errs << { key: k, error: party.errors.full_messages }
             has_error = true
           end
           @items << party
         else
-          redirect_to bulk_admin_parties_path(@deffered.id), flash: { notice: "Your deffered activity is broken, or you are trying to brake this peace of code" }
+          redirect_to bulk_admin_parties_path(@deffered.id), flash: { notice: t("mongoid.messages.deffered.missing_parameter") }
         end
       }
 
       respond_to do |format|
         if !has_error
+          @deffered.soft_destroy
           format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.party.one'))} }
         else
-          format.html { render 'bulk', id: @deffered.id, flash: {success:  t('shared.msgs.unexpected_error')} }
+          format.html { render 'bulk', id: @deffered.id, flash: {notice:  t('shared.msgs.unexpected_error')} }
         end
       end
     end

@@ -8,8 +8,8 @@
 </div>
 <div class="row"><hr/></div>
 
-<div class="table-responsive">
-  <table class="table table-bordered table-hover">
+<div class="row">
+  <table class="table table-bordered table-hover table-responsive datatable">
     <thead>
       <tr>
         <th><%= @model.human_attribute_name(:party_id) %></th>
@@ -17,22 +17,23 @@
         <th><%= @model.human_attribute_name(:source) %></th>
         <th><%= @model.human_attribute_name(:state) %></th>
         <th><%= @model.human_attribute_name(:updated_at) %></th>
-        <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
+        <th class="actions-3 sorting_disabled"><%=t '.actions', :default => t("helpers.actions") %></th>
       </tr>
     </thead>
     <tbody>
       <% @items.each do |item| %>
         <tr>
           <td><%= item.party.name %></td>
-          <td><%= item.period.title %></td>
+          <td class="text-right"><%= item.period.title %></td>
           <td><%= item.source_file_name %></td>
-          <td><%= item.current_state %></td>
-          <td><%= item.updated_at %></td>
-          <td>
-            <div class="btn-group btn-group-sm" role="group" aria-label="...">
-              <%= links_for(item, :admin, [:destroy]) %>
-            </div>
-
+          <td class="state-<%= item.current_state_sym %> text-center"><%= item.current_state %></td>
+          <td class="text-right"><%= item.updated_at %></td>
+          <td class="text-center">
+            <% if item.is_state(:processed) %>
+              <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                <%= links_for(item, :admin, [:view, :destroy]) %>
+              </div>
+            <% end %>
           </td>
         </tr>
       <% end %>

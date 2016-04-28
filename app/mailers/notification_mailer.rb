@@ -15,6 +15,11 @@ class NotificationMailer < ActionMailer::Base
     mail(msg.to_hash.merge({:template_name => "common"})) if msg.valid?
   end
 
+  def about_dataset_file_process(msg)
+    puts "------------------------- #{msg.to_hash}"
+    @message = msg
+    mail(msg.to_hash.merge({:template_name => "common"})) if msg.valid?
+  end
 
   # def send_new_user(message)
   #   @message = message

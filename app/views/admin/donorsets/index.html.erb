@@ -7,7 +7,8 @@
   </div>
 </div>
 <div class="row"><hr/></div>
-<div>
+
+<div class="row">
   <table class="table table-bordered table-hover table-responsive datatable">
     <thead>
       <tr>
@@ -24,10 +25,11 @@
           <td class="state-<%= item.current_state_sym %> text-center"><%= item.current_state %></td>
           <td class="text-right"><%= item.updated_at %></td>
           <td class="text-center">
-            <div class="btn-group btn-group-sm" role="group" aria-label="...">
-              <%= links_for(item, :admin, [:view, :destroy]) %>
-            </div>
-
+            <% if item.is_state(:processed) %>
+              <div class="btn-group btn-group-sm" role="group" aria-label="...">
+                <%= links_for(item, :admin, [:view, :destroy]) %>
+              </div>
+            <% end %>
           </td>
         </tr>
       <% end %>

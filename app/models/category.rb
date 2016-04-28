@@ -22,6 +22,8 @@ class Category
   #field :tmp_id, type: Integer
   field :order, type: Integer
 
+  scope :virtual, ->{ where(virtual: true) }
+  scope :non_virtual, ->{ where(virtual: false) }
 
   index code: 1
   index title: 1
@@ -41,8 +43,11 @@ class Category
     else
       out = "<ul id='#{id}'>"
       list.each { |item|
-        out += "<li order='#{item[:c].order}'>#{item[:c].title}"
-        out += sub_tree_out(item[:sub], select) if item[:sub].present?
+        has_sub = item[:sub].present?
+        info = []
+        item[:c].forms.each_with_index{|f, i| info << "#{f}/#{item[:c].cells[i]}/#{item[:c].codes[i] if item[:c].codes.present?}" } if item[:c].forms.present?
+        out += "<li order='#{item[:c].order}'><div class='box#{has_sub ? ' inner' : '' }'><label>#{item[:c].title}</label><div class='info'>#{ info.join(', ')}</div></div>"
+        out += sub_tree_out(item[:sub], select) if has_sub
         out += "</li>"
       }
       out += "</ul>"
@@ -81,8 +86,11 @@ class Category
       else
         out = "<ul>"
         list.each { |item|
-          out += "<li order='#{item[:c].order}' class='#{item[:c].level}'>#{item[:c].title}"
-          out += sub_tree_out(item[:sub], select) if item[:sub].present?
+          has_sub = item[:sub].present?
+          info = []
+          item[:c].forms.each_with_index{|f, i| info << "#{f}/#{item[:c].cells[i]}/#{item[:c].codes[i] if item[:c].codes.present?}" } if item[:c].forms.present?
+          out += "<li order='#{item[:c].order}' class='#{item[:c].level}'><div class='box#{has_sub ? ' inner' : '' }'><label>#{item[:c].title}</label><div class='info'>#{info.join(', ')}</div></div>"
+          out += sub_tree_out(item[:sub], select) if has_sub
           out += "</li>"
         }
         out += "</ul>"

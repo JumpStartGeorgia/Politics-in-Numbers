@@ -1,8 +1,13 @@
 <% title t '.title', :default => t('helpers.titles.new', :model => @model.model_name.human,
                                  :default => "New #{@model.model_name.human}") %>
-<div class="form-group form-group-admin-buttons">
-  <%= links_for(@item, :admin, [:view_all, :pre]) %>
+
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@model, :admin, [:pre, :view_all]) %>
+    <div class="pull-right"></div>
+  </div>
 </div>
+<div class="row"><hr/></div>
 
 <%= render :partial => 'form' %>
 

@@ -1,8 +1,13 @@
 <% title t '.title', :default => @model.model_name.human(:count => 2) %>
 
-<div class="form-group form-group-admin-buttons">
-  <%= links_for(@model, :admin, [:pre, :new]) %>
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@model, :admin, [:pre]) %>
+    <div class="pull-right"><%= links_for(@model, :admin, [:new]) %></div>
+  </div>
 </div>
+<div class="row"><hr/></div>
+
 <div>
   <table class="table table-bordered table-hover table-responsive datatable">
   <thead>

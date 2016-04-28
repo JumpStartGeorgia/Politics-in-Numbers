@@ -33,7 +33,7 @@ module StarterTemplate
       Rails.root.join('config', 'locales', '**', '*.{rb,yml}')
     ]
 
-    config.i18n.fallbacks = true
+    config.i18n.fallbacks = [:ka, :en, :ru]
 
     config.i18n.default_locale = :ka
 

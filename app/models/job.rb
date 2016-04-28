@@ -1,16 +1,188 @@
 class Job
   # Those are two &lt; symbols (the blog is screwing them up)
   class << self
-    def _donorset_file_process(item_id, user_id)
+    def _dataset_file_process(item_id, user_id, links)
       begin
-        # puts "user infoooooooooooooooooooooo #{@donorset.inspect} #{@user.inspect}"
-        # puts "_method"
-        notifiers = [:user]
+        @dataset = Dataset.find(item_id)
+        @user = User.find(user_id)
+
+        (raise Exception.new(I18n.t("notifier.job.dataset_file_process.donorset_not_found"))) if @dataset.nil?
+        (raise Exception.new(I18n.t("notifier.job.dataset_file_process.operator_not_found"));) if @user.nil?
+
+        sheets = ["1", "2", "3", "4" , "4.1" , "4.2" , "4.3" , "4.4" , "5" , "5.1" , "5.2" , "5.3" , "5.4", "5.5", "6" , "6.1" , "7", "8", "8.1" , "9" , "9.1" , "9.2" , "9.3", "9.4" , "9.5", "9.6", "9.7", "9.7.1",  "Validation"] # 9.71 = 9.8
+        sheets_abbr = ["FF1", "FF2", "FF3", "FF4" , "FF4.1" , "FF4.2" , "FF4.3" , "FF4.4" , "FF5" , "FF5.1" , "FF5.2" , "FF5.3" , "FF5.4" , "FF5.5" , "FF6" , "FF6.1" , "FF7", "FF8", "FF8.1" , "FF9" , "FF9.1" , "FF9.2" , "FF9.3", "FF9.4" , "FF9.5", "FF9.6", "FF9.7", "FF9.7.1", "V"]
+
+        lg = Delayed::Worker.logger
+
+        workbook = RubyXL::Parser.parse(@dataset.source.path)
+        missed_sheets = []
+        extra_sheets = []
+        workbook_sheets = []
+        workbook_sheets_map = {}
+
+        workbook.worksheets.each_with_index { |w, wi|
+          sheet_id = get_sheet_id(w.sheet_name)
+          workbook_sheets << sheet_id #w.sheet_name
+          if sheet_id != "Validation"
+            extra_sheets << w.sheet_name if !sheets.include? sheet_id
+            workbook_sheets_map["FF#{sheet_id}"] = wi
+          end
+        }
+        sheets.each_with_index { |w, wi|
+          missed_sheets << w if !workbook_sheets.include? w
+        }
+
+
+        Category.non_virtual.each { |item|
+          val = 0
+          item.forms.each_with_index { |form, form_i|
+            cell = item.cells[form_i]
+            code = item.codes && item.codes[form_i]
+            if sheets_abbr.include? form
+              abbr_index = sheets_abbr.index(form)
+              address = RubyXL::Reference.ref2ind(cell)
+              is_code = true
+              if code.present?
+                cd = deep_present(workbook, [workbook_sheets_map[form], address[0], 0])
+                cd = cd.present? ? cd.value.to_s : ""
+                if code != cd
+                  lg.info("#{item.title}/#{form}/#{cell}/#{code} but is #{cd}")
+                  is_code = false
+                end
+              end
+              if is_code
+                lg.info "good"
+                val_tmp = deep_present(workbook, [workbook_sheets_map[form], address[0], address[1]])
+                val += val_tmp.present? ? val_tmp.value.to_f : 0.0
+              end
+
+              lg.info "#{form}#{cell}#{val}"
+            else
+              lg.info("Missing form #{form}")
+            end
+          }
+          @dataset.category_datas << CategoryData.new({ value: val, category_id: item._id })
+        }
+        # Detail.each{ |item|
+        #   next
+        #   table = []
+        #   next if item.code != "FF4.1"
+        #   schemas = item.detail_schemas.order_by(order: 1)
+        #   required = []
+        #   has_required_or = false
+        #   defaults = []
+        #   types = []
+        #   skipped = []
+        #   header_map = []
+        #   schemas.each do |sch|
+        #     has_required_or = true if sch.required == :or
+        #     required << sch.required
+        #     defaults << sch.default_value
+        #     types << sch.field_type
+        #     skipped << sch.skip
+        #     header_map << sch.orig_title
+        #   end
+        #   cnt = item.fields_count
+
+        #   worksheet = workbook[workbook_sheets_map[item.code]]
+        #   (lg.info "missing sheet"; next;) if worksheet.nil?
+        #   #worksheet_to_table(worksheet)
+
+        #   is_header = true
+        #   terms = {}
+        #   item.terminators.each{|r|
+        #     terms[r.field_index] = [] if !terms.key?(r.field_index)
+        #     terms[r.field_index] << r.term
+        #   }
+        #   #d("Terms are: #{terms.values.join(' | ')}")
+
+        #   worksheet.each_with_index { |row, row_i|
+        #     if row && row.cells
+        #       cells = Array.new(header_map.length, nil)
+        #       row.cells.each_with_index do |c, c_i|
+        #         if c && c.value.present?
+        #           cells[c_i] = c.value.class != String ? c.value : (!(c_i == 0 && c.value.to_s.strip == "...") ? c.value.to_s.strip : "" )
+        #         end
+        #       end
+
+        #       if is_header
+        #         if cells[0] == "N"
+        #           lg.info cells.inspect
+        #         end
+        #         if cells == header_map
+        #           lg.info "plus one"
+        #           is_header = false
+        #         end
+        #       else
+        #         begin
+        #           or_state = 0
+        #           good_row = true
+        #           stop_row = false
+        #           required.each_with_index do |r, r_i|
+        #             good_cell = r_i < cells.length && cells[r_i].present?
+        #             (stop_row = true; good_row = false; break;) if good_cell && terms.key?(r_i+1) && terms[r_i+1].any? { |t| cells[r_i].to_s.include?(t) }
+        #             # 11.2015 not stopping
+        #             next if skipped[r_i]
+        #             if r == :and
+        #               (good_row = false;) if !good_cell
+        #             elsif r == :or
+        #               or_state += 1 if good_cell
+        #             else
+
+        #             end
+        #           end
+        #           good_row = false if has_required_or && or_state == 0
+
+        #           if stop_row
+        #             #lg.info "stop row #{cells.join('; ')}"
+        #             break
+        #           else
+        #             if good_row
+        #               cells.each_with_index do |r, r_i|
+        #                 cells[r_i] = defaults[r_i] if r.nil? && defaults[r_i].present?
+        #                 cells[r_i] = cells[r_i].to_f if types[r_i] == "Float"
+        #               end
+        #               table << cells
+        #               #d("#{cells.join('; ')}")
+        #               #put default if needed
+        #             else
+        #               #lg.info "bad row #{cells.join('; ')}"
+        #             end
+        #           end
+        #         rescue Exception => e
+        #           d("#{cells.inspect}exception --------------------- #{e.inspect}")
+        #         end
+        #       end
+        #     end
+        #   }
+
+        #   if is_header
+        #     d("Form header was not found. Should be #{header_map}")
+        #     break
+        #   else
+        #     dd = DetailData.new({ table: table, detail_id: item._id }) if table.present?
+        #     lg.info dd.inspect
+        #     dataset.detail_datas << dd
+        #   end
+        # }
+        @dataset.set_state(:processed)
+
+      rescue Exception => e
+        @dataset.destroy if @dataset.present?
+        lg.info e.inspect
+        Notifier.about_dataset_file_process(e.message, @user);
+      end
+    end
+    handle_asynchronously :_dataset_file_process, :priority => 1
+
+    def _donorset_file_process(item_id, user_id, links)
+      begin
+        # notifiers = [:user]
         @donorset = Donorset.find(item_id)
         @user = User.find(user_id)
 
-        (raise Exception.new("Donorset to process was not found, probably you request to delete it.");) if @donorset.nil?
-        (raise Exception.new("Operator not found, send to nowhere.");) if @user.nil?
+        (raise Exception.new(I18n.t("notifier.job.donorset_file_process.donorset_not_found"))) if @donorset.nil?
+        (raise Exception.new(I18n.t("notifier.job.donorset_file_process.operator_not_found"));) if @user.nil?
 
         headers_map = ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
 
@@ -43,46 +215,72 @@ class Job
                   if p.valid?
                     missing_parties << p
                   else
-                    raise Exception.new("Party '#{clean_name}', name is invalid check row #{row_i} in excel, and make sure it has party name")
+                    raise Exception.new(I18n.t("notifier.job.donorset_file_process.invalid_party_name", name: clean_name, row: row_i))
                   end
                 end
               end
               donor = Donor.new({ give_date: cells[1], first_name: cells[2],
                 last_name: cells[3], tin: cells[4], amount: cells[5],
                 party_id: p._id, comment: cells[7] })
-              puts "#{donor.errors.inspect}" if !donor.valid?
               @donorset.donors << donor
             end
           end
         }
 
         if is_header
-          raise Exception.new("Header in provided file is distinct, compare to expected one #{headers_map}.")
+          raise Exception.new(I18n.t("notifier.job.donorset_file_process.unmatched_header", header: headers_map))
         else
-          # @donorset.save
+          @donorset.save
+          deffered = nil
           if missing_parties.present?
             missing_parties.each {|mp| mp.save; }
-            @user.deffereds << Deffered.new({ type: Deffered.type_is(:parties_type_correction), user_id: @user._id, related_ids: missing_parties.map{|r| r._id }});
-            #puts "--------------------------#{@user.inspect}"
+            deffered = Deffered.new({ type: Deffered.type_is(:parties_type_correction), user_id: @user._id, related_ids: missing_parties.map{|r| r._id }})
+            @user.deffereds << deffered
             @user.save
           end
-          puts "======================= point1"
           @donorset.set_state(:processed)
-          puts "======================= point2"
-          Notifier.about_donorset_file_process("File #{@donorset.source_file_name} was successfully processed. To view processed data follow the <a href='#'>link</a>.", @user);
-          puts "======================= point3"
+
+          Notifier.about_donorset_file_process(
+            I18n.t("notifier.job.donorset_file_process.success",
+              filename: @donorset.source_file_name,
+              link: links[0].gsub("_id", @donorset.id),
+              missing_parties: deffered.present? ? I18n.t("notifier.job.donorset_file_process.missing_parties", link: links[1].gsub("_id", deffered.id)) : ""
+            ),
+            @user)
         end
 
       rescue Exception => e
         @donorset.destroy if @donorset.present?
+        lg.info e.inspect
         Notifier.about_donorset_file_process(e.message, @user);
       end
     end
     handle_asynchronously :_donorset_file_process, :priority => 1
+
+    def get_sheet_id(sheet_name)
+      tmp = sheet_name.gsub 'ფორმა', ''
+      tmp.gsub! 'N', ''
+      tmp.gsub! ' ', ''
+      tmp
+    end
+    def deep_present(parent, tree)
+      p = parent
+      tree.each {|d|
+        p = p[d].present? ? p[d] : nil
+        break if p.nil?
+      }
+      p
+    end
   end
 
-  # My importer as a class method
-  def self.donorset_file_process(item_id, user_id)
-    Job._donorset_file_process(item_id, user_id)
+
+
+  def self.dataset_file_process(item_id, user_id, links)
+    Job._dataset_file_process(item_id, user_id, links)
   end
+
+  def self.donorset_file_process(item_id, user_id, links)
+    Job._donorset_file_process(item_id, user_id, links)
+  end
+
 end

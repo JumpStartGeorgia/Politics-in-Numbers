@@ -6,12 +6,22 @@ class CategoryData
 
   embedded_in :dataset
 
-  field :type, type: Integer
+  #field :type, type: Integer
   field :value, type: Float
   field :category_id, type: BSON::ObjectId
   validates_presence_of :value, :category_id
 
   def category
-    Category.find(category_id)
+    @category = Category.find(category_id)
+
+  end
+
+  def category_name
+    @category = category if @category.nil?
+    if @category.present?
+      @category.title
+    else
+      I18n.t("shared.common.unknown")
+    end
   end
 end

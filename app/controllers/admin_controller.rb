@@ -11,6 +11,15 @@ class AdminController < ApplicationController
     end
   end
 
+  def category
+    @virtual = Category.tree(true)
+    @non_virtual = Category.tree(false)
+
+    respond_to do |format|
+      format.html # index.html.erb
+    end
+  end
+
   def permalink
     value = params[:value]
     locale = params[:locale]
