@@ -12,8 +12,8 @@ class AdminController < ApplicationController
   end
 
   def category
-    @virtual = Category.tree(true)
-    @non_virtual = Category.tree(false)
+    # @virtual = Category.tree(true)
+    # @non_virtual = Category.tree(false)
 
     respond_to do |format|
       format.html # index.html.erb

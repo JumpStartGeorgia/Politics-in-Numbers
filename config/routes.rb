@@ -14,14 +14,8 @@ Rails.application.routes.draw do
                },
                constraints: { format: :html }
     match '/admin', :to => 'admin#index', :as => :admin, :via => :get
-    #match '/admin/category', :to => 'admin#category', :as => :category, :via => :get
-    # TODO correct to be admin/category path
-    # resources :admin, :constraints => { format: :html } do
-    #   collection do
-    #     get 'category'
-    #   end
-    # end
     namespace :admin, :constraints => { format: :html } do
+      get :categories, :to => "/admin#category", :as => :categories
       resources :users do
         collection do
           get 'deffered'
@@ -29,6 +23,7 @@ Rails.application.routes.draw do
       end
       resources :datasets, only: [:index, :show, :new, :create, :destroy]
       resources :donorsets, only: [:index, :show, :new, :create, :destroy]
+      resources :periods, only: [:index, :show, :new, :create, :edit, :update, :destroy]
       resources :parties do
         collection do
           get 'bulk'

@@ -1,6 +1,6 @@
 <%-
-  label_key = "mongoid.attributes.party."
-  hint_key = "formtastic.hints.party."
+  label_key = "mongoid.attributes.period."
+  hint_key = "formtastic.hints.period."
   title t '.title', :default => @model.model_name.human(:count => 2)
   locales = I18n.available_locales
   default_locale = locales[0].to_s
@@ -44,15 +44,6 @@
               <%= translation.input locale, :as => :text, rows: 10, hint: hint.html_safe, label: label,
                   :input_html => { class: "tinymce" } %>
             <% end %>
-            <%= f.fields_for :permalink_translations, OpenStruct.new(f.object.permalink_translations) do |translation| %>
-            <%
-              label = t(label_key + 'permalink')
-              hint = t(hint_key + 'permalink')
-              hint << show_default_text(@item._slugs_translations[default_locale].last) if index > 0 && @item._slugs_translations[default_locale].present?
-            %>
-            <%= translation.input locale, hint: hint.html_safe, label: label , input_html: { value: get_slug(@item, locale), class: "permalink-receiver-#{locale}" }%>
-          <% end %>
-            <%#= f.input :permalink, hint: t(hint_key + 'permalink') %>
         </div>
       <% end %>
     </div>
@@ -60,10 +51,9 @@
 
 
   <%= f.inputs do %>
-    <%= f.input :type, :as => :radio, :collection => Party.types %>
-    <%= f.label :color %>
-    <%= f.color_field :color, class: "colorpicker" %>
-    <%= f.input :name, hint: t(hint_key + 'name') %>
+    <%= f.input :type, :as => :radio, :collection => Period.types %>
+    <%= f.input :start_date, :as => :string, input_html: { class: "datepicker start" } %>
+    <%= f.input :end_date, :as => :string, input_html: { class: "datepicker end" } %>
   <% end %>
 
 

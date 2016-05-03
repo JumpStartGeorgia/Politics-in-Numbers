@@ -12,6 +12,8 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
   *= require select2
   *= require select2-bootstrap
 
+  *= require jquery-ui/datepicker
+
   require dataTables/jquery.dataTables
   *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
   *= require dataTables/extras/dataTables.responsive

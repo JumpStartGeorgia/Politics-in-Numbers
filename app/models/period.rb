@@ -12,13 +12,33 @@ class Period
   field :title, type: String, localize: true
   field :description, type: String, localize: true
 
+  validate :validate_dates
   validates_presence_of :type, :start_date, :end_date, :title
   validates_inclusion_of :type, in: [0, 1]
 
-  index({ type: 1, start_date: 1 }, unique: true)
+  index({ type: 1, start_date: 1, end_date: 1 }, unique: true)
   # rake db:mongoid:create_indexes
 
   all.map{|t| [t.id, t.title] }
+
+  def validate_dates
+    if self.type == TYPES.index(:annual)
+      self.start_date = Date.new(self.start_date.year, 1, 1)
+      self.end_date = Date.new(self.start_date.year, 12, 31)
+    end
+  end
+
+  def period_start
+    I18n.l(start_date)
+  end
+
+  def period_end
+    I18n.l(end_date)
+  end
+
+  def current_type
+    I18n.t("mongoid.options.period.type.#{TYPES[type].to_s}")
+  end
 
   def self.sorted
     order_by([[:type, :asc],[:title, :asc]])#.limit(3)
@@ -37,12 +57,5 @@ class Period
   end
   def self.type_is(tp)
     TYPES.index(tp.to_sym)
-  end
-  def self.is_type(tp)
-    begin
-      tp.to_i < TYPES.length
-    rescue
-      false
-    end
   end
 end

@@ -75,4 +75,8 @@ class Dataset
     self.state == STATES.index(st)
   end
 
+  def self.by_period(per_id)
+    where({period_id: per_id})
+  end
+
 end

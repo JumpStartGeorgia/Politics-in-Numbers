@@ -1,6 +1,6 @@
 <% title t('.title') %>
-<% @virtual.inspect %>
-<% @non_virtual.inspect %>
+<%# @virtual.inspect %>
+<%# @non_virtual.inspect %>
 
 <div class="row">
   <ul class="nav nav-tabs"  role="tablist">
@@ -9,10 +9,10 @@
   </ul>
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active tree" id="virtual">
-      <%= Category.tree_out(false, false, "category-virtual-list").html_safe %>
+      <%= Category.tree_out(true, false, "category-virtual-list").html_safe %>
     </div>
     <div role="tabpanel" class="tab-pane tree" id="non_virtual">
-      <%= Category.tree_out(true, false, "category-non_virtual-list").html_safe %>
+      <%= Category.tree_out(false, false, "category-non_virtual-list").html_safe %>
     </div>
   </div>
 </div>

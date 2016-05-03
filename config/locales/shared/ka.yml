@@ -34,6 +34,7 @@ ka:
       short:
         en: En
         ka: "ქა"
+        ru: "ру"
     msgs:
       does_not_exist: You tried to access a page that does not exist.
       not_authorized: You are not authorized to view that page.
@@ -42,15 +43,21 @@ ka:
       success_destroyed: "%{obj} was successfully destroyed."
       success_updated: "%{obj} was successfully updated."
       unexpected_error: "Error occur while processing request, please log your action and send request to app support team."
+      fail_destroyed_existed_relation: "%{obj} was not destroyed, remove all relation before continue."
     prompts:
       confirm: Are you sure?
       forgot_password: Forgot your password?
   notifier:
     job:
       donorset_file_process:
-        donorset_not_found: "Donorset to process was not found, probably you request to delete it."
+        donorset_not_found: "Donorset to process was not found, probably you already delete it."
         operator_not_found: "Operator not found, send to nowhere."
         invalid_party_name: "Party '%{name}', name is invalid, check row %{row} in excel, and make sure it has party name"
         unmatched_header: "Header in provided file is distinct, compare to expected one %{header}."
         success: "File %{filename} was successfully processed. To view processed data follow the <a href='%{link}'>link</a>.%{missing_parties}"
         missing_parties: "New parties were added, and you need to specify correct types <a href='%{link}'>link</a>"
+      dataset_file_process:
+        dataset_not_found: "Dataset to process was not found, probably you already delete it."
+        operator_not_found: "Operator not found, send to nowhere."
+        unmatched_header: "Header in provided file is distinct, compare to expected one %{header}."
+        success: "File %{filename} was successfully processed. To view processed data follow the <a href='%{link}'>link</a>."

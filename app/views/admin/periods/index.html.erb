@@ -1,0 +1,40 @@
+<% title t '.title', :default => @model.model_name.human(:count => 2) %>
+
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@model, :admin, [:pre]) %>
+    <div class="pull-right"><%= links_for(@model, :admin, [:new]) %></div>
+  </div>
+</div>
+<div class="row"><hr/></div>
+
+<div>
+  <table class="table table-bordered table-hover table-responsive datatable">
+  <thead>
+    <tr>
+      <th><%= @model.human_attribute_name(:title) %></th>
+      <th><%= @model.human_attribute_name(:type) %></th>
+      <th><%= @model.human_attribute_name(:description) %></th>
+      <th><%= @model.human_attribute_name(:start_date) %></th>
+      <th><%= @model.human_attribute_name(:end_date) %></th>
+      <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td class="available-locales-box"><%= "#{item.title} #{existence_translations(item, :title)}".html_safe %></td>
+        <td class="text-center"><%= t("mongoid.shared.options.period.type.#{@model::TYPES[item.type]}") %></td>
+        <td class="available-locales-box"><%= "#{item.description} #{existence_translations(item, :description)}".html_safe %></td>
+        <td class="text-right"><%= I18n.l(item.start_date) %></td>
+        <td class="text-right"><%= I18n.l(item.end_date) %></td>
+        <td class="text-center">
+          <div class="btn-group btn-group-sm" role="group" aria-label="...">
+            <%= links_for(item, :admin, [:view, :edit, :destroy]) %>
+          </div>
+
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

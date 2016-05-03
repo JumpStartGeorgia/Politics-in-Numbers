@@ -8,6 +8,7 @@
   <div class="panel-body">
     <ul class="list-group">
       <li class="list-group-item"><%= link_to t('.parties'), admin_parties_path %></li>
+      <li class="list-group-item"><%= link_to t('.periods'), admin_periods_path %></li>
       <li class="list-group-item"><%= link_to t('.datasets'), admin_datasets_path %></li>
       <li class="list-group-item"><%= link_to t('.donorsets'), admin_donorsets_path %></li>
       <% if current_user.deffereds.present? %>
@@ -19,6 +20,7 @@
         </li>
       <% end %>
       <li class="list-group-item"><%= link_to t('.users'), admin_users_path %></li>
+      <li class="list-group-item"><%= link_to t('.categories'), admin_categories_path %></li>
       <!-- <li><%#= link_to t('.page_contents'), admin_page_contents_path %></li> -->
     </ul>
   </div>

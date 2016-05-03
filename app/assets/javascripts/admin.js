@@ -12,7 +12,7 @@ function permalink (str, locale, receiver) {
     }
   });
 }
-
+ console.log("est");
 
 $(".permalink-trigger").on("change keyup paste click", debounce(function() {
   var t = $(this), receiver = t.attr("data-permalink-receiver");
@@ -79,4 +79,25 @@ $(document).ready(function(){
       $(this).find(".badge-notifier").removeClass("badge-notifier");
     });
     $(".tree ul .box.inner").click(function(){ $(this).toggleClass("closed"); });
+
+    //$(".datepicker").datepicker();
+    $( ".datepicker.start" ).datepicker({
+      //defaultDate: "+1w",
+      changeMonth: true,
+      changeYear: true,
+      numberOfMonths: 1,
+      onClose: function( selectedDate ) {
+        $(".datepicker.end").datepicker( "option", "minDate", selectedDate );
+      }
+    });
+    $( ".datepicker.end" ).datepicker({
+      //defaultDate: "+1w",
+      changeMonth: true,
+      changeYear: true,
+      numberOfMonths: 1,
+      onClose: function( selectedDate ) {
+        $( ".datepicker.start" ).datepicker( "option", "maxDate", selectedDate );
+      }
+    });
+
 });
