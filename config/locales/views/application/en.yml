@@ -2,7 +2,11 @@
 en:
   application:
     navbar_header:
-      about: About Project
+      about: About
+      media: In Media
+      download: Download
+      api: Api
+      parties: Parties
       account:
         edit_profile: Edit Profile
         logout: Logout

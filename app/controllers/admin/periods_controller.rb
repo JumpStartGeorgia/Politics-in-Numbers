@@ -1,4 +1,4 @@
-class Admin::PeriodsController < ApplicationController
+class Admin::PeriodsController < AdminController
   authorize_resource
   before_filter do @model = Period; end
 

@@ -11,6 +11,7 @@
       <li class="list-group-item"><%= link_to t('.periods'), admin_periods_path %></li>
       <li class="list-group-item"><%= link_to t('.datasets'), admin_datasets_path %></li>
       <li class="list-group-item"><%= link_to t('.donorsets'), admin_donorsets_path %></li>
+      <li class="list-group-item"><%= link_to t('.media'), admin_media_path %></li>
       <% if current_user.deffereds.present? %>
         <li class="list-group-item">
           <%= link_to deffered_admin_users_path do %>
@@ -20,8 +21,8 @@
         </li>
       <% end %>
       <li class="list-group-item"><%= link_to t('.users'), admin_users_path %></li>
+      <li class="list-group-item"><%= link_to t('.page_contents'), admin_page_contents_path %></li>
       <li class="list-group-item"><%= link_to t('.categories'), admin_categories_path %></li>
-      <!-- <li><%#= link_to t('.page_contents'), admin_page_contents_path %></li> -->
     </ul>
   </div>
 </div>

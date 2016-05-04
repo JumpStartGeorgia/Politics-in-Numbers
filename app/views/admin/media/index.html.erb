@@ -1,0 +1,53 @@
+<% title t '.title', :default => @model.model_name.human(:count => 2) %>
+
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@model, :admin, [:pre]) %>
+    <div class="pull-right"><%= links_for(@model, :admin, [:new]) %></div>
+  </div>
+</div>
+<div class="row"><hr/></div>
+
+<div>
+  <table class="table table-bordered table-hover table-responsive datatable">
+  <thead>
+    <tr>
+      <th><%= @model.human_attribute_name(:name) %></th>
+      <th><%= @model.human_attribute_name(:title) %></th>
+      <th><%= @model.human_attribute_name(:description) %></th>
+      <th><%= @model.human_attribute_name(:author) %></th>
+      <th><%= @model.human_attribute_name(:embed) %></th>
+      <th><%= @model.human_attribute_name(:permalink) %></th>
+
+      <th><%= @model.human_attribute_name(:public) %></th>
+      <th><%= @model.human_attribute_name(:published_at) %></th>
+
+      <th><%= @model.human_attribute_name(:web) %></th>
+      <th><%= @model.human_attribute_name(:read_more) %></th>
+      <th><%= @model.human_attribute_name(:show_image) %></th>
+
+      <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @items.each do |item| %>
+      <tr>
+        <td class="available-locales-box"><%= "#{item.name} #{existence_translations(item, :name)}".html_safe %></td>
+        <td class="available-locales-box"><%= "#{item.title} #{existence_translations(item, :title)}".html_safe %></td>
+        <td class="available-locales-box"><%= "#{item.author} #{existence_translations(item, :author)}".html_safe %></td>
+        <td class="available-locales-box"><%= "#{item.description} #{existence_translations(item, :description)}".html_safe %></td>
+
+        <!-- <td><%#= t("mongoid.shared.options.party.type.#{@model::TYPES[item.type]}") %></td> -->
+        <td><%= item.published_at %></td>
+        <td class="available-locales-box"><%= "#{item.web} #{existence_translations(item, :web)}".html_safe %></td>
+        <td><%= item.permalink %></td>
+        <td>
+          <div class="btn-group btn-group-sm" role="group" aria-label="...">
+            <%= links_for(item, :admin, [:view, :edit, :destroy]) %>
+          </div>
+
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

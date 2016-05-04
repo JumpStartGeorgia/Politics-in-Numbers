@@ -8,9 +8,11 @@
     <%= link_to t('shared.common.name'), root_path, class: 'navbar-brand' %>
     <div class="navbar-collapse collapse navbar-responsive-collapse">
       <ul class="nav navbar-nav navbar-left">
-        <li><%= link_to t('.link1'), "/path1"  %></li>
-        <li><%= link_to t('.link2'), "/path2"  %></li>
         <li><%= link_to t('.about'), about_path  %></li>
+        <li><%= link_to t('.media'), media_path  %></li>
+        <li><%= link_to t('.download'), download_path  %></li>
+        <li><%= link_to t('.parties'), parties_path  %></li>
+        <li><%= link_to t('.api'), api_path  %></li>
       </ul>
       <ul class='nav navbar-nav navbar-right'>
         <% if user_signed_in? %>

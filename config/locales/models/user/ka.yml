@@ -6,7 +6,9 @@ ka:
       donorsets: Donors Lists
       deffereds: Deffered activities
       available_actions: List of actions
+      media: In Media
       categories: List of Categories
+      page_contents: Page Contents
     category:
       title: List of Categories
     periods:
@@ -57,13 +59,30 @@ ka:
         period_name: *period
         current_state: *state
         source_file_name: *source
-      donorsets:
+      donorset:
         source: *source
         state: *state
         updated_at: *updated_at
         current_state: *state
         source_file_name: *source
         donors: Donors List
+      medium:
+        name: Media Name
+        name_translations: Media Name
+        title: Title
+        title_translations: Title
+        description: Summary
+        description_translations: Summary
+        author: Author
+        author_translations: Author
+        embed: Embed Content
+        embed_translations: Embed Content
+        permalink: Permalink
+        public: Is Published?
+        published_at: Publish Date
+        web: Direct Link
+        read_more: Has 'Read more'?
+        show_image: "Image, otherwise embed"
     models:
       user:
         one: User
@@ -83,6 +102,9 @@ ka:
       donorset:
         one: Donor data
         other: Donor data
+      medium:
+        one: In Media
+        other: In Media
       deffered:
         one: Deffered activity
         other: Deffered activities
@@ -111,6 +133,16 @@ ka:
         deffered:
           type:
             parties_type_correction: Correct party type, after adding new donorset
+      media:
+        public:
+          true: Published
+          false: Unpublished
+        read_more:
+          true: With 'Read more' link
+          false: Without 'Read more' link
+        show_image:
+          true: Image
+          false: Embed
     messages:
       deffered:
         not_found: "You don't have uncompleted deffered activies."

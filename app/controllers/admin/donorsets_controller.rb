@@ -1,4 +1,4 @@
-class Admin::DonorsetsController < ApplicationController
+class Admin::DonorsetsController < AdminController
   authorize_resource
   before_filter do @model = Donorset; end
 

@@ -1,3 +1,44 @@
+/*
+The CSS for this project is written according to the Trello CSS Style Guide.
+Please read the style guide before making changes to the project.
+
+URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
+*/
+
+/*
+  *= require formtastic
+  *= require formtastic-bootstrap
+
+  *= require select2
+  *= require select2-bootstrap
+
+  *= require jquery-ui/datepicker
+
+  require dataTables/jquery.dataTables
+  *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+  *= require dataTables/extras/dataTables.responsive
+*/
+
+@charset 'UTF-8';
+@import 'variables';
+@import 'media-queries';
+@import 'bootstrap_and_overrides';
+@import 'formtastic_overrides';
+
+// Font awesome icons
+@import 'font-awesome-sprockets';
+@import 'font-awesome';
+
+// Components
+@import 'components/actions';
+@import 'components/app-footer';
+@import 'components/language_switcher';
+@import 'components/loading_indicator';
+@import 'components/primary_header';
+@import 'components/categories-list';
+@import 'components/tabbed_translation_form';
+
+
 .actions-3 {
   min-width:166px;
 }

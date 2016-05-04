@@ -82,6 +82,12 @@ $gray-light: lighten($gray-base, 70%);
     display:inline-block;
   }
 }
+.formtastic .boolean label {
+  padding-left:0px;
+}
+.checkbox input[type="checkbox"] {
+  position:relative;
+}
 input[type='color'] {
   border: 0 !important;
   padding: 0px !important;

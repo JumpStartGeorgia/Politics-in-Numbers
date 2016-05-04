@@ -9,12 +9,14 @@ class Period
   field :type, type: Integer
   field :start_date, type: Date
   field :end_date, type: Date
-  field :title, type: String, localize: true
+  field :title, type: String, localize: true, default: ->{ "#{start_date.strftime('%d/%m/%Y')} - #{end_date.strftime('%d/%m/%Y')}" }
   field :description, type: String, localize: true
 
   validate :validate_dates
   validates_presence_of :type, :start_date, :end_date, :title
   validates_inclusion_of :type, in: [0, 1]
+
+  #default_scope ->{ order_by([[:type, :desc], [:title, :asc]]) }
 
   index({ type: 1, start_date: 1, end_date: 1 }, unique: true)
   # rake db:mongoid:create_indexes

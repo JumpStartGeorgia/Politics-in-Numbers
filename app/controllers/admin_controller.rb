@@ -1,5 +1,6 @@
 class AdminController < ApplicationController
   before_filter :authenticate_user!
+  layout "admin"
   # before_filter do |controller_instance|
   #   controller_instance.send(:valid_role?, @site_admin_role)
   # end

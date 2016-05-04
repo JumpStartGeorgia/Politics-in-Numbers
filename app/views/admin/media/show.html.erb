@@ -1,0 +1,16 @@
+<% title t '.title', :default => @model.model_name.human %>
+
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@model, :admin, [:pre, :view_all]) %>
+    <div class="pull-right"><%= links_for(@item, :admin, [:edit, :destroy]) %></div>
+  </div>
+</div>
+<div class="row"><hr/></div>
+<div class="row">
+  <div class="col-md-12">
+  <% [:name, :title, :description, :author, :embed, :permalink, :human_public, :human_published_at, :web, :human_read_more, :human_show_image, :human_image].each { |f| %>
+    <p><strong><%= @model.human_attribute_name(f) %>: </strong><%= @item.send(f) %></p>
+  <% } %>
+  </div>
+</div>

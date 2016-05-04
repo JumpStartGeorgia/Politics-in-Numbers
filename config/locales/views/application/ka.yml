@@ -3,6 +3,10 @@ ka:
   application:
     navbar_header:
       about: "პროექტის შესახებ"
+      media: In Media
+      download: Download
+      api: Api
+      parties: Parties
       account:
         edit_profile: პროფილის შეცვლა
         logout: გასვლა

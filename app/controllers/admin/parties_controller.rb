@@ -1,4 +1,4 @@
-class Admin::PartiesController < ApplicationController
+class Admin::PartiesController < AdminController
   authorize_resource
   before_filter do @model = Party; end
 

@@ -1,0 +1,85 @@
+# Party class - meta information about parties
+class Medium
+  include Mongoid::Document
+  include Mongoid::Timestamps
+  include Mongoid::Slug
+
+  before_save :image_localization
+
+  embeds_many :media_images
+
+  field :name, type: String, localize: true
+  field :title, type: String, localize: true
+  field :description, type: String, localize: true
+  field :author, type: String, localize: true
+  field :embed, type: String, localize: true
+  field :permalink, type: String, localize: true
+  field :web, type: String, localize: true
+
+  field :public, type: Boolean, default: false
+  field :published_at, type: Date
+
+  field :read_more, type: Boolean, default: false
+  field :show_image, type: Boolean, default: true # if false embed code will be shown
+
+  field :image, type: BSON::ObjectId, localize: true
+
+  slug :permalink, :title, history: true, localize: true do |d|
+    if d.permalink_changed?
+      d.permalink.to_url
+    elsif d.title_changed?
+      d.title.to_url
+    else
+      d.id.to_s
+    end
+  end
+
+  def image_localization
+    tmp = {}
+    self.media_images.each{ |img|
+      tmp[img.locale] = img._id
+    }
+    self.image_translations = tmp
+  end
+
+  validate :validate_translations
+  validates_presence_of :public, :read_more
+
+  def validate_translations
+    default = I18n.default_locale
+    ["name_translations", "title_translations", "description_translations",
+     "author_translations", "embed_translations", "web_translations"].each{|f|
+      if self.send(f)[default].blank?
+        errors.add(:base, I18n.t('mongoid.errors.messages.validations.default_translation_missing',
+          field: self.class.human_attribute_name(f),
+          lang: Language.name_by_locale(default)))
+      end
+    }
+  end
+
+  def cover
+    media_images.find(image)
+  end
+
+  def human_public
+    I18n.t("mongoid.options.media.public.#{public.to_s}")
+  end
+
+  def human_read_more
+    I18n.t("mongoid.options.media.read_more.#{read_more.to_s}")
+  end
+
+  def human_show_image
+    I18n.t("mongoid.options.media.show_image.#{show_image.to_s}")
+  end
+  # def human_image
+  #   image_path
+  # end
+  def human_published_at
+    I18n.l(published_at)
+  end
+
+  def self.sorted
+    order_by([[:public, :asc], [:published_at, :asc], [:title, :asc]])#.limit(3)
+  end
+end

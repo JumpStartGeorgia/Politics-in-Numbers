@@ -23,21 +23,25 @@ namespace :populate do
 
 
     files.each_with_index {|f,f_i|
-      tmp_id = filenames[f_i].split(".")
       lg.info filenames[f_i]
-      prt = Party.where(tmp_id: tmp_id[0])
-      per = Period.where({start_date: Date.strptime("01.01.#{tmp_id[1]}", "%d.%m.%Y"), type: Period.type_is(:annual)})
+
+      tmp_id = filenames[f_i].split(".")
+      year = tmp_id[1]
+      tmp_id = tmp_id[0]
+
+      prt = Party.find_by(tmp_id: tmp_id)
+      per = Period.find_or_create_by({start_date: Date.strptime("01.01.#{year}", "%d.%m.%Y"), type: Period.type_is(:annual)})
 
       dataset = nil
       if prt.present? && per.present?
-        party_id = prt.first._id
-        period_id = per.first._id
+        party_id = prt._id
+        period_id = per._id
         dataset = Dataset.new({party_id: party_id, period_id: period_id, source: File.open(f) })
         dataset.save
-        Job.dataset_file_process(dataset._id, User.all[0]._id, []) # [admin_dataset_url(id: "_id")])
+        Job.dataset_file_process(dataset._id, User.all[1]._id, []) # [admin_dataset_url(id: "_id")])
       else
-        lg.info "File #{filenames[f_i]}, Party for id #{tmp_id[0]} is missing" if prt.first.nil?
-        lg.info "File #{filenames[f_i]}, Period for id #{tmp_id[1]} is missing" if per.first.nil?
+        lg.info "File #{filenames[f_i]}, Party for id #{tmp_id} is missing" if prt.nil?
+        lg.info "File #{filenames[f_i]}, Period for id #{year} is missing" if per.nil?
         next
       end
 
@@ -48,7 +52,7 @@ namespace :populate do
   desc "Read and upload all election files"
   task :election => :environment do |t, args|
 
-    lg = Logger.new File.new('log/tasks/populate.log', 'w')
+    lg = Logger.new File.new('log/tasks/populate_election.log', 'w')
     lg.formatter = proc do |severity, datetime, progname, msg|
       "#{msg}\n"
     end
@@ -74,27 +78,35 @@ namespace :populate do
       end
     }
 
-
+    puts files.length
+      ps = []
     files.each_with_index {|f,f_i|
-      tmp_id = filenames[f_i].split(".")
       lg.info filenames[f_i]
-      prt = Party.where(tmp_id: tmp_id[0])
-      per = Period.where({start_date: Date.strptime("01.01.#{tmp_id[1]}", "%d.%m.%Y"), type: Period.type_is(:annual)})
+
+      tmp_id = filenames[f_i].split("_")
+      periods = tmp_id[1].split("-")
+      start_date = Date.strptime(periods[0], '%d.%m.%Y')
+      end_date = Date.strptime(periods[1], '%d.%m.%Y')
+      #puts "#{periods.inspect}:
+      # ps |= ["#{start_date} #{end_date}"]
+      tmp_id = tmp_id[0]
+
+      prt = Party.find_by(tmp_id: tmp_id)
+      per = Period.find_or_create_by({ start_date: start_date, end_date: end_date, type: Period.type_is(:election) })
 
       dataset = nil
       if prt.present? && per.present?
-        party_id = prt.first._id
-        period_id = per.first._id
-        dataset = Dataset.new({party_id: party_id, period_id: period_id, source: File.open(f) })
+        dataset = Dataset.new({party_id: prt._id, period_id: period_id = per._id, source: File.open(f) })
         dataset.save
-        Job.dataset_file_process(dataset._id, User.all[0]._id, []) # [admin_dataset_url(id: "_id")])
+        Job.dataset_file_process(dataset._id, User.all[1]._id, [])
       else
-        lg.info "File #{filenames[f_i]}, Party for id #{tmp_id[0]} is missing" if prt.first.nil?
-        lg.info "File #{filenames[f_i]}, Period for id #{tmp_id[1]} is missing" if per.first.nil?
+        lg.info "File #{filenames[f_i]}, Party for id #{tmp_id} is missing" if prt.nil?
+        lg.info "File #{filenames[f_i]}, Period for id #{tmp_id} is missing" if per.nil?
         next
       end
 
-      lg.close
     }
+    # puts ps.inspect
+    lg.close
   end
 end

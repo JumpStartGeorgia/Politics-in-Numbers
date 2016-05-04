@@ -1,4 +1,4 @@
-class Admin::DatasetsController < ApplicationController
+class Admin::DatasetsController < AdminController
   authorize_resource
   before_filter do @model = Dataset; end
 
@@ -11,6 +11,7 @@ class Admin::DatasetsController < ApplicationController
     end
   end
 
+  # GET /datasets
   def index
     @items = @model.sorted
 

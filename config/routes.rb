@@ -30,13 +30,19 @@ Rails.application.routes.draw do
           post 'bulk_update'
         end
       end
+      resources :media
+      resources :page_contents
     end
 
     root 'root#index'
     get '/about' => 'root#about'
-    get '/read' => 'root#read'
-    get '/read_details' => 'root#read_details'
-    get '/read_donors' => 'root#read_donors'
+    get '/media' => 'root#media'
+    get '/download' => 'root#download'
+    get '/api' => 'root#api'
+    get '/parties' => 'root#parties'
+    # get '/read' => 'root#read'
+    # get '/read_details' => 'root#read_details'
+    # get '/read_donors' => 'root#read_donors'
 
     # handles /en/fake/path/whatever
     get '*path', to: redirect("/#{I18n.default_locale}")

@@ -1,6 +1,35 @@
 /*global $, chrome*/
 /*eslint no-console: "allow"*/
 
+//= require jquery
+//= require jquery_ujs
+//= require jquery-ui/datepicker
+
+////////////////////////////////////////
+///////  Load dependencies here  ///////
+
+// Bootstrap Javascript
+// require twitter/bootstrap/transition
+// require twitter/bootstrap/alert
+// require twitter/bootstrap/modal
+//= require twitter/bootstrap/dropdown
+// require twitter/bootstrap/scrollspy
+//= require twitter/bootstrap/tab
+//= require twitter/bootstrap/tooltip
+// require twitter/bootstrap/popover
+// require twitter/bootstrap/button
+// require twitter/bootstrap/collapse
+// require twitter/bootstrap/carousel
+// require twitter/bootstrap/affix
+//= require util
+//= require select2
+//= require dataTables/jquery.dataTables
+//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require dataTables/extras/dataTables.responsive
+
+//= require_self
+////////////////////////////////////////
+
 function permalink (str, locale, receiver) {
  $.ajax({
     dataType: "json",

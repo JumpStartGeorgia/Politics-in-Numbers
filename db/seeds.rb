@@ -19,6 +19,8 @@ if destroy_mode
   puts "Destroy phase ----------------------"
   puts "  languages"
   Language.destroy_all
+  puts "  page_content"
+  PageContent.destroy_all
   puts "  party data"
   Party.destroy_all
   puts "  period data"
@@ -65,6 +67,33 @@ if User.where(email: email).count == 0
   u.save(validate: false)
   #u.api_keys.create
 end
+
+puts "Populate page content data"
+PageContent.create(name: 'about', title_translations: {'en' => 'About', 'ka' => 'about'}, content_translations: {
+  'en' =>  %q(
+    <div class="section">
+      <h1>Methodology</h1>
+      <div class="content">
+        <div class="column">
+          <label>Donations</label>
+          <p>lorem ipsum</p>
+        </div>
+        <div class="column">
+          <label>Party Finances</label>
+          <p>lorem ipsum</p>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h1>Sponsors</h1>
+      <div class="content">
+        <a href="#"><img src="js.jpg"></a>
+        <a href="#js"><img src="js.jpg"></a>
+      </div>
+    </div>
+  ),
+  'ka' => ''}) if PageContent.by_name('about').nil?
+
 
 puts "Gather category data"
 categories_cell = []

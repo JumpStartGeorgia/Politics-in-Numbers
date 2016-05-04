@@ -5,8 +5,27 @@ class RootController < ApplicationController
     # @categories = Category.tree_out
     #@parties = Dataset.first
   end
+
   def about
+    @page_content = PageContent.by_name('about')
   end
+
+  def media
+    # @page_content = PageContent.by_name('about')
+  end
+
+  def download
+    # @page_content = PageContent.by_name('about')
+  end
+
+  def api
+    # @page_content = PageContent.by_name('about')
+  end
+
+  def parties
+    # @page_content = PageContent.by_name('about')
+  end
+
 
   def read
     I18n.locale = :en
