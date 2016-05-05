@@ -88,10 +88,10 @@ $(document).ready(function(){
 
 
 
-     console.log("test");
-     $("input").click(function(){
-       console.log($(this).val());
-     });
+     // console.log("test");
+     // $("input").click(function(){
+     //   console.log($(this).val());
+     // });
     $("#toggle_type input").change(function(){
       var t = $(this), p = t.parent(), v = t.val();
       //, table = p.closest("table"),
@@ -128,5 +128,20 @@ $(document).ready(function(){
         $( ".datepicker.start" ).datepicker( "option", "maxDate", selectedDate );
       }
     });
+
+  $(".image_preview_trigger").change(function(){ readURL(this); });
+
+  function readURL(input) {
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        $("#image_preview_reciever_" + input.id + " img").attr('src', e.target.result);
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  $(".embed_preview_trigger").change(function(e){
+    $("#embed_preview_reciever_" + this.id + " iframe").attr('src', this.value);
+  });
 
 });

@@ -1,6 +1,6 @@
 <%-
-  label_key = "mongoid.attributes.party."
-  hint_key = "formtastic.hints.party."
+  label_key = "mongoid.attributes.medium."
+  hint_key = "formtastic.hints.medium."
   title t '.title', :default => @model.model_name.human(:count => 2)
   locales = I18n.available_locales
   default_locale = locales[0].to_s
@@ -69,8 +69,13 @@
               hint = t(hint_key + 'embed')
               hint << show_default_text(@item.embed_translations[default_locale]) if index > 0
             %>
-            <%= translation.input locale, :as => :text, rows: 3, hint: hint.html_safe, label: label,
-                  :input_html => { class: "tinymce" } %>
+            <%= translation.input locale, hint: hint.html_safe, label: label, input_html: { class: "embed_preview_trigger"}  %>
+              <% if @item.embed_translations[locale].present? %>
+                <div id="embed_preview_reciever_medium_embed_translations_<%= locale %>" class="preview form-group">
+                  <iframe src="<%= @item.embed_translations[locale] %>" width="200" height="200" frameborder="0">Sorry your browser does not support inline frames.</iframe>
+                </div>
+              <% end %>
+
           <% end %>
 
           <%= f.fields_for :image_translations, OpenStruct.new(f.object.image_translations) do |translation| %>
@@ -79,7 +84,10 @@
               hint = t(hint_key + 'image')
               hint << show_default_text(@item.image_translations[default_locale]) if index > 0
             %>
-            <%= translation.input locale, :as => :file, hint: hint.html_safe, label: label %>
+            <%= translation.input locale, :as => :file, hint: hint.html_safe, label: label, input_html: { class: "image_preview_trigger"} %>
+            <% if @item.image_translations[locale].present? %>
+              <div id="image_preview_reciever_medium_image_translations_<%= locale %>" class="preview form-group"><img src="<%= @item.cover(locale).url(:small) %>"></div>
+            <% end %>
           <% end %>
 
           <%= f.fields_for :web_translations, OpenStruct.new(f.object.web_translations) do |translation| %>
@@ -116,7 +124,7 @@
   <div class="form-group" style="margin-top: 20px;">
     <%= f.submit nil, :class => 'btn btn-primary' %>
     <%= f.submit t('shared.actions.reset'), :class => 'btn btn-warning', :type => :reset, :name => :reset %>
-    <%= link_to t('shared.actions.cancel'), admin_parties_path, :class => 'btn btn-warning' %>
+    <%= link_to t('shared.actions.cancel'), admin_media_path, :class => 'btn btn-warning' %>
   </div>
 <% end %>
 

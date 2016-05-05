@@ -78,11 +78,16 @@ ka:
         embed: Embed Content
         embed_translations: Embed Content
         permalink: Permalink
-        public: Is Published?
-        published_at: Publish Date
+        public: &public Is Published?
+        human_public: *public
+        published_at: &published_at Publish Date
+        human_published_at: *published_at
         web: Direct Link
-        read_more: Has 'Read more'?
-        show_image: "Image, otherwise embed"
+        read_more: &read_more Has 'Read more'?
+        human_read_more: *read_more
+        show_image: &show_image "Image, otherwise embed"
+        human_show_image: *show_image
+        human_cover: Cover image
     models:
       user:
         one: User
@@ -135,14 +140,14 @@ ka:
             parties_type_correction: Correct party type, after adding new donorset
       media:
         public:
-          true: Published
-          false: Unpublished
+          t: "Yes"
+          f: "No"
         read_more:
-          true: With 'Read more' link
-          false: Without 'Read more' link
+          t: "Yes"
+          f: "No"
         show_image:
-          true: Image
-          false: Embed
+          t: Image
+          f: Embed
     messages:
       deffered:
         not_found: "You don't have uncompleted deffered activies."

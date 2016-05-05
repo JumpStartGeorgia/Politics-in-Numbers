@@ -18,7 +18,9 @@ class Dataset
 
   default_scope ->{ where(del: false) }
 
-  has_mongoid_attached_file :source, :path => ':rails_root/public/system/:class/:attachment/:id/:style.:extension'
+  has_mongoid_attached_file :source,
+    :path => ':rails_root/public/system/:class/:attachment/:id/:style.:extension',
+    :url => '/system/:class/:attachment/:id/:style.:extension'
 
 
   validates_presence_of :party_id, :period_id

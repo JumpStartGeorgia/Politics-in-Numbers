@@ -19,7 +19,9 @@ class Donorset
 #   Band.where(name: "Depeche Mode")
 # end
 
-  has_mongoid_attached_file :source, :path => ':rails_root/public/system/:class/:attachment/:id/:style.:extension'
+  has_mongoid_attached_file :source,
+    :path => ':rails_root/public/system/:class/:attachment/:id/:style.:extension',
+    :url => '/system/:class/:attachment/:id/:style.:extension'
 
 
   validates_attachment :source, presence: true, content_type: { content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }, size: { in: 0..25.megabytes }

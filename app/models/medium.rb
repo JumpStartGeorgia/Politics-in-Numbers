@@ -6,7 +6,7 @@ class Medium
 
   before_save :image_localization
 
-  embeds_many :media_images
+  embeds_many :media_images, :cascade_callbacks => true
 
   field :name, type: String, localize: true
   field :title, type: String, localize: true
@@ -42,8 +42,13 @@ class Medium
     self.image_translations = tmp
   end
 
+  require 'uri'
   validate :validate_translations
   validates_presence_of :public, :read_more
+  validates_format_of :web, :embed, :with => URI.regexp
+
+
+  #/^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ix
 
   def validate_translations
     default = I18n.default_locale
@@ -57,26 +62,36 @@ class Medium
     }
   end
 
-  def cover
-    media_images.find(image)
+  def cover(locale=nil)
+    if locale.present? && image_translations.has_key?(locale)
+      tmp = media_images.find(image_translations[locale])
+    else
+      tmp = media_images.find(image)
+    end
+    tmp.present? ? tmp.image : nil
   end
 
   def human_public
-    I18n.t("mongoid.options.media.public.#{public.to_s}")
+    I18n.t("mongoid.options.media.public.#{public.to_s[0]}")
   end
 
   def human_read_more
-    I18n.t("mongoid.options.media.read_more.#{read_more.to_s}")
+    puts "mongoid.options.media.read_more.#{read_more.to_s[0]}"
+    I18n.t("mongoid.options.media.read_more.#{read_more.to_s[0]}")
   end
 
   def human_show_image
-    I18n.t("mongoid.options.media.show_image.#{show_image.to_s}")
+    I18n.t("mongoid.options.media.show_image.#{show_image.to_s[0]}")
   end
   # def human_image
   #   image_path
   # end
   def human_published_at
-    I18n.l(published_at)
+    published_at.present? ? I18n.l(published_at) : nil
+  end
+
+  def human_cover
+    "<img src='#{cover.url(:small)}'>".html_safe
   end
 
   def self.sorted

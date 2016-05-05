@@ -56,24 +56,22 @@ class Admin::MediaController < AdminController
   # PUT /media/1
   def update
     @item = @model.find(params[:id])
-    respond_to do |format|
-      pars = _params
-      if pars && pars[:medium] && pars[:medium][:media_images]
-        pars[:medium][:media_images].each{ |img|
-          @item.media_images.find_or_create_by(img)
-        }
-        pars[:medium].delete(:media_images)
-      end
+    pars = _params
+    if pars && pars[:media_images]
+      pars[:media_images].each{ |img|
+        tmp = @item.media_images.find_or_create_by(locale: img[:locale])
+        tmp.update_attributes({ image: img[:image] })
+        tmp.save
+      }
+      pars.delete(:media_images)
+    end
 
+    if @item.update_attributes(pars)
+      redirect_to admin_media_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.medium.one'))}
+    else
+      set_tabbed_translation_form_settings
 
-      puts "--------------------------#{pars.inspect}"
-      if @item.update_attributes(pars)
-        format.html { redirect_to admin_media_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.medium.one'))} }
-      else
-        set_tabbed_translation_form_settings
-
-        format.html { render action: "edit" }
-      end
+      render action: "edit"
     end
   end
 
@@ -92,9 +90,8 @@ class Admin::MediaController < AdminController
       [:name_translations, :title_translations, :description_translations,
        :author_translations, :permalink_translations, :embed_translations,
        :web_translations, :image_translations]
-       .each{|f| params[:medium][f].delete_if{|k,v| !v.present? } }
+       .each{|f| params[:medium][f].delete_if{|k,v| !v.present? } if params[:medium].has_key?(f) }
 
-      #image_translations = { ka: nil, en: nil, ru: nil }
       if params && params[:medium] && params[:medium][:image_translations]
         params[:medium][:media_images] = []
         params[:medium][:image_translations].each{ |k,v|
@@ -102,9 +99,7 @@ class Admin::MediaController < AdminController
         }
       end
       params[:medium].delete(:image_translations)
-      puts "--------------------------#{params.inspect}"
-      # params[:medium][:image_translations]
-      #  image_translations
+
       params.require(:medium).permit( :public, :read_more, :show_image,
         name_translations: [:ka, :en, :ru],
         title_translations: [:ka, :en, :ru],
