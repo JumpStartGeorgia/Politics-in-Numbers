@@ -183,9 +183,9 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
     }
   }
 }
-main {
-  padding:50px 0;
-}
+// main {
+//   padding:50px 0;
+// }
 .footer {
   background:#F4F3EA url(/assets/footer/pattern.svg);
   padding:26px 24px 34px;
@@ -239,7 +239,43 @@ main {
 
     }
   }
+  /* Pop */
+    @-webkit-keyframes pop {
+      50% {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+      }
+    }
+
+    @keyframes pop {
+      50% {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+      }
+    }
+
+  .pop {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .pop:hover, .pop:focus, .pop:active {
+    -webkit-animation-name: pop;
+    animation-name: pop;
+    -webkit-animation-duration: 0.3s;
+    animation-duration: 0.3s;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+    -webkit-animation-iteration-count: 1;
+    animation-iteration-count: 1;
+  }
 }
+
 @media (min-width: 768px) {
 
 }
@@ -268,30 +304,31 @@ main {
       display:inline-block;
     }
     .navbar-left {
-      width:auto;
-      margin-left:209px;
-      .navbar-nav {
-        li {
-          display:inline-block;
-        }
+      display:table-cell;
+      width:100%;
+      .navbar-collapse {
+        width:100%;
       }
       .navbar-nav {
+        margin-left:209px;
         li {
-          display:inline-block;
+          display:table-cell;
           width:auto;
           text-align:center;
-          margin:0 40px;
+          padding:0 40px;
           a {
             display:inline-block;
             padding:24px 18px 0;
             height:72px;
+            white-space:nowrap;
           }
         }
       }
     }
     .navbar-right {
+      display:table-cell;
       width:auto;
-      float:right;
+      white-space:nowrap;
       padding-right:10px;
       .navbar-nav {
         li {

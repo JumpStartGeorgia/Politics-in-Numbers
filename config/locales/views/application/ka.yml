@@ -2,6 +2,7 @@
 ka:
   application:
     navbar_header:
+      explore: Explore
       about: "პროექტის შესახებ"
       media: In Media
       download: Download

@@ -1,4 +1,5 @@
 /* global $ */
+/*eslint no-console: "error"*/
 // This is a manifest file that'll be compiled into application.js, which will include all the files
 // listed below.
 //
@@ -38,7 +39,6 @@
 // require twitter/bootstrap/affix
 //= require util
 //= require select2
-//= require admin
 //= require dataTables/jquery.dataTables
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require dataTables/extras/dataTables.responsive
@@ -62,7 +62,7 @@ $(document).ready(function (){
   });
   $(document).click(function (event){
     var t = $(event.target);
-     console.log(event, t.hasClass("navbar-section"), t.hasClass("active"));
+    //console.log(event, t.hasClass("navbar-section"), t.hasClass("active"));
     if(nav && !(t.hasClass("navbar-section") && t.hasClass("active")) && !$(this).closest(".navbar-section").length) {
       $(".navbar-toggle-receiver").removeClass("active");
     }

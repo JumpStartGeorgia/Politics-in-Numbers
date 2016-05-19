@@ -19,6 +19,9 @@
     </script>
 
     <%= javascript_include_tag "application" %>
+    <% if content_for? :custom_js %>
+      <%= javascript_include_tag "#{yield(:custom_js)}"  %>
+    <% end %>
   </body>
 
 </html>

@@ -22,3 +22,9 @@
     font-style: normal;
     font-weight: 200;
 }
+@font-face {
+    font-family: "firasans_sb";
+    src: url( '/assets/fonts/firasans_sb.otf') format("opentype");
+    font-style: normal;
+    font-weight: 200;
+}

@@ -1,0 +1,23 @@
+<div id="explore">
+  <div id="filter_type" class="filter-type">
+    <div class="back"><img alt="<%= t('shared.common.back') %>" src="/assets/explore/back.svg" title="<%= t('shared.common.back') %>"></div>
+    <div class="donation" data-type="donation">
+      <button type="button" id="donation_toggle" class="donation-toggle"><%= t('.donations') %></button>
+    </div>
+    <div class="sep"></div>
+    <div class="finance" data-type="finance">
+      <button type="button" id="finance_toggle" class="finance-toggle"><%= t('.party_finances').html_safe %><span>:</span></button>
+      <div class="finance-category-list">
+        <ul>
+          <li><a><%= t('.income') %></a></li>
+          <li>
+            <div><a><%= t('.debts') %></a></div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="forward"><img alt="<%= t('shared.common.back') %>" src="/assets/explore/forward.svg" title="<%= t('shared.common.back') %>"></div>
+  </div>
+</div>
+<% content_for :custom_js, "explore" %>
+<% content_for :custom_css, "explore" %>

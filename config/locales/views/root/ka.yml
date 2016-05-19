@@ -2,4 +2,17 @@
 ka:
   root:
     about:
-      title: ამის შესახებ
+      title: About
+    explore:
+      title: Explore
+      donations: DONATIONS
+      party_finances: PARTY FINANCES
+      income: INCOME
+      expenses: EXPENSES
+      property_assets: PROPERTY ASSETS
+      financial_assets: FINANCIAL ASSETS
+      debts: DEBTS
+      campaign: Campaign
+      all: All
+      add_hint: Add category to filter
+      remove_hint: Remove category from filter

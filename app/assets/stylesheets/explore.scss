@@ -1,0 +1,124 @@
+#explore {
+  .filter-type {
+    background-color:#F5F7F5;
+    width:100%;
+    padding:60px 0 28px;
+    margin:0px auto;
+    > div {
+      display:table-cell;
+      vertical-align:top;
+    }
+    .back {
+      display:none;
+      img {
+      }
+      cursor:pointer;
+    }
+    .forward {
+      display:none;
+      img {
+      }
+      cursor:pointer;
+    }
+    .sep {
+      height:100%;
+      border-left:1px dashed #a9afa8;
+    }
+    .donation {
+      width:50%;
+      text-align:right;
+      padding:8px 26px 8px 0;
+      .donation-toggle {
+        font: 16px firasans_sb;
+        color:#DDCD37;
+        background-color:transparent;
+        padding:0 11px;
+        border:3px solid #DDCD37;
+        height:56px;
+        min-width:111px;
+        outline:none;
+        transition-duration: 0.3s;
+        transition-property: color, background-color;
+        &.active, &:hover {
+          background-color: #DDCD37;
+          color:#3E443D;
+          cursor:pointer;
+        }
+      }
+      &.active {
+        .donation-toggle {
+          background-color: #DDCD37;
+          color:#3E443D;
+        }
+      }
+    }
+    .finance {
+      width:50%;
+      text-align:left;
+      padding:8px 0 8px 26px;
+      .finance-toggle {
+        font: 16px firasans_sb;
+        color:#F78E69;
+        text-align:left;
+        background-color:transparent;
+        padding:0 11px;
+        border:3px solid #F78E69;
+        height:56px;
+        min-width:111px;
+        outline:none;
+        transition-duration: 0.3s;
+         transition-property: color, background-color;
+        &:hover {
+          background-color: #F78E69;
+          color:#fff;
+          cursor:pointer;
+        }
+        span {
+
+        }
+      }
+      &.active {
+        .finance-toggle {
+          background-color: #F78E69;
+          color:#fff;
+        }
+      }
+      .finance-category-list {
+        display:none;
+        ul {
+          li {
+            a {
+
+            }
+          }
+        }
+      }
+    }
+    &[data-type='donation'] {
+      .donation {
+        width:100%;
+        text-align:center;
+      }
+      .finance {
+        display:none;
+      }
+      .sep {
+        display:none;
+      }
+      .forward {
+        display:table-cell;
+        padding: 8px 0;
+      }
+    }
+  }
+}
+@media (min-width: 768px) {
+
+}
+@media (min-width: 992px) {
+
+}
+@media (min-width: 1200px) {
+
+}
+// TODO| test svg styling with inner classes via image or background

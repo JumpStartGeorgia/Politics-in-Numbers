@@ -6,6 +6,10 @@ class RootController < ApplicationController
     #@parties = Dataset.first
   end
 
+  def explore
+    #@page_content = PageContent.by_name('about')
+  end
+
   def about
     @page_content = PageContent.by_name('about')
   end
@@ -18,14 +22,13 @@ class RootController < ApplicationController
     # @page_content = PageContent.by_name('about')
   end
 
-  def api
-    # @page_content = PageContent.by_name('about')
-  end
+  # def api
+  #   # @page_content = PageContent.by_name('about')
+  # end
 
-  def parties
-    # @page_content = PageContent.by_name('about')
-  end
-
+  # def parties
+  #   # @page_content = PageContent.by_name('about')
+  # end
 
   def read
     I18n.locale = :en

@@ -11,5 +11,8 @@
   <![endif]-->
 
   <%= stylesheet_link_tag defined?(is_admin) ? "admin" : "application", :media => "all" %>
+  <% if content_for? :custom_css %>
+    <%= stylesheet_link_tag "#{yield(:custom_css)}"  %>
+  <% end %>
   <%= render partial: 'application/head/favicons' %>
 </head>

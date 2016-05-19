@@ -12,9 +12,7 @@
       <div class="navbar-collapse collapse navbar-menu-collapse">
         <ul class="nav navbar-nav">
           <!-- <li><%#= link_to t('.parties').upcase, parties_path  %></li> -->
-          <li><%= link_to t('.about').upcase, about_path  %></li>
-          <li><%= link_to t('.media').upcase, media_path  %></li>
-          <li><%= link_to t('.download').upcase, download_path  %></li>
+          <li><%= link_to t('.explore').upcase, explore_path  %></li><li><%= link_to t('.about').upcase, about_path  %></li><li><%= link_to t('.media').upcase, media_path  %></li><li><%= link_to t('.download').upcase, download_path  %></li>
           <!-- <li><%#= link_to t('.api').upcase, api_path  %></li> -->
           <% if user_signed_in? %>
             <li class="dropdown">

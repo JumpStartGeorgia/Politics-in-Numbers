@@ -46,7 +46,7 @@ module StarterTemplate
       g.orm :mongoid
     end
 
-    config.assets.precompile += %w( admin.js admin.css )
+    config.assets.precompile += %w( admin.js admin.css explore.js explore.css )
 
     config.active_job.queue_adapter = :delayed_job
   end
