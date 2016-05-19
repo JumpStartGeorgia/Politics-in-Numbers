@@ -1,0 +1,24 @@
+/*@font-face {
+    font-family: "prime_en";
+    src: url( '/assets/fonts/en/prime.otf') format("opentype");
+    font-style: normal;
+    font-weight: 200;
+}*/
+@font-face {
+    font-family: "dejavusans_c";
+    src: url( '/assets/fonts/dejavusans_c.ttf') format("truetype");
+    font-style: normal;
+    font-weight: 200;
+}
+@font-face {
+    font-family: "donaneue_u";
+    src: url( '/assets/fonts/donaneue_u.otf') format("opentype");
+    font-style: normal;
+    font-weight: 200;
+}
+@font-face {
+    font-family: "firasans_book";
+    src: url( '/assets/fonts/firasans_book.otf') format("opentype");
+    font-style: normal;
+    font-weight: 200;
+}

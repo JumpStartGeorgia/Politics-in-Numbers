@@ -1,5 +1,5 @@
 <% page_title t 'shared.common.name' %>
-<% I18n.locale = :en %>
+<%# I18n.locale = :en %>
 <%#= @parties.category_datas.inspect %>
 <%#= @categories[0].inspect %>
 <%#= Category.tree_out(false, true, "categories-list").html_safe %>
@@ -9,7 +9,7 @@
   <%# @categories.each do |cat| %>
 <%= admin_donorset_url(id: "_id", locale: :en) %>
 <%= bulk_admin_parties_url(id: "_id", locale: :en) %>
-<% Party.destroy_all({tmp_id: -99})
+<#% Party.destroy_all({tmp_id: -99})
   Donorset.destroy_all
   Dataset.destroy_all
   me = User.last

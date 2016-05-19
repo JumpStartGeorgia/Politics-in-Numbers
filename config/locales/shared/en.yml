@@ -29,12 +29,26 @@ en:
       unknown: Unknown
       jumpstart:
         slogan: JumpStart Georgia - We communicate data better!
-      name: Rails Starter Template
+      name: Politics in Numbers
+      language: Language Switch
+      twitter: Share on Twitter
+      facebook: Share on Facebook
+      phone: Phone
+      actual_phone: +995 012 3456789
+      email: Email
+      actual_email: email@jumpstart.ge
+      address: Address
+      actual_address: "6 Melikishvili Street, Third Floor, 0179 Tbilisi, Georgia"
+      summary: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit, voluptatum! Magnam quas consequatur nihil quo reiciendis asperiores vitae obcaecati quam, quidem ratione delectus, veritatis nulla maiores quae nemo debitis. Sed."
     locale:
       short:
         en: En
         ka: "ქა"
-        ru: "ру"
+        ru: "Ру"
+      long:
+        en: "English"
+        ka: "ქართული"
+        ru: "Русский"
     msgs:
       does_not_exist: You tried to access a page that does not exist.
       not_authorized: You are not authorized to view that page.

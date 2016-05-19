@@ -1,82 +1,86 @@
-<div class="navbar navbar-default navbar-static-top">
+<nav class="navbar">
   <div class="container">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <%= link_to t('shared.common.name'), root_path, class: 'navbar-brand' %>
-    <div class="navbar-collapse collapse navbar-responsive-collapse">
-      <ul class="nav navbar-nav navbar-left">
-        <li><%= link_to t('.about'), about_path  %></li>
-        <li><%= link_to t('.media'), media_path  %></li>
-        <li><%= link_to t('.download'), download_path  %></li>
-        <li><%= link_to t('.parties'), parties_path  %></li>
-        <li><%= link_to t('.api'), api_path  %></li>
-      </ul>
-      <ul class='nav navbar-nav navbar-right'>
-        <% if user_signed_in? %>
-          <li class="dropdown">
-            <a href="#" id="user-dropdown" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-              <%= icon('user')%>
-              <% if current_user.deffereds.present? %>
-                <span class="badge badge-notifier"><%= current_user.deffereds.length %></span>
-              <% end %>
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" role="menu">
-              <% if current_user.deffereds.present? %>
+    <div class="navbar-section navbar-left navbar-toggle-receiver">
+      <button type="button" class="navbar-toggle navbar-menu-toggle" data-toggle="collapse" data-target=".navbar-toggle-receiver">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <%= link_to  root_path, class: 'navbar-brand' do %>
+        <img alt="<%= t('shared.common.name') %>" title="<%= t('shared.common.name') %>" src="/assets/logo_<%= I18n.locale %>.svg">
+      <% end %>
+      <div class="navbar-collapse collapse navbar-menu-collapse">
+        <ul class="nav navbar-nav">
+          <!-- <li><%#= link_to t('.parties').upcase, parties_path  %></li> -->
+          <li><%= link_to t('.about').upcase, about_path  %></li>
+          <li><%= link_to t('.media').upcase, media_path  %></li>
+          <li><%= link_to t('.download').upcase, download_path  %></li>
+          <!-- <li><%#= link_to t('.api').upcase, api_path  %></li> -->
+          <% if user_signed_in? %>
+            <li class="dropdown">
+              <a href="#" id="user-dropdown" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                <%= icon('user')%>
+                <% if current_user.deffereds.present? %>
+                  <span class="badge badge-notifier"><%= current_user.deffereds.length %></span>
+                <% end %>
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <% if current_user.deffereds.present? %>
+                  <li>
+                    <%= link_to admin_path do %>
+                      <%= t('mongoid.models.deffered', count: current_user.deffereds.length).upcase %>
+                      <span class="badge"><%= current_user.deffereds.length %></span>
+                    <% end %>
+                  </li>
+                <% end %>
                 <li>
-                  <%= link_to admin_path do %>
-                    <%= t('mongoid.models.deffered', count: current_user.deffereds.length) %>
-                    <span class="badge"><%= current_user.deffereds.length %></span>
-                  <% end %>
+                  <%= link_to t('mongoid.models.user', count: 999).upcase,
+                              admin_users_path %>
                 </li>
+                <li>
+                  <%= link_to t('mongoid.models.admin', count: 1).upcase,
+                              admin_path %>
+                </li>
+
+                <li class='divider'>
+
+                </li>
+                <li>
+                  <%= link_to t('.account.edit_profile').upcase,
+                              edit_user_registration_path %>
+                </li>
+                <li>
+                  <%= link_to t('.account.logout').upcase,
+                              destroy_user_session_path,
+                              method: :delete %>
+                </li>
+              </ul>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div><div class="navbar-section navbar-right navbar-toggle-receiver">
+      <button type="button" class="navbar-toggle navbar-lang-toggle" data-toggle="collapse" data-target=".navbar-toggle-receiver">
+        <span><%= t("shared.locale.short.#{I18n.locale}") %></span>
+        <img class="icon-earth" alt="<%= t('shared.common.language') %>" title="<%= t('shared.common.language') %>" src="/assets/earth.svg">
+      </button>
+      <div class="navbar-collapse collapse navbar-lang-collapse">
+        <ul class='nav navbar-nav'>
+          <% ln = I18n.available_locales.length %>
+          <% I18n.available_locales.each_with_index do |locale, locale_ind| %>
+            <li class='<%= "active" if I18n.locale == locale %>'>
+              <%= link_to url_for(locale: locale) do %>
+                <span class="short"><%= I18n.locale != locale ? t("shared.locale.short.#{locale}") : t("shared.locale.long.#{locale}") %></span>
+                <span class="long"><%= t("shared.locale.long.#{locale}") %></span>
               <% end %>
-              <li>
-                <%= link_to t('mongoid.models.user', count: 999),
-                            admin_users_path %>
-              </li>
-              <li>
-                <%= link_to t('mongoid.models.admin', count: 1),
-                            admin_path %>
-              </li>
-
-              <li class='divider'>
-
-              </li>
-              <li>
-                <%= link_to t('.account.edit_profile'),
-                            edit_user_registration_path %>
-              </li>
-              <li>
-                <%= link_to t('.account.logout'),
-                            destroy_user_session_path,
-                            method: :delete %>
-              </li>
-            </ul>
-          </li>
-        <% end %>
-
-        <li class='language-switcher-container'>
-          <ul class='language-switcher'>
-            <% I18n.available_locales.each do |locale| %>
-              <li class='language-switcher-item <%= "is-active" if I18n.locale == locale %>'>
-                <%=
-                if I18n.locale == locale
-                  link_to t("shared.locale.short.#{locale}"),
-                          url_for(locale: locale),
-                          class: 'language-switcher-item-link is-active'
-                else
-                  link_to t("shared.locale.short.#{locale}"),
-                          url_for(locale: locale),
-                          class: 'language-switcher-item-link'
-                end %>
-              </li>
+            </li>
+            <% if locale_ind != ln-1 %>
+              <li class="sep">/</li>
             <% end %>
-          </ul>
-        </li>
-      </ul>
+          <% end %>
+        </ul>
+      </div>
     </div>
   </div>
-</div>
+</nav>

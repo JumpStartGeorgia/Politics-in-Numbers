@@ -1,3 +1,4 @@
+/* global $ */
 // This is a manifest file that'll be compiled into application.js, which will include all the files
 // listed below.
 //
@@ -48,3 +49,22 @@
 
 // require turbolinks
 // require google-analytics-turbolinks
+
+$(document).ready(function (){
+  var nav = false;
+  $(".navbar-toggle").click(function (event){
+    var t = $(this).closest(".navbar-toggle-receiver"),
+      state = t.hasClass("active");
+    $(".navbar-toggle-receiver").removeClass("active");
+    t.toggleClass("active", !state);
+    nav = true;
+    event.stopPropagation();
+  });
+  $(document).click(function (event){
+    var t = $(event.target);
+     console.log(event, t.hasClass("navbar-section"), t.hasClass("active"));
+    if(nav && !(t.hasClass("navbar-section") && t.hasClass("active")) && !$(this).closest(".navbar-section").length) {
+      $(".navbar-toggle-receiver").removeClass("active");
+    }
+  });
+});
