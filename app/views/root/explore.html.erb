@@ -1,17 +1,41 @@
 <div id="explore">
-  <div id="filter_type" class="filter-type">
+  <div id="filter_type" class="filter-type" data-type="donation">
     <div class="back"><img alt="<%= t('shared.common.back') %>" src="/assets/explore/back.svg" title="<%= t('shared.common.back') %>"></div>
-    <div class="donation" data-type="donation">
+    <div class="donation active" data-type="donation">
       <button type="button" id="donation_toggle" class="donation-toggle"><%= t('.donations') %></button>
     </div>
     <div class="sep"></div>
     <div class="finance" data-type="finance">
-      <button type="button" id="finance_toggle" class="finance-toggle"><%= t('.party_finances').html_safe %><span>:</span></button>
-      <div class="finance-category-list">
-        <ul>
-          <li><a><%= t('.income') %></a></li>
+      <div class="finance-container">
+        <button type="button" id="finance_toggle" class="finance-toggle"><%= t('.party_finances').html_safe %><span>:</span></button><ul id="finance_category" >
           <li>
-            <div><a><%= t('.debts') %></a></div>
+            <a href="#" class="finance-category-toggle" data-state="" data-cat="income">
+              <span class="sub" data-sub="all"><%= t('.all') %></span>
+              <span class="sub" data-sub="campaign"><%= t('.campaign') %></span>
+              <span class="label"><%= t('.income') %></span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="finance-category-toggle" data-state="" data-cat="expense">
+              <span class="sub" data-sub="all"><%= t('.all') %></span>
+              <span class="sub" data-sub="campaign"><%= t('.campaign') %></span>
+              <span class="label"><%= t('.expenses') %></span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="finance-category-toggle" data-state="simple" data-cat="property">
+              <span class="label long"><%= t('.property_assets').html_safe %></span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="finance-category-toggle" data-state="simple" data-cat="financial">
+              <span class="label long"><%= t('.financial_assets').html_safe %></span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="finance-category-toggle" data-state="simple" data-cat="debt">
+              <span class="label"><%= t('.debts') %></span>
+            </a>
           </li>
         </ul>
       </div>

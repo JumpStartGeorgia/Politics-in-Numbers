@@ -39,6 +39,9 @@
         outline:none;
         transition-duration: 0.3s;
         transition-property: color, background-color;
+        position: relative;
+        top: -1px;
+        left: -1px;
         &.active, &:hover {
           background-color: #DDCD37;
           color:#3E443D;
@@ -56,7 +59,15 @@
       width:50%;
       text-align:left;
       padding:8px 0 8px 26px;
+      &.active {
+        .finance-container {
+          border:1px dashed #ced1cd;
+          border-right:0;
+          padding:0 0 0 20px;
+        }
+      }
       .finance-toggle {
+        float:left;
         font: 16px firasans_sb;
         color:#F78E69;
         text-align:left;
@@ -67,7 +78,8 @@
         min-width:111px;
         outline:none;
         transition-duration: 0.3s;
-         transition-property: color, background-color;
+        transition-property: color, background-color;
+        vertical-align:top;
         &:hover {
           background-color: #F78E69;
           color:#fff;
@@ -81,14 +93,127 @@
         .finance-toggle {
           background-color: #F78E69;
           color:#fff;
+          position: relative;
+          top: -1px;
+          left: -21px;
         }
       }
-      .finance-category-list {
+      ul#finance_category {
         display:none;
-        ul {
-          li {
-            a {
+        li {
+          display:inline-block;
+          vertical-align:top;
+          padding:9px 0 10px;
+          a {
+            display:inline-block;
+            font:12px firasans_sb;
+            color:#5D675B;
+            text-decoration:none;
+            opacity:.6;
+            height:37px;
+            min-width:90px;
 
+            border:1px solid #9aa199;
+            position:relative;
+            &[data-state='']:hover span.label:before,
+            &[data-state='simple']:hover span.label:before {
+              content:"";
+              display:inline-block;
+              background:rgba(136,216,119,.8) url(/assets/explore/add.svg) no-repeat center;
+              background-size:20px;
+              position:absolute;
+              top:0px;
+              right:0px;
+              bottom:0px;
+              left:0px;
+            }
+            span.label {
+              display: inline-block;
+              padding:11px 9px 0;
+            }
+            span.label.long {
+              padding:4px 9px 0;
+            }
+            span.sub {
+              display:none;
+              font:12px firasans_book;
+              color:#5D675B;
+            }
+
+            &[data-state='preselect'] {
+              border:1px dashed #9aa199;
+              span.label { padding:0; }
+              span.sub {
+                padding:2px 9px 0;
+                display:block;
+                height:50%;
+                position:relative;
+                &:hover:before {
+                  content:"";
+                  display:inline-block;
+                  background:rgba(136,216,119,.8) url(/assets/explore/add.svg) no-repeat center;
+                  background-size:13px;
+                  position:absolute;
+                  top:0px;
+                  right:0px;
+                  bottom:0px;
+                  left:0px;
+                }
+              }
+              span.sub[data-sub='all'] {
+                border-bottom:1px dashed #9aa199;
+              }
+              span.label {
+                display:none;
+              }
+            }
+            &[data-state='all'] {
+              background-color:#5D675B;
+              color:#fff;
+              span.label { padding:0 9px; }
+              span.sub[data-sub='all'] {
+                padding:5px 9px 0;
+                display:block;
+                font:12px firasans_r;
+                color:#fff;
+              }
+            }
+            &[data-state='campaign'] {
+              background-color:#5D675B;
+              color:#fff;
+              span.label { padding:0 9px; }
+              span.sub[data-sub='campaign'] {
+                padding:4px 9px 0;
+                display:block;
+                font:12px firasans_r;
+                color:#fff;
+              }
+            }
+            &[data-state='simpled'] {
+              background-color:#5D675B;
+              color:#fff;
+            }
+            &[data-state='all']:hover,
+            &[data-state='campaign']:hover,
+            &[data-state='simpled']:hover {
+              span.label:before {
+                content:"";
+                display:inline-block;
+                background:rgba(247,142,105,.8) url(/assets/explore/remove.svg) no-repeat center;
+                background-size:20px;
+                position:absolute;
+                top:0px;
+                right:0px;
+                bottom:0px;
+                left:0px;
+              }
+            }
+
+
+          }
+          &:first-of-type {
+            a {
+              border-left:0;
             }
           }
         }
@@ -107,7 +232,27 @@
       }
       .forward {
         display:table-cell;
-        padding: 8px 0;
+        padding: 7px 0 9px;
+      }
+    }
+    &[data-type='finance'] {
+      .donation {
+        display:none;
+      }
+      .finance {
+        width:100%;
+        text-align:left;
+        #finance_category {
+          display:inline;
+          margin-left: -21px;
+        }
+      }
+      .sep {
+        display:none;
+      }
+      .back {
+        display:table-cell;
+        padding: 7px 0 9px;
       }
     }
   }

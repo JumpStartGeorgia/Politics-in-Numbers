@@ -9,8 +9,8 @@ en:
       party_finances: PARTY <br/>FINANCES
       income: INCOME
       expenses: EXPENSES
-      property_assets: PROPERTY ASSETS
-      financial_assets: FINANCIAL ASSETS
+      property_assets: PROPERTY <br/>ASSETS
+      financial_assets: FINANCIAL <br/>ASSETS
       debts: DEBTS
       campaign: Campaign
       all: All

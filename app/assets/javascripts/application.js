@@ -66,5 +66,8 @@ $(document).ready(function (){
     if(nav && !(t.hasClass("navbar-section") && t.hasClass("active")) && !$(this).closest(".navbar-section").length) {
       $(".navbar-toggle-receiver").removeClass("active");
     }
+    if(typeof global_click_callback === "function") {
+      global_click_callback();
+    }
   });
 });
