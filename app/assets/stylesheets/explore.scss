@@ -14,12 +14,6 @@
       }
       cursor:pointer;
     }
-    .forward {
-      display:none;
-      img {
-      }
-      cursor:pointer;
-    }
     .sep {
       height:100%;
       border-left:1px dashed #a9afa8;
@@ -55,17 +49,11 @@
         }
       }
     }
+
     .finance {
       width:50%;
       text-align:left;
       padding:8px 0 8px 26px;
-      &.active {
-        .finance-container {
-          border:1px dashed #ced1cd;
-          border-right:0;
-          padding:0 0 0 20px;
-        }
-      }
       .finance-toggle {
         float:left;
         font: 16px firasans_sb;
@@ -85,11 +73,11 @@
           color:#fff;
           cursor:pointer;
         }
-        span {
-
-        }
       }
       &.active {
+        .finance-container {
+          padding:0 0 0 20px;
+        }
         .finance-toggle {
           background-color: #F78E69;
           color:#fff;
@@ -98,7 +86,7 @@
           left: -21px;
         }
       }
-      ul#finance_category {
+      #finance_category {
         display:none;
         li {
           display:inline-block;
@@ -220,31 +208,34 @@
       }
     }
     &[data-type='donation'] {
-      .donation {
-        width:100%;
-        text-align:center;
-      }
-      .finance {
-        display:none;
-      }
-      .sep {
-        display:none;
-      }
-      .forward {
-        display:table-cell;
-        padding: 7px 0 9px;
-      }
+      // .donation {
+      //   width:100%;
+      //   text-align:center;
+      // }
+      // .finance {
+      //   display:none;
+      // }
+      // .sep {
+      //   display:none;
+      // }
+      // .forward {
+      //   display:table-cell;
+      //   padding: 7px 0 9px;
+      // }
     }
-    &[data-type='finance'] {
+    &.in-depth[data-type='finance'] {
       .donation {
         display:none;
       }
       .finance {
         width:100%;
-        text-align:left;
         #finance_category {
           display:inline;
           margin-left: -21px;
+        }
+        .finance-container {
+          border:1px dashed #ced1cd;
+          border-right:0;
         }
       }
       .sep {
@@ -252,18 +243,194 @@
       }
       .back {
         display:table-cell;
-        padding: 7px 0 9px;
+        padding: 7px 0 6px;
       }
     }
   }
-}
-@media (min-width: 768px) {
+  .filter-extended {
+    position:relative;
+    .filter-prompt {
+      display:block;
+      padding:15px 24px 12px 16px;
+      border-bottom:1px solid #D7DDD4;
+      .filter-icon {
+        vertical-align: middle;
+        width:20px;
+        height:15px;
+      }
+      .filter-close {
+        float: right;
+        vertical-align: middle;
+        width:20px;
+        height:20px;
+        position: relative;
+        top: -3px;
+        cursor:pointer;
+      }
+      span, > span.label {
+        font:14px firasans_r;
+        color:#88D877;
+        padding:0 12px;
+      }
+    }
+    .donation {
+      display:none;
+      &.active {
+        display:initial;
+      }
+    }
+    .finance {
+      display:none;
+      &.active {
+        display:initial;
+      }
+    }
+    .filter-inputs {
+      background-color:#F5F7F5;
+      position:absolute;
+      top: 0px;
+      z-index:55;
+      width:60%;
+      min-width:200px;
+      padding:0px 14px;
+      .row {
+        padding:15px 2px;
+      }
+      .row:not(:last-of-type) {
+        border-bottom:1px solid #D7DDD4;
+      }
+      .row:last-of-type {
+        text-align:center;
+      }
+      .filter_intro {
+        font:12px firasans_l;
+        color:#7F897D;
+      }
+      .filter-input {
+        label {
+          font:14px firasans_l;
+          color:#5D675B;
+          padding-bottom:12px;
+        }
+        .sublabel {
+          font:12px firasans_r;
+          color:#5D675B;
+          margin:15px 0 8px;
+        }
+        .toggle {
+          background:transparent url(/assets/explore/expand.svg) no-repeat center;
+          float:right;
+          width:16px;
+          height:16px;
+          cursor:pointer;
 
-}
-@media (min-width: 992px) {
+        }
+        &.expanded {
+          .toggle {
+            background:transparent url(/assets/explore/collapse.svg) no-repeat center;
+          }
+          .input-group {
+            display:initial;
+          }
+        }
+        .list {
+          margin-bottom:8px;
+          li {
+            font:14px firasans_book;
+            color:#F78E69;
+            padding:4px 0px;
+            .item-close {
+              padding:4px 0 0 5px;
+              vertical-align: top;
+              cursor:pointer;
+            }
+          }
+        }
+        .input-group {
+          display:none;
+        }
+        input {
+          font:12px firasans_r;
+          color:#5D675B;
+          background-color:#F5F7F5;
+          padding:6px 10px;
+          width:100%;
+          border:1px solid #F78E69;
+          outline:none;
+          &:focus, &:hover {
+            background-color:#fff;
+          }
+          &.datepicker, &[type='checkbox'] {
+            width:auto;
+          }
+          &[type='checkbox'] {
+            border:1px solid #F78E69;
+            border-radius:0;
+          }
+        }
+        .reset {
+          font:14px firasans_b;
+          color:#5D675B;
+          background-color:#fff;
+          border:1px solid #C5CEC2;
+          padding:8px 18px;
+        }
+      }
+    }
+  }
+  .content {
+    position:relative;
+    .overlay {
+      background-color:#5D675B;
+      opacity:.7;
+      position:absolute;
+      top:-45px;
+      right:0;
+      bottom:0;
+      left:0;
+      z-index:15;
+    }
+  }
 
-}
-@media (min-width: 1200px) {
+  @media (min-width: 768px) {
 
+  }
+  @media (min-width: 992px) {
+    .filter-type, .filter-type.in-depth[data-type='finance'] {
+      padding-left:269px;
+      .donation {
+        display:table-cell;
+        width:auto;
+        text-align:left;
+      }
+      .finance {
+        width:100%;
+        #finance_category {
+          display:inline;
+          margin-left: 0;
+        }
+        .finance-container {
+          border:0;
+        }
+        &.active {
+          .finance-container {
+            padding:0 0 0 0px;
+          }
+          .finance-toggle {
+            position: initial;
+          }
+        }
+
+      }
+      .sep {
+        display:table-cell;
+      }
+      .back {
+        display:none !important;
+      }
+    }
+  }
+  @media (min-width: 1200px) {
+
+  }
 }
-// TODO| test svg styling with inner classes via image or background

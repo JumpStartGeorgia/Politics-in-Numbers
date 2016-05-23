@@ -400,3 +400,56 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 @media (min-width: 1200px) {
 
 }
+
+// input[type="text"] + input[type="text"] {
+//   margin-top:8px;
+// }
+input[type="checkbox"] {
+    display:none;
+}
+input[type="checkbox"] + label {
+  font:14px firasans_book;
+  color:#F78E69;
+  cursor:pointer;
+}
+input[type="checkbox"] + label span {
+    display:inline-block;
+    width:14px;
+    height:14px;
+    vertical-align:middle;
+    background:url(checkbox.svg) no-repeat -15px top;
+    cursor:pointer;
+    margin-right:10px;
+}
+input[type="checkbox"]:checked + label span {
+  background:url(checkbox.svg) no-repeat 0px top;
+}
+
+input[type="radio"] {
+    display:none;
+}
+input[type="radio"] + label {
+  font:14px firasans_book;
+  color:#F78E69;
+  cursor:pointer;
+}
+input[type="radio"] + label span {
+    display:inline-block;
+    width:15px;
+    height:15px;
+    vertical-align:middle;
+    background:url(radio.svg) no-repeat -16px top;
+    cursor:pointer;
+    margin-right:6px;
+}
+input[type="radio"]:checked + label span {
+  background:url(radio.svg) no-repeat 0px top;
+}
+
+input[type="radio"] + label + input[type="radio"] + label {
+  margin-left:30px;
+}
+
+.hidden {
+  display:none;
+}

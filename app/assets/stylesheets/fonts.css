@@ -22,10 +22,21 @@
     font-style: normal;
     font-weight: 200;
 }
-
+@font-face {
+    font-family: "firasans_l";
+    src: url( '/assets/fonts/firasans_l.otf') format("opentype");
+    font-style: normal;
+    font-weight: 200;
+}
 @font-face {
     font-family: "firasans_book";
     src: url( '/assets/fonts/firasans_book.otf') format("opentype");
+    font-style: normal;
+    font-weight: 200;
+}
+@font-face {
+    font-family: "firasans_b";
+    src: url( '/assets/fonts/firasans_b.otf') format("opentype");
     font-style: normal;
     font-weight: 200;
 }

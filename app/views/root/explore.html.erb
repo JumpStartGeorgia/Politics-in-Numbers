@@ -40,7 +40,124 @@
         </ul>
       </div>
     </div>
-    <div class="forward"><img alt="<%= t('shared.common.back') %>" src="/assets/explore/forward.svg" title="<%= t('shared.common.back') %>"></div>
+  </div>
+  <div id="filter_extended" class="filter-extended" data-type="donation">
+    <div class="filter-prompt">
+      <img alt="<%= t('.filters') %>" src="/assets/explore/filter.svg" title="<%= t('.filters') %>" class="filter-icon">
+      <span class="label"><%= t('.filters') %></span>
+    </div>
+    <div class="donation filter-inputs" data-type="donation">
+      <div class="row filter-prompt">
+        <img alt="<%= t('.filters') %>" src="/assets/explore/filter.svg" title="<%= t('.filters') %>" class="filter-icon">
+        <span class="label"><%= t('.filters') %></span>
+        <img alt="<%= t('.filter_close') %>" src="/assets/explore/close.svg" title="<%= t('.filter_close') %>" class="filter-close">
+      </div>
+      <div class="row filter-input">
+        <label><%= t('.id_name') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <ul class="list">
+          <li>
+            Badri Patarkatsishvili
+            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
+          </li>
+        </ul>
+        <div class="input-group">
+          <input type="text">
+        </div>
+      </div>
+      <div class="row filter-input">
+        <label><%= t('.time_period') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <div class="list"></div>
+        <div class="input-group">
+          <input type="text" placeholder="<%= t('.from') %>" class="datepicker">
+          <input type="text" placeholder="<%= t('.to') %>" class="datepicker">
+          <div class="sublabel"><%= t('.campaign') %>:</div>
+          <ul class="campaign-list">
+            <li>
+              <input type="checkbox" id="campaign_period_1" name="campaign_period">
+              <label for="campaign_period_1"><span></span>2012</label>
+            </li>
+             <li>
+                <input type="checkbox" id="campaign_period_2" name="campaign_period_2">
+                <label for="campaign_period_2"><span></span>2013</label>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="row filter-input">
+        <label><%= t('.amount') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <div class="list"></div>
+        <div class="input-group">
+          <input type="text" placeholder="<%= t('.from') %>" class="datepicker">
+          <input type="text" placeholder="<%= t('.to') %>" class="datepicker">
+        </div>
+      </div>
+      <div class="row filter-input">
+        <label><%= t('.party') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <ul class="list">
+          <li>
+            UNM
+            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
+          </li>
+           <li>
+            Georgian Dream
+            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
+          </li>
+        </ul>
+        <div class="input-group">
+          <input type="text">
+        </div>
+      </div>
+      <div class="row filter-input">
+        <label><%= t('.donation_type') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <div class="list"></div>
+        <div class="input-group">
+          <input type="radio" id="donation_type_monetary" name="donation_type" value="monetary">
+          <label for="donation_type_monetary"><span></span><%= t('.monetary') %></label>
+          <input type="radio"  id="donation_type_nonmonetary" name="donation_type" value="non_monetary">
+          <label for="donation_type_nonmonetary"><span></span><%= t('.non_monetary') %></label>
+        </div>
+      </div>
+      <div class="row filter-input">
+        <label><%= t('.donated_multiple_parties') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <div class="list"></div>
+        <div class="input-group">
+          <input type="radio" id="donation_multiple_yes" name="donation_multiple" value="yes">
+          <label for="donation_multiple_yes"><span></span><%= t('._yes') %></label>
+          <input type="radio" id="donation_multiple_no" name="donation_multiple" value="no">
+          <label for="donation_multiple_no"><span></span><%= t('._no') %></label>
+        </div>
+      </div>
+      <div class="row filter-input">
+        <button id="reset" class="reset"><%= t('.reset') %></button>
+      </div>
+    </div>
+    <div class="finance filter-inputs" data-type="finance">
+      <div class="row filter_intro"><%= t('.filter_intro') %></div>
+      <div class="row filter-input">
+        <div class="label">
+          <%= t('.party') %>
+          <img alt="<%= t('.filter_toggle') %>" src="/assets/explore/expand.svg" title="<%= t('.filter_toggle') %>" class="toggle">
+        </div>
+        <ul class="list">
+          <li>
+            UNM
+            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
+          </li>
+           <li>
+            Georgian Dream
+            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
+          </li>
+        </ul>
+        <input type="text">
+      </div>
+    </div>
+  </div>
+  <div class="content">
+    <div class="overlay hidden"></div>
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br/> Numquam obcaecati quo nam dignissimos tempora rerum! <br/>Autem in, deserunt dolores esse ut distinctio quam. <br/>Modi accusamus blanditiis, culpa rem explicabo aspernatur?
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br/> Numquam obcaecati quo nam dignissimos tempora rerum! <br/>Autem in, deserunt dolores esse ut distinctio quam. <br/>Modi accusamus blanditiis, culpa rem explicabo aspernatur?
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br/> Numquam obcaecati quo nam dignissimos tempora rerum! <br/>Autem in, deserunt dolores esse ut distinctio quam. <br/>Modi accusamus blanditiis, culpa rem explicabo aspernatur?
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br/> Numquam obcaecati quo nam dignissimos tempora rerum! <br/>Autem in, deserunt dolores esse ut distinctio quam. <br/>Modi accusamus blanditiis, culpa rem explicabo aspernatur?
   </div>
 </div>
 <% content_for :custom_js, "explore" %>
