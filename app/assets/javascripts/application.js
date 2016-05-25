@@ -28,17 +28,17 @@
 // require twitter/bootstrap/transition
 // require twitter/bootstrap/alert
 // require twitter/bootstrap/modal
-//= require twitter/bootstrap/dropdown
+// require twitter/bootstrap/dropdown
 // require twitter/bootstrap/scrollspy
-//= require twitter/bootstrap/tab
-//= require twitter/bootstrap/tooltip
+// require twitter/bootstrap/tab
+// require twitter/bootstrap/tooltip
 // require twitter/bootstrap/popover
 // require twitter/bootstrap/button
 // require twitter/bootstrap/collapse
 // require twitter/bootstrap/carousel
 // require twitter/bootstrap/affix
 //= require util
-//= require select2
+// require select2
 //= require dataTables/jquery.dataTables
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 //= require dataTables/extras/dataTables.responsive
@@ -49,6 +49,26 @@
 
 // require turbolinks
 // require google-analytics-turbolinks
+
+
+// Returns a function, that, as long as it continues to be invoked, will not
+// be triggered. The function will be called after it stops being called for
+// N milliseconds. If `immediate` is passed, trigger the function on the
+// leading edge, instead of the trailing.
+function debounce(func, wait, immediate) {
+  var timeout;
+  return function() {
+    var context = this, args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) func.apply(context, args);
+  };
+};
 
 $(document).ready(function (){
   var nav = false;
@@ -68,6 +88,19 @@ $(document).ready(function (){
     }
     if(typeof global_click_callback === "function") {
       global_click_callback(event.target);
+    }
+  });
+  $(document).on("keyup", function(event) {
+
+    if(event.keyCode === 38) { // up
+      if(typeof global_keyup_up_callback === "function") {
+        global_keyup_up_callback(event.target);
+      }
+    }
+    else if(event.keyCode === 40) { // down
+      if(typeof global_keyup_down_callback === "function") {
+        global_keyup_down_callback(event.target);
+      }
     }
   });
 });

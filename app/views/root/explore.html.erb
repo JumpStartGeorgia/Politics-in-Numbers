@@ -2,70 +2,68 @@
   <div id="filter_type" class="filter-type" data-type="donation">
     <div class="back"><img alt="<%= t('shared.common.back') %>" src="/assets/explore/back.svg" title="<%= t('shared.common.back') %>"></div>
     <div class="donation active" data-type="donation">
-      <button type="button" id="donation_toggle" class="donation-toggle"><%= t('.donations') %></button>
+      <button type="button" id="donation_toggle" class="donation-toggle" tabindex="4"><%= t('.donations') %></button>
     </div>
     <div class="sep"></div>
     <div class="finance" data-type="finance">
       <div class="finance-container">
-        <button type="button" id="finance_toggle" class="finance-toggle"><%= t('.party_finances').html_safe %><span>:</span></button><ul id="finance_category" >
+        <button type="button" id="finance_toggle" class="finance-toggle" tabindex="4"><%= t('.party_finances').html_safe %><span>:</span></button><ul id="finance_category" >
           <li>
-            <a href="#" class="finance-category-toggle" data-state="" data-cat="income">
-              <span class="sub" data-sub="all"><%= t('.all') %></span>
-              <span class="sub" data-sub="campaign"><%= t('.campaign') %></span>
-              <span class="label"><%= t('.income') %></span>
-            </a>
+            <div class="finance-category-toggle" data-state="" data-cat="income">
+              <a href="#income" class="label" tabindex="4"><span class="f"><%= t('.all') %></span><span class="s"><%= t('.campaign') %></span><%= t('.income') %></a>
+              <a href="#income-all" class="sub" tabindex="4" data-sub="all"><%= t('.all') %></a>
+              <a href="#income-campaign" class="sub" tabindex="4" data-sub="campaign"><%= t('.campaign') %></a>
+            </div>
           </li>
           <li>
-            <a href="#" class="finance-category-toggle" data-state="" data-cat="expense">
-              <span class="sub" data-sub="all"><%= t('.all') %></span>
-              <span class="sub" data-sub="campaign"><%= t('.campaign') %></span>
-              <span class="label"><%= t('.expenses') %></span>
-            </a>
+            <div class="finance-category-toggle" data-state="" data-cat="expense">
+              <a href="#expense" class="label" tabindex="4"><span class="f"><%= t('.all') %></span><span class="s"><%= t('.campaign') %></span><%= t('.expenses') %></a>
+              <a href="#expense-all" class="sub" tabindex="4" data-sub="all"><%= t('.all') %></a>
+              <a href="#expense-campaign" class="sub" tabindex="4" data-sub="campaign"><%= t('.campaign') %></a>
+            </div>
           </li>
           <li>
-            <a href="#" class="finance-category-toggle" data-state="simple" data-cat="property">
-              <span class="label long"><%= t('.property_assets').html_safe %></span>
-            </a>
+            <div class="finance-category-toggle" data-state="simple" data-cat="property">
+              <a href="#property" class="label long" tabindex="4"><%= t('.property_assets').html_safe %></a>
+            </div>
           </li>
           <li>
-            <a href="#" class="finance-category-toggle" data-state="simple" data-cat="financial">
-              <span class="label long"><%= t('.financial_assets').html_safe %></span>
-            </a>
+            <div class="finance-category-toggle" data-state="simple" data-cat="financial">
+              <a href="#financial" class="label long" tabindex="4"><%= t('.financial_assets').html_safe %></a>
+            </div>
           </li>
           <li>
-            <a href="#" class="finance-category-toggle" data-state="simple" data-cat="debt">
-              <span class="label"><%= t('.debts') %></span>
-            </a>
+            <div class="finance-category-toggle" data-state="simple" data-cat="debt">
+              <a href="#debt" class="label" tabindex="4"><%= t('.debts').html_safe %></a>
+            </div>
           </li>
         </ul>
       </div>
     </div>
   </div>
   <div id="filter_extended" class="filter-extended" data-type="donation">
-    <div class="filter-prompt">
-      <img alt="<%= t('.filters') %>" src="/assets/explore/filter.svg" title="<%= t('.filters') %>" class="filter-icon">
-      <span class="label"><%= t('.filters') %></span>
-    </div>
+    <div class="filter-toggle"><span class="icon-filter" title="<%= t('.filters') %>"></span><%= t('.filters') %></div>
     <div class="donation filter-inputs" data-type="donation">
-      <div class="row filter-prompt">
-        <img alt="<%= t('.filters') %>" src="/assets/explore/filter.svg" title="<%= t('.filters') %>" class="filter-icon">
-        <span class="label"><%= t('.filters') %></span>
-        <img alt="<%= t('.filter_close') %>" src="/assets/explore/close.svg" title="<%= t('.filter_close') %>" class="filter-close">
+      <div class="row filter-header">
+        <label><span class="icon-filter" title="<%= t('.filters') %>"></span><%= t('.filters') %></label>
+        <span class="icon-close filter-close" title="<%= t('.filter_close') %>"></span>
       </div>
       <div class="row filter-input">
-        <label><%= t('.id_name') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
-        <ul class="list">
-          <li>
-            Badri Patarkatsishvili
-            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
-          </li>
-        </ul>
+        <a href="#" class="toggle" tabindex="5"><%= t('.id_name') %><span title="<%= t('.filter_toggle') %>"></span></a>
+        <ul class="list" data-autocomplete-view="donation-donor"></ul>
         <div class="input-group">
-          <input type="text">
+          <div class="autocomplete" data-autocomplete-id="donation-donor">
+            <input type="text" placeholder="Type Person Id or Name" tabindex="5">
+            <ul class="dropdown" id="filter_donation_by_donors" tabindex="5">
+              <% Donorset.first.donors.limit(10).each{|m| %>
+                <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.first_name} #{m.last_name}" %></li>
+              <% } %>
+            </ul>
+          </div>
         </div>
       </div>
       <div class="row filter-input">
-        <label><%= t('.time_period') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <div class="list"></div>
         <div class="input-group">
           <input type="text" placeholder="<%= t('.from') %>" class="datepicker">
@@ -84,7 +82,7 @@
         </div>
       </div>
       <div class="row filter-input">
-        <label><%= t('.amount') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <a href="#" class="toggle" tabindex="5"><%= t('.amount') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <div class="list"></div>
         <div class="input-group">
           <input type="text" placeholder="<%= t('.from') %>" class="datepicker">
@@ -92,7 +90,7 @@
         </div>
       </div>
       <div class="row filter-input">
-        <label><%= t('.party') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <a href="#" class="toggle" tabindex="5"><%= t('.party') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <ul class="list">
           <li>
             UNM
@@ -108,7 +106,7 @@
         </div>
       </div>
       <div class="row filter-input">
-        <label><%= t('.donation_type') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <a href="#" class="toggle" tabindex="5"><%= t('.donation_type') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <div class="list"></div>
         <div class="input-group">
           <input type="radio" id="donation_type_monetary" name="donation_type" value="monetary">
@@ -118,7 +116,7 @@
         </div>
       </div>
       <div class="row filter-input">
-        <label><%= t('.donated_multiple_parties') %><span class="toggle" title="<%= t('.filter_toggle') %>"></span></label>
+        <a href="#" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <div class="list"></div>
         <div class="input-group">
           <input type="radio" id="donation_multiple_yes" name="donation_multiple" value="yes">
@@ -132,12 +130,13 @@
       </div>
     </div>
     <div class="finance filter-inputs" data-type="finance">
+      <div class="row filter-header">
+        <label><span class="icon-filter" title="<%= t('.filters') %>"></span><%= t('.filters') %></label>
+        <span class="icon-close filter-close" title="<%= t('.filter_close') %>"></span>
+      </div>
       <div class="row filter_intro"><%= t('.filter_intro') %></div>
       <div class="row filter-input">
-        <div class="label">
-          <%= t('.party') %>
-          <img alt="<%= t('.filter_toggle') %>" src="/assets/explore/expand.svg" title="<%= t('.filter_toggle') %>" class="toggle">
-        </div>
+        <a href="#" class="toggle" tabindex="5"><%= t('.party') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <ul class="list">
           <li>
             UNM
@@ -148,9 +147,42 @@
             <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
           </li>
         </ul>
-        <input type="text">
+        <div class="input-group">
+          <input type="text">
+        </div>
+      </div>
+      <div class="row filter-input">
+        <a href="#" class="toggle" tabindex="5"><%= t('.income') %> <%= t('.categories') %><span title="<%= t('.filter_toggle') %>"></span></a>
+        <ul class="list">
+          <li>
+            Category1
+            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
+          </li>
+        </ul>
+        <div class="input-group">
+          <input type="text">
+        </div>
+      </div>
+      <div class="row filter-input">
+        <a href="#" class="toggle" tabindex="5"><%= t('.time') %><span title="<%= t('.filter_toggle') %>"></span></a>
+        <ul class="list">
+          <li>
+            2015
+            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
+          </li>
+        </ul>
+        <div class="input-group">
+          Annual or Campaign
+          <input type="checkbox" id="campaign_period_2" name="campaign_period_2">
+          <label for="campaign_period_2"><span></span>2013</label>
+        </div>
+      </div>
+      <div class="row filter-input">
+        <button id="reset" class="reset"><%= t('.reset') %></button>
+        <button id="compare" class="compare"><span class='icon-compare'></span><%= t('.compare') %></button>
       </div>
     </div>
+
   </div>
   <div class="content">
     <div class="overlay hidden"></div>

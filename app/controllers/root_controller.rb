@@ -7,7 +7,8 @@ class RootController < ApplicationController
   end
 
   def explore
-    #@page_content = PageContent.by_name('about')
+    gon.filter_item_close = t('.filter_item_close');
+    # interesting donor first
   end
 
   def about
@@ -29,7 +30,23 @@ class RootController < ApplicationController
   # def parties
   #   # @page_content = PageContent.by_name('about')
   # end
-
+  def select_donors
+    q = params[:q].split
+    @donors = []
+    if q.length == 1
+      regex1 =  /^#{Regexp.escape(q[0])}/i
+      regex2 = /.*/i
+    else
+      regex1 =  /^#{Regexp.escape(q[0])}/i
+      regex2 = /^#{Regexp.escape(q[1])}/i
+    end
+    Donorset.all.each{ |set|
+      set.donors.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
+        @donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
+      }
+    }
+    render :json => @donors
+  end
   def read
     I18n.locale = :en
     Dataset.destroy_all

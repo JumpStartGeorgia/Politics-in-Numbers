@@ -11,8 +11,8 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
   *= require formtastic
   *= require formtastic-bootstrap
 
-  *= require select2
-  *= require select2-bootstrap
+  * require select2
+  * require select2-bootstrap
 
   *= require jquery-ui/datepicker
 
@@ -27,6 +27,12 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 
 * {
   box-sizing:border-box;
+}
+a {
+  text-decoration:none;
+  &:hover, &:focus, &:active, &:visited {
+    color:inherit;
+  }
 }
 .navbar {
   .container {
@@ -60,6 +66,7 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
         display:block;
         width:100%;
         text-align:center;
+        vertical-align: top;
         a {
           display:inline-block;
           width:100%;
@@ -67,7 +74,7 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
           font: 20px donaneue_u;
           color:#fff;
           text-decoration:none;
-          &:hover {
+          &:hover, &:focus, &:active, &.active {
             background-color:#fff;
             color:#88D877;
           }
@@ -298,7 +305,7 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
       z-index: 3;
       img {
         width:100px;
-        height:145px;
+        height:142px;
       }
     }
     .navbar-collapse {
@@ -446,10 +453,112 @@ input[type="radio"]:checked + label span {
   background:url(radio.svg) no-repeat 0px top;
 }
 
-input[type="radio"] + label + input[type="radio"] + label {
-  margin-left:30px;
+input[type="radio"] + label{
+  margin-right:30px;
 }
 
 .hidden {
   display:none;
+}
+
+
+
+.ui-datepicker {
+  border-radius:0;
+  border:1px solid #F78E69;
+  padding:0;
+  margin-top: 2px;
+  .ui-datepicker-header {
+    border-radius:0;
+    border:0;
+    border-bottom:1px solid #e0e0e0;
+    background:none;
+    background-color:#fff !important;
+    padding:4px 0;
+    .ui-datepicker-title {
+      font: 14px firasans_sb;
+      color: #5D675B;
+      margin: 0;
+      padding: 8px 0;
+    }
+    .ui-datepicker-next {
+      top:5px;
+      right: 4px;
+      border:1px solid transparent;
+      border-right:0;
+      border-top:0;
+      span {
+        background:transparent url(/assets/arrow_right.svg) no-repeat center;
+        width:9px;
+        height:15px;
+        padding:5px;
+        padding:5px;
+        margin-top: -8px;
+        margin-left:-4px;
+        top:14px;
+      }
+      &.ui-state-hover {
+        border-radius: 0;
+        background: none;
+        background-color: #fff;
+        border:1px solid #e0e0e0;
+        border-right:0;
+        border-top:0;
+      }
+    }
+    .ui-datepicker-prev {
+      top:5px;
+      left: 4px;
+      border:1px solid transparent;
+      border-left:0;
+      border-top:0;
+      span {
+        background:transparent url(/assets/arrow_left.svg) no-repeat center;
+        width:9px;
+        height:15px;
+        padding:5px;
+        margin-top: -8px;
+        margin-left:-4px;
+        top:14px;
+      }
+      &.ui-state-hover {
+        border-radius: 0;
+        background: none;
+        background-color: #fff;
+        border:1px solid #e0e0e0;
+        border-left:0;
+        border-top:0;
+      }
+    }
+  }
+  .ui-datepicker-calendar {
+    margin:0;
+    thead th span {
+      font: 14px firasans_sb;
+      color: #5D675B;
+    }
+    tbody td {
+      .ui-state-default {
+        font: 14px firasans_r;
+        color: #5D675B;
+        background:none;
+        background-color:#fff;
+        border-color:#e0e0e0;
+        border-top: 0;
+        border-left: 0;
+        padding-right: 6px;
+        &:hover {
+          border-color:#F78E69;
+        }
+      }
+      .ui-state-highlight {
+        border-color:#F78E69;
+        color:#F78E69;
+      }
+      .ui-state-active {
+        border-color:#F78E69;
+      }
+      &.ui-datepicker-week-end {}
+    }
+  }
 }

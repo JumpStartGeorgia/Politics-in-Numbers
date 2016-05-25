@@ -79,13 +79,15 @@ gem 'puma', '~> 2.11.1'
 gem 'exception_notification', '~> 4.1', '>= 4.1.1'
 
 # Select2 is a jQuery based replacement for select boxes.
-gem 'select2-rails', '~> 4.0', '>= 4.0.1.1'
+# gem 'select2-rails', '~> 4.0', '>= 4.0.1.1'
 
 # Work with xlsx files
 gem "rubyXL"
 
 # jQuery DataTables plugin - provides all the basic DataTables files, and a few of the extras.
 gem 'jquery-datatables-rails', '~> 3.3.0'
+
+gem 'gon'
 
 group :development do
   # Silences assets-related logging

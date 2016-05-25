@@ -1,4 +1,5 @@
 #explore {
+  position:relative;
   .filter-type {
     background-color:#F5F7F5;
     width:100%;
@@ -30,13 +31,12 @@
         border:3px solid #DDCD37;
         height:56px;
         min-width:111px;
-        outline:none;
         transition-duration: 0.3s;
         transition-property: color, background-color;
         position: relative;
         top: -1px;
         left: -1px;
-        &.active, &:hover {
+        &.active, &:hover{
           background-color: #DDCD37;
           color:#3E443D;
           cursor:pointer;
@@ -64,7 +64,6 @@
         border:3px solid #F78E69;
         height:56px;
         min-width:111px;
-        outline:none;
         transition-duration: 0.3s;
         transition-property: color, background-color;
         vertical-align:top;
@@ -92,19 +91,19 @@
           display:inline-block;
           vertical-align:top;
           padding:9px 0 10px;
-          a {
+          .finance-category-toggle {
             display:inline-block;
-            font:12px firasans_sb;
-            color:#5D675B;
-            text-decoration:none;
+
             opacity:.6;
             height:37px;
             min-width:90px;
 
             border:1px solid #9aa199;
             position:relative;
-            &[data-state='']:hover span.label:before,
-            &[data-state='simple']:hover span.label:before {
+            &[data-state='']:hover a.label:before,
+            &[data-state='']:focus a.label:before,
+            &[data-state='simple']:hover a.label:before,
+            &[data-state='simple']:focus a.label:before {
               content:"";
               display:inline-block;
               background:rgba(136,216,119,.8) url(/assets/explore/add.svg) no-repeat center;
@@ -115,14 +114,26 @@
               bottom:0px;
               left:0px;
             }
-            span.label {
+            a.label {
+              font:12px firasans_sb;
+              color:#5D675B;
+              text-decoration:none;
               display: inline-block;
               padding:11px 9px 0;
+              width: 100%;
+              height: 100%;
+              vertical-align: middle;
+              span { display:none; }
             }
-            span.label.long {
+            a.label span {
+              font:12px firasans_r;
+              color:#fff;
+              padding:4px 0 0;
+            }
+            a.label.long {
               padding:4px 9px 0;
             }
-            span.sub {
+            a.sub {
               display:none;
               font:12px firasans_book;
               color:#5D675B;
@@ -130,8 +141,8 @@
 
             &[data-state='preselect'] {
               border:1px dashed #9aa199;
-              span.label { padding:0; }
-              span.sub {
+              a.label { padding:0; }
+              a.sub {
                 padding:2px 9px 0;
                 display:block;
                 height:50%;
@@ -148,43 +159,39 @@
                   left:0px;
                 }
               }
-              span.sub[data-sub='all'] {
+              a.sub[data-sub='all'] {
                 border-bottom:1px dashed #9aa199;
               }
-              span.label {
+              a.label {
                 display:none;
               }
             }
             &[data-state='all'] {
               background-color:#5D675B;
-              color:#fff;
-              span.label { padding:0 9px; }
-              span.sub[data-sub='all'] {
-                padding:5px 9px 0;
-                display:block;
-                font:12px firasans_r;
+              a.label {
                 color:#fff;
+                padding:0 9px;
+                span.f { display:block; }
               }
             }
             &[data-state='campaign'] {
               background-color:#5D675B;
-              color:#fff;
-              span.label { padding:0 9px; }
-              span.sub[data-sub='campaign'] {
-                padding:4px 9px 0;
-                display:block;
-                font:12px firasans_r;
+              a.label {
                 color:#fff;
+                padding:0 9px;
+                span.s { display:block; }
               }
             }
             &[data-state='simpled'] {
               background-color:#5D675B;
-              color:#fff;
+              a.label {
+                color:#fff;
+              }
             }
             &[data-state='all']:hover,
             &[data-state='campaign']:hover,
             &[data-state='simpled']:hover {
-              span.label:before {
+              a.label:before {
                 content:"";
                 display:inline-block;
                 background:rgba(247,142,105,.8) url(/assets/explore/remove.svg) no-repeat center;
@@ -249,41 +256,12 @@
   }
   .filter-extended {
     position:relative;
-    .filter-prompt {
-      display:block;
-      padding:15px 24px 12px 16px;
+    .filter-toggle {
+      font:14px firasans_r;
+      color:#88D877;
+      padding:15px 24px 12px 24px;
       border-bottom:1px solid #D7DDD4;
-      .filter-icon {
-        vertical-align: middle;
-        width:20px;
-        height:15px;
-      }
-      .filter-close {
-        float: right;
-        vertical-align: middle;
-        width:20px;
-        height:20px;
-        position: relative;
-        top: -3px;
-        cursor:pointer;
-      }
-      span, > span.label {
-        font:14px firasans_r;
-        color:#88D877;
-        padding:0 12px;
-      }
-    }
-    .donation {
-      display:none;
-      &.active {
-        display:initial;
-      }
-    }
-    .finance {
-      display:none;
-      &.active {
-        display:initial;
-      }
+      cursor:pointer;
     }
     .filter-inputs {
       background-color:#F5F7F5;
@@ -293,6 +271,22 @@
       width:60%;
       min-width:200px;
       padding:0px 14px;
+      overflow-y:auto;
+      &::-webkit-scrollbar-track {
+        background-color: #F5F7F5;
+      }
+      &::-webkit-scrollbar {
+        height: 8px;
+        width:8px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color:#848484;
+        border: 2px solid #F5F7F5;
+      }
+      &::-webkit-scrollbar-thumb:hover {
+        background-color: #848484;
+        cursor: pointer;
+      }
       .row {
         padding:15px 2px;
       }
@@ -302,31 +296,64 @@
       .row:last-of-type {
         text-align:center;
       }
-      .filter_intro {
-        font:12px firasans_l;
-        color:#7F897D;
+      .filter-header {
+        display:block;
+        padding:15px 0 12px;
+        border-bottom:1px solid #D7DDD4;
+        label {
+          display:inline-block;
+          font:14px firasans_r;
+          color:#88D877;
+          padding:0 10px;
+        }
+        .icon-close {
+          float: right;
+          vertical-align: middle;
+          background:transparent url(/assets/explore/close.svg) no-repeat center;
+          width:20px;
+          height:20px;
+          position: relative;
+          top: -3px;
+          cursor:pointer;
+        }
+      }
+      &.donation {
+        display:none;
+      }
+      &.finance {
+        display:none;
+        .filter_intro {
+          font:12px firasans_l;
+          color:#7F897D;
+        }
       }
       .filter-input {
-        label {
+        .toggle {
           font:14px firasans_l;
           color:#5D675B;
-          padding-bottom:12px;
+          margin-bottom: 12px;
+          padding-right: 16px;
+          display: inline-block;
+          width: 100%;
+          position:relative;
         }
         .sublabel {
           font:12px firasans_r;
           color:#5D675B;
           margin:15px 0 8px;
         }
-        .toggle {
+        .toggle span {
           background:transparent url(/assets/explore/expand.svg) no-repeat center;
           float:right;
           width:16px;
           height:16px;
           cursor:pointer;
-
+          position:absolute;
+          top:0px;
+          right:0px;
         }
         &.expanded {
-          .toggle {
+          .toggle span{
             background:transparent url(/assets/explore/collapse.svg) no-repeat center;
           }
           .input-group {
@@ -339,6 +366,16 @@
             font:14px firasans_book;
             color:#F78E69;
             padding:4px 0px;
+            position:relative;
+            i {
+              display: inline-block;
+              width: 10px;
+              height: 10px;
+              background: transparent url(/assets/explore/close_s.svg) no-repeat right top;
+              cursor:pointer;
+              position:absolute;
+              top:3px;
+            }
             .item-close {
               padding:4px 0 0 5px;
               vertical-align: top;
@@ -348,38 +385,161 @@
         }
         .input-group {
           display:none;
-        }
-        input {
-          font:12px firasans_r;
-          color:#5D675B;
-          background-color:#F5F7F5;
-          padding:6px 10px;
-          width:100%;
-          border:1px solid #F78E69;
-          outline:none;
-          &:focus, &:hover {
-            background-color:#fff;
-          }
-          &.datepicker, &[type='checkbox'] {
-            width:auto;
-          }
-          &[type='checkbox'] {
+          input {
+            font:12px firasans_r;
+            color:#5D675B;
+            background-color:#F5F7F5;
+            padding:6px 10px;
+            width:100%;
             border:1px solid #F78E69;
-            border-radius:0;
+            outline:none;
+            &:focus, &:hover {
+              background-color:#fff;
+            }
+            &.datepicker {
+              max-width:70px;
+            }
+            &[type='checkbox'] {
+              width:auto;
+            }
+            &[type='checkbox'] {
+              border:1px solid #F78E69;
+              border-radius:0;
+            }
           }
         }
         .reset {
+          display:block;
           font:14px firasans_b;
           color:#5D675B;
           background-color:#fff;
           border:1px solid #C5CEC2;
           padding:8px 18px;
+          margin: 0px auto;
+        }
+        .compare {
+          display:block;
+          font:14px firasans_b;
+          color:#fff;
+          background-color:#F78E69;
+          padding:8px 18px;
+          border:0;
+          margin:12px auto 0;
+          .icon-compare {
+            background:transparent url(/assets/explore/compare.svg) no-repeat center;
+            width:20px;
+            height:20px;
+          }
+        }
+      }
+    }
+    &.active[data-type='donation'] {
+      .donation { display:initial; }
+      .finance { display:none; }
+    }
+    &.active[data-type='finance'] {
+      .donation { display:none; }
+      .finance { display:initial; }
+    }
+    .icon-filter {
+      display: inline-block;
+      background:transparent url(/assets/explore/filter.svg) no-repeat center;
+      vertical-align: middle;
+      width:20px;
+      height:15px;
+      margin-right:12px;
+    }
+    .select2-selection {
+      font:12px firasans_r;
+      color:#5D675B;
+      background-color:#F5F7F5;
+      padding:0;
+      width:100%;
+      border:1px solid #F78E69;
+      border-radius:0;
+      > ul {
+        padding:0;
+      }
+      .select2-search {
+        width:100%;
+        .select2-search__field {
+          border:0 !important;
+          width:100% !important;
+          margin:0 !important;
+        }
+        &:hover {
+
+        }
+      }
+
+    }
+    .select2-container--focus {
+      .select2-selection {
+        background-color:#fff;
+      }
+    }
+    .autocomplete {
+      position:relative;
+      input {
+        height:32px;
+        &:hover, &:focus {
+          background-color:#fff;
+        }
+      }
+      .dropdown {
+        display:none;
+        position:absolute;
+        z-index:66;
+        top:100%;
+        bottom:-500%;
+        background-color:#fff;
+        border: 1px solid #F78E69;
+        border-top:0;
+        max-height:700%;
+        overflow-y:auto;
+        width:100%;
+        li {
+          font:14px firasans_book;
+          color:#F78E69;
+          padding:8px 10px;
+          cursor:pointer;
+          // outline:none;
+          &:hover {
+            background-color: #F5F7F5;
+          }
+        }
+        &::-webkit-scrollbar-track {
+          background-color: #F5F7F5;
+        }
+        &::-webkit-scrollbar {
+          height: 8px;
+          width:8px;
+        }
+        &::-webkit-scrollbar-thumb {
+          background-color:#848484;
+          border: 2px solid #F5F7F5;
+        }
+        &::-webkit-scrollbar-thumb:hover {
+          background-color: #848484;
+          cursor: pointer;
+        }
+      }
+      &.active {
+        input {
+          background-color:#fff !important;
+        }
+        .dropdown {
+          display:initial;
+          .selected, .focus {
+            background-color: #F5F7F5;
+          }
         }
       }
     }
   }
   .content {
     position:relative;
+    padding:10px;
     .overlay {
       background-color:#5D675B;
       opacity:.7;
@@ -396,6 +556,9 @@
 
   }
   @media (min-width: 992px) {
+    .filter-type {
+      padding:28px 0;
+    }
     .filter-type, .filter-type.in-depth[data-type='finance'] {
       padding-left:269px;
       .donation {
@@ -420,13 +583,49 @@
             position: initial;
           }
         }
-
       }
-      .sep {
-        display:table-cell;
+      .sep { display:table-cell; }
+      .back { display:none !important; }
+    }
+    .filter-extended {
+      top:-22px;
+      left:32px;
+      width:190px;
+      min-width:190px;
+      .filter-header { display:none; }
+      .filter-inputs {
+        min-width:190px;
+        .filter-header {
+          display:block;
+          padding:0 0 6px !important;
+          border-bottom:0 !important;
+          text-align:center;
+          label {
+            font:14px firasans_r;
+            color:#fff;
+            background-color:#88D877;
+            padding:12px 20px;
+            display: inline-block;
+            .icon-filter {
+              background:transparent url(/assets/explore/filter_w.svg) no-repeat center;
+            }
+          }
+          .filter-close { display:none; }
+        }
       }
-      .back {
-        display:none !important;
+      &[data-type='donation'] {
+        .donation { display:initial; }
+        .finance { display:none; }
+      }
+      &[data-type='finance'] {
+        .donation { display:none; }
+        .finance { display:initial; }
+      }
+    }
+    .content {
+      margin-left:222px;
+      .overlay {
+        display:none;
       }
     }
   }

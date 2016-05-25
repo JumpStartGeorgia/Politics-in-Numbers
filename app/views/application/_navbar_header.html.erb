@@ -6,13 +6,13 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <%= link_to  root_path, class: 'navbar-brand' do %>
+      <%= link_to  root_path, class: 'navbar-brand', tabindex: 1 do %>
         <img alt="<%= t('shared.common.name') %>" title="<%= t('shared.common.name') %>" src="/assets/logo_<%= I18n.locale %>.svg">
       <% end %>
       <div class="navbar-collapse collapse navbar-menu-collapse">
         <ul class="nav navbar-nav">
           <!-- <li><%#= link_to t('.parties').upcase, parties_path  %></li> -->
-          <li><%= link_to t('.explore').upcase, explore_path  %></li><li><%= link_to t('.about').upcase, about_path  %></li><li><%= link_to t('.media').upcase, media_path  %></li><li><%= link_to t('.download').upcase, download_path  %></li>
+          <li><%= link_to t('.explore').upcase, explore_path, { tabindex: 2 }.merge(current_page?(explore_path) ? { :class => "active" } : {}) %></li><li><%= link_to t('.about').upcase, about_path, { tabindex: 2 }.merge(current_page?(about_path) ? { :class => "active" } : {}) %></li><li><%= link_to t('.media').upcase, media_path, { tabindex: 2 }.merge(current_page?(media_path) ? { :class => "active" } : {}) %></li><li><%= link_to t('.download').upcase, download_path, { tabindex: 2 }.merge(current_page?(download_path) ? { :class => "active" } : {}) %></li>
           <!-- <li><%#= link_to t('.api').upcase, api_path  %></li> -->
           <% if user_signed_in? %>
             <li class="dropdown">
@@ -26,7 +26,7 @@
               <ul class="dropdown-menu" role="menu">
                 <% if current_user.deffereds.present? %>
                   <li>
-                    <%= link_to admin_path do %>
+                    <%= link_to admin_path, tabindex: 2  do %>
                       <%= t('mongoid.models.deffered', count: current_user.deffereds.length).upcase %>
                       <span class="badge"><%= current_user.deffereds.length %></span>
                     <% end %>
@@ -34,11 +34,11 @@
                 <% end %>
                 <li>
                   <%= link_to t('mongoid.models.user', count: 999).upcase,
-                              admin_users_path %>
+                              admin_users_path, tabindex: 2  %>
                 </li>
                 <li>
                   <%= link_to t('mongoid.models.admin', count: 1).upcase,
-                              admin_path %>
+                              admin_path, tabindex: 2  %>
                 </li>
 
                 <li class='divider'>
@@ -46,12 +46,12 @@
                 </li>
                 <li>
                   <%= link_to t('.account.edit_profile').upcase,
-                              edit_user_registration_path %>
+                              edit_user_registration_path, tabindex: 2  %>
                 </li>
                 <li>
                   <%= link_to t('.account.logout').upcase,
                               destroy_user_session_path,
-                              method: :delete %>
+                              method: :delete, tabindex: 2  %>
                 </li>
               </ul>
             </li>
@@ -68,7 +68,7 @@
           <% ln = I18n.available_locales.length %>
           <% I18n.available_locales.each_with_index do |locale, locale_ind| %>
             <li class='<%= "active" if I18n.locale == locale %>'>
-              <%= link_to url_for(locale: locale) do %>
+              <%= link_to url_for(locale: locale), tabindex: 3  do %>
                 <span class="short"><%= I18n.locale != locale ? t("shared.locale.short.#{locale}") : t("shared.locale.long.#{locale}") %></span>
                 <span class="long"><%= t("shared.locale.long.#{locale}") %></span>
               <% end %>

@@ -41,6 +41,7 @@ Rails.application.routes.draw do
     get '/download' => 'root#download'
     get '/api' => 'root#api'
     get '/parties' => 'root#parties'
+    get 'select/donors' => 'root#select_donors'
     # get '/read' => 'root#read'
     # get '/read_details' => 'root#read_details'
     # get '/read_donors' => 'root#read_donors'
