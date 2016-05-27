@@ -52,7 +52,7 @@
         <a href="#" class="toggle" tabindex="5"><%= t('.id_name') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <ul class="list" data-autocomplete-view="donation-donor"></ul>
         <div class="input-group">
-          <div class="autocomplete" data-autocomplete-id="donation-donor">
+          <div class="autocomplete" data-autocomplete-id="donation-donor" data-url="select/donors">
             <input type="text" placeholder="Type Person Id or Name" tabindex="5">
             <ul class="dropdown" id="filter_donation_by_donors" tabindex="5">
               <% Donorset.first.donors.limit(10).each{|m| %>
@@ -66,18 +66,13 @@
         <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <div class="list"></div>
         <div class="input-group">
-          <input type="text" placeholder="<%= t('.from') %>" class="datepicker">
-          <input type="text" placeholder="<%= t('.to') %>" class="datepicker">
+          <input id="donation_period_from" type="text" placeholder="<%= t('.from') %>" class="datepicker">
+          <input id="donation_period_to" type="text" placeholder="<%= t('.to') %>" class="datepicker">
           <div class="sublabel"><%= t('.campaign') %>:</div>
-          <ul class="campaign-list">
-            <li>
-              <input type="checkbox" id="campaign_period_1" name="campaign_period">
-              <label for="campaign_period_1"><span></span>2012</label>
-            </li>
-             <li>
-                <input type="checkbox" id="campaign_period_2" name="campaign_period_2">
-                <label for="campaign_period_2"><span></span>2013</label>
-            </li>
+          <ul id="donation_period_campaigns">
+            <% Period.campaigns.each {|r| %>
+              <li><a href="#" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date} - #{l r.end_date}"%></a></li>
+            <% } %>
           </ul>
         </div>
       </div>
@@ -85,24 +80,22 @@
         <a href="#" class="toggle" tabindex="5"><%= t('.amount') %><span title="<%= t('.filter_toggle') %>"></span></a>
         <div class="list"></div>
         <div class="input-group">
-          <input type="text" placeholder="<%= t('.from') %>" class="datepicker">
-          <input type="text" placeholder="<%= t('.to') %>" class="datepicker">
+          <input type="number" placeholder="<%= t('.from') %>" class="datepicker">
+          <input type="number" placeholder="<%= t('.to') %>" class="datepicker">
         </div>
       </div>
       <div class="row filter-input">
         <a href="#" class="toggle" tabindex="5"><%= t('.party') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <ul class="list">
-          <li>
-            UNM
-            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
-          </li>
-           <li>
-            Georgian Dream
-            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
-          </li>
-        </ul>
+        <ul class="list" data-autocomplete-view="donation-party"></ul>
         <div class="input-group">
-          <input type="text">
+          <div class="autocomplete" data-autocomplete-id="donation-party" data-local="parties">
+            <input type="text" placeholder="Type Party Name" tabindex="5">
+            <ul class="dropdown" id="filter_donation_by_parties" tabindex="5">
+              <% Party.each{|m| %>
+                <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.title}" %></li>
+              <% } %>
+            </ul>
+          </div>
         </div>
       </div>
       <div class="row filter-input">
@@ -127,6 +120,7 @@
       </div>
       <div class="row filter-input">
         <button id="reset" class="reset"><%= t('.reset') %></button>
+        <button id="explore_donation" class="explore-button"><span class='icon-explore'></span><%= t('.explore') %></button>
       </div>
     </div>
     <div class="finance filter-inputs" data-type="finance">
@@ -179,7 +173,7 @@
       </div>
       <div class="row filter-input">
         <button id="reset" class="reset"><%= t('.reset') %></button>
-        <button id="compare" class="compare"><span class='icon-compare'></span><%= t('.compare') %></button>
+        <button id="explore_finance" class="explore-button"><span class='icon-explore'></span><%= t('.explore') %></button>
       </div>
     </div>
 

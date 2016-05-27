@@ -10,8 +10,13 @@ $(document).ready(function (){
     filter_extended = $("#filter_extended"),
     finance_category = $("#finance_category"),
     overlay = $(".overlay"),
-    autocompletes = {};
-
+    autocompletes = {},
+    donation = {
+      period_from: $("#donation_period_from"),
+      period_to: $("#donation_period_to")
+    };
+  // gon.donation_period_min = new Date(gon.donation_period_min);
+  // gon.donation_period_max = new Date(gon.donation_period_max);
   finance_toggle.click(function (event){
     is_type_donation = false;
     var p = finance_toggle.parent().parent();
@@ -119,7 +124,7 @@ $(document).ready(function (){
   }
 
   var autocomplete_change = debounce(function(event) {
-    console.log(event);
+    //console.log(event);
 
     var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul"), autocomplete_id = p.attr("data-autocomplete-id");
     if(event.type === "keyup" && event.keyCode === 40) {
@@ -141,20 +146,33 @@ $(document).ready(function (){
     else {
       if(v.length >= 3 && t.data("previous") !== v) {
         t.data("previous", v);
-        console.log("ajax");
-        $.ajax({
-          url: "select/donors",
-          dataType: 'json',
-          data: { q: v },
-          success: function(data) {
-            var html = "";
-            data.forEach(function(d) {
-              html += "<li data-id='" + d[1] + "'" + (autocompletes.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
-            });
-            p.find("ul").html(html).addClass("active");
-            console.log("ajax success");
-          }
-        });
+        if(p.is("[data-local]")) {
+          ul.find("li").hide();
+          var regex = new RegExp(".*" + v + ".*", "i");
+          gon[p.attr("data-local")].forEach(function(d) {
+            if(d[1].match(regex) !== null) {
+              ul.find("li[data-id='" + d[0] + "']").show();
+            }
+
+          });
+          console.log("local");
+        }
+        else {
+          console.log("ajax");
+          $.ajax({
+            url: p.attr("data-url"),
+            dataType: 'json',
+            data: { q: v },
+            success: function(data) {
+              var html = "";
+              data.forEach(function(d) {
+                html += "<li data-id='" + d[1] + "'" + (autocompletes.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
+              });
+              p.find("ul").html(html).addClass("active");
+              console.log("ajax success");
+            }
+          });
+        }
       }
       else {
         ul.addClass("active");
@@ -223,8 +241,34 @@ $(document).ready(function (){
     event.stopPropagation();
   });
 
-  filter_extended.find(".datepicker").datepicker();
+   donation.period_from.datepicker({
+      firstDay: 1,
+      changeMonth: true,
+      changeYear: true,
+      // minDate: gon.donation_period_min,
+      // maxDate: gon.donation_period_max,
+      onClose: function( selectedDate ) {
+        donation.period_to.datepicker( "option", "minDate", selectedDate );
+      }
+    });
+    donation.period_to.datepicker({
+      firstDay: 1,
+      changeMonth: true,
+      changeYear: true,
+      // minDate: gon.donation_period_min,
+      // maxDate: gon.donation_period_max,
+      onClose: function( selectedDate ) {
+        donation.period_from.datepicker( "option", "maxDate", selectedDate );
+      }
+    });
 
+    $("#donation_period_campaigns a").click(function(){
+      var t = $(this), v = t.attr("data-value").split(";");
+       console.log(v);
+      donation.period_from.datepicker('setDate', new Date(v[0]));
+      donation.period_to.datepicker('setDate', new Date(v[1]));
+       console.log("radio");
+    });
   // dev block
     filter_extended.find(".filter-toggle").trigger("click");
     filter_extended.find(".filter-input:nth-of-type(3) .toggle").trigger("click");

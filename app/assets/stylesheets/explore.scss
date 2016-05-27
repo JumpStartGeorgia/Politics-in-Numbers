@@ -331,7 +331,6 @@
         .toggle {
           font:14px firasans_l;
           color:#5D675B;
-          margin-bottom: 12px;
           padding-right: 16px;
           display: inline-block;
           width: 100%;
@@ -357,16 +356,17 @@
             background:transparent url(/assets/explore/collapse.svg) no-repeat center;
           }
           .input-group {
-            display:initial;
+            display: inline-block;
           }
         }
         .list {
-          margin-bottom:8px;
+
           li {
             font:14px firasans_book;
             color:#F78E69;
             padding:4px 0px;
             position:relative;
+            &:first-of-type { margin:12px 0 0; }
             i {
               display: inline-block;
               width: 10px;
@@ -385,6 +385,8 @@
         }
         .input-group {
           display:none;
+          margin:8px 0 0;
+          width: 100%;
           input {
             font:12px firasans_r;
             color:#5D675B;
@@ -397,7 +399,7 @@
               background-color:#fff;
             }
             &.datepicker {
-              max-width:70px;
+              max-width:100px;
             }
             &[type='checkbox'] {
               width:auto;
@@ -405,6 +407,16 @@
             &[type='checkbox'] {
               border:1px solid #F78E69;
               border-radius:0;
+            }
+          }
+          ul {
+            margin-bottom:8px;
+            li {
+              padding:2px 0px;
+              a {
+                font:14px firasans_book;
+                color:#F78E69;
+              }
             }
           }
         }
@@ -417,7 +429,7 @@
           padding:8px 18px;
           margin: 0px auto;
         }
-        .compare {
+        .explore-button {
           display:block;
           font:14px firasans_b;
           color:#fff;
@@ -425,12 +437,16 @@
           padding:8px 18px;
           border:0;
           margin:12px auto 0;
-          .icon-compare {
+          .icon-explore {
+            display:inline-block;
             background:transparent url(/assets/explore/compare.svg) no-repeat center;
             width:20px;
             height:20px;
+            vertical-align: middle;
+            margin-right: 10px;
           }
         }
+
       }
     }
     &.active[data-type='donation'] {
@@ -448,35 +464,6 @@
       width:20px;
       height:15px;
       margin-right:12px;
-    }
-    .select2-selection {
-      font:12px firasans_r;
-      color:#5D675B;
-      background-color:#F5F7F5;
-      padding:0;
-      width:100%;
-      border:1px solid #F78E69;
-      border-radius:0;
-      > ul {
-        padding:0;
-      }
-      .select2-search {
-        width:100%;
-        .select2-search__field {
-          border:0 !important;
-          width:100% !important;
-          margin:0 !important;
-        }
-        &:hover {
-
-        }
-      }
-
-    }
-    .select2-container--focus {
-      .select2-selection {
-        background-color:#fff;
-      }
     }
     .autocomplete {
       position:relative;
@@ -501,7 +488,7 @@
         li {
           font:14px firasans_book;
           color:#F78E69;
-          padding:8px 10px;
+          padding:8px 10px !important;
           cursor:pointer;
           // outline:none;
           &:hover {

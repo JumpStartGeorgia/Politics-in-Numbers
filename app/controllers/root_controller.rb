@@ -8,6 +8,10 @@ class RootController < ApplicationController
 
   def explore
     gon.filter_item_close = t('.filter_item_close');
+    gon.parties = Party.each_with_index.map{|m,i| [m.id.to_s, m.title] }
+    # dates_range = Donorset.dates_range
+    # gon.donation_period_min = dates_range[0]
+    # gon.donation_period_max = dates_range[1]
     # interesting donor first
   end
 
@@ -32,7 +36,7 @@ class RootController < ApplicationController
   # end
   def select_donors
     q = params[:q].split
-    @donors = []
+    donors = []
     if q.length == 1
       regex1 =  /^#{Regexp.escape(q[0])}/i
       regex2 = /.*/i
@@ -42,11 +46,25 @@ class RootController < ApplicationController
     end
     Donorset.all.each{ |set|
       set.donors.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
-        @donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
+        donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
       }
     }
-    render :json => @donors
+    render :json => donors
   end
+
+  # def select_parties
+  #   q = params[:q]
+  #   parties = []
+  #   regex1 =  /^#{Regexp.escape(q[0])}/i
+  #   # Party.all.each{ |set|
+  #   #   set.donors.any_of({ title: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
+  #   #     parties << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
+  #   #   }
+  #   # }
+  #   render :json => parties
+  # end
+
+
   def read
     I18n.locale = :en
     Dataset.destroy_all

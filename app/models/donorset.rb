@@ -58,4 +58,20 @@ class Donorset
   def is_state(st)
     self.state == STATES.index(st)
   end
+
+  def self.dates_range
+    min = nil
+    max = nil
+    Donorset.all.each {|r|
+      tmp_min = r.donors.min(:give_date)
+      tmp_max = r.donors.max(:give_date)
+      if min.nil? || tmp_min < min
+        min = tmp_min
+      end
+      if max.nil? || tmp_max > max
+        max = tmp_max
+      end
+    }
+    [min, max]
+  end
 end

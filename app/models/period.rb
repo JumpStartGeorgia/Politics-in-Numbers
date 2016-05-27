@@ -17,6 +17,8 @@ class Period
   validates_inclusion_of :type, in: [0, 1]
 
   #default_scope ->{ order_by([[:type, :desc], [:title, :asc]]) }
+  #
+  scope :campaigns, ->{ where(type: type_is(:election)) }
 
   index({ type: 1, start_date: 1, end_date: 1 }, unique: true)
   # rake db:mongoid:create_indexes

@@ -79,7 +79,7 @@ gem 'puma', '~> 2.11.1'
 gem 'exception_notification', '~> 4.1', '>= 4.1.1'
 
 # Select2 is a jQuery based replacement for select boxes.
-# gem 'select2-rails', '~> 4.0', '>= 4.0.1.1'
+gem 'select2-rails', '~> 4.0', '>= 4.0.1.1'
 
 # Work with xlsx files
 gem "rubyXL"

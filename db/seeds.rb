@@ -233,7 +233,9 @@ periods_data = [
   { type: Period.type_is(:annual), start_date: '01.01.2012', end_date: '31.01.2012', title_translations: { ka: "2012" }, description_translations: { ka: "2012 description" }},
   { type: Period.type_is(:annual), start_date: '01.01.2013', end_date: '31.01.2013', title_translations: { ka: "2013" }, description_translations: { ka: "2013 description" }},
   { type: Period.type_is(:annual), start_date: '01.01.2014', end_date: '31.01.2014', title_translations: { ka: "2014" }, description_translations: { ka: "2014 description" }},
-  { type: Period.type_is(:annual), start_date: '01.01.2015', end_date: '31.01.2015', title_translations: { ka: "2015" }, description_translations: { ka: "2015 description" }}
+  { type: Period.type_is(:annual), start_date: '01.01.2015', end_date: '31.01.2015', title_translations: { ka: "2015" }, description_translations: { ka: "2015 description" }},
+  { type: Period.type_is(:election), start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "election 2015" }, description_translations: { ka: "election 2015" }},
+  { type: Period.type_is(:election), start_date: '01.01.2016', end_date: '31.03.2016', title_translations: { ka: "election 2016" }, description_translations: { ka: "election 2016" }}
   #{ type: 'election', start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "2015 election" }, description_translations: { ka: "2015 election description" }}
 ]
 

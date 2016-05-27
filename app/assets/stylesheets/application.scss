@@ -476,19 +476,32 @@ input[type="radio"] + label{
     background-color:#fff !important;
     padding:4px 0;
     .ui-datepicker-title {
-      font: 14px firasans_sb;
-      color: #5D675B;
+
       margin: 0;
       padding: 8px 0;
+      padding:0;
+      select {
+        font: 14px firasans_r;
+        color: #5D675B;
+        border:0;
+        background:0;
+        max-width:56px;
+        cursor:pointer;
+      }
+      .ui-datepicker-month {
+        margin-right:10px;
+      }
+      .ui-datepicker-year {
+      }
     }
-    .ui-datepicker-next {
+    .ui-datepicker-next,
+    .ui-datepicker-prev {
       top:5px;
       right: 4px;
       border:1px solid transparent;
-      border-right:0;
       border-top:0;
+      cursor:pointer;
       span {
-        background:transparent url(/assets/arrow_right.svg) no-repeat center;
         width:9px;
         height:15px;
         padding:5px;
@@ -502,39 +515,32 @@ input[type="radio"] + label{
         background: none;
         background-color: #fff;
         border:1px solid #e0e0e0;
-        border-right:0;
         border-top:0;
       }
     }
+    .ui-datepicker-next {
+      border-right:0;
+      span {
+        background:transparent url(/assets/arrow_right.svg) no-repeat center;
+      }
+     &.ui-state-hover {
+        border-right:0;
+     }
+    }
     .ui-datepicker-prev {
-      top:5px;
-      left: 4px;
-      border:1px solid transparent;
       border-left:0;
-      border-top:0;
       span {
         background:transparent url(/assets/arrow_left.svg) no-repeat center;
-        width:9px;
-        height:15px;
-        padding:5px;
-        margin-top: -8px;
-        margin-left:-4px;
-        top:14px;
       }
       &.ui-state-hover {
-        border-radius: 0;
-        background: none;
-        background-color: #fff;
-        border:1px solid #e0e0e0;
         border-left:0;
-        border-top:0;
       }
     }
   }
   .ui-datepicker-calendar {
     margin:0;
     thead th span {
-      font: 14px firasans_sb;
+      font: 14px firasans_r;
       color: #5D675B;
     }
     tbody td {
@@ -547,9 +553,7 @@ input[type="radio"] + label{
         border-top: 0;
         border-left: 0;
         padding-right: 6px;
-        &:hover {
-          border-color:#F78E69;
-        }
+        &:hover { border-color:#F78E69; }
       }
       .ui-state-highlight {
         border-color:#F78E69;
@@ -558,7 +562,17 @@ input[type="radio"] + label{
       .ui-state-active {
         border-color:#F78E69;
       }
-      &.ui-datepicker-week-end {}
+      &.ui-datepicker-week-end {
+        .ui-state-default {
+          color:#A1A5A0;
+        }
+      }
+      &.ui-datepicker-unselectable {
+        .ui-state-default:hover {
+          border-color:#e0e0e0;
+        }
+      }
+
     }
   }
 }
