@@ -16,7 +16,7 @@
 /.env
 /public/assets
 /public/system
-/public/upload
+/public/tmp
 # Temporary files often end with ~ character
 *~
 /sources/*
