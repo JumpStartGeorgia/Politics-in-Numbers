@@ -42,141 +42,129 @@
     </div>
   </div>
   <div id="filter_extended" class="filter-extended" data-type="donation">
-    <div class="filter-toggle"><span class="icon-filter" title="<%= t('.filters') %>"></span><%= t('.filters') %></div>
-    <div class="donation filter-inputs" data-type="donation">
-      <div class="row filter-header">
-        <label><span class="icon-filter" title="<%= t('.filters') %>"></span><%= t('.filters') %></label>
-        <span class="icon-close filter-close" title="<%= t('.filter_close') %>"></span>
+    <div class="filter-toggle"><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></div>
+    <div class="pane">
+      <div class="filter-header">
+        <label><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></label>
+        <i class="close" title="<%= t('.filter_close') %>"></i>
       </div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.id_name') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <ul class="list" data-autocomplete-view="donation-donor"></ul>
-        <div class="input-group">
-          <div class="autocomplete" data-autocomplete-id="donation-donor" data-url="select/donors">
-            <input type="text" placeholder="Type Person Id or Name" tabindex="5">
-            <ul class="dropdown" id="filter_donation_by_donors" tabindex="5">
-              <% Donorset.first.donors.limit(10).each{|m| %>
-                <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.first_name} #{m.last_name}" %></li>
+      <div class="donation filter-inputs" data-type="donation">
+        <div class="row filter-input" data-field="donor" data-type="autocomplete">
+          <a href="#" class="toggle" tabindex="5"><%= t('.id_name') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <ul id="donation_donor" class="list" data-autocomplete-view="donation-donor" data-type="autocomplete"></ul>
+          <div class="input-group">
+            <div class="autocomplete" data-autocomplete-id="donation-donor" data-url="select/donors">
+              <input type="text" placeholder="Type Person Id or Name" tabindex="5">
+              <ul class="dropdown" id="filter_donation_by_donors" tabindex="5">
+                <% Donorset.first.donors.limit(10).each{|m| %>
+                  <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.first_name} #{m.last_name}" %></li>
+                <% } %>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="row filter-input" data-field="period" data-type="period">
+          <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <div class="list"></div>
+          <div class="input-group">
+            <input id="donation_period_from" type="text" placeholder="<%= t('.from') %>" class="datepicker" data-type="period">
+            <input id="donation_period_to" type="text" placeholder="<%= t('.to') %>" class="datepicker" data-type="period">
+            <div class="sublabel"><%= t('.campaign') %>:</div>
+            <ul id="donation_period_campaigns">
+              <% Period.campaigns.each {|r| %>
+                <li><a href="#" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date} - #{l r.end_date}"%></a></li>
               <% } %>
             </ul>
           </div>
         </div>
-      </div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <div class="list"></div>
-        <div class="input-group">
-          <input id="donation_period_from" type="text" placeholder="<%= t('.from') %>" class="datepicker">
-          <input id="donation_period_to" type="text" placeholder="<%= t('.to') %>" class="datepicker">
-          <div class="sublabel"><%= t('.campaign') %>:</div>
-          <ul id="donation_period_campaigns">
-            <% Period.campaigns.each {|r| %>
-              <li><a href="#" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date} - #{l r.end_date}"%></a></li>
-            <% } %>
-          </ul>
+        <div class="row filter-input" data-field="amount" data-type="range">
+          <a href="#" class="toggle" tabindex="5"><%= t('.amount') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <div class="list hidden"></div>
+          <div class="input-group">
+            <input id="donation_amount_from" type="number" placeholder="<%= t('.from') %>" class="datepicker" data-type="range">
+            <input id="donation_amount_to" type="number" placeholder="<%= t('.to') %>" class="datepicker" data-type="range">
+          </div>
         </div>
-      </div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.amount') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <div class="list"></div>
-        <div class="input-group">
-          <input type="number" placeholder="<%= t('.from') %>" class="datepicker">
-          <input type="number" placeholder="<%= t('.to') %>" class="datepicker">
+        <div class="row filter-input" data-field="party" data-type="autocomplete">
+          <a href="#" class="toggle" tabindex="5"><%= t('.party') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <ul id="donation_party" class="list" data-autocomplete-view="donation-party" data-type="autocomplete"></ul>
+          <div class="input-group">
+            <div class="autocomplete" data-autocomplete-id="donation-party" data-local="parties">
+              <input type="text" placeholder="Type Party Name" tabindex="5">
+              <ul class="dropdown" id="filter_donation_by_parties" tabindex="5">
+                <% Party.each{|m| %>
+                  <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.title}" %></li>
+                <% } %>
+              </ul>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.party') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <ul class="list" data-autocomplete-view="donation-party"></ul>
-        <div class="input-group">
-          <div class="autocomplete" data-autocomplete-id="donation-party" data-local="parties">
-            <input type="text" placeholder="Type Party Name" tabindex="5">
-            <ul class="dropdown" id="filter_donation_by_parties" tabindex="5">
-              <% Party.each{|m| %>
-                <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.title}" %></li>
-              <% } %>
-            </ul>
+        <div class="row filter-input" data-field="type" data-type="radio">
+          <a href="#" class="toggle" tabindex="5"><%= t('.donation_type') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <div class="list hidden"></div>
+          <div class="input-group">
+            <div class="block b1">
+              <input type="radio" id="donation_type_monetary" name="donation_type" value="monetary" data-type="radio">
+              <label for="donation_type_monetary"><span></span><%= t('.monetary') %></label>
+            </div>
+            <div class="block">
+              <input type="radio"  id="donation_type_nonmonetary" name="donation_type" value="non_monetary" data-type="radio">
+              <label for="donation_type_nonmonetary"><span></span><%= t('.non_monetary') %></label>
+            </div>
+          </div>
+        </div>
+        <div class="row filter-input" data-field="multiple" data-type="radio">
+          <a href="#" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <div class="list hidden"></div>
+          <div class="input-group">
+            <div class="block b1">
+              <input type="radio" id="donation_multiple_yes" name="donation_multiple" value="yes" data-type="radio">
+              <label for="donation_multiple_yes"><span></span><%= t('._yes') %></label>
+            </div>
+            <div class="block">
+              <input type="radio" id="donation_multiple_no" name="donation_multiple" value="no" data-type="radio">
+              <label for="donation_multiple_no"><span></span><%= t('._no') %></label>
+            </div>
           </div>
         </div>
       </div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.donation_type') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <div class="list"></div>
-        <div class="input-group">
-          <input type="radio" id="donation_type_monetary" name="donation_type" value="monetary">
-          <label for="donation_type_monetary"><span></span><%= t('.monetary') %></label>
-          <input type="radio"  id="donation_type_nonmonetary" name="donation_type" value="non_monetary">
-          <label for="donation_type_nonmonetary"><span></span><%= t('.non_monetary') %></label>
+      <div class="finance filter-inputs" data-type="finance">
+        <div class="row filter-input">
+          <a href="#" class="toggle" tabindex="5"><%= t('.party') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <ul id="donation_party" class="list" data-autocomplete-view="donation-party" data-type="autocomplete"></ul>
+          <div class="input-group">
+            <div class="autocomplete" data-autocomplete-id="donation-party" data-local="parties">
+              <input type="text" placeholder="Type Party Name" tabindex="5">
+              <ul class="dropdown" id="filter_donation_by_parties" tabindex="5">
+                <% Party.each{|m| %>
+                  <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.title}" %></li>
+                <% } %>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="row filter-input">
+          <a href="#" class="toggle" tabindex="5"><%= t('.income') %> <%= t('.categories') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <ul class="list"></ul>
+          <div class="input-group">
+            <input type="text">
+          </div>
+        </div>
+        <div class="row filter-input">
+          <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <ul class="list"></ul>
+          <div class="input-group">
+            Annual or Campaign
+            <input type="checkbox" id="campaign_period_2" name="campaign_period_2">
+            <label for="campaign_period_2"><span></span>2013</label>
+          </div>
         </div>
       </div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <div class="list"></div>
-        <div class="input-group">
-          <input type="radio" id="donation_multiple_yes" name="donation_multiple" value="yes">
-          <label for="donation_multiple_yes"><span></span><%= t('._yes') %></label>
-          <input type="radio" id="donation_multiple_no" name="donation_multiple" value="no">
-          <label for="donation_multiple_no"><span></span><%= t('._no') %></label>
-        </div>
-      </div>
-      <div class="row filter-input">
+      <div class="filter-footer">
         <button id="reset" class="reset"><%= t('.reset') %></button>
-        <button id="explore_donation" class="explore-button"><span class='icon-explore'></span><%= t('.explore') %></button>
+        <button id="explore_button" class="explore-button"><i class='explore'></i><%= t('.explore') %></button>
       </div>
     </div>
-    <div class="finance filter-inputs" data-type="finance">
-      <div class="row filter-header">
-        <label><span class="icon-filter" title="<%= t('.filters') %>"></span><%= t('.filters') %></label>
-        <span class="icon-close filter-close" title="<%= t('.filter_close') %>"></span>
-      </div>
-      <div class="row filter_intro"><%= t('.filter_intro') %></div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.party') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <ul class="list">
-          <li>
-            UNM
-            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
-          </li>
-           <li>
-            Georgian Dream
-            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
-          </li>
-        </ul>
-        <div class="input-group">
-          <input type="text">
-        </div>
-      </div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.income') %> <%= t('.categories') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <ul class="list">
-          <li>
-            Category1
-            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
-          </li>
-        </ul>
-        <div class="input-group">
-          <input type="text">
-        </div>
-      </div>
-      <div class="row filter-input">
-        <a href="#" class="toggle" tabindex="5"><%= t('.time') %><span title="<%= t('.filter_toggle') %>"></span></a>
-        <ul class="list">
-          <li>
-            2015
-            <img alt="<%= t('.filter_item_close') %>" src="/assets/explore/close_s.svg" title="<%= t('.filter_item_close') %>" class="item-close">
-          </li>
-        </ul>
-        <div class="input-group">
-          Annual or Campaign
-          <input type="checkbox" id="campaign_period_2" name="campaign_period_2">
-          <label for="campaign_period_2"><span></span>2013</label>
-        </div>
-      </div>
-      <div class="row filter-input">
-        <button id="reset" class="reset"><%= t('.reset') %></button>
-        <button id="explore_finance" class="explore-button"><span class='icon-explore'></span><%= t('.explore') %></button>
-      </div>
-    </div>
-
   </div>
   <div class="content">
     <div class="overlay hidden"></div>

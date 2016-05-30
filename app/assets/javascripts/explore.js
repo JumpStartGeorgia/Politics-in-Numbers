@@ -1,6 +1,7 @@
 /* global $ */
 /*eslint no-console: "error"*/
 //= require jquery-ui/datepicker
+var dn;
 $(document).ready(function (){
   // console.log("here");
   var finance_toggle = $("#finance_toggle"),
@@ -10,11 +11,222 @@ $(document).ready(function (){
     filter_extended = $("#filter_extended"),
     finance_category = $("#finance_category"),
     overlay = $(".overlay"),
-    autocompletes = {},
+    autocomplete = {
+      push: function(autocomplete_id, key, value) {
+        if(!this.hasOwnProperty(autocomplete_id)) {
+          this[autocomplete_id] = {};
+        }
+        if(!this[autocomplete_id].hasOwnProperty(key)) {
+          $("[data-autocomplete-view='" + autocomplete_id + "']").append("<li data-id='"+key+"'>"+value+"<i class='close' title='" + gon.filter_item_close + "'></i></li>");
+          this[autocomplete_id][key] = value;
+        }
+      },
+      pop: function(autocomplete_id, key) {
+        if(this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key)) {
+          $("[data-autocomplete-view='" + autocomplete_id + "'] li[data-id='" + key + "']").remove();
+          delete this[autocomplete_id][key];
+        }
+      },
+      clear: function(autocomplete_id) {
+        if(this.hasOwnProperty(autocomplete_id)) {
+          $("[data-autocomplete-view='" + autocomplete_id + "'] li").remove();
+          delete this[autocomplete_id];
+        }
+      },
+      has: function(autocomplete_id, key) {
+        return this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key);
+      },
+      onchange: debounce(function(event) {
+        var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul"), autocomplete_id = p.attr("data-autocomplete-id");
+        if(event.type === "keyup" && event.keyCode === 40) {
+          // ul.find("li:first").addClass("focus").focus();
+
+          global_keyup_up_callback = function() {
+            var tmp = ul.find("li.focus").removeClass("focus").prev();
+            if(!tmp.length) { tmp = ul.find("li:last"); }
+            tmp.addClass("focus").focus();
+          };
+          global_keyup_down_callback = function() {
+            console.log("down");
+            var tmp = ul.find("li.focus").removeClass("focus").next();
+            if(!tmp.length) { tmp = ul.find("li:first"); }
+            tmp.addClass("focus").focus();
+          };
+          global_keyup_down_callback();
+        }
+        else {
+          if(v.length >= 3 && t.data("previous") !== v) {
+            t.data("previous", v);
+            if(p.is("[data-local]")) {
+              ul.find("li").hide();
+              var regex = new RegExp(".*" + v + ".*", "i");
+              gon[p.attr("data-local")].forEach(function(d) {
+                if(d[1].match(regex) !== null) {
+                  ul.find("li[data-id='" + d[0] + "']").show();
+                }
+
+              });
+              console.log("local");
+            }
+            else {
+              console.log("ajax");
+              $.ajax({
+                url: p.attr("data-url"),
+                dataType: 'json',
+                data: { q: v },
+                success: function(data) {
+                  var html = "";
+                  data.forEach(function(d) {
+                    html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
+                  });
+                  p.find("ul").html(html).addClass("active");
+                  console.log("ajax success");
+                }
+              });
+            }
+          }
+          else {
+            ul.addClass("active");
+          }
+        }
+        event.stopPropagation();
+      }, 250),
+      bind: function() {
+        $(".autocomplete input").on("change paste keyup", this.onchange);
+        $(".autocomplete input").on("click", function() {
+          var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul");
+          p.addClass("active");
+          global_click_callback = function(target) {
+            target = $(target);
+             console.log("here", target.hasClass(".autocomplete"), target.closest(".autocomplete").length);
+            if(!target.hasClass(".autocomplete") && !target.closest(".autocomplete").length) {
+               console.log("inner");
+              p.removeClass("active");
+              global_click_callback = undefined;
+              global_keyup_up_callback = undefined;
+              global_keyup_down_callback = undefined;
+            }
+          }
+          event.stopPropagation();
+        });
+
+        $(document).on("click keypress", ".autocomplete .dropdown li", function(event) {
+           console.log("click keypress autocomplete name");
+          if(event.type === "keypress" && event.keyCode !== 13) { return; }
+          var t = $(this), dropdown = t.parent(), p = dropdown.parent(), is_selected = t.hasClass("selected");
+
+          t.toggleClass("selected");
+          var autocomplete_id = p.attr("data-autocomplete-id");
+          if(is_selected) {
+             console.log("is selected");
+            autocomplete.pop(autocomplete_id, t.attr("data-id"));
+          }
+          else {
+            console.log("is not selected");
+            autocomplete.push(autocomplete_id, t.attr("data-id"), t.text());
+          }
+          // console.log(autocomplete);
+          event.stopPropagation();
+        });
+
+
+        $(document).on("click", ".list li .close", function(event) {
+          var t = $(this).parent(), list = t.parent(), autocomplete_id = list.attr("data-autocomplete-view");
+          $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li[data-id='" + t.attr("data-id") + "']").toggleClass("selected");
+          autocomplete.pop(autocomplete_id, t.attr("data-id"));
+          event.stopPropagation();
+        });
+      }
+    },
     donation = {
-      period_from: $("#donation_period_from"),
-      period_to: $("#donation_period_to")
+      elem: {
+        donor: $("#donation_donor"),
+        period: {
+          from: $("#donation_period_from"),
+          to: $("#donation_period_to")
+        },
+        amount: {
+          from: $("#donation_amount_from"),
+          to: $("#donation_amount_to")
+        },
+        party: $("#donation_party"),
+        type: {
+          monetary: $("#donation_type_monetary"),
+          nonmonetary: $("#donation_type_nonmonetary")
+        },
+        multiple: {
+          yes: $("#donation_multiple_yes"),
+          no: $("#donation_multiple_no")
+        }
+        // reset: $("#donation_reset"),
+        // explore: $("#donation_explore")
+      },
+      data: {},
+      get: function() {
+        var t = this, tp, tmp, tmp_v, tmp_d, tmp_o, lnk;
+        t.data = {};
+        Object.keys(this.elem).forEach(function(el){
+          var is_elem = Object.keys(t.elem[el]).length;
+
+          (is_elem ? Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; }) : [t.elem[el]]).forEach(function(elem, elem_i){
+            tmp = $(elem);
+            tp = tmp.attr("data-type");
+            if(tp === "autocomplete") {
+              lnk = tmp.attr("data-autocomplete-view");
+              if(autocomplete.hasOwnProperty(lnk)) {
+                t.data[el] = Object.keys(autocomplete[lnk]);
+              }
+            }
+            else if(tp === "period") {
+              tmp_v = tmp.datepicker('getDate');
+              tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
+              if(isDate(tmp_v)) {
+                tmp_d[elem_i] = tmp_v;
+              }
+              if(tmp_d.toString() === [-1, -1].toString()) {
+                delete t.data[el];
+              }
+              else {
+                t.data[el] = tmp_d;
+              }
+            }
+            else if(tp === "range") {
+              tmp_v = tmp.val();
+              tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
+              if(isNumber(tmp_v)) {
+                tmp_d[elem_i] = tmp_v;
+              }
+              if(tmp_d.toString() === [-1, -1].toString()) {
+                delete t.data[el];
+              }
+              else {
+                t.data[el] = tmp_d;
+              }
+            }
+            else if(tp === "radio") {
+              if(tmp.is(":checked")) {
+                t.data[el] = tmp.val();
+              }
+            }
+            else {
+              //console.log("Type is not specified", t.elem[el]);
+            }
+          });
+        });
+        console.log(t.data);
+      },
+      reset: function() {
+        $(".filter-inputs[data-type='donation'] .filter-input").each(function(i,d) {
+          var t = $(this);
+            field = t.attr("data-field"),
+            type = t.attr("data-type");
+             console.log(field,type);
+        });
+      },
+      validate: function() {}
     };
+    dn = donation;
+     console.log(donation.get(), donation);
   // gon.donation_period_min = new Date(gon.donation_period_min);
   // gon.donation_period_max = new Date(gon.donation_period_max);
   finance_toggle.click(function (event){
@@ -45,18 +257,12 @@ $(document).ready(function (){
     event.stopPropagation();
   });
 
-  // filter_type.find(".forward").click(function () {
-  //   var p = donation_toggle.parent();
-  //   p.removeClass("active");
-  //   filter_type.attr("data-type", "");
-  // });
-
   filter_type.find(".back").click(function () {1
     filter_type.toggleClass("in-depth");
   });
 
   finance_category.find(".finance-category-toggle").click(function(event) {
-     console.log("toggle");
+    console.log("toggle");
     if(is_type_donation) { finance_toggle.trigger("click"); }
     var t = $(this), state = t.attr("data-state"), sub, sub_state, cat = t.attr("data-cat");
     global_click_callback = undefined;
@@ -98,178 +304,119 @@ $(document).ready(function (){
 
 // -----------------------------------------------------------------
 
-  filter_extended.find(".filter-toggle").click(function(){
-    filter_extended.toggleClass("active");
-    overlay.removeClass("hidden");
-    event.stopPropagation();
-  });
-  filter_extended.find(".filter-close").click(function(){
-    overlay.addClass("hidden");
-    filter_extended.toggleClass("active");
-  });
-  filter_extended.find(".filter-input .toggle").click(function(){
-    var t = $(this).parent();
-    t.toggleClass("expanded");
-  });
-  function function_name (argument) {
-    // body...
-  }
-  $(window).on("resize", function(){
-    filter_extended.find(".filter-inputs").css("max-height", $(window).height() - filter_extended.find(".filter-toggle").offset().top);
-  });
 
 
-  function filter() {
 
-  }
 
-  var autocomplete_change = debounce(function(event) {
-    //console.log(event);
 
-    var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul"), autocomplete_id = p.attr("data-autocomplete-id");
-    if(event.type === "keyup" && event.keyCode === 40) {
-      // ul.find("li:first").addClass("focus").focus();
+  function bind() {
+    filter_extended.find(".filter-toggle").click(function(){
+      filter_extended.toggleClass("active");
+      overlay.removeClass("hidden");
+      event.stopPropagation();
+    });
+    filter_extended.find(".filter-close").click(function(){
+      overlay.addClass("hidden");
+      filter_extended.toggleClass("active");
+    });
+    filter_extended.find(".filter-input .toggle").click(function(){
+      var t = $(this).parent(),
+        field = t.attr("data-field"),
+        type = t.attr("data-type"),
+        html = "",
+        list = t.find(".list"),
+        tmp, tmp2,
+        state = t.hasClass("expanded");
 
-      global_keyup_up_callback = function() {
-        var tmp = ul.find("li.focus").removeClass("focus").prev();
-        if(!tmp.length) { tmp = ul.find("li:last"); }
-        tmp.addClass("focus").focus();
-      };
-      global_keyup_down_callback = function() {
-        console.log("down");
-        var tmp = ul.find("li.focus").removeClass("focus").next();
-        if(!tmp.length) { tmp = ul.find("li:first"); }
-        tmp.addClass("focus").focus();
-      };
-      global_keyup_down_callback();
-    }
-    else {
-      if(v.length >= 3 && t.data("previous") !== v) {
-        t.data("previous", v);
-        if(p.is("[data-local]")) {
-          ul.find("li").hide();
-          var regex = new RegExp(".*" + v + ".*", "i");
-          gon[p.attr("data-local")].forEach(function(d) {
-            if(d[1].match(regex) !== null) {
-              ul.find("li[data-id='" + d[0] + "']").show();
-            }
+      if(state) {
+        if(type === "period") {
+          tmp = [];
+          t.find(".input-group input[type='text'].datepicker").each(function(i, d){
+            tmp2 = $(d).datepicker("getDate");
+            tmp.push(tmp2 ? tmp2.format("mm/dd/yyyy") : null);
+          });
+          tmp = formatRange(tmp);
+          list.html(tmp ? "<span>" + tmp + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp);
+        }
+        else if(type === "range") {
+          tmp = [];
+          t.find(".input-group input[type='number']").each(function(i, d){
+            tmp2 = $(d).val();
+            tmp.push(tmp2 !== "" ? tmp2 : null);
 
           });
-          console.log("local");
+          tmp = formatRange(tmp);
+          list.html(tmp ? "<span>" + tmp + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp);
         }
-        else {
-          console.log("ajax");
-          $.ajax({
-            url: p.attr("data-url"),
-            dataType: 'json',
-            data: { q: v },
-            success: function(data) {
-              var html = "";
-              data.forEach(function(d) {
-                html += "<li data-id='" + d[1] + "'" + (autocompletes.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
-              });
-              p.find("ul").html(html).addClass("active");
-              console.log("ajax success");
-            }
-          });
+        else if(type === "radio") {
+          tmp = t.find(".input-group input[type='radio']:checked");
+          list.html(tmp.length ? "<span>" + tmp.next().text() + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp.length);
         }
       }
-      else {
-        ul.addClass("active");
-      }
-    }
-    event.stopPropagation();
-  }, 250);
-  $(".autocomplete input").on("change paste keyup", autocomplete_change);
-  $(".autocomplete input").on("click", function() {
-    var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul");
-    p.addClass("active");
-    global_click_callback = function(target) {
-      target = $(target);
-       console.log("here", target.hasClass(".autocomplete"), target.closest(".autocomplete").length);
-      if(!target.hasClass(".autocomplete") && !target.closest(".autocomplete").length) {
-         console.log("inner");
-        p.removeClass("active");
-        global_click_callback = undefined;
-        global_keyup_up_callback = undefined;
-        global_keyup_down_callback = undefined;
-      }
-    }
-    event.stopPropagation();
-  });
+      t.toggleClass("expanded", !state);
+    });
+    $(window).on("resize", function(){
+      filter_extended.find(".filter-inputs").css("max-height", $(window).height() - filter_extended.find(".filter-toggle").offset().top);
+    });
 
-  $(document).on("click keypress", ".autocomplete .dropdown li", function(event) {
-     console.log("click keypress autocomplete name");
-    if(event.type === "keypress" && event.keyCode !== 13) { return; }
-    var t = $(this), dropdown = t.parent(), p = dropdown.parent(), is_selected = t.hasClass("selected");
 
-    t.toggleClass("selected");
-    var autocomplete_id = p.attr("data-autocomplete-id");
-    if(is_selected) {
-       console.log("is selected");
-      autocompletes.pop(autocomplete_id, t.attr("data-id"));
-    }
-    else {
-      console.log("is not selected");
-      autocompletes.push(autocomplete_id, t.attr("data-id"), t.text());
-    }
-    // console.log(autocompletes);
-    event.stopPropagation();
-  });
-  autocompletes.push = function(autocomplete_id, key, value) {
-    if(!this.hasOwnProperty(autocomplete_id)) {
-      this[autocomplete_id] = {};
-    }
-    if(!this[autocomplete_id].hasOwnProperty(key)) {
-      $("[data-autocomplete-view='" + autocomplete_id + "']").append("<li data-id='"+key+"'>"+value+"<i class='close' title='" + gon.filter_item_close + "'></i></li>");
-      this[autocomplete_id][key] = value;
-    }
-  };
-  autocompletes.pop = function(autocomplete_id, key) {
-    if(this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key)) {
-      $("[data-autocomplete-view='" + autocomplete_id + "'] li[data-id='" + key + "']").remove();
-      delete this[autocomplete_id][key];
-    }
-  };
-  autocompletes.has = function(autocomplete_id, key) {
-    return this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key);
-  };
-  $(document).on("click", ".list li .close", function(event) {
-    var t = $(this).parent(), list = t.parent(), autocomplete_id = list.attr("data-autocomplete-view");
-    $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li[data-id='" + t.attr("data-id") + "']").toggleClass("selected");
-    autocompletes.pop(autocomplete_id, t.attr("data-id"));
-    event.stopPropagation();
-  });
-
-   donation.period_from.datepicker({
+    donation.elem.period.from.datepicker({
       firstDay: 1,
       changeMonth: true,
       changeYear: true,
-      // minDate: gon.donation_period_min,
-      // maxDate: gon.donation_period_max,
       onClose: function( selectedDate ) {
-        donation.period_to.datepicker( "option", "minDate", selectedDate );
+        donation.elem.period.to.datepicker( "option", "minDate", selectedDate );
       }
     });
-    donation.period_to.datepicker({
+    donation.elem.period.to.datepicker({
       firstDay: 1,
       changeMonth: true,
       changeYear: true,
-      // minDate: gon.donation_period_min,
-      // maxDate: gon.donation_period_max,
       onClose: function( selectedDate ) {
-        donation.period_from.datepicker( "option", "maxDate", selectedDate );
+        donation.elem.period.from.datepicker( "option", "maxDate", selectedDate );
       }
     });
 
     $("#donation_period_campaigns a").click(function(){
       var t = $(this), v = t.attr("data-value").split(";");
-       console.log(v);
-      donation.period_from.datepicker('setDate', new Date(v[0]));
-      donation.period_to.datepicker('setDate', new Date(v[1]));
+      console.log(v);
+      donation.elem.period.from.datepicker('setDate', new Date(v[0]));
+      donation.elem.period.to.datepicker('setDate', new Date(v[1]));
        console.log("radio");
     });
+    $(document).on("click", ".list > span .close", function(event) {
+      var t = $(this);
+        p = t.closest(".filter-input"),
+        field = p.attr("data-field"),
+        type = p.attr("data-type");
+        t.parent().remove();
+
+      if(type === "period") {
+        p.find(".input-group input[type='text'].datepicker").datepicker('setDate', null);
+      }
+      else if(type === "range") {
+
+        p.find(".input-group input[type='number']").val(null);
+      }
+      else if(type === "radio") {
+        p.find(".input-group input[type='radio']:checked").prop("checked", false);
+      }
+      event.stopPropagation();
+    });
+
+    autocomplete.bind();
+  }
+
+
+  function filter() {
+     console.log("start filter");
+  }
+
+  bind();
+
   // dev block
-    filter_extended.find(".filter-toggle").trigger("click");
-    filter_extended.find(".filter-input:nth-of-type(3) .toggle").trigger("click");
+  filter_extended.find(".filter-toggle").trigger("click");
+  filter_extended.find(".filter-input:nth-of-type(3) .toggle").trigger("click");
+
 });
+

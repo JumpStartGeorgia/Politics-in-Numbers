@@ -28,10 +28,11 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 * {
   box-sizing:border-box;
 }
-a {
+a, button {
   text-decoration:none;
   &:hover, &:focus, &:active, &:visited {
     color:inherit;
+    cursor:pointer;
   }
 }
 .navbar {

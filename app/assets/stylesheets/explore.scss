@@ -263,14 +263,63 @@
       border-bottom:1px solid #D7DDD4;
       cursor:pointer;
     }
-    .filter-inputs {
+    .filter-header {
+      display:block;
+      padding:15px 0 12px;
+      border-bottom:1px solid #D7DDD4;
+      label {
+        display:inline-block;
+        font:14px firasans_r;
+        color:#88D877;
+        padding:0 10px;
+      }
+      .close {
+        float: right;
+        vertical-align: middle;
+        background:transparent url(/assets/explore/close.svg) no-repeat center;
+        width:20px;
+        height:20px;
+        position: relative;
+        top: -3px;
+        cursor:pointer;
+      }
+    }
+    .filter-footer {
+      .reset {
+        display:block;
+        font:14px firasans_b;
+        color:#5D675B;
+        background-color:#fff;
+        border:1px solid #C5CEC2;
+        padding:8px 18px;
+        margin: 0px auto;
+      }
+      .explore-button {
+        display:block;
+        font:14px firasans_b;
+        color:#fff;
+        background-color:#F78E69;
+        padding:8px 18px;
+        border:0;
+        margin:12px auto 0;
+        i.explore {
+          display:inline-block;
+          background:transparent url(/assets/explore/compare.svg) no-repeat center;
+          width:20px;
+          height:20px;
+          vertical-align: middle;
+          margin-right: 10px;
+        }
+      }
+    }
+    .pane {
       background-color:#F5F7F5;
       position:absolute;
       top: 0px;
       z-index:55;
       width:60%;
       min-width:200px;
-      padding:0px 14px;
+      padding:0px 14px 12px;
       overflow-y:auto;
       &::-webkit-scrollbar-track {
         background-color: #F5F7F5;
@@ -296,52 +345,28 @@
       .row:last-of-type {
         text-align:center;
       }
-      .filter-header {
-        display:block;
-        padding:15px 0 12px;
-        border-bottom:1px solid #D7DDD4;
-        label {
-          display:inline-block;
-          font:14px firasans_r;
-          color:#88D877;
-          padding:0 10px;
-        }
-        .icon-close {
-          float: right;
-          vertical-align: middle;
-          background:transparent url(/assets/explore/close.svg) no-repeat center;
-          width:20px;
-          height:20px;
-          position: relative;
-          top: -3px;
-          cursor:pointer;
-        }
-      }
-      &.donation {
+      .filter-inputs.donation {
         display:none;
       }
-      &.finance {
+      .filter-inputs.finance {
         display:none;
-        .filter_intro {
-          font:12px firasans_l;
-          color:#7F897D;
-        }
       }
       .filter-input {
         .toggle {
+          position:relative;
+          display: inline-block;
           font:14px firasans_l;
           color:#5D675B;
-          padding-right: 16px;
-          display: inline-block;
+          text-align:left;
           width: 100%;
-          position:relative;
+          padding-right: 16px;
         }
         .sublabel {
           font:12px firasans_r;
           color:#5D675B;
           margin:15px 0 8px;
         }
-        .toggle span {
+        .toggle i {
           background:transparent url(/assets/explore/expand.svg) no-repeat center;
           float:right;
           width:16px;
@@ -352,19 +377,24 @@
           right:0px;
         }
         &.expanded {
-          .toggle span{
+          .toggle i{
             background:transparent url(/assets/explore/collapse.svg) no-repeat center;
           }
           .input-group {
             display: inline-block;
           }
         }
-        .list {
 
-          li {
+        .list {
+          &.hidden {
+            display:none;
+          }
+          li, span {
+            display:inline-block;
+            width:100%;
             font:14px firasans_book;
             color:#F78E69;
-            padding:4px 0px;
+            padding:4px 14px 4px 0;
             position:relative;
             &:first-of-type { margin:12px 0 0; }
             i {
@@ -372,13 +402,6 @@
               width: 10px;
               height: 10px;
               background: transparent url(/assets/explore/close_s.svg) no-repeat right top;
-              cursor:pointer;
-              position:absolute;
-              top:3px;
-            }
-            .item-close {
-              padding:4px 0 0 5px;
-              vertical-align: top;
               cursor:pointer;
             }
           }
@@ -419,33 +442,14 @@
               }
             }
           }
-        }
-        .reset {
-          display:block;
-          font:14px firasans_b;
-          color:#5D675B;
-          background-color:#fff;
-          border:1px solid #C5CEC2;
-          padding:8px 18px;
-          margin: 0px auto;
-        }
-        .explore-button {
-          display:block;
-          font:14px firasans_b;
-          color:#fff;
-          background-color:#F78E69;
-          padding:8px 18px;
-          border:0;
-          margin:12px auto 0;
-          .icon-explore {
+          .block {
             display:inline-block;
-            background:transparent url(/assets/explore/compare.svg) no-repeat center;
-            width:20px;
-            height:20px;
-            vertical-align: middle;
-            margin-right: 10px;
+            &.b1 {
+              margin-bottom:10px;
+            }
           }
         }
+
 
       }
     }
@@ -457,7 +461,7 @@
       .donation { display:none; }
       .finance { display:initial; }
     }
-    .icon-filter {
+    i.filter {
       display: inline-block;
       background:transparent url(/assets/explore/filter.svg) no-repeat center;
       vertical-align: middle;
@@ -579,26 +583,35 @@
       left:32px;
       width:190px;
       min-width:190px;
-      .filter-header { display:none; }
+      .filter-toggle {
+        display:inline-block;
+        padding:12px 20px;
+        margin:0px auto;
+        border-bottom:0 !important;
+        text-align:center;
+        font:14px firasans_r;
+        color:#fff;
+        background-color:#88D877;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 77;
+        i.filter {
+          background:transparent url(/assets/explore/filter_w.svg) no-repeat center;
+        }
+        i.close { display:none; }
+      }
+      .pane {
+        position:relative;
+        top:-22px;
+        padding:24px 14px 12px;
+        .filter-header {
+          display:none;
+        }
+      }
       .filter-inputs {
         min-width:190px;
-        .filter-header {
-          display:block;
-          padding:0 0 6px !important;
-          border-bottom:0 !important;
-          text-align:center;
-          label {
-            font:14px firasans_r;
-            color:#fff;
-            background-color:#88D877;
-            padding:12px 20px;
-            display: inline-block;
-            .icon-filter {
-              background:transparent url(/assets/explore/filter_w.svg) no-repeat center;
-            }
-          }
-          .filter-close { display:none; }
-        }
+
       }
       &[data-type='donation'] {
         .donation { display:initial; }
