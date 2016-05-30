@@ -309,7 +309,7 @@ task deploy: :environment do
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
     invoke :'bundle:install'
-    invoke :'rails:db_migrate'
+#    invoke :'rails:db_migrate'
     invoke :'deploy:assets:copy_tmp_to_current'
     invoke :'nginx:generate_conf'
     invoke :'puma:generate_conf'
