@@ -166,13 +166,55 @@
       </div>
     </div>
   </div>
-  <div class="content">
+  <div id="content" class="content">
     <div class="overlay hidden"></div>
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br/> Numquam obcaecati quo nam dignissimos tempora rerum! <br/>Autem in, deserunt dolores esse ut distinctio quam. <br/>Modi accusamus blanditiis, culpa rem explicabo aspernatur?
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br/> Numquam obcaecati quo nam dignissimos tempora rerum! <br/>Autem in, deserunt dolores esse ut distinctio quam. <br/>Modi accusamus blanditiis, culpa rem explicabo aspernatur?
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br/> Numquam obcaecati quo nam dignissimos tempora rerum! <br/>Autem in, deserunt dolores esse ut distinctio quam. <br/>Modi accusamus blanditiis, culpa rem explicabo aspernatur?
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit.<br/> Numquam obcaecati quo nam dignissimos tempora rerum! <br/>Autem in, deserunt dolores esse ut distinctio quam. <br/>Modi accusamus blanditiis, culpa rem explicabo aspernatur?
+    <div class="panes" data-type="donation">
+      <div class="pane" data-type="donation">
+        <div class="caption"><%= t('.donation_caption') %></div>
+        <div class="charts">
+          <div class="chart-container chart-container-1">
+            <div class="actions">
+              <div class="share" title="<%= t('.share_chart') %>"></div>
+              <div class="embed" title="<%= t('.embed_chart') %>"></div>
+              <div class="download" title="<%= t('.download_chart') %>"></div>
+            </div>
+            <div id="donation_chart_1"></div>
+          </div>
+          <div class="separator">
+            <span class="donors"><%= t('.donors') %></span>
+            <span class="party-donations"><%= t('.party_donations').html_safe %></span>
+          </div>
+          <div class="chart-container chart-container-2">
+             <div class="actions">
+                <div class="share" title="<%= t('.share_chart') %>"></div>
+              <div class="embed" title="<%= t('.embed_chart') %>"></div>
+              <div class="download" title="<%= t('.download_chart') %>"></div>
+            </div>
+            <div id="donation_chart_1"></div>
+          </div>
+        </div>
+        <div class="total">
+          <div id="donation_total_amount"><div class="box"><label><%= t('.total_amount') %>:</label><span></span></div></div>
+          <div class="separator"></div>
+          <div id="donation_total_donations"><div class="box"><label><%= t('.total_donations') %>:</label><span></span></div></div>
+        </div>
+        <div class="table">
+            <div class="actions">
+              <div class="share" title="<%= t('.share_table') %>"></div>
+              <div class="embed" title="<%= t('.embed_table') %>"></div>
+              <div class="download" title="<%= t('.download_table') %>"></div>
+            </div>
+          <div id="donation_table">
+            <table><thead><!-- <tr><th>Header1</th><th>Header2</th></tr> --></thead>
+            <tbody>
+              <!-- <tr><td>Value1<button class="view"><%= t('.view') %></button></td><td>Value2</td></tr></tbody></table> -->
+          </div>
+        </div>
+      </div>
+      <div class="pane" data-type="finance"></div>
+    </div>
   </div>
 </div>
-<% content_for :custom_js, "explore" %>
+<% content_for :custom_js,  "explore"  %>
+<% @custom_js = ["https://code.highcharts.com/highcharts.js"] %>
 <% content_for :custom_css, "explore" %>

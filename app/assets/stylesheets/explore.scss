@@ -256,6 +256,8 @@
   }
   .filter-extended {
     position:relative;
+    display:inline-block;
+    width:100%;
     .filter-toggle {
       font:14px firasans_r;
       color:#88D877;
@@ -313,6 +315,7 @@
       }
     }
     .pane {
+      display:none;
       background-color:#F5F7F5;
       position:absolute;
       top: 0px;
@@ -345,12 +348,12 @@
       .row:last-of-type {
         text-align:center;
       }
-      .filter-inputs.donation {
-        display:none;
-      }
-      .filter-inputs.finance {
-        display:none;
-      }
+      // .filter-inputs.donation {
+      //   display:none;
+      // }
+      // .filter-inputs.finance {
+      //   display:none;
+      // }
       .filter-input {
         .toggle {
           position:relative;
@@ -454,10 +457,12 @@
       }
     }
     &.active[data-type='donation'] {
+      .pane { display:inline-block; }
       .donation { display:initial; }
       .finance { display:none; }
     }
     &.active[data-type='finance'] {
+      .pane { display:inline-block; }
       .donation { display:none; }
       .finance { display:initial; }
     }
@@ -530,7 +535,190 @@
   }
   .content {
     position:relative;
-    padding:10px;
+    display:inline-block;
+    vertical-align:top;
+    // padding:10px;
+    width:100%;
+    .panes {
+      .pane[data-type='donation'] {
+        .caption {
+          font:18px firasans_r;
+          color:#5d675b;
+          text-align:center;
+          padding:20px 10px 15px;
+        }
+        .charts {
+          .chart-container {
+            display:block;
+            width:100%;
+            padding:12px 6px 22px;
+            .actions {
+              text-align:center;
+              padding:0 0 18px;
+              > div {
+                display:inline-block;
+                width:24px;
+                height:21px;
+                background:transparent url(/assets/explore/actions.svg) no-repeat top left;
+                &:hover, &:focus, &:active {
+                  cursor:pointer;
+                }
+              }
+              .share {
+                background-position: 0px 0px;
+                &:hover { background-position: 0px -22px; }
+              }
+              .embed {
+                background-position: -25px 0px;
+                margin:0 10px;
+                &:hover { background-position: -25px -22px; }
+              }
+              .download {
+                background-position: -49px 0px;
+                &:hover { background-position: -49px -22px; }
+              }
+            }
+          }
+          .chart-container-1 {
+            background-color:#ebe187;
+          }
+          .separator {
+            display:none;
+          }
+          .chart-container-2 {
+            background-color:#b8e8ad;
+          }
+        }
+        .total {
+
+          margin:20px 0 42px;
+          > div {
+            display:table-cell;
+            &:not(.separator) {
+
+              width:50%;
+              text-align:center;
+            }
+          }
+          .box {
+            padding:12px 24px;
+            margin:10px 0;
+            background-color:#F5F7F5;
+          }
+          label {
+            display:block;
+            font:14px firasans_r;
+            margin-bottom:8px;
+            color:#C1B02F;
+          }
+          span {
+            display:block;
+            font:16px firasans_b;
+            color:#5D675B;
+          }
+          .separator {
+            min-width: 55px;
+            height:80px;
+            background:#F78E69 url(/assets/explore/stats.svg) no-repeat center;
+            background-size:33px;
+            position: relative;
+            &:after {
+              content: "";
+              width: 0;
+              height: 0;
+              border-style: solid;
+              border-width: 14px 27px 0 27px;
+              border-color: #F78E69 transparent transparent transparent;
+              line-height: 0px;
+              _border-color: #F78E69 #000000 #000000 #000000;
+              _filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
+              position: absolute;
+              bottom: -14px;
+            }
+          }
+        }
+        .table {
+          .actions {
+            text-align:right;
+            padding:0 16px 18px;
+            > div {
+              display:inline-block;
+              width:24px;
+              height:21px;
+              background:transparent url(/assets/explore/actions.svg) no-repeat top left;
+              &:hover, &:focus, &:active {
+                cursor:pointer;
+              }
+            }
+
+            .share {
+              background-position: 0px -43px;
+              &:hover { background-position: 0px -65px; }
+            }
+            .embed {
+              background-position: -25px -43px;
+              margin:0 20px;
+              &:hover { background-position: -25px -65px; }
+            }
+            .download {
+              background-position: -49px -43px;
+              &:hover { background-position: -49px -65px; }
+            }
+          }
+          #donation_table {
+            width:100%;
+            padding:0px 6px;
+            table {
+              width:100%;
+              thead {
+                border:1px solid #c5cec2;
+                background-color:#f3f9f2;
+                // e2e6e0
+                //
+                th {
+                  font:16px firasans_r;
+                  color:#5D675B;
+                  text-align:left;
+                  padding:15px 13px;
+                  &:not(:last-of-type) {
+                    border-right:1px solid #e2e6e0;
+                  }
+                }
+              }
+              tbody {
+                tr {
+                  border:1px solid #e2e6e0;
+                  border-top:0;
+                  td {
+                    font:14px firasans_l;
+                    color:#5D675B;
+                    text-align:left;
+                    padding:15px 13px;
+                    vertical-align:top;
+                    &:not(:last-of-type) {
+                      border-right:1px solid #e2e6e0;
+                    }
+                    button.view {
+                      font:12px firasans_r;
+                      color:#383d37;
+                      background-color: #ddcd37;
+                      padding:9px 12px;
+                      border:0;
+                      float:right;
+                      &:hover, &:focus, &:active {
+                        text-decoration:none;
+                        color:#383d37;
+                      }
+                    }
+                  }
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     .overlay {
       background-color:#5D675B;
       opacity:.7;
@@ -579,6 +767,7 @@
       .back { display:none !important; }
     }
     .filter-extended {
+      display:table-cell;
       top:-22px;
       left:32px;
       width:190px;
@@ -602,6 +791,7 @@
         i.close { display:none; }
       }
       .pane {
+        display:inline-block;
         position:relative;
         top:-22px;
         padding:24px 14px 12px;
@@ -614,16 +804,200 @@
 
       }
       &[data-type='donation'] {
+        .pane { display:inline-block; }
         .donation { display:initial; }
         .finance { display:none; }
       }
       &[data-type='finance'] {
+        .pane { display:inline-block; }
         .donation { display:none; }
         .finance { display:initial; }
       }
     }
     .content {
-      margin-left:222px;
+      // margin-left:222px;
+      display:table-cell;
+      padding: 10px 10px 10px 42px;
+      .panes {
+        .pane[data-type='donation'] {
+          .caption {
+            padding:45px 10px 55px;
+          }
+          .charts {
+            display:table;
+            width:100%;
+            .chart-container {
+              display:table-cell;
+              width:50%;
+              padding:12px 14px 44px;
+              position:relative;
+              z-index:32;
+              .actions {
+                text-align:right;
+                padding:0 0 18px;
+              }
+            }
+            .chart-container-1 {
+              right:-15px;
+            }
+            .separator {
+              display:table-cell;
+              position:relative;
+              min-width:330px;
+              height:286px;
+              background:transparent url(/assets/explore/image.png) no-repeat center;
+              z-index:33;
+              .donors {
+                font:20px firasans_b;
+                color:#2e302d;
+                vertical-align:middle;
+                position: absolute;
+                top: 174px;
+                left: 40px;
+              }
+              .party-donations {
+                font:20px firasans_b;
+                color:#fff;
+                vertical-align:top;
+                position: absolute;
+                top: 65px;
+                left: 185px;
+              }
+            }
+            .chart-container-2 {
+              left:-15px;
+            }
+          }
+          .total {
+
+            margin:20px auto 42px;
+            display:table;
+            > div {
+              display:table-cell;
+              &:not(.separator) {
+                width:180px;
+                height:60px;
+              }
+            }
+            .box {
+              padding:12px 24px;
+              margin:10px 0;
+              background-color:#F5F7F5;
+            }
+            label {
+              display:block;
+              font:14px firasans_r;
+              margin-bottom:8px;
+              color:#C1B02F;
+            }
+            span {
+              display:block;
+              font:16px firasans_b;
+              color:#5D675B;
+            }
+            .separator {
+              min-width: 55px;
+              height:80px;
+              background:#F78E69 url(/assets/explore/stats.svg) no-repeat center;
+              background-size:33px;
+              position: relative;
+              &:after {
+                content: "";
+                width: 0;
+                height: 0;
+                border-style: solid;
+                border-width: 14px 27px 0 27px;
+                border-color: #F78E69 transparent transparent transparent;
+                line-height: 0px;
+                _border-color: #F78E69 #000000 #000000 #000000;
+                _filter: progid:DXImageTransform.Microsoft.Chroma(color='#000000');
+                position: absolute;
+                bottom: -14px;
+              }
+            }
+          }
+          .table {
+            .actions {
+              text-align:right;
+              padding:0 16px 18px;
+              > div {
+                display:inline-block;
+                width:24px;
+                height:21px;
+                background:transparent url(/assets/explore/actions.svg) no-repeat top left;
+                &:hover, &:focus, &:active {
+                  cursor:pointer;
+                }
+              }
+
+              .share {
+                background-position: 0px -43px;
+                &:hover { background-position: 0px -65px; }
+              }
+              .embed {
+                background-position: -25px -43px;
+                margin:0 20px;
+                &:hover { background-position: -25px -65px; }
+              }
+              .download {
+                background-position: -49px -43px;
+                &:hover { background-position: -49px -65px; }
+              }
+            }
+            #donation_table {
+              width:100%;
+              padding:0px 6px;
+              table {
+                width:100%;
+                thead {
+                  border:1px solid #c5cec2;
+                  background-color:#f3f9f2;
+                  // e2e6e0
+                  //
+                  th {
+                    font:16px firasans_r;
+                    color:#5D675B;
+                    text-align:left;
+                    padding:15px 13px;
+                    &:not(:last-of-type) {
+                      border-right:1px solid #e2e6e0;
+                    }
+                  }
+                }
+                tbody {
+                  tr {
+                    border:1px solid #e2e6e0;
+                    border-top:0;
+                    td {
+                      font:14px firasans_l;
+                      color:#5D675B;
+                      text-align:left;
+                      padding:15px 13px;
+                      vertical-align:top;
+                      &:not(:last-of-type) {
+                        border-right:1px solid #e2e6e0;
+                      }
+                      button.view {
+                        font:12px firasans_r;
+                        color:#383d37;
+                        background-color: #ddcd37;
+                        padding:9px 12px;
+                        border:0;
+                        float:right;
+                        &:hover, &:focus, &:active {
+                          text-decoration:none;
+                          color:#383d37;
+                        }
+                      }
+                    }
+
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
       .overlay {
         display:none;
       }

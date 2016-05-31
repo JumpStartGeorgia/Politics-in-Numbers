@@ -4,7 +4,8 @@ class Donor
   include Mongoid::Timestamps
 
   #embeds_many :terminators
-  embedded_in :donorset
+  #embedded_in :donorset
+  belongs_to :donorset
 
   field :first_name, type: String
   field :last_name, type: String
@@ -19,9 +20,15 @@ class Donor
   def self.sorted
     order_by([[:give_date, :desc], [:first_name, :asc], [:last_name, :asc]])
   end
+  def self.sorted_by_amount
+    order_by([[:amount, :desc], [:give_date, :desc], [:first_name, :asc], [:last_name, :asc]])
+  end
 
   def party
     p = Party.find(party_id)
     p.present? ? p.title : "Unknown"
+  end
+
+  def top(params)
   end
 end

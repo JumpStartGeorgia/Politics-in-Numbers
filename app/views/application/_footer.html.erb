@@ -12,7 +12,6 @@
   </div>
   <div class="footer-center">
     <div class="footer-share">
-      <!-- TODO|animate buttons on hover -->
       <a href="https://www.facebook.com/sharer/sharer.php?u=<%= root_url %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img alt="<%= t('shared.common.facebook') %>" title="<%= t('shared.common.facebook') %>" src="/assets/footer/fb.svg"></a>
       <% title = content_for?(:page_title) ? "#{yield(:page_title)} | #{t("shared.common.name")}" : "#{t("shared.common.name")}".html_safe %>
       <a href="https://twitter.com/share?text=<%= title %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img alt="<%= t('shared.common.twitter') %>" title="<%= t('shared.common.twitter') %>" src="/assets/footer/twitter.svg"></a>

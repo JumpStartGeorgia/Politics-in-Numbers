@@ -1,7 +1,6 @@
 # Non-resource pages
 class RootController < ApplicationController
   def index
-    puts "--------------------------#{new_user_session_path}"
     # @categories = Category.tree_out
     #@parties = Dataset.first
   end
@@ -52,6 +51,27 @@ class RootController < ApplicationController
     render :json => donors
   end
 
+  def explore_filter
+     Rails.logger.debug("--------------------------------------------#{params.inspect}")
+    res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
+    # q = params[:q].split
+    # donors = []
+    # if q.length == 1
+    #   regex1 =  /^#{Regexp.escape(q[0])}/i
+    #   regex2 = /.*/i
+    # else
+    #   regex1 =  /^#{Regexp.escape(q[0])}/i
+    #   regex2 = /^#{Regexp.escape(q[1])}/i
+    # end
+    # Donorset.all.each{ |set|
+    #   set.donors.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
+    #     donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
+    #   }
+    # }
+    #
+    # {"donor"=>["574422cffbb6bd5450000001", "574422cffbb6bd5450000000"], "period"=>{"0"=>"Thu Jan 01 2015 00:00:00 GMT+0400 (GET)", "1"=>"Tue Mar 31 2015 00:00:00 GMT+0400 (GET)"}, "amount"=>["2", "3"], "party"=>["5748093cfbb6bd3781000016"], "type"=>"non_monetary", "multiple"=>"no",
+    render :json => res
+  end
   # def select_parties
   #   q = params[:q]
   #   parties = []

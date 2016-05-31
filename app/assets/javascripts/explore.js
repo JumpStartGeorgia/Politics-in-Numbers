@@ -10,6 +10,7 @@ $(document).ready(function (){
     is_type_donation = true,
     filter_extended = $("#filter_extended"),
     finance_category = $("#finance_category"),
+    content = $("#content"),
     overlay = $(".overlay"),
     autocomplete = {
       push: function(autocomplete_id, key, value) {
@@ -111,18 +112,18 @@ $(document).ready(function (){
         });
 
         $(document).on("click keypress", ".autocomplete .dropdown li", function(event) {
-           console.log("click keypress autocomplete name");
+           //console.log("click keypress autocomplete name");
           if(event.type === "keypress" && event.keyCode !== 13) { return; }
           var t = $(this), dropdown = t.parent(), p = dropdown.parent(), is_selected = t.hasClass("selected");
 
           t.toggleClass("selected");
           var autocomplete_id = p.attr("data-autocomplete-id");
           if(is_selected) {
-             console.log("is selected");
+             //console.log("is selected");
             autocomplete.pop(autocomplete_id, t.attr("data-id"));
           }
           else {
-            console.log("is not selected");
+            //console.log("is not selected");
             autocomplete.push(autocomplete_id, t.attr("data-id"), t.text());
           }
           // console.log(autocomplete);
@@ -181,7 +182,7 @@ $(document).ready(function (){
               tmp_v = tmp.datepicker('getDate');
               tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
               if(isDate(tmp_v)) {
-                tmp_d[elem_i] = tmp_v;
+                tmp_d[elem_i] = tmp_v.getTime();
               }
               if(tmp_d.toString() === [-1, -1].toString()) {
                 delete t.data[el];
@@ -213,20 +214,35 @@ $(document).ready(function (){
             }
           });
         });
-        console.log(t.data);
+        return t.data;
       },
       reset: function() {
         $(".filter-inputs[data-type='donation'] .filter-input").each(function(i,d) {
           var t = $(this);
             field = t.attr("data-field"),
             type = t.attr("data-type");
-             console.log(field,type);
+             list = t.find(".list");
+
+            if(type === "autocomplete") {
+              autocomplete.clear(t.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"));
+            }
+            else if(type === "period") {
+              t.find(".input-group input[type='text'].datepicker").datepicker('setDate', null);
+            }
+            else if(type === "range") {
+              t.find(".input-group input[type='number']").val(null);
+            }
+            else if(type === "radio") {
+              t.find(".input-group input[type='radio']:checked").prop("checked", false);
+            }
+            list.empty();
+            event.stopPropagation();
         });
       },
       validate: function() {}
     };
     dn = donation;
-     console.log(donation.get(), donation);
+     // console.log(donation.get(), donation);
   // gon.donation_period_min = new Date(gon.donation_period_min);
   // gon.donation_period_max = new Date(gon.donation_period_max);
   finance_toggle.click(function (event){
@@ -315,7 +331,7 @@ $(document).ready(function (){
       overlay.removeClass("hidden");
       event.stopPropagation();
     });
-    filter_extended.find(".filter-close").click(function(){
+    filter_extended.find(".filter-header .close").click(function(){
       overlay.addClass("hidden");
       filter_extended.toggleClass("active");
     });
@@ -403,20 +419,109 @@ $(document).ready(function (){
       }
       event.stopPropagation();
     });
-
+    $("#reset").click(function(){
+      if(is_type_donation) {
+        donation.reset();
+      }
+      else {
+        finance.reset();
+      }
+    });
+    $("#explore_button").click(function(){ filter(); });
     autocomplete.bind();
   }
 
 
   function filter() {
+    if(is_type_donation) {
+       console.log(donation.get());
+      // content.text("donation");
+      $.ajax({
+        url: "explore_filter",
+        dataType: 'json',
+        data: donation.get(),
+        success: function(data) {
+          bar_chart(data);
+           console.log(data, "filter donation",donation.get());
+          // var html = "";
+          // data.forEach(function(d) {
+          //   html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
+          // });
+          // p.find("ul").html(html).addClass("active");
+          // console.log("ajax success");
+        }
+      });
+    }
+     else {
+      content.text("finance");
+     }
      console.log("start filter");
   }
 
   bind();
+  filter();
+  function bar_chart(data) {
+     console.log("building highcharts", data.map(function(m) { return m.value;}));
+      $('#donation_chart_1').highcharts({
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: 'TOP 5 DONORS'
+        },
+        // subtitle: {
+        //     text: 'Source: <a href="https://en.wikipedia.org/wiki/World_population">Wikipedia.org</a>'
+        // },
+        xAxis: {
+            type: "category"
+        },
+        // xAxis: {
+        //     categories: data.map(function(m) { return m.name;}),
+        //     title: {
+        //         text: null
+        //     }
+        // },
+        // yAxis: {
+        //     min: 0,
+        //     title: {
+        //         text: 'Population (millions)',
+        //         align: 'high'
+        //     },
+        //     labels: {
+        //         overflow: 'justify'
+        //     }
+        // },
+        // tooltip: {
+        //     valueSuffix: ' millions'
+        // },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        // legend: {
+        //     layout: 'vertical',
+        //     align: 'right',
+        //     verticalAlign: 'top',
+        //     x: -40,
+        //     y: 80,
+        //     floating: true,
+        //     borderWidth: 1,
+        //     backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+        //     shadow: true
+        // },
+        credits: {
+            enabled: false
+        },
+        series: [{ data: data.map(function(m) { return [m.name, m.value];}) }]
+    });
+  }
 
   // dev block
-  filter_extended.find(".filter-toggle").trigger("click");
-  filter_extended.find(".filter-input:nth-of-type(3) .toggle").trigger("click");
+  // filter_extended.find(".filter-toggle").trigger("click");
+  // filter_extended.find(".filter-input:nth-of-type(3) .toggle").trigger("click");
 
 });
 

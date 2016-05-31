@@ -20,6 +20,12 @@
     </script>
 
     <%= javascript_include_tag "application" %>
+    <% if @custom_js.present? %>
+      <% @custom_js.each{|t| %>
+        <%= javascript_include_tag "#{t}" %>
+      <% } %>
+    <% end %>
+
     <% if content_for? :custom_js %>
       <%= javascript_include_tag "#{yield(:custom_js)}"  %>
     <% end %>
