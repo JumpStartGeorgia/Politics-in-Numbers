@@ -551,6 +551,7 @@
           .chart-container {
             display:block;
             width:100%;
+            min-width:300px;
             padding:12px 6px 22px;
             .actions {
               text-align:center;

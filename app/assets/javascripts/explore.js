@@ -4,7 +4,10 @@
 var dn;
 $(document).ready(function (){
   // console.log("here");
-  var finance_toggle = $("#finance_toggle"),
+  var js = {
+      cache: {}
+    },
+    finance_toggle = $("#finance_toggle"),
     donation_toggle = $("#donation_toggle"),
     filter_type = $("#filter_type"),
     is_type_donation = true,
@@ -214,7 +217,7 @@ $(document).ready(function (){
             }
           });
         });
-        return t.data;
+        return Object.keys(t.data).length ? t.data : { "all": true };
       },
       reset: function() {
         $(".filter-inputs[data-type='donation'] .filter-input").each(function(i,d) {
@@ -431,18 +434,44 @@ $(document).ready(function (){
     autocomplete.bind();
   }
 
-
+  var first_filter = true;
   function filter() {
+    console.log("start filter");
+    var filters = {},
+      remote_required = false;
+
     if(is_type_donation) {
-       console.log(donation.get());
+      // test if not cached remote_required
+      filters["donation"] = donation.get();
+      remote_required = true;
+      console.log("donation", donation.get());
       // content.text("donation");
+
+    }
+    else {
+      // test if not cached
+      // remote_required
+      //
+      filters["finance"] = donation.get();
+      // content.text("finance");
+    }
+
+    if(remote_required) {
       $.ajax({
         url: "explore_filter",
         dataType: 'json',
-        data: donation.get(),
+        data: filters,
         success: function(data) {
-          bar_chart(data);
-           console.log(data, "filter donation",donation.get());
+          console.log("remote filtered data", data);
+          if(data.hasOwnProperty("donation")) {
+
+          }
+          if(data.hasOwnProperty("finance")) {
+
+          }
+          filter_callback(data);
+
+          //console.log(data, "filter donation", donation.get());
           // var html = "";
           // data.forEach(function(d) {
           //   html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
@@ -452,10 +481,10 @@ $(document).ready(function (){
         }
       });
     }
-     else {
-      content.text("finance");
-     }
-     console.log("start filter");
+
+  }
+  function filter_callback(data) {
+    bar_chart(data.donation);
   }
 
   bind();
@@ -464,7 +493,9 @@ $(document).ready(function (){
      console.log("building highcharts", data.map(function(m) { return m.value;}));
       $('#donation_chart_1').highcharts({
         chart: {
-            type: 'bar'
+            type: 'bar',
+            backgroundColor: "transparent",
+            height: 200
         },
         title: {
             text: 'TOP 5 DONORS'
@@ -473,7 +504,21 @@ $(document).ready(function (){
         //     text: 'Source: <a href="https://en.wikipedia.org/wiki/World_population">Wikipedia.org</a>'
         // },
         xAxis: {
-            type: "category"
+            type: "category",
+            lineWidth: 0,
+            tickWidth: 0,
+            shadow:false
+           // lineWidth: 0,
+           // minorGridLineWidth: 0,
+           // lineColor: 'transparent',
+           // minorTickLength: 0,
+           // tickLength: 0
+        },
+        yAxis: {
+          visible: false
+        },
+        legend: {
+          enabled: false
         },
         // xAxis: {
         //     categories: data.map(function(m) { return m.name;}),
@@ -496,9 +541,18 @@ $(document).ready(function (){
         // },
         plotOptions: {
             bar: {
+                color:"#ffffff",
                 dataLabels: {
-                    enabled: true
-                }
+                    enabled: true,
+                    padding: 6,
+                    shadow: false
+                },
+                pointInterval:1,
+                pointWidth:15,
+                pointPadding: 0,
+                groupPadding: 0,
+                borderWidth: 0,
+                shadow: false
             }
         },
         // legend: {
