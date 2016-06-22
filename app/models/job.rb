@@ -191,6 +191,7 @@ class Job
       begin
         # notifiers = [:user]
         @donorset = Donorset.find(item_id)
+        donors = []
         @user = User.find(user_id)
 
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.donorset_not_found"))) if @donorset.nil?
@@ -231,10 +232,18 @@ class Job
                   end
                 end
               end
-              donor = Donor.new({ give_date: cells[1], first_name: cells[2],
-                last_name: cells[3], tin: cells[4], amount: cells[5],
-                party_id: p._id, comment: cells[7] })
-              @donorset.donors << donor
+              donor = Donor.by_tin(cells[4]).first
+              if !donor.present?
+                donor = Donor.new({ first_name: cells[2], last_name: cells[3], tin: cells[4] })
+                puts "================================== here #{donor.inspect}"
+              end
+              donation = Donation.new({ give_date: cells[1], amount: cells[5], party_id: p._id, comment: cells[7], monetary: cells[7] == "არაფულადი",
+              donorset_id: @donorset.id })
+              puts "================================== here #{donation.inspect}"
+              donor.donations << donation
+              donors << donor
+              #@donorset.donations << donor.donations
+              puts "================================== here last"
             end
           end
         }
@@ -242,7 +251,9 @@ class Job
         if is_header
           raise Exception.new(I18n.t("notifier.job.donorset_file_process.unmatched_header", header: headers_map))
         else
+          puts "================================== here last saving"
           @donorset.save
+          donors.each{|t| t.save }
           deffered = nil
           if missing_parties.present?
             missing_parties.each {|mp| mp.save; }

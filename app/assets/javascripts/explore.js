@@ -158,10 +158,8 @@ $(document).ready(function (){
           monetary: $("#donation_type_monetary"),
           nonmonetary: $("#donation_type_nonmonetary")
         },
-        multiple: {
-          yes: $("#donation_multiple_yes"),
-          no: $("#donation_multiple_no")
-        }
+        multiple: $("#donation_multiple_yes")
+
         // reset: $("#donation_reset"),
         // explore: $("#donation_explore")
       },
@@ -212,6 +210,11 @@ $(document).ready(function (){
                 t.data[el] = tmp.val();
               }
             }
+            else if(tp === "checkbox") {
+              if(tmp.is(":checked")) {
+                t.data[el] = tmp.val();
+              }
+            }
             else {
               //console.log("Type is not specified", t.elem[el]);
             }
@@ -238,11 +241,24 @@ $(document).ready(function (){
             else if(type === "radio") {
               t.find(".input-group input[type='radio']:checked").prop("checked", false);
             }
+            else if(type === "checkbox") {
+              t.find(".input-group input[type='checkbox']:checked").prop("checked", false);
+            }
             list.empty();
             event.stopPropagation();
         });
       },
-      validate: function() {}
+      validate: function() {},
+      id: function(data) {
+        var period = [-1, -1], amount = [-1, -1];
+        if(data.hasOwnProperty("period")) {
+          period = data.period;
+        }
+        if(data.hasOwnProperty("amount")) {
+          amount = data.amount;
+        }
+        return CryptoJS.MD5(["d", data.donors, period.join(";"), amount.join(";"), data.parties, data.monetary,data.multiple].join(";")).toString();
+      }
     };
     dn = donation;
      // console.log(donation.get(), donation);
@@ -371,6 +387,10 @@ $(document).ready(function (){
           tmp = t.find(".input-group input[type='radio']:checked");
           list.html(tmp.length ? "<span>" + tmp.next().text() + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp.length);
         }
+        else if(type === "checkbox") {
+          tmp = t.find(".input-group input[type='checkbox']:checked");
+          list.html(tmp.length ? "<span>" + tmp.next().text() + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp.length);
+        }
       }
       t.toggleClass("expanded", !state);
     });
@@ -420,6 +440,9 @@ $(document).ready(function (){
       else if(type === "radio") {
         p.find(".input-group input[type='radio']:checked").prop("checked", false);
       }
+      else if(type === "checkbox") {
+        p.find(".input-group input[type='checkbox']:checked").prop("checked", false);
+      }
       event.stopPropagation();
     });
     $("#reset").click(function(){
@@ -443,8 +466,9 @@ $(document).ready(function (){
     if(is_type_donation) {
       // test if not cached remote_required
       filters["donation"] = donation.get();
+       console.log(donation.id(filters["donation"]));
       remote_required = true;
-      console.log("donation", donation.get());
+      console.log("donation", filters["donation"]);
       // content.text("donation");
 
     }
@@ -484,7 +508,8 @@ $(document).ready(function (){
 
   }
   function filter_callback(data) {
-    bar_chart(data.donation);
+     console.log("filter_callback`",data);
+    //bar_chart(data.donation);
   }
 
   bind();

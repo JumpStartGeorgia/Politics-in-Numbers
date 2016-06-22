@@ -56,7 +56,7 @@
             <div class="autocomplete" data-autocomplete-id="donation-donor" data-url="select/donors">
               <input type="text" placeholder="Type Person Id or Name" tabindex="5">
               <ul class="dropdown" id="filter_donation_by_donors" tabindex="5">
-                <% Donorset.first.donors.limit(10).each{|m| %>
+                <% Donor.limit(10).each{|m| %>
                   <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.first_name} #{m.last_name}" %></li>
                 <% } %>
               </ul>
@@ -113,17 +113,13 @@
             </div>
           </div>
         </div>
-        <div class="row filter-input" data-field="multiple" data-type="radio">
+        <div class="row filter-input" data-field="multiple" data-type="checkbox">
           <a href="#" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><i title="<%= t('.filter_toggle') %>"></i></a>
           <div class="list hidden"></div>
           <div class="input-group">
-            <div class="block b1">
-              <input type="radio" id="donation_multiple_yes" name="donation_multiple" value="yes" data-type="radio">
-              <label for="donation_multiple_yes"><span></span><%= t('._yes') %></label>
-            </div>
             <div class="block">
-              <input type="radio" id="donation_multiple_no" name="donation_multiple" value="no" data-type="radio">
-              <label for="donation_multiple_no"><span></span><%= t('._no') %></label>
+              <input type="checkbox" id="donation_multiple_yes" name="donation_multiple" value="yes" data-type="checkbox">
+              <label for="donation_multiple_yes"><span></span><%= t('._yes') %></label>
             </div>
           </div>
         </div>
@@ -216,5 +212,5 @@
   </div>
 </div>
 <% content_for :custom_js,  "explore"  %>
-<% @custom_js = ["https://code.highcharts.com/highcharts.js"] %>
+<% @custom_js = ["https://code.highcharts.com/highcharts.js", "crypto.min.js" ] %>
 <% content_for :custom_css, "explore" %>

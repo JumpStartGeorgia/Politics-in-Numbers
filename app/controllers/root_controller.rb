@@ -57,6 +57,7 @@ class RootController < ApplicationController
 
     if pars[:donation].present?
       res[:donation] = Donor.explore(pars[:donation])
+      Rails.logger.debug("--------------------------------------------#{res.inspect}")
     end
     #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
 

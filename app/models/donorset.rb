@@ -7,7 +7,7 @@ class Donorset
 
   STATES = [:pending, :processed, :discontinued]  # 0 pending 1 processed 2 discontinued
 
-  has_many :donors
+  # has_many :donations
 
   field :state, type: Integer, default: 0
   field :del, type: Boolean, default: false
