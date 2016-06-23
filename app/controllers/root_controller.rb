@@ -8,10 +8,32 @@ class RootController < ApplicationController
   def explore
     gon.filter_item_close = t('.filter_item_close');
     gon.parties = Party.each_with_index.map{|m,i| [m.id.to_s, m.title] }
-    # dates_range = Donorset.dates_range
-    # gon.donation_period_min = dates_range[0]
-    # gon.donation_period_max = dates_range[1]
-    # interesting donor first
+
+
+    pars = explore_params
+    gon.gonned = false
+    tmp = pars[:filter]
+    has_filters = tmp.present? && (tmp == "donation" || tmp == "finance")
+
+
+
+    if has_filters
+      gon.gonned = true
+      pars.each{|k,v|
+        pars[k] = v.split(";") if v.index(";")
+      }
+      if tmp == "donation"
+        dt = Donor.explore(pars)
+        gon.donation_data = dt[:data]
+        pars[:donor] = dt[:donor_info] if dt[:donor_info].present?
+      else
+
+      end
+
+      pars.delete(:locale)
+      gon.params = pars
+    end
+
   end
 
   def about
@@ -56,8 +78,8 @@ class RootController < ApplicationController
     pars = explore_filter_params
 
     if pars[:donation].present?
-      res[:donation] = Donor.explore(pars[:donation])
-      Rails.logger.debug("--------------------------------------------#{res.inspect}")
+      res[:donation] = Donor.explore(pars[:donation])[:data]
+      # Rails.logger.debug("--------------------------------------------#{res.inspect}")
     end
     #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
 
@@ -99,8 +121,11 @@ class RootController < ApplicationController
     #     "type"=>"monetary",
     #      "multiple"=>"yes"},
     #       "locale"=>"en"}
+    def explore_params
+      params.permit([:filter, :monetary, :multiple, :locale, { donor: [], period: [], amount: [], party: [] }])
+    end
     def explore_filter_params
-      params.permit(:donation => [:type, :multiple, :all, { donor: [], period: [], amount: [], party: []}],
+      params.permit(:donation => [:monetary, :multiple, :all, :locale, { donor: [], period: [], amount: [], party: []}],
         :finance => [])
     end
 end

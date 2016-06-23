@@ -3,7 +3,7 @@
 //= require jquery-ui/datepicker
 var dn;
 $(document).ready(function (){
-  // console.log("here");
+  // console.log("explore ready");
   var js = {
       cache: {}
     },
@@ -24,6 +24,7 @@ $(document).ready(function (){
           $("[data-autocomplete-view='" + autocomplete_id + "']").append("<li data-id='"+key+"'>"+value+"<i class='close' title='" + gon.filter_item_close + "'></i></li>");
           this[autocomplete_id][key] = value;
         }
+        console.log(autocomplete);
       },
       pop: function(autocomplete_id, key) {
         if(this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key)) {
@@ -143,6 +144,14 @@ $(document).ready(function (){
       }
     },
     donation = {
+      types: {
+        donor: "autocomplete",
+        period: "period",
+        amount: "range",
+        party: "autocomplete",
+        monetary: "radio",
+        multiple: "checkbox"
+      },
       elem: {
         donor: $("#donation_donor"),
         period: {
@@ -154,9 +163,9 @@ $(document).ready(function (){
           to: $("#donation_amount_to")
         },
         party: $("#donation_party"),
-        type: {
-          monetary: $("#donation_type_monetary"),
-          nonmonetary: $("#donation_type_nonmonetary")
+        monetary: {
+          yes: $("#donation_monetary_yes"),
+          no: $("#donation_monetary_no")
         },
         multiple: $("#donation_multiple_yes")
 
@@ -222,6 +231,49 @@ $(document).ready(function (){
         });
         return Object.keys(t.data).length ? t.data : { "all": true };
       },
+      set_by_url: function() {
+        var t = this, tmp, tp, v, p, el;
+        console.log("set_by_url");
+        if(gon.params) {
+          Object.keys(gon.params).forEach(function(k) {
+                        // console.log(gon.params);
+            if(k == "filter" || !t.types.hasOwnProperty(k)) return;
+              el = t.elem[k];
+              tp = t.types[k];
+              v = gon.params[k];
+
+            if(tp === "autocomplete") {
+              p = el.parent();
+              Object.keys(v).forEach(function(kk){
+                autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), kk, v[kk]);
+              });
+            }
+            else if(tp === "period") {
+              el.from.datepicker('setDate', new Date(+v[0]));
+              el.to.datepicker('setDate', new Date(+v[1]));
+              tmp = formatRange([el.from.datepicker("getDate").format("mm/dd/yyyy"), el.to.datepicker("getDate").format("mm/dd/yyyy")]);
+              create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
+            }
+            else if(tp === "range") {
+              el.from.val(+v[0]);
+              el.to.val(+v[1]);
+              tmp = formatRange(v);
+              create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
+            }
+            else if(tp === "radio") {
+              el = el[Object.keys(el)[0]];
+              p = el.closest(".filter-input");
+              tmp = p.find(".input-group input[type='radio'][value='" + v + "']").prop("checked", true);
+              create_list_item(p.find(".list"), tmp.next().text(), tmp.length);
+            }
+            else if(tp === "checkbox") {
+              tmp = el.prop("checked", el.val() === v ? true : false);
+              create_list_item(el.closest(".filter-input").find(".list"), tmp.next().text(), tmp.length);
+            }
+          });
+          console.log(gon.params);
+        }
+      },
       reset: function() {
         $(".filter-inputs[data-type='donation'] .filter-input").each(function(i,d) {
           var t = $(this);
@@ -249,15 +301,34 @@ $(document).ready(function (){
         });
       },
       validate: function() {},
-      id: function(data) {
+      id: function(v) {
         var period = [-1, -1], amount = [-1, -1];
-        if(data.hasOwnProperty("period")) {
-          period = data.period;
+        if(v.hasOwnProperty("period")) {
+          period = v.period;
         }
-        if(data.hasOwnProperty("amount")) {
-          amount = data.amount;
+        if(v.hasOwnProperty("amount")) {
+          amount = v.amount;
         }
-        return CryptoJS.MD5(["d", data.donors, period.join(";"), amount.join(";"), data.parties, data.monetary,data.multiple].join(";")).toString();
+        console.log(["d", v.donors, period.join(";"), amount.join(";"), v.parties, v.monetary,v.multiple].join(";"));
+        return CryptoJS.MD5(["d", v.donors, period.join(";"), amount.join(";"), v.parties, v.monetary,v.multiple].join(";")).toString();
+      },
+      url: function(v) {
+        var t = this, url = "?", params = [], tmp;
+
+        Object.keys(this.elem).forEach(function(el){
+          if(v.hasOwnProperty(el)) {
+            tmp = v[el];
+            if(el !== "monetary" && el !== "multiple" && Array.isArray(tmp)) {
+              tmp.forEach(function(r){
+                params.push(el + "[]=" + r);
+              });
+            }
+            else {
+              params.push(el + "=" + tmp);
+            }
+          }
+        });
+        window.history.pushState(v, null, window.location.pathname + (params.length ? ("?filter=donation&" + params.join("&")) : ""));
       }
     };
     dn = donation;
@@ -343,8 +414,13 @@ $(document).ready(function (){
 
 
 
-
+  function create_list_item(list, text, vbool) {
+    list.html(vbool ? "<span>" + text + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !vbool);
+  }
   function bind() {
+    window.onpopstate = function(event) {
+       console.log("onpopstate location: " + window.location + ", state: " + JSON.stringify(event.state));
+    };
     filter_extended.find(".filter-toggle").click(function(){
       filter_extended.toggleClass("active");
       overlay.removeClass("hidden");
@@ -371,7 +447,7 @@ $(document).ready(function (){
             tmp.push(tmp2 ? tmp2.format("mm/dd/yyyy") : null);
           });
           tmp = formatRange(tmp);
-          list.html(tmp ? "<span>" + tmp + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp);
+          create_list_item(list, tmp, tmp);
         }
         else if(type === "range") {
           tmp = [];
@@ -381,15 +457,15 @@ $(document).ready(function (){
 
           });
           tmp = formatRange(tmp);
-          list.html(tmp ? "<span>" + tmp + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp);
+          create_list_item(list, tmp, tmp);
         }
         else if(type === "radio") {
           tmp = t.find(".input-group input[type='radio']:checked");
-          list.html(tmp.length ? "<span>" + tmp.next().text() + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp.length);
+          create_list_item(list, tmp.next().text(), tmp.length);
         }
         else if(type === "checkbox") {
           tmp = t.find(".input-group input[type='checkbox']:checked");
-          list.html(tmp.length ? "<span>" + tmp.next().text() + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !tmp.length);
+          create_list_item(list, tmp.next().text(), tmp.length);
         }
       }
       t.toggleClass("expanded", !state);
@@ -418,10 +494,8 @@ $(document).ready(function (){
 
     $("#donation_period_campaigns a").click(function(){
       var t = $(this), v = t.attr("data-value").split(";");
-      console.log(v);
       donation.elem.period.from.datepicker('setDate', new Date(v[0]));
       donation.elem.period.to.datepicker('setDate', new Date(v[1]));
-       console.log("radio");
     });
     $(document).on("click", ".list > span .close", function(event) {
       var t = $(this);
@@ -457,28 +531,45 @@ $(document).ready(function (){
     autocomplete.bind();
   }
 
-  var first_filter = true;
   function filter() {
     console.log("start filter");
     var filters = {},
-      remote_required = false;
+      remote_required = false, tmp, cacher_id, donation_id, finance_id;
 
     if(is_type_donation) {
-      // test if not cached remote_required
-      filters["donation"] = donation.get();
-       console.log(donation.id(filters["donation"]));
-      remote_required = true;
-      console.log("donation", filters["donation"]);
-      // content.text("donation");
+      if(gon.gonned) {
+        donation.set_by_url();
+      }
 
+      tmp = donation.get();
+      donation_id = donation.id(tmp);
+
+      if(!gon.gonned) {
+        donation.url(tmp);
+      }
+      else {
+        gon.gonned = false;
+      }
+      // console.log(donation_id, tmp);
+
+      if(!js.cache.hasOwnProperty(donation_id)) {
+        filters["donation"] = tmp;
+        remote_required = true;
+      }
+      else {
+        filter_callback(js.cache[donation_id], "donation");
+      }
+      // content.text("donation");
     }
     else {
       // test if not cached
       // remote_required
       //
-      filters["finance"] = donation.get();
+      filters["finance"] = finance.get();
       // content.text("finance");
     }
+
+
 
     if(remote_required) {
       $.ajax({
@@ -487,32 +578,24 @@ $(document).ready(function (){
         data: filters,
         success: function(data) {
           console.log("remote filtered data", data);
-          if(data.hasOwnProperty("donation")) {
-
-          }
-          if(data.hasOwnProperty("finance")) {
-
-          }
-          filter_callback(data);
-
-          //console.log(data, "filter donation", donation.get());
-          // var html = "";
-          // data.forEach(function(d) {
-          //   html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
-          // });
-          // p.find("ul").html(html).addClass("active");
-          // console.log("ajax success");
+          if(data.hasOwnProperty("donation")) { filter_callback(js.cache[donation_id] = data.donation, "donation"); }
+          if(data.hasOwnProperty("finance")) { filter_callback(js.cache[finance_id] = data.finance, "finance"); }
+           console.log(js.cache);
         }
       });
     }
 
   }
-  function filter_callback(data) {
-     console.log("filter_callback`",data);
+  function filter_callback(data, partial) {
+     //console.log("filter_callback", partial, data.length);
     //bar_chart(data.donation);
   }
 
   bind();
+  if(gon.gonned) {
+    is_type_donation = gon.hasOwnProperty("donation_data")
+  }
+
   filter();
   function bar_chart(data) {
      console.log("building highcharts", data.map(function(m) { return m.value;}));

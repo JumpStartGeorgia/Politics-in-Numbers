@@ -37,6 +37,7 @@ function exist(v) { return typeof v !== 'undefined' && v !== null && v !== '';}
 function isNumber(v) { return /^\d+$/.test(v); }
 function isDate(v) { return v !== null; }
 function formatRange(range) {
+  console.log(range);
   if(range.length === 2) {
     if(range[0] !== null && range[1] !== null) {
       return range.join(" - ");

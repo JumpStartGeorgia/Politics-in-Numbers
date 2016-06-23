@@ -10,7 +10,7 @@ class Donation
   field :party_id, type: BSON::ObjectId
   field :give_date, type: Date
   field :comment, type: String
-  field :monetary, type: Boolean, default: false
+  field :monetary, type: Boolean, default: true
   field :donorset_id, type: BSON::ObjectId
 
   validates_presence_of :amount, :party_id, :give_date, :donorset_id

@@ -18,10 +18,27 @@ class Donor
   scope :to_date, -> v { where("donations.give_date" => { "$lte":  v}) if v.present? && v != -1 }
   scope :from_amount, -> v { where("donations.amount" => { "$gte":  v}) if v.present? && v != -1 }
   scope :to_amount, -> v { where("donations.amount" => { "$lte":  v}) if v.present? && v != -1 }
-  scope :by_monetary_type, -> v { where("donations.monetary" => v) if v == true || v == false }
+  scope :where_monetary, -> v { where("donations.monetary" => v) if v == true || v == false }
   scope :only_multiple_donations, -> v { where("donations.1" => { "$exists" => true }) if v == true }
+  # d.collection.aggregate([{ "$project": { "name": {"$concat": ["$first_name","-","$last_name"] } }}]).first
+  #scope :pair_by_donors, -> v { where(:id.in => v).aggregate([{ "$project": { "name": {"$concat": ["$first_name","-","$last_name"] } }}]) if v.present? }
+   # d.collection.aggregate([ { "$match": { tin: "17001006279"}}, { "$project": { "name": {"$concat": ["$first_name","-","$last_name"] } }}])
+
+  def amount
+    donations.sum(:amount)
+  end
+
   def self.sorted
     order_by([[:first_name, :asc], [:last_name, :asc]])
+  end
+
+
+  def self.pair_by_donors(ids) #id name
+    res = {}
+    collection.aggregate([ { "$match": { "_id": { "$in": ids } } }, { "$project": { "name": {"$concat": ["$first_name"," ","$last_name"] } }}]).each{|d|
+      res[d[:_id].to_s] = d[:name]
+    }
+    res
   end
 
   def self.explore(params)
@@ -41,8 +58,8 @@ class Donor
     tmp = params[:party]
     parties = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
 
-    tmp = params[:type]
-    monetary = tmp == "monetary" if tmp == "monetary" || tmp == "non_monetary"
+    tmp = params[:monetary]
+    monetary = tmp == "yes" if tmp == "yes" || tmp == "no"
 
     multiple = true if params[:multiple] == "yes"
 
@@ -53,13 +70,32 @@ class Donor
             .to_date(period[1])
             .from_amount(amount[0])
             .to_amount(amount[1])
-            .by_monetary_type(monetary)
+            .where_monetary(monetary)
             .only_multiple_donations(multiple)
 
-    require 'digest'
-     #Rails.logger.debug("-------------------------------------------->#{["d",donor_ids,period,amount,parties,monetary,multiple].join(";")}<")
-    { data: donors, id: Digest::MD5.hexdigest(["d",donor_ids,period,amount,parties,monetary,multiple].join(";"))}
+    # *TODO* donor should now about amount for all donations
+    # donors.order_by(amount: 'desc')
+    # sort_by {|v|
+    #    v.amount
+    #  }
+    donor_pairs = donor_ids.present? ? Donor.pair_by_donors(donor_ids.map{|m| BSON::ObjectId(m) }) : []
+    #Rails.logger.debug("------------------------------------#{donor_ids}-------->#{@donor_pairs}<")
+    # require 'digest'
+    # Rails.logger.debug("-------------------------------------------->#{["d",donor_ids,period,amount,parties,monetary,multiple].join(";")}<")
+    # { data: donors, id: Digest::MD5.hexdigest(["d",donor_ids,period,amount,parties,monetary,multiple].join(";"))}
 
+    parties = {}
+    Party.each{|e| parties[e.id] = 0}
+
+    Donor.each{|e|
+      e.donations.each { |ee|
+        parties[ee.party_id] += ee.amount
+      }
+    }
+
+    parties.sort_by { |k, v| v }
+
+    { data: donors, donor_info: donor_pairs,  }
     #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
     # res
     #     What happens when filters are selected (table always show full results):

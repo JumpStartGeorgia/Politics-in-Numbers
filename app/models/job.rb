@@ -237,7 +237,7 @@ class Job
                 donor = Donor.new({ first_name: cells[2], last_name: cells[3], tin: cells[4] })
                 puts "================================== here #{donor.inspect}"
               end
-              donation = Donation.new({ give_date: cells[1], amount: cells[5], party_id: p._id, comment: cells[7], monetary: cells[7] == "არაფულადი",
+              donation = Donation.new({ give_date: cells[1], amount: cells[5], party_id: p._id, comment: cells[7], monetary: cells[7] != "არაფულადი",
               donorset_id: @donorset.id })
               puts "================================== here #{donation.inspect}"
               donor.donations << donation
