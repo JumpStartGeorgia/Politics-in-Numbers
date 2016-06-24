@@ -3,17 +3,26 @@ class Donor
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  embeds_many :donations
+  embeds_many :donations, after_add: :calculate_donated_amount, after_remove: :calculate_donated_amount do
+    # * TODO * find out how to filter embed data
+    def by_party(v)
+      where("party_id" => { "$in": v.map{|m| BSON::ObjectId(m) } }) if v.present?
+    end
+  end
+
+  NATURE_TYPES = ["private", "organization"]
 
   field :first_name, type: String
   field :last_name, type: String
   field :tin, type: String
+  field :donated_amount, type: Float
+  field :nature, type: Integer, default: 0
 
   validates_presence_of :first_name, :last_name, :tin
 
   scope :by_donors, -> v { where(:id.in => v) if v.present? }
-  scope :by_party, -> v { where("donations.party_id" => { "$in": v}) if v.present? }
-  scope :by_tin, -> v { where("donations.tin" => v) }
+  scope :by_party, -> v { }
+  scope :by_tin, -> v { where("tin" => v) }
   scope :from_date, -> v { where("donations.give_date" => { "$gte":  v}) if v.present? && v != -1 }
   scope :to_date, -> v { where("donations.give_date" => { "$lte":  v}) if v.present? && v != -1 }
   scope :from_amount, -> v { where("donations.amount" => { "$gte":  v}) if v.present? && v != -1 }
@@ -24,7 +33,13 @@ class Donor
   #scope :pair_by_donors, -> v { where(:id.in => v).aggregate([{ "$project": { "name": {"$concat": ["$first_name","-","$last_name"] } }}]) if v.present? }
    # d.collection.aggregate([ { "$match": { tin: "17001006279"}}, { "$project": { "name": {"$concat": ["$first_name","-","$last_name"] } }}])
 
-  def amount
+  def calculate_donated_amount(v)
+    self.donated_amount = 0
+    donations.each{ |e| self.donated_amount += e.amount }
+    puts "------------------------#{save}"
+  end
+
+  def partial_donated_amount
     donations.sum(:amount)
   end
 
@@ -35,13 +50,14 @@ class Donor
 
   def self.pair_by_donors(ids) #id name
     res = {}
-    collection.aggregate([ { "$match": { "_id": { "$in": ids } } }, { "$project": { "name": {"$concat": ["$first_name"," ","$last_name"] } }}]).each{|d|
+    collection.aggregate([ { "$match": { "_id": { "$in": ids.map{|m| BSON::ObjectId(m) } } } }, { "$project": { "name": {"$concat": ["$first_name"," ","$last_name"] } }}]).each{|d|
       res[d[:_id].to_s] = d[:name]
     }
     res
   end
 
   def self.explore(params)
+    limiter = 5
     donor_ids = parties = monetary = multiple = nil
     period = [-1,-1]
     amount = [-1,-1]
@@ -72,35 +88,69 @@ class Donor
             .to_amount(amount[1])
             .where_monetary(monetary)
             .only_multiple_donations(multiple)
+            #.order_by(donated_amount: :desc)
 
-    # *TODO* donor should now about amount for all donations
-    # donors.order_by(amount: 'desc')
-    # sort_by {|v|
-    #    v.amount
-    #  }
-    donor_pairs = donor_ids.present? ? Donor.pair_by_donors(donor_ids.map{|m| BSON::ObjectId(m) }) : []
-    #Rails.logger.debug("------------------------------------#{donor_ids}-------->#{@donor_pairs}<")
-    # require 'digest'
-    # Rails.logger.debug("-------------------------------------------->#{["d",donor_ids,period,amount,parties,monetary,multiple].join(";")}<")
-    # { data: donors, id: Digest::MD5.hexdigest(["d",donor_ids,period,amount,parties,monetary,multiple].join(";"))}
+    chart1 = []
+    chart2 = []
+    table = []
+    total_amount = 0
+    total_donations = 0
 
-    parties = {}
-    Party.each{|e| parties[e.id] = 0}
+     Rails.logger.debug("--------------------------------------------#{params[:party]} #{donors.length}")
+    if donor_ids.nil? && parties.nil? # If select anything other than party and donor -> charts show the top 5
+      chart1 = donors.descending(:donated_amount).limit(limiter).map{|m| { value: m.donated_amount, name: "#{m.first_name} #{m.last_name}" } }
 
-    Donor.each{|e|
-      e.donations.each { |ee|
-        parties[ee.party_id] += ee.amount
+      parties = {}
+      Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
+      monetary_values = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
+      nature_values = [I18n.t("mongoid.attributes.donor.nature_values.private"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
+
+      donors.each{|e|
+        total_amount += e.donated_amount
+        e.donations.each { |ee|
+          parties[ee.party_id][:value] += ee.amount
+          total_donations += 1
+          table.push(["#{ee.id}", "#{e.first_name} #{e.last_name}", nature_values[e.nature], I18n.l(ee.give_date), ee.amount, parties[ee.party_id][:name], monetary_values[ee.monetary ? 0 : 1] ])
+        }
       }
-    }
+      table.unshift([human_attribute_name(:id), human_attribute_name(:name),
+        human_attribute_name(:nature), human_attribute_name(:give_date),
+        Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
+        Donation.human_attribute_name(:monetary)])
 
-    parties.sort_by { |k, v| v }
+
+      chart2 = parties.sort_by { |k, v| -1*v[:value] }.first(limiter).map{|k,v| v }
+
+     # Rails.logger.debug("--------------------------------------------#{chart1} #{chart2} #{table} #{total_amount} #{total_donations}")
+    elsif donor_ids.nil? && parties.length == 1 # If select 1 party -> top 5 donors for party, last 5 donations for party
+      chart1 = donors.sort!{ |x,y| y.partial_donated_amount <=> x.partial_donated_amount }.first(limiter).map{|m| { value: m.partial_donated_amount, name: "#{m.first_name} #{m.last_name}" } }
+      # donors.each{|e|
+      #   total_amount += e.donated_amount
+      #   e.donations.each { |ee|
+      #     # parties[ee.party_id][:value] += ee.amount
+      #     total_donations += 1
+      #     # table.push(["#{ee.id}", "#{e.first_name} #{e.last_name}", nature_values[e.nature], I18n.l(ee.give_date), ee.amount, parties[ee.party_id][:name], monetary_values[ee.monetary ? 0 : 1] ])
+      #   }
+      # }
+
+      Rails.logger.debug("--------------------------------------------#{chart1} #{chart2} #{table} #{total_amount} #{total_donations}")
+    end
+
+
+
+
+
+    donor_pairs = donor_ids.present? ? Donor.pair_by_donors(donor_ids) : []
+
+
 
     { data: donors, donor_info: donor_pairs,  }
-    #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
-    # res
+
+
+
     #     What happens when filters are selected (table always show full results):
-# If select anything other than party and donor -> charts show the top 5
-# If select 1 party -> top 5 donors for party, last 5 donations for party
+#
+
 # If select > 1 party -> top 5 donors for parties, total donations for selected parties
 # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
 # If select > 1 donor-> total donations for each donor, top 5 parties donated to
@@ -112,6 +162,9 @@ class Donor
     #     "type"=>"monetary",
     #      "multiple"=>"yes"},
     #       "locale"=>"en"}
+    #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
+    # require 'digest'
+    # { data: donors, id: Digest::MD5.hexdigest(["d",donor_ids,period,amount,parties,monetary,multiple].join(";"))}
   end
   # def self.validate_params(params)
 
