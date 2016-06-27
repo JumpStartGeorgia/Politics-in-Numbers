@@ -1,6 +1,34 @@
 # Non-resource pages
 class RootController < ApplicationController
   def index
+    dd = nil
+     Donor.each{|e| e.donations.each{|ee|
+        if ee.amount == 800
+          dd = e
+        end
+      }
+    }
+    #Rails.logger.debug("--------------------------------------------#{dd.collection.inspect}")
+    # sd = dd.collection.aggregate([
+    #     { "$match": { "donations.amount": 800 } },
+    #    {
+    #       "$project": {
+    #         first_name: 1,
+    #          donations: {
+    #             "$filter": {
+    #                 input: "$donations",
+    #                 as: "donation",
+    #                 cond: { "$eq": [ "$$donation.amount", 800 ] }
+    #                #cond: { "$$donation": { "$amount": 800 } }
+    #             }
+    #          }
+    #       }
+    #    }
+    # ])
+    # # .each do | doc |
+    # #     pp doc
+    # # end
+    #  Rails.logger.debug("--------------------------------#{sd.inspect}")
     # @categories = Category.tree_out
     #@parties = Dataset.first
   end

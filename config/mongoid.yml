@@ -1,6 +1,6 @@
 development:
   # Configure available database sessions. (required)
-  sessions:
+  clients:
     # Defines the default session. (required)
     default:
       database: politic-staging
@@ -68,7 +68,7 @@ development:
     # use_utc: false
 staging:
   # Configure available database sessions. (required)
-  sessions:
+  clients:
     # Defines the default session. (required)
     default:
       database: politic-staging
@@ -136,7 +136,7 @@ staging:
     # use_utc: false
 test:
   # Configure available database sessions. (required)
-  sessions:
+  clients:
     # Defines the default session. (required)
     default:
       database: politic-staging
