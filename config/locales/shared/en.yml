@@ -64,6 +64,17 @@ en:
     prompts:
       confirm: Are you sure?
       forgot_password: Forgot your password?
+    chart:
+      title:
+        top_5_donor: Top 5 Donor
+        top_5_party: Top 5 Party
+        top_5_donors_for_party: Top 5 donor for party
+        last_5_donations_for_party: Last 5 donations for party
+        top_5_donors_for_parties: Top 5 donors for parties
+        total_donations_for_parties: Total donations for parties
+        last_5_donations_for_donor: Last 5 donors donations
+        top_5_parties_donated_to: Top 5 parties donated to
+        total_donations_for_each_donor: Total donations for each donor
   notifier:
     job:
       donorset_file_process:

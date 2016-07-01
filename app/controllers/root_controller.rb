@@ -35,8 +35,8 @@ class RootController < ApplicationController
 
   def explore
     gon.filter_item_close = t('.filter_item_close');
-    gon.parties = Party.each_with_index.map{|m,i| [m.id.to_s, m.title] }
-
+    gon.party_list = Party.each_with_index.map{|m| [m.id.to_s, m.title] }
+    gon.donor_list = Donor.each_with_index.map{|m| [m.id.to_s, "#{m.first_name} #{m.last_name}"] }
 
     pars = explore_params
     gon.gonned = false
@@ -47,13 +47,13 @@ class RootController < ApplicationController
 
     if has_filters
       gon.gonned = true
-      pars.each{|k,v|
-        pars[k] = v.split(";") if v.index(";")
-      }
+      # pars.each{|k,v|
+      #   pars[k] = v.split(";") if v.index(";")
+      # }
       if tmp == "donation"
         dt = Donor.explore(pars)
-        gon.donation_data = dt[:data]
-        pars[:donor] = dt[:donor_info] if dt[:donor_info].present?
+        gon.donation_data = dt
+        #pars[:donor] = dt[:donor_info] if dt[:donor_info].present?
       else
 
       end
@@ -93,10 +93,8 @@ class RootController < ApplicationController
       regex1 =  /^#{Regexp.escape(q[0])}/i
       regex2 = /^#{Regexp.escape(q[1])}/i
     end
-    Donorset.all.each{ |set|
-      set.donors.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
-        donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
-      }
+    Donor.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
+      donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
     }
     render :json => donors
   end

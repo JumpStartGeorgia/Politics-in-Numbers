@@ -233,7 +233,7 @@ $(document).ready(function (){
       },
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
-        console.log("set_by_url");
+        console.log("set_by_url", gon.params);
         if(gon.params) {
           Object.keys(gon.params).forEach(function(k) {
                         // console.log(gon.params);
@@ -245,7 +245,7 @@ $(document).ready(function (){
             if(tp === "autocomplete") {
               p = el.parent();
               Object.keys(v).forEach(function(kk){
-                autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), kk, v[kk]);
+                autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[p.attr("data-field")+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
               });
             }
             else if(tp === "period") {
@@ -548,9 +548,11 @@ $(document).ready(function (){
         donation.url(tmp);
       }
       else {
+        js.cache[donation_id] = gon.donation_data;
         gon.gonned = false;
       }
       // console.log(donation_id, tmp);
+
 
       if(!js.cache.hasOwnProperty(donation_id)) {
         filters["donation"] = tmp;
@@ -572,23 +574,45 @@ $(document).ready(function (){
 
 
     if(remote_required) {
+      console.log("remote explore", filters);
       $.ajax({
         url: "explore_filter",
         dataType: 'json',
         data: filters,
         success: function(data) {
           console.log("remote filtered data", data);
-          if(data.hasOwnProperty("donation")) { filter_callback(js.cache[donation_id] = data.donation, "donation"); }
-          if(data.hasOwnProperty("finance")) { filter_callback(js.cache[finance_id] = data.finance, "finance"); }
+          if(data.hasOwnProperty("donation")) { filter_callback(js.cache[donation_id]["full"] = data.donation, "donation"); }
+          if(data.hasOwnProperty("finance")) { filter_callback(js.cache[finance_id]["full"] = data.finance, "finance"); }
            console.log(js.cache);
         }
       });
     }
 
   }
+
+  var donation_total_amount = $("#donation_total_amount span"),
+    donation_total_donations = $("#donation_total_donations span"),
+    donation_table = $("#donation_table table");
+
+  function render_table(table_header, table, total_amount, total_donations) {
+    donation_total_amount.text(total_amount);
+    donation_total_donations.text(total_donations);
+
+    donation_table.DataTable({
+       "aaData": table,
+      "aoColumns": table_header.map(function(m){ return { "title": m }; })
+
+      // data: table
+      // ,
+      // "columns": table_header.map(function(m){ return { "data": m }; })
+    });
+  }
   function filter_callback(data, partial) {
-     //console.log("filter_callback", partial, data.length);
-    //bar_chart(data.donation);
+     // console.log("filter_callback", partial);
+    console.dir( data);
+    render_table(data.table_header, data.table, data.total_amount, data.total_donations);
+    bar_chart("#donation_chart_1", data.chart1, data.chart1_title);
+    bar_chart("#donation_chart_2", data.chart2, data.chart2_title);
   }
 
   bind();
@@ -597,87 +621,41 @@ $(document).ready(function (){
   }
 
   filter();
-  function bar_chart(data) {
-     console.log("building highcharts", data.map(function(m) { return m.value;}));
-      $('#donation_chart_1').highcharts({
-        chart: {
-            type: 'bar',
-            backgroundColor: "transparent",
-            height: 200
-        },
-        title: {
-            text: 'TOP 5 DONORS'
-        },
-        // subtitle: {
-        //     text: 'Source: <a href="https://en.wikipedia.org/wiki/World_population">Wikipedia.org</a>'
-        // },
-        xAxis: {
-            type: "category",
-            lineWidth: 0,
-            tickWidth: 0,
-            shadow:false
-           // lineWidth: 0,
-           // minorGridLineWidth: 0,
-           // lineColor: 'transparent',
-           // minorTickLength: 0,
-           // tickLength: 0
-        },
-        yAxis: {
-          visible: false
-        },
-        legend: {
-          enabled: false
-        },
-        // xAxis: {
-        //     categories: data.map(function(m) { return m.name;}),
-        //     title: {
-        //         text: null
-        //     }
-        // },
-        // yAxis: {
-        //     min: 0,
-        //     title: {
-        //         text: 'Population (millions)',
-        //         align: 'high'
-        //     },
-        //     labels: {
-        //         overflow: 'justify'
-        //     }
-        // },
-        // tooltip: {
-        //     valueSuffix: ' millions'
-        // },
-        plotOptions: {
-            bar: {
-                color:"#ffffff",
-                dataLabels: {
-                    enabled: true,
-                    padding: 6,
-                    shadow: false
-                },
-                pointInterval:1,
-                pointWidth:15,
-                pointPadding: 0,
-                groupPadding: 0,
-                borderWidth: 0,
-                shadow: false
-            }
-        },
-        // legend: {
-        //     layout: 'vertical',
-        //     align: 'right',
-        //     verticalAlign: 'top',
-        //     x: -40,
-        //     y: 80,
-        //     floating: true,
-        //     borderWidth: 1,
-        //     backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
-        //     shadow: true
-        // },
-        credits: {
-            enabled: false
-        },
-        series: [{ data: data.map(function(m) { return [m.name, m.value];}) }]
+  function bar_chart(elem, series_data, title) {
+    console.log("chart", elem, series_data);
+    $(elem).highcharts({
+      chart: {
+          type: 'bar',
+          backgroundColor: "transparent",
+          height: 200
+      },
+      title: { text: title },
+      xAxis: {
+          type: "category",
+          lineWidth: 0,
+          tickWidth: 0,
+          shadow:false
+      },
+      yAxis: { visible: false },
+      legend: { enabled: false },
+      plotOptions: {
+          bar: {
+              color:"#ffffff",
+              dataLabels: {
+                  enabled: true,
+                  padding: 6,
+                  shadow: false
+              },
+              pointInterval:1,
+              pointWidth:15,
+              pointPadding: 0,
+              groupPadding: 0,
+              borderWidth: 0,
+              shadow: false
+          }
+      },
+      credits: { enabled: false },
+      series: [{ data: series_data }]
     });
   }
 

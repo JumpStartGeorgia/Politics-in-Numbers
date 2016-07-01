@@ -89,7 +89,7 @@
           <a href="#" class="toggle" tabindex="5"><%= t('.party') %><i title="<%= t('.filter_toggle') %>"></i></a>
           <ul id="donation_party" class="list" data-autocomplete-view="donation-party" data-type="autocomplete"></ul>
           <div class="input-group">
-            <div class="autocomplete" data-autocomplete-id="donation-party" data-local="parties">
+            <div class="autocomplete" data-autocomplete-id="donation-party" data-local="party_list">
               <input type="text" placeholder="Type Party Name" tabindex="5">
               <ul class="dropdown" id="filter_donation_by_parties" tabindex="5">
                 <% Party.each{|m| %>
@@ -129,7 +129,7 @@
           <a href="#" class="toggle" tabindex="5"><%= t('.party') %><i title="<%= t('.filter_toggle') %>"></i></a>
           <ul id="donation_party" class="list" data-autocomplete-view="donation-party" data-type="autocomplete"></ul>
           <div class="input-group">
-            <div class="autocomplete" data-autocomplete-id="donation-party" data-local="parties">
+            <div class="autocomplete" data-autocomplete-id="donation-party" data-local="party_list">
               <input type="text" placeholder="Type Party Name" tabindex="5">
               <ul class="dropdown" id="filter_donation_by_parties" tabindex="5">
                 <% Party.each{|m| %>
@@ -186,7 +186,7 @@
               <div class="embed" title="<%= t('.embed_chart') %>"></div>
               <div class="download" title="<%= t('.download_chart') %>"></div>
             </div>
-            <div id="donation_chart_1"></div>
+            <div id="donation_chart_2"></div>
           </div>
         </div>
         <div class="total">
@@ -201,9 +201,7 @@
               <div class="download" title="<%= t('.download_table') %>"></div>
             </div>
           <div id="donation_table">
-            <table><thead><!-- <tr><th>Header1</th><th>Header2</th></tr> --></thead>
-            <tbody>
-              <!-- <tr><td>Value1<button class="view"><%= t('.view') %></button></td><td>Value2</td></tr></tbody></table> -->
+            <table></table>
           </div>
         </div>
       </div>
