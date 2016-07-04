@@ -66,15 +66,17 @@ en:
       forgot_password: Forgot your password?
     chart:
       title:
-        top_5_donor: Top 5 Donor
-        top_5_party: Top 5 Party
-        top_5_donors_for_party: Top 5 donor for party
-        last_5_donations_for_party: Last 5 donations for party
-        top_5_donors_for_parties: Top 5 donors for parties
-        total_donations_for_parties: Total donations for parties
-        last_5_donations_for_donor: Last 5 donors donations
-        top_5_parties_donated_to: Top 5 parties donated to
-        total_donations_for_each_donor: Total donations for each donor
+        top_5_donors: Top 5 Donors
+        top_5_parties: Top 5 Parties
+        top_5_donors_for_party: Top %{n} Donors for %{obj}
+        last_5_donations_for_party: Last %{n} Donations for %{obj}
+        top_5_donors_for_parties: Top %{n} Donors for All Parties
+        total_donations_for_parties: Total Donations for Parties
+        last_5_donations_for_donor: Last %{n} Donations
+        top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj}
+        total_donations_for_each_donor: Total Donations for Each Donor
+        donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb}
+        parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj}
   notifier:
     job:
       donorset_file_process:

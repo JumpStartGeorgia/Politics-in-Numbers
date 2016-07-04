@@ -33,7 +33,7 @@ gem 'jquery-rails', '~> 4.0.3'
 # JSON creation
 gem 'jbuilder', '~> 2.0'
 
-# Stores project secrets in environment variables
+# Stores project secrets itest environment variables
 gem 'dotenv-rails', '~> 2.0.0'
 
 # Makes compatibility easier for jQuery and turbolinks
@@ -149,7 +149,7 @@ group :test do
   gem 'capybara-screenshot', '~> 1.0.4'
 
   # Cleans database during tests
-  gem 'database_cleaner', '~> 1.3.0'
+  gem 'database_cleaner', '~> 1.5.0'
 
   # Fast web driver with JavaScript support for feature tests
   gem 'poltergeist', '~> 1.7'

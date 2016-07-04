@@ -1,4 +1,4 @@
-<div id="explore">
+<div id="explore" data-type="donation">
   <div id="filter_type" class="filter-type" data-type="donation">
     <div class="back"><img alt="<%= t('shared.common.back') %>" src="/assets/explore/back.svg" title="<%= t('shared.common.back') %>"></div>
     <div class="donation active" data-type="donation">
@@ -164,15 +164,24 @@
   </div>
   <div id="content" class="content">
     <div class="overlay hidden"></div>
-    <div class="panes" data-type="donation">
+    <div class="panes" >
       <div class="pane" data-type="donation">
         <div class="caption"><%= t('.donation_caption') %></div>
         <div class="charts">
           <div class="chart-container chart-container-1">
             <div class="actions">
-              <div class="share" title="<%= t('.share_chart') %>"></div>
-              <div class="embed" title="<%= t('.embed_chart') %>"></div>
-              <div class="download" title="<%= t('.download_chart') %>"></div>
+              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+              <div class="download download_menu" title="<%= t('.download_chart') %>">
+                <i></i>
+                <ul class="chart_download" data-target="#donation_chart_1">
+                  <li><a href="#" data-type="print">print</a></li>
+                  <li><a href="#" data-type="pdf">pdf</a></li>
+                  <li><a href="#" data-type="svg">svg</a></li>
+                  <li><a href="#" data-type="jpeg">jpeg</a></li>
+                  <li><a href="#" data-type="png">png</a></li>
+                </ul>
+              </div>
             </div>
             <div id="donation_chart_1"></div>
           </div>
@@ -181,10 +190,19 @@
             <span class="party-donations"><%= t('.party_donations').html_safe %></span>
           </div>
           <div class="chart-container chart-container-2">
-             <div class="actions">
-                <div class="share" title="<%= t('.share_chart') %>"></div>
-              <div class="embed" title="<%= t('.embed_chart') %>"></div>
-              <div class="download" title="<%= t('.download_chart') %>"></div>
+            <div class="actions">
+              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+              <div class="download download_menu" title="<%= t('.download_chart') %>">
+                <i></i>
+                <ul class="chart_download" data-target="#donation_chart_2">
+                  <li><a href="#" data-type="print">print</a></li>
+                  <li><a href="#" data-type="pdf">pdf</a></li>
+                  <li><a href="#" data-type="svg">svg</a></li>
+                  <li><a href="#" data-type="png">png</a></li>
+                  <li><a href="#" data-type="jpeg">jpeg</a></li>
+                </ul>
+              </div>
             </div>
             <div id="donation_chart_2"></div>
           </div>
@@ -196,19 +214,54 @@
         </div>
         <div class="table">
             <div class="actions">
-              <div class="share" title="<%= t('.share_table') %>"></div>
-              <div class="embed" title="<%= t('.embed_table') %>"></div>
-              <div class="download" title="<%= t('.download_table') %>"></div>
+              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+              <a href="" id="donation_csv_download" class="download" title="<%= t('.download_table') %>"><i></i></a>
             </div>
           <div id="donation_table">
             <table></table>
           </div>
         </div>
       </div>
-      <div class="pane" data-type="finance"></div>
+      <div class="pane" data-type="finance">
+        <div class="charts">
+          <div class="chart-container">
+            <div class="actions">
+              <div class="left">
+                <label>View as:</label>
+                <div class="view-chart" title="<%= t('.view_as_chart') %>"><i></i></div>
+                <div class="view-table" title="<%= t('.view_as_table') %>"><i></i></div>
+              </div>
+              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+              <div class="download download_menu-list" title="<%= t('.download_chart') %>">
+                <i></i>
+                <ul class="chart_download" data-target="#donation_chart_1">
+                  <li><a href="#" data-type="print">print</a></li>
+                  <li><a href="#" data-type="pdf">pdf</a></li>
+                  <li><a href="#" data-type="svg">svg</a></li>
+                  <li><a href="#" data-type="jpeg">jpeg</a></li>
+                  <li><a href="#" data-type="png">png</a></li>
+                </ul>
+              </div>
+            </div>
+            <div id="finance_chart"></div>
+          </div>
+        </div>
+        <div class="table">
+            <div class="actions">
+              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+              <a href="" id="donation_csv_download" class="download" title="<%= t('.download_chart') %>"><i></i></a>
+            </div>
+          <div id="donation_table">
+            <table></table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 <% content_for :custom_js,  "explore"  %>
-<% @custom_js = ["https://code.highcharts.com/highcharts.js", "crypto.min.js" ] %>
+<% @custom_js = ["https://code.highcharts.com/highcharts.js", "https://code.highcharts.com/modules/exporting.js", "https://code.highcharts.com/modules/offline-exporting.js", "crypto.min.js" ] %>
 <% content_for :custom_css, "explore" %>

@@ -7,6 +7,7 @@ $(document).ready(function (){
   var js = {
       cache: {}
     },
+    explore = $("#explore"),
     finance_toggle = $("#finance_toggle"),
     donation_toggle = $("#donation_toggle"),
     filter_type = $("#filter_type"),
@@ -152,6 +153,7 @@ $(document).ready(function (){
         monetary: "radio",
         multiple: "checkbox"
       },
+      download: $("#donation_csv_download"),
       elem: {
         donor: $("#donation_donor"),
         period: {
@@ -309,8 +311,8 @@ $(document).ready(function (){
         if(v.hasOwnProperty("amount")) {
           amount = v.amount;
         }
-        console.log(["d", v.donors, period.join(";"), amount.join(";"), v.parties, v.monetary,v.multiple].join(";"));
-        return CryptoJS.MD5(["d", v.donors, period.join(";"), amount.join(";"), v.parties, v.monetary,v.multiple].join(";")).toString();
+        console.log(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple].join(";"));
+        return CryptoJS.MD5(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple].join(";")).toString();
       },
       url: function(v) {
         var t = this, url = "?", params = [], tmp;
@@ -329,6 +331,7 @@ $(document).ready(function (){
           }
         });
         window.history.pushState(v, null, window.location.pathname + (params.length ? ("?filter=donation&" + params.join("&")) : ""));
+        t.download.attr("href", window.location.pathname + (params.length ? ("?filter=donation&format=csv&" + params.join("&")) : ""))
       }
     };
     dn = donation;
@@ -344,6 +347,7 @@ $(document).ready(function (){
       p.addClass("active");
       filter_type.attr("data-type", "finance");
       filter_extended.attr("data-type", "finance");
+      explore.attr("data-type", "finance");
     }
 
     filter_type.addClass("in-depth");
@@ -359,6 +363,7 @@ $(document).ready(function (){
       p.addClass("active");
       filter_type.attr("data-type", "donation");
       filter_extended.attr("data-type", "donation");
+      explore.attr("data-type", "donation");
     }
     event.stopPropagation();
   });
@@ -528,6 +533,23 @@ $(document).ready(function (){
       }
     });
     $("#explore_button").click(function(){ filter(); });
+    $(".chart_download a").click(function(){
+      var t = $(this), type = t.attr("data-type"), p = t.parent().parent(), target = p.attr("data-target"),
+      chart = $(target).highcharts(),
+      mimes = {
+        "png": "image/png",
+        "jpeg": "image/jpeg",
+        "svg": "image/svg+xml",
+        "pdf": "application/pdf",
+      };
+      console.log(target, type, mimes[type]);
+      if(type === "print") {
+        chart.print();
+      }
+      else {
+        chart.exportChart({ type: mimes[type] });
+      }
+    });
     autocomplete.bind();
   }
 
@@ -543,6 +565,7 @@ $(document).ready(function (){
 
       tmp = donation.get();
       donation_id = donation.id(tmp);
+      console.log("***",tmp, donation_id);
 
       if(!gon.gonned) {
         donation.url(tmp);
@@ -581,8 +604,8 @@ $(document).ready(function (){
         data: filters,
         success: function(data) {
           console.log("remote filtered data", data);
-          if(data.hasOwnProperty("donation")) { filter_callback(js.cache[donation_id]["full"] = data.donation, "donation"); }
-          if(data.hasOwnProperty("finance")) { filter_callback(js.cache[finance_id]["full"] = data.finance, "finance"); }
+          if(data.hasOwnProperty("donation")) { filter_callback(js.cache[donation_id] = data.donation, "donation"); }
+          if(data.hasOwnProperty("finance")) { filter_callback(js.cache[finance_id] = data.finance, "finance"); }
            console.log(js.cache);
         }
       });
@@ -594,25 +617,26 @@ $(document).ready(function (){
     donation_total_donations = $("#donation_total_donations span"),
     donation_table = $("#donation_table table");
 
-  function render_table(table_header, table, total_amount, total_donations) {
-    donation_total_amount.text(total_amount);
-    donation_total_donations.text(total_donations);
+  function render_table(table) {
+    donation_total_amount.text(table.total_amount);
+    donation_total_donations.text(table.total_donations);
 
     donation_table.DataTable({
-       "aaData": table,
-      "aoColumns": table_header.map(function(m){ return { "title": m }; })
-
-      // data: table
-      // ,
-      // "columns": table_header.map(function(m){ return { "data": m }; })
+      destroy: true,
+      "aaData": table.data,
+      "aoColumns": table.header.map(function(m,i) {
+        return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
+      }),
+      buttons: [ 'copy', 'csv', 'excel', 'pdf', 'print' ],
+      dom: 'Bfrtip'
     });
   }
   function filter_callback(data, partial) {
      // console.log("filter_callback", partial);
     console.dir( data);
-    render_table(data.table_header, data.table, data.total_amount, data.total_donations);
-    bar_chart("#donation_chart_1", data.chart1, data.chart1_title);
-    bar_chart("#donation_chart_2", data.chart2, data.chart2_title);
+    render_table(data.table);
+    bar_chart("#donation_chart_1", data.chart1, data.chart1_title, "#EBE187");
+    bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
   }
 
   bind();
@@ -621,20 +645,34 @@ $(document).ready(function (){
   }
 
   filter();
-  function bar_chart(elem, series_data, title) {
+  function bar_chart(elem, series_data, title, bg) {
     console.log("chart", elem, series_data);
     $(elem).highcharts({
       chart: {
           type: 'bar',
-          backgroundColor: "transparent",
+          backgroundColor: bg,
           height: 200
+      },
+      exporting: {
+        buttons: {
+          contextButton: {
+            enabled: false
+          }
+        }
       },
       title: { text: title },
       xAxis: {
-          type: "category",
-          lineWidth: 0,
-          tickWidth: 0,
-          shadow:false
+        type: "category",
+        lineWidth: 0,
+        tickWidth: 0,
+        labels: {
+          style: {
+            color: "#5d675b",
+            fontSize:"14px",
+            fontFamily: "firasans_book",
+            textShadow: 'none'
+          }
+        }
       },
       yAxis: { visible: false },
       legend: { enabled: false },
@@ -644,10 +682,15 @@ $(document).ready(function (){
               dataLabels: {
                   enabled: true,
                   padding: 6,
-                  shadow: false
+                  style: {
+                    color: "#5d675b",
+                    fontSize:"14px",
+                    fontFamily: "firasans_r",
+                    textShadow: 'none'
+                  }
               },
               pointInterval:1,
-              pointWidth:15,
+              pointWidth:17,
               pointPadding: 0,
               groupPadding: 0,
               borderWidth: 0,

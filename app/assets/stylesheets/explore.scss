@@ -556,27 +556,40 @@
             .actions {
               text-align:center;
               padding:0 0 18px;
-              > div {
+              > div
+              {
                 display:inline-block;
-                width:24px;
-                height:21px;
-                background:transparent url(/assets/explore/actions.svg) no-repeat top left;
-                &:hover, &:focus, &:active {
-                  cursor:pointer;
+                position:relative;
+                width:36px;
+                height:28px;
+                > i {
+                  display:block;
+                  width:24px;
+                  height:21px;
+                  position:absolute;
+                  top:50%;
+                  left:50%;
+                  transform:translate(-50%, -50%);
+                  background:transparent url(/assets/explore/actions.svg) no-repeat top left;
+                  &:hover, &:focus, &:active {
+                    cursor:pointer;
+                  }
+                  margin:0px auto;
                 }
               }
-              .share {
-                background-position: 0px 0px;
+              .share
+              {
+                i { background-position: 0px 0px; }
                 &:hover { background-position: 0px -22px; }
               }
-              .embed {
-                background-position: -25px 0px;
-                margin:0 10px;
-                &:hover { background-position: -25px -22px; }
+              .embed
+              {
+                i { background-position: -25px 0px; }
+                &:hover i { background-position: -25px -22px; }
               }
-              .download {
-                background-position: -49px 0px;
-                &:hover { background-position: -49px -22px; }
+              .download{
+                i { background-position: -49px 0px; }
+                &:hover i { background-position: -49px -22px; }
               }
             }
           }
@@ -642,28 +655,39 @@
           .actions {
             text-align:right;
             padding:0 16px 18px;
-            > div {
-              display:inline-block;
-              width:24px;
-              height:21px;
-              background:transparent url(/assets/explore/actions.svg) no-repeat top left;
-              &:hover, &:focus, &:active {
-                cursor:pointer;
+            > div, > a
+              {
+                display:inline-block;
+                position:relative;
+                width:36px;
+                height:28px;
+                > i {
+                  display:block;
+                  width:24px;
+                  height:21px;
+                  position:absolute;
+                  top:50%;
+                  left:50%;
+                  transform:translate(-50%, -50%);
+                  background:transparent url(/assets/explore/actions.svg) no-repeat top left;
+                  &:hover, &:focus, &:active {
+                    cursor:pointer;
+                  }
+                  margin:0px auto;
+                }
               }
-            }
 
             .share {
-              background-position: 0px -43px;
-              &:hover { background-position: 0px -65px; }
+              i { background-position: 0px -43px; }
+              &:hover i { background-position: 0px -65px; }
             }
             .embed {
-              background-position: -25px -43px;
-              margin:0 20px;
-              &:hover { background-position: -25px -65px; }
+              i { background-position: -25px -43px; }
+              &:hover i { background-position: -25px -65px; }
             }
             .download {
-              background-position: -49px -43px;
-              &:hover { background-position: -49px -65px; }
+              i { background-position: -49px -43px; }
+              &:hover i { background-position: -49px -65px; }
             }
           }
           #donation_table {
@@ -711,6 +735,8 @@
                         color:#383d37;
                       }
                     }
+                    &.right { text-align: right; }
+                    &.center { text-align: center; }
                   }
 
                 }
@@ -732,6 +758,14 @@
     }
   }
 
+  & #content .pane[data-type='donation'] ,
+  & #content .pane[data-type='finance'] {
+    display:none;
+  }
+  &[data-type='donation'] #content .pane[data-type='donation'],
+  &[data-type='finance'] #content .pane[data-type='finance'] {
+    display:table-cell;
+  }
   @media (min-width: 768px) {
 
   }
@@ -1006,5 +1040,35 @@
   }
   @media (min-width: 1200px) {
 
+  }
+}
+// 40 36
+.actions .download_menu {
+  position:relative;
+  z-index:888;
+  ul {
+    display:none;
+  }
+  &:hover {
+    background-color:#fff;
+    border:1px dashed #aeb3ad;
+    ul {
+      display:block;
+      position:absolute;
+      top:100%;
+      right:0;
+      background-color:#fff;
+      border:1px dashed #aeb3ad;
+      li a {
+        display:block;
+        font: 14px firasans_l;
+        color: #5D675B;
+        padding:6px 10px;
+        text-align:center;
+        &:hover {
+          background-color: #F5F5F5;
+        }
+      }
+    }
   }
 }

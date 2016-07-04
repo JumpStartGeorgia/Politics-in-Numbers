@@ -37,7 +37,7 @@ class RootController < ApplicationController
     gon.filter_item_close = t('.filter_item_close');
     gon.party_list = Party.each_with_index.map{|m| [m.id.to_s, m.title] }
     gon.donor_list = Donor.each_with_index.map{|m| [m.id.to_s, "#{m.first_name} #{m.last_name}"] }
-
+    dt = []
     pars = explore_params
     gon.gonned = false
     tmp = pars[:filter]
@@ -61,7 +61,21 @@ class RootController < ApplicationController
       pars.delete(:locale)
       gon.params = pars
     end
+    if pars[:format] == 'csv'
+      require 'csv'
 
+      csv_file = CSV.generate do |csv|
+        csv << dt[:table][:header]
+        dt[:table][:data].each do |r|
+          csv << r
+        end
+      end
+    end
+
+    respond_to do |format|
+      format.html
+      format.csv { send_data csv_file, filename: "Explore-#{Date.today}.csv" }
+    end
   end
 
   def about
@@ -104,7 +118,7 @@ class RootController < ApplicationController
     pars = explore_filter_params
 
     if pars[:donation].present?
-      res[:donation] = Donor.explore(pars[:donation])[:data]
+      res[:donation] = Donor.explore(pars[:donation])
       # Rails.logger.debug("--------------------------------------------#{res.inspect}")
     end
     #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
@@ -139,6 +153,59 @@ class RootController < ApplicationController
   #   render :json => parties
   # end
 
+  def share
+   if (request.user_agent.include?("facebook") && request.user_agent.include?("externalhit")) # if facebook robot Rails.env.development? ||
+      pars = explore_params
+
+      # if p.present?
+      #   encodedP = Base64.urlsafe_encode64(p.to_param)
+      #   require 'game_data'
+
+      #   @url = request.original_url.split('?').first + '?f=' + encodedP
+      #   tick = 12
+      #   cur_ticks = p['t'].to_i
+      #   gender = p['g']
+      #   category = GameData.category(p['c'])
+      #   salary = p['s'].to_i
+
+      #   msalary = 0
+      #   if(gender=='m')
+      #     msalary = salary
+      #     fsalary = salary + (category[:outrun]==1 ? 1 : -1)*(salary * category[:percent] / 100);
+      #   else
+      #     fsalary = salary
+      #     msalary = salary + (category[:outrun]==1 ? -1 : 1)*(salary * category[:percent] / 100);
+      #   end
+      #   fsalary_total = ((gender == 'm' ? msalary : fsalary) * (cur_ticks * tick)).floor
+      #   ssalary_total = ((gender == 'm' ? fsalary : msalary) * (cur_ticks * tick)).floor
+      #   salary_total_diff = (fsalary_total - ssalary_total).abs.floor
+
+
+      #   # params needed for t('.desc1') that is in the share page
+      #   @years = ((cur_ticks * tick) / 12).to_s
+      #   @job = ''
+      #   if p['c'] != 'hyn3wmKk' # do not show job title for 'all jobs'
+      #     @job = I18n.t('gap.share.job', job: I18n.t("gap.gamedata.share_category.#{p['c']}"))
+      #   end
+
+
+      #   @salary = view_context.number_with_delimiter(salary_total_diff)
+      #   @more_less = ((gender == 'm' && msalary > fsalary) || (gender == 'f' && fsalary > msalary)) ? t('gap.share.more') : t('gap.share.less')
+      #   @gender = I18n.t("gap.share.#{gender == 'f' ? 'm' : 'f'}")
+
+
+      #   @descr = "Gender " + I18n.t("gap.gamedata.gender.#{p['g']}") + ", Age " + p['a'] + ", Category " + I18n.t("gap.gamedata.category.#{p['c']}") + ", Salary " + p['s'] + ", Interest " +  I18n.t("gap.gamedata.interest.#{p['i']}") + ", Salary Percent " + p['p']
+      #   respond_to do |format|
+      #     format.html
+      #   end
+      # else
+      #   redirect_to gap_path and return
+      # end
+    else
+      redirect_to explore_path and return
+    end
+  end
+
   private
       # "donation"=>{"donor"=>["574d9379fbb6bd0313000007", "574d9379fbb6bd0313000014"],
     #  "period"=>["1464724800000", "1464897600000"],
@@ -148,7 +215,7 @@ class RootController < ApplicationController
     #      "multiple"=>"yes"},
     #       "locale"=>"en"}
     def explore_params
-      params.permit([:filter, :monetary, :multiple, :locale, { donor: [], period: [], amount: [], party: [] }])
+      params.permit([:filter, :monetary, :multiple, :locale, :format, { donor: [], period: [], amount: [], party: [] }])
     end
     def explore_filter_params
       params.permit(:donation => [:monetary, :multiple, :all, :locale, { donor: [], period: [], amount: [], party: []}],

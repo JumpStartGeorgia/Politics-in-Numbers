@@ -140,7 +140,7 @@ test:
   clients:
     # Defines the default session. (required)
     default:
-      database: politic-staging
+      database: politic-staging-test
       #user: root
       #password: root
       # Provides the hosts the default session can connect to. Must be an array
