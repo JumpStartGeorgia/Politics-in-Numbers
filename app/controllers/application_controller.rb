@@ -9,9 +9,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_locale
 
   def set_locale
-    puts "-------------#{I18n.locale}"
     I18n.locale = params[:locale] || I18n.default_locale
-    puts "-------------#{I18n.locale}"
   end
   # before_action :set_locale
   #private :set_locale
@@ -60,7 +58,6 @@ class ApplicationController < ActionController::Base
   # # end
 
   # def not_authorized
-  #   puts "-------------------------sdf-"
   #   redirect_to new_user_session, alert: t('shared.msgs.not_authorized')
   # rescue ActionController::RedirectBackError
   #   redirect_to root_path

@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     get '/parties' => 'root#parties'
     get 'select/donors' => 'root#select_donors'
     get 'select/parties' => 'root#select_parties'
+    get 'explore_filter' => 'root#explore_filter'
     # get '/read' => 'root#read'
     # get '/read_details' => 'root#read_details'
     # get '/read_donors' => 'root#read_donors'

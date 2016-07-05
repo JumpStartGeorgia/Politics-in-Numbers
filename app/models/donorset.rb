@@ -7,7 +7,7 @@ class Donorset
 
   STATES = [:pending, :processed, :discontinued]  # 0 pending 1 processed 2 discontinued
 
-  embeds_many :donors
+  # has_many :donations
 
   field :state, type: Integer, default: 0
   field :del, type: Boolean, default: false
@@ -59,19 +59,19 @@ class Donorset
     self.state == STATES.index(st)
   end
 
-  def self.dates_range
-    min = nil
-    max = nil
-    Donorset.all.each {|r|
-      tmp_min = r.donors.min(:give_date)
-      tmp_max = r.donors.max(:give_date)
-      if min.nil? || tmp_min < min
-        min = tmp_min
-      end
-      if max.nil? || tmp_max > max
-        max = tmp_max
-      end
-    }
-    [min, max]
-  end
+  # def self.dates_range
+  #   min = nil
+  #   max = nil
+  #   Donorset.all.each {|r|
+  #     tmp_min = r.donors.min(:give_date)
+  #     tmp_max = r.donors.max(:give_date)
+  #     if min.nil? || tmp_min < min
+  #       min = tmp_min
+  #     end
+  #     if max.nil? || tmp_max > max
+  #       max = tmp_max
+  #     end
+  #   }
+  #   [min, max]
+  # end
 end

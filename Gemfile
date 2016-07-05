@@ -7,10 +7,10 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.2'
 
 # Connection to Mongodb database
-gem "mongoid", "~> 4.0.0"
+gem "mongoid", "~> 5.1.0"
 
 # Mongoid URL slug or permalink generator
-gem 'mongoid-slug', '~> 5.0.0'
+gem 'mongoid-slug', '~> 5.2.0'
 
 # Integrate Paperclip into Mongoid.
 gem "mongoid-paperclip", :require => "mongoid_paperclip"
@@ -33,7 +33,7 @@ gem 'jquery-rails', '~> 4.0.3'
 # JSON creation
 gem 'jbuilder', '~> 2.0'
 
-# Stores project secrets in environment variables
+# Stores project secrets itest environment variables
 gem 'dotenv-rails', '~> 2.0.0'
 
 # Makes compatibility easier for jQuery and turbolinks
@@ -94,7 +94,7 @@ group :development do
   gem 'quiet_assets', '~> 1.0.3'
 
   # Recommends SQL query performance optimizations
-  gem 'bullet', '~> 4.14.5'
+  gem 'bullet', '~> 5.1.0'
 
   # Static code analyzer that finds potential security issues
   gem 'brakeman', '~> 3.0.5', require: false
@@ -118,14 +118,17 @@ end
 
 group :test do
   # Specification testing
-  gem 'rspec-rails', '~> 3.1.0'
+  gem 'rspec-rails', '~> 3.4.0'
 
+  # %w[rspec-core rspec-expectations rspec-mocks rspec-rails rspec-support].each do |lib|
+  #   gem lib, :git => "https://github.com/rspec/#{lib}.git", :branch => 'master'
+  # end
   # Adds syntax to check that a collection has a certain number of something
   # Ex: expect(new_user).to have(1).error_on(:role)
-  gem 'rspec-collection_matchers', '~> 1.1.2'
+  gem 'rspec-collection_matchers'#, '~> 1.1.2'
 
   # Provides a collection of RSpec-compatible matchers that help to test Mongoid documents.
-  gem 'mongoid-rspec', '~> 2.1.0'
+  gem 'mongoid-rspec', '3.0.0'
 
   # Easy data creation in tests
   gem 'factory_girl_rails', '~> 4.5.0'
@@ -146,7 +149,7 @@ group :test do
   gem 'capybara-screenshot', '~> 1.0.4'
 
   # Cleans database during tests
-  gem 'database_cleaner', '~> 1.3.0'
+  gem 'database_cleaner', '~> 1.5.0'
 
   # Fast web driver with JavaScript support for feature tests
   gem 'poltergeist', '~> 1.7'

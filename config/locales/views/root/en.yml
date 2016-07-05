@@ -39,4 +39,16 @@ en:
       time: Time
       annual: Annual
       explore: EXPLORE
-      filter_intro: "*You can choose many parties and one category OR many categories and one party"
+      share_chart: Share chart
+      embed_chart: Embed chart
+      download_chart: Download chart
+      share_table: Share table
+      embed_table: Embed table
+      download_table: Download table
+      top5_donors: TOP 5 DONORS
+      top5_parties_by_donations: TOP 5 PARTIES BY DONATIONS
+      donor: DONOR
+      donors: DONORS
+      party_donations: PARTY <br/>DONATIONS
+      view: View
+      donation_caption: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia expedita enim fugiat"

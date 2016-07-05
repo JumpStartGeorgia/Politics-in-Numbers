@@ -41,6 +41,7 @@ en:
       actual_address: "6 Melikishvili Street, Third Floor, 0179 Tbilisi, Georgia"
       summary: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit, voluptatum! Magnam quas consequatur nihil quo reiciendis asperiores vitae obcaecati quam, quidem ratione delectus, veritatis nulla maiores quae nemo debitis. Sed."
       back: Back
+      ns: Not Specified
     locale:
       short:
         en: En
@@ -63,6 +64,19 @@ en:
     prompts:
       confirm: Are you sure?
       forgot_password: Forgot your password?
+    chart:
+      title:
+        top_5_donors: Top 5 Donors
+        top_5_parties: Top 5 Parties
+        top_5_donors_for_party: Top %{n} Donors for %{obj}
+        last_5_donations_for_party: Last %{n} Donations for %{obj}
+        top_5_donors_for_parties: Top %{n} Donors for All Parties
+        total_donations_for_parties: Total Donations for Parties
+        last_5_donations_for_donor: Last %{n} Donations
+        top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj}
+        total_donations_for_each_donor: Total Donations for Each Donor
+        donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb}
+        parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj}
   notifier:
     job:
       donorset_file_process:
