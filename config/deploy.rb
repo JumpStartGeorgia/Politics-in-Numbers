@@ -69,8 +69,8 @@ set :nginx_symlink, -> { "/etc/nginx/sites-enabled/#{application}" }
 
 # SSL settings
 set_default :use_ssl, false
-set :ssl_key, -> { "/etc/sslmate/#{web_url}.key" }
-set :ssl_cert, -> { "/etc/sslmate/#{web_url}.chained.crt" }
+set :ssl_key, -> { "/etc/letsencrypt/live/#{web_url}/privkey.pem" }
+set :ssl_cert, -> { "/etc/letsencrypt/live/#{web_url}/fullchain.pem" }
 
 # Assets settings
 set :precompiled_assets_dir, 'public/assets'
