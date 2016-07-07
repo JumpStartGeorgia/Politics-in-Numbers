@@ -66,7 +66,7 @@ namespace :nginx do
   task :reload do |task|
     system %(echo "")
     system %(echo "Restarts Nginx.")
-    system %(#{sudo_ssh_cmd(task)} 'sudo service nginx reload')
+    system %(#{sudo_ssh_cmd(task)} 'sudo nginx -s reload')
     system %(echo "")
   end
 

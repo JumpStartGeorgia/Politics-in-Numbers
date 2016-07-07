@@ -20,3 +20,6 @@
 # Temporary files often end with ~ character
 *~
 /sources/*
+
+#ignore db config
+/config/mongoid.yml

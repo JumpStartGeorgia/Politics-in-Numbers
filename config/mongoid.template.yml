@@ -1,6 +1,6 @@
 development:
   # Configure available database sessions. (required)
-  clients:
+  sessions:
     # Defines the default session. (required)
     default:
       database: <%= ENV["DB_NAME"] %>
@@ -11,7 +11,6 @@ development:
       hosts:
         - localhost:27017
       options:
-        truncate_logs: false
         # Change whether the session persists in safe mode by default.
         # (default: false)
         # safe: false
@@ -69,7 +68,7 @@ development:
     # use_utc: false
 staging:
   # Configure available database sessions. (required)
-  clients:
+  sessions:
     # Defines the default session. (required)
     default:
       database: <%= ENV["DB_NAME"] %>
@@ -137,7 +136,7 @@ staging:
     # use_utc: false
 test:
   # Configure available database sessions. (required)
-  clients:
+  sessions:
     # Defines the default session. (required)
     default:
       database: <%= ENV["DB_NAME"] %>

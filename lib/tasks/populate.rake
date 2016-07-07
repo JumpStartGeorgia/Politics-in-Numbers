@@ -1,8 +1,11 @@
+require 'fileutils'
 namespace :populate do
   desc "Read and upload all annual files"
   task :annual => :environment do |t, args|
 
-    lg = Logger.new File.new('log/tasks/populate.log', 'w')
+    log_path = "#{Rails.root}/log/tasks"
+    FileUtils.mkpath(log_path)
+    lg = Logger.new File.new("#{log_path}/populate.log", 'w')
     lg.formatter = proc do |severity, datetime, progname, msg|
       "#{msg}\n"
     end
@@ -52,7 +55,9 @@ namespace :populate do
   desc "Read and upload all election files"
   task :election => :environment do |t, args|
 
-    lg = Logger.new File.new('log/tasks/populate_election.log', 'w')
+    log_path = "#{Rails.root}/log/tasks"
+    FileUtils.mkpath(log_path)
+    lg = Logger.new File.new("#{log_path}/populate_election.log", 'w')
     lg.formatter = proc do |severity, datetime, progname, msg|
       "#{msg}\n"
     end

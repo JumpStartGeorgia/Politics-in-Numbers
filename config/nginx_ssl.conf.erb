@@ -4,14 +4,16 @@ upstream puma_<%= application %> {
 
 server {
   listen 80;
-  server_name <%= web_url %> www.<%= web_url %>;
+  server_name <%= web_url %>;
   return 301 https://$server_name$request_uri;
 }
 
 server {
-  listen 443 ssl spdy default deferred;
+  ### there can only be one default and deferred on a server
+  #  listen 443 ssl http2 default deferred;
+  listen 443 ssl http2;
 
-  server_name <%= web_url %> www.<%= web_url %>;
+  server_name <%= web_url %>;
   root <%= full_current_path %>/public;
   try_files $uri/index.html $uri @puma_<%= application %>;
 
@@ -37,7 +39,7 @@ server {
   ssl_session_timeout 5m;
 
   # Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits
-  ssl_dhparam /etc/ssl/dhparams.pem;
+  ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
   # enables server-side protection from BEAST attacks
   # http://blog.ivanristic.com/2013/09/is-beast-still-a-threat.html
@@ -66,9 +68,9 @@ server {
   # control buffer overflow attacks
   # https://www.acunetix.com/blog/articles/nginx-server-security-hardening-configuration-1/
   client_body_buffer_size 10k;
-  client_header_buffer_size 1k;
+  client_header_buffer_size 8k;
   client_max_body_size 8m;
-  large_client_header_buffers 2 1k;
+  large_client_header_buffers 4 8k;
 
   # when serving user-supplied content, include a X-Content-Type-Options: nosniff header along with the Content-Type: header,
   # to disable content-type sniffing on some browsers.
@@ -101,7 +103,8 @@ server {
   gzip_comp_level  2;
   gzip_min_length  1000;
   gzip_proxied     expired no-cache no-store private auth;
-  gzip_types       text/plain application/x-javascript text/xml text/css application/xml;
+  gzip_types       text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+  gzip_vary        on;
 
   error_page 500 502 504 /500.html;
   error_page 503 @503;
@@ -109,6 +112,8 @@ server {
   location @puma_<%= application %> {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-Ssl on;
     proxy_redirect off;
     proxy_pass http://puma_<%= application %>;
     access_log <%= full_shared_path %>/log/nginx.access.log;
@@ -129,25 +134,24 @@ server {
     root html;
   }
 
-  if ($request_method !~ ^(GET|HEAD|PUT|POST|DELETE)$ ){
-    return 405;
-  }
-
-  ###########################################
-  # Maintenance
-
-  # Rename public/maintenance_disabled.html to public/maintenance.html
-  # to make all site requests redirect to the maintenance page.
   location @503 {
-    error_page 405 = /maintenance.html;
-    if (-f $document_root/maintenance.html) {
-      rewrite ^(.*)$ /maintenance.html break;
+    error_page 405 = /system/maintenance.html;
+    if (-f $document_root/system/maintenance.html) {
+      rewrite ^(.*)$ /system/maintenance.html break;
     }
     rewrite ^(.*)$ /503.html break;
   }
 
-  if (-f $document_root/maintenance.html) {
+  if ($request_method !~ ^(GET|HEAD|PUT|POST|DELETE)$ ){
+    return 405;
+  }
+
+  if (-f $document_root/system/maintenance.html) {
     return 503;
+  }
+
+  location ~ \.(php|html)$ {
+    return 405;
   }
 
   ###########################################
@@ -155,4 +159,13 @@ server {
   location ~ \.(php|html)$ {
     return 405;
   }
+
+  ##############################################################
+  # the following is to allow certbots/letsencrypt access to certs
+  ##############################################################
+  location ~ /.well-known {
+    allow all;
+  }
+
+
 }
