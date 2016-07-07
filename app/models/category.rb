@@ -21,6 +21,7 @@ class Category
   field :default_language, type: String
   #field :tmp_id, type: Integer
   field :order, type: Integer
+  field :sym, type: Symbol
 
   scope :virtual, ->{ where(virtual: true) }
   scope :non_virtual, ->{ where(virtual: false) }
@@ -28,7 +29,20 @@ class Category
   index code: 1
   index title: 1
   index parent_id: 1
-  index simple: 1
+  #index simple: 1
+
+  def self.by_sym(sym, vir = false)
+    out = ""
+    tree(vir, sym).each { |item| out += by_sym_helper(item[:sub], true) if item[:sub].present? }
+    out
+  end
+
+  def self.tree(vir = false, sym = nil)
+    cats = Category.all
+    list = []
+    cats.where({level: 0, virtual: vir}.merge!( sym.present? ? { sym: sym } : {} )).order_by(order: :asc).each{ |cat| list << { c: cat, sub: sub_tree(cat.id, 1, vir) } }
+    list
+  end
 
   def self.tree_out(vir = false, select = false, id = "categories-list")
     list = tree(vir)
@@ -53,12 +67,6 @@ class Category
       out += "</ul>"
     end
   end
-  def self.tree(vir = false)
-    cats = Category.all
-    list = []
-    cats.where({level: 0, virtual: vir}).order_by(order: :asc).each{ |cat| list << { c: cat, sub: sub_tree(cat.id, 1, vir) } }
-    list
-  end
 
   private
 
@@ -72,7 +80,6 @@ class Category
     end
     list
   end
-
 
   def self.sub_tree_out(sub, select)
     list = sub
@@ -95,6 +102,22 @@ class Category
         }
         out += "</ul>"
       end
+    end
+    out
+  end
+
+  def self.by_sym_helper(sub, first)
+    list = sub
+    out = ""
+    if list.present?
+        out = "<ul>" if !first
+        list.each { |item|
+          has_sub = item[:sub].present?
+          out += "<li class='l#{item[:c].level}#{has_sub ? ' collapse' : ''}' tabindex='5'>#{has_sub ? '<div class=\'tree-toggle\'></div>' : ''}<div class='item' data-id='#{item[:c].id}'>#{item[:c].title}</div>"
+          out += by_sym_helper(item[:sub], false) if has_sub
+          out += "</li>"
+        }
+        out += "</ul>" if !first
     end
     out
   end

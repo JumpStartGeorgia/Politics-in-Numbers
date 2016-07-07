@@ -1,0 +1,10 @@
+<div class="row filter-input" data-field="<%= input_field %>" data-type="autocomplete" data-on="<%= on %>">
+  <a href="#" class="toggle" tabindex="5"><%= t(label) %> <%= t('.category') %><i title="<%= t('.filter_toggle') %>"></i></a>
+  <ul id="<%= "#{input_for}_#{input_field}" %>" class="list" data-autocomplete-view="<%= "#{input_for}-#{input_field}" %>" data-type="autocomplete"></ul>
+  <div class="input-group">
+    <div class="autocomplete" data-autocomplete-id="<%= "#{input_for}-#{input_field}" %>" data-local="<%= input_field %>">
+      <input type="text" placeholder="Select Category" tabindex="5">
+      <ul class="dropdown" id="filter_<%= input_for %>_by_<%= input_field %>" tabindex="5"><%= list %></ul>
+    </div>
+  </div>
+</div>

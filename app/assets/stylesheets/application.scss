@@ -30,8 +30,10 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 }
 a, button {
   text-decoration:none;
+  font:16px firasans_r;
+  color:#f78e69;
   &:hover, &:focus, &:active, &:visited {
-    color:inherit;
+    color:#f78e69;
     cursor:pointer;
   }
 }
@@ -573,6 +575,117 @@ input[type="radio"] + label{
           border-color:#e0e0e0;
         }
       }
+
+    }
+  }
+}
+
+
+.dataTables_wrapper .dataTables_paginate {
+  .pagination {
+    li {
+      display:inline-block;
+      padding:0 3px;
+    }
+  }
+  .paginate_current a{
+    font:16px firasans_b;
+    color:#88d877;
+  }
+  .paginate_button.disabled {
+    opacity:.5;
+  }
+
+  .paginate_text {
+    font:16px firasans_r;
+    color:#5d675b;
+  }
+  .paginate_count {
+    font:14px firasans_r;
+  }
+}
+
+
+.userbox {
+  max-width:300px;
+  margin: 0 auto;
+  padding: 10px 6px;
+  h1 {
+    font:20px firasans_b;
+    color:#2f332f;
+  }
+  a {
+    font:14px firasans_r;
+  }
+  fieldset {
+    padding:10px;
+  }
+  .input {
+    margin:0;
+    margin-top:10px;
+    margin-bottom:2px;
+    padding:0;
+
+  }
+  .form-label {
+    display:block;
+    padding-bottom: 2px;
+    label {
+      font:16px firasans_r;
+      color:#f78e69;
+    }
+  }
+  input {
+    font:12px firasans_r;
+    color:#5D675B;
+    background-color:#F5F7F5;
+    padding:6px 10px;
+    width:100% !important;
+    border:1px solid #F78E69;
+    outline:none;
+    &:focus, &:hover {
+      background-color:#fff;
+    }
+    &.datepicker {
+      max-width:100px;
+    }
+    &[type='checkbox'] {
+      width:auto;
+    }
+    &[type='checkbox'] {
+      border:1px solid #F78E69;
+      border-radius:0;
+    }
+  }
+
+  input[type='submit'] {
+    display:block;
+    font:14px firasans_b;
+    color:#5D675B;
+    width:auto !important;
+    background-color:#fff;
+    border:1px solid #C5CEC2;
+    padding:8px 18px;
+    margin: 0px auto;
+  }
+}
+
+.container .alert {
+  position: absolute;
+  top: 80px;
+  right: 10px;
+  font:14px firasans_r;
+  color:#f78e69;
+  background-color:#f5f7f5;
+  padding: 12px 4px 10px 18px;
+  border-radius:1px;
+  button {
+    float:right;
+    border:0px;
+    background-color:transparent;
+    position: relative;
+    top: -10px;
+    &:hover {
 
     }
   }

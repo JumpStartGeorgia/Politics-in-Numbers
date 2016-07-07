@@ -9,8 +9,12 @@ en:
       party_finances: PARTY <br/>FINANCES
       income: INCOME
       expenses: EXPENSES
-      property_assets: PROPERTY <br/>ASSETS
-      financial_assets: FINANCIAL <br/>ASSETS
+      reform_expense_button: REFORMS FUND <br/>EXPENSES
+      reform_expense: Reforms Fund Expenses
+      property_assets_button: PROPERTY <br/>ASSETS
+      property_assets: Property Assets
+      financial_assets_button: FINANCIAL <br/>ASSETS
+      financial_assets: Financial Assets
       debts: DEBTS
       campaign: Campaign
       all: All
@@ -52,3 +56,6 @@ en:
       party_donations: PARTY <br/>DONATIONS
       view: View
       donation_caption: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia expedita enim fugiat"
+      view_as: View as
+      view_as_chart: Chart view
+      view_as_table: Table view

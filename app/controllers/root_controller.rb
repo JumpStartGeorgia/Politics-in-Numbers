@@ -1,13 +1,13 @@
 # Non-resource pages
 class RootController < ApplicationController
   def index
-    dd = nil
-     Donor.each{|e| e.donations.each{|ee|
-        if ee.amount == 800
-          dd = e
-        end
-      }
-    }
+    # dd = nil
+    #  Donor.each{|e| e.donations.each{|ee|
+    #     if ee.amount == 800
+    #       dd = e
+    #     end
+    #   }
+    # }
     #Rails.logger.debug("--------------------------------------------#{dd.collection.inspect}")
     # sd = dd.collection.aggregate([
     #     { "$match": { "donations.amount": 800 } },
@@ -37,11 +37,15 @@ class RootController < ApplicationController
     gon.filter_item_close = t('.filter_item_close');
     gon.party_list = Party.each_with_index.map{|m| [m.id.to_s, m.title] }
     gon.donor_list = Donor.each_with_index.map{|m| [m.id.to_s, "#{m.first_name} #{m.last_name}"] }
+    gon.all = t('.all')
+    gon.campaign = t('.campaign')
+
     dt = []
     pars = explore_params
+    pars = pars
     gon.gonned = false
-    tmp = pars[:filter]
-    has_filters = tmp.present? && (tmp == "donation" || tmp == "finance")
+    which_filter = pars[:filter]
+    has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
 
 
 
@@ -50,25 +54,23 @@ class RootController < ApplicationController
       # pars.each{|k,v|
       #   pars[k] = v.split(";") if v.index(";")
       # }
-      if tmp == "donation"
+      if which_filter == "donation"
         dt = Donor.explore(pars)
         gon.donation_data = dt
         #pars[:donor] = dt[:donor_info] if dt[:donor_info].present?
       else
-
+        dt = Dataset.explore(pars)
+        gon.finance_data = dt
       end
-
       pars.delete(:locale)
+      @download_link = request.path + "?" +  pars.to_param  + "#{pars.empty? ? '' : '&'}#{'format=csv'}"
       gon.params = pars
     end
-    if pars[:format] == 'csv'
-      require 'csv'
 
+    if which_filter == "donation" && pars[:format] == 'csv'
       csv_file = CSV.generate do |csv|
         csv << dt[:table][:header]
-        dt[:table][:data].each do |r|
-          csv << r
-        end
+        dt[:table][:data].each { |r| csv << r }
       end
     end
 
@@ -119,8 +121,10 @@ class RootController < ApplicationController
 
     if pars[:donation].present?
       res[:donation] = Donor.explore(pars[:donation])
-      # Rails.logger.debug("--------------------------------------------#{res.inspect}")
+    elsif pars[:finance].present?
+      res[:finance] = Dataset.explore(pars[:finance])
     end
+    Rails.logger.debug("--------------------------------------------#{pars.inspect}")
     #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
 
     # q = params[:q].split
@@ -219,7 +223,7 @@ class RootController < ApplicationController
     end
     def explore_filter_params
       params.permit(:donation => [:monetary, :multiple, :all, :locale, { donor: [], period: [], amount: [], party: []}],
-        :finance => [])
+        :finance => [:all, :locale, :income])
     end
 end
 

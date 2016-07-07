@@ -23,13 +23,18 @@
             </div>
           </li>
           <li>
+            <div class="finance-category-toggle" data-state="simple" data-cat="reform_expense">
+              <a href="#reform_expense" class="label long" tabindex="4"><%= t('.reform_expense_button').html_safe %></a>
+            </div>
+          </li>
+          <li>
             <div class="finance-category-toggle" data-state="simple" data-cat="property">
-              <a href="#property" class="label long" tabindex="4"><%= t('.property_assets').html_safe %></a>
+              <a href="#property" class="label long" tabindex="4"><%= t('.property_assets_button').html_safe %></a>
             </div>
           </li>
           <li>
             <div class="finance-category-toggle" data-state="simple" data-cat="financial">
-              <a href="#financial" class="label long" tabindex="4"><%= t('.financial_assets').html_safe %></a>
+              <a href="#financial" class="label long" tabindex="4"><%= t('.financial_assets_button').html_safe %></a>
             </div>
           </li>
           <li>
@@ -125,36 +130,21 @@
         </div>
       </div>
       <div class="finance filter-inputs" data-type="finance">
-        <div class="row filter-input">
-          <a href="#" class="toggle" tabindex="5"><%= t('.party') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <ul id="donation_party" class="list" data-autocomplete-view="donation-party" data-type="autocomplete"></ul>
+        <div class="row filter-input" data-field="income" data-type="autocomplete" data-on="false">
+          <a href="#" class="toggle" tabindex="5"><%= t('.income') %> (<span></span>) <%= t('.category') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <ul id="finance_income" class="list" data-autocomplete-view="finance-income" data-type="autocomplete"></ul>
           <div class="input-group">
-            <div class="autocomplete" data-autocomplete-id="donation-party" data-local="party_list">
-              <input type="text" placeholder="Type Party Name" tabindex="5">
-              <ul class="dropdown" id="filter_donation_by_parties" tabindex="5">
-                <% Party.each{|m| %>
+            <div class="autocomplete" data-autocomplete-id="finance-income" data-url="select/category">
+              <input type="text" placeholder="Select Category" tabindex="5">
+              <ul class="dropdown" id="filter_finance_by_income" tabindex="5">
+                <% Category.limit(10).each{|m| %>
                   <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.title}" %></li>
                 <% } %>
               </ul>
             </div>
           </div>
         </div>
-        <div class="row filter-input">
-          <a href="#" class="toggle" tabindex="5"><%= t('.income') %> <%= t('.categories') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <ul class="list"></ul>
-          <div class="input-group">
-            <input type="text">
-          </div>
-        </div>
-        <div class="row filter-input">
-          <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <ul class="list"></ul>
-          <div class="input-group">
-            Annual or Campaign
-            <input type="checkbox" id="campaign_period_2" name="campaign_period_2">
-            <label for="campaign_period_2"><span></span>2013</label>
-          </div>
-        </div>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "financial", label: "financial_assets", on: false, list: Category.by_sym(:financial_assets).html_safe } %>
       </div>
       <div class="filter-footer">
         <button id="reset" class="reset"><%= t('.reset') %></button>
@@ -216,7 +206,7 @@
             <div class="actions">
               <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
               <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
-              <a href="" id="donation_csv_download" class="download" title="<%= t('.download_table') %>"><i></i></a>
+              <a href='<%= "#{@download_link}" %>' id="donation_csv_download" class="download" title="<%= t('.download_table') %>"><i></i></a>
             </div>
           <div id="donation_table">
             <table></table>
@@ -234,7 +224,7 @@
               </div>
               <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
               <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
-              <div class="download download_menu-list" title="<%= t('.download_chart') %>">
+              <div class="download download_menu" title="<%= t('.download_chart') %>">
                 <i></i>
                 <ul class="chart_download" data-target="#donation_chart_1">
                   <li><a href="#" data-type="print">print</a></li>
@@ -254,7 +244,7 @@
               <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
               <a href="" id="donation_csv_download" class="download" title="<%= t('.download_chart') %>"><i></i></a>
             </div>
-          <div id="donation_table">
+          <div id="finance_table">
             <table></table>
           </div>
         </div>

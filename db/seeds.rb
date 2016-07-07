@@ -45,7 +45,7 @@ if (Language.count == 0)
   ]
 
   langs = langs.map{|x| {locale: x[0], name: x[1]}}
-  Language.collection.insert(langs)
+  Language.collection.insert_many(langs)
 end
 
 ## Create app user and api key
@@ -107,7 +107,7 @@ parent_id = nil
 workbook[0].each_with_index { |row, row_i|
   next if row_i == 0
   if row && row.cells
-    cells = Array.new(9, nil) # Level0  Level1  Level2  Level3  Level4  Cells Codes Details Short
+    cells = Array.new(10, nil) # Level0  Level1  Level2  Level3  Level4  Cells Codes Details Short Alias
     row.cells.each_with_index do |c, c_i|
       if c && c.value.present?
         cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
@@ -140,7 +140,7 @@ workbook[0].each_with_index { |row, row_i|
     (puts "Code is empty";) if codes.nil?
 
     dt = cells[7].present? ? cells[7] : nil
-    tmp = { tmp_id: cat_id, virtual: false, level: level, parent_id: parent_id, forms: forms_and_cells[0], cells: forms_and_cells[1], codes: codes, title_translations: { en: cells[level].strip }, detail_id: dt, order: orders[level]}
+    tmp = { tmp_id: cat_id, virtual: false, level: level, parent_id: parent_id, forms: forms_and_cells[0], cells: forms_and_cells[1], codes: codes, title_translations: { en: cells[level].strip }, detail_id: dt, order: orders[level], sym: cells[9] }
     categories_cell << (cells << cat_id)
     categories_data << tmp
     cat_id += 1

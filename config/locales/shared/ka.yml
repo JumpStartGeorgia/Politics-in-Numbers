@@ -21,6 +21,7 @@ ka:
         update: Update %{obj}
         view: View %{obj}
         view_all: View All %{obj}
+      remember_me: Remember Me
     common:
       account: Account
       actions: Actions

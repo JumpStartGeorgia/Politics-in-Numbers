@@ -7,7 +7,7 @@
         <span class="icon-bar"></span>
       </button>
       <%= link_to  root_path, class: 'navbar-brand', tabindex: 1 do %>
-        <img alt="<%= t('shared.common.name') %>" title="<%= t('shared.common.name') %>" src="/assets/logo_<%= I18n.locale %>.svg">
+        <%= image_tag("logo_#{I18n.locale}.svg", alt: t('shared.common.name'), title: t('shared.common.name')) %>
       <% end %>
       <div class="navbar-collapse collapse navbar-menu-collapse">
         <ul class="nav navbar-nav">
@@ -61,7 +61,7 @@
     </div><div class="navbar-section navbar-right navbar-toggle-receiver">
       <button type="button" class="navbar-toggle navbar-lang-toggle" data-toggle="collapse" data-target=".navbar-toggle-receiver">
         <span><%= t("shared.locale.short.#{I18n.locale}") %></span>
-        <img class="icon-earth" alt="<%= t('shared.common.language') %>" title="<%= t('shared.common.language') %>" src="/assets/earth.svg">
+        <%= image_tag("earth.svg", alt: t('shared.common.language'), title: t('shared.common.language'), class: "icon-earth") %>
       </button>
       <div class="navbar-collapse collapse navbar-lang-collapse">
         <ul class='nav navbar-nav'>

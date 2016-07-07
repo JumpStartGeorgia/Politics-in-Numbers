@@ -159,32 +159,32 @@ class Dataset
   end
   def self.explore(params)
     limiter = 5
+    { category: Category.tree(false) }
+    # f = {
+    #   donor_ids: nil,
+    #   parties: nil,
+    #   monetary: nil,
+    #   multiple: nil,
+    #   period: [-1,-1],
+    #   amount: [-1,-1]
+    # }
 
-    f = {
-      donor_ids: nil,
-      parties: nil,
-      monetary: nil,
-      multiple: nil,
-      period: [-1,-1],
-      amount: [-1,-1]
-    }
+    # tmp = params[:donor]
+    # f[:donor_ids] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
 
-    tmp = params[:donor]
-    f[:donor_ids] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
+    # tmp = params[:period]
+    # f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
 
-    tmp = params[:period]
-    f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
+    # tmp = params[:amount]
+    # f[:amount] = tmp.map{|t| t.to_i } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
 
-    tmp = params[:amount]
-    f[:amount] = tmp.map{|t| t.to_i } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
+    # tmp = params[:party]
+    # f[:parties] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
 
-    tmp = params[:party]
-    f[:parties] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
+    # tmp = params[:monetary]
+    # f[:monetary] = tmp == "yes" if tmp == "yes" || tmp == "no"
 
-    tmp = params[:monetary]
-    f[:monetary] = tmp == "yes" if tmp == "yes" || tmp == "no"
-
-    f[:multiple] = true if params[:multiple] == "yes"
+    # f[:multiple] = true if params[:multiple] == "yes"
 
 
     # data = filter(f).to_a
@@ -300,7 +300,19 @@ class Dataset
     #     total_donations: total_donations
     #   }
     # }
-    {}
+
+# If one category > page 1 of design
+# If multiple categories selected > page 3 of design
+
+
+#     Party - Donations for:
+# Category - Grouped by:
+# Grouped by: Income - Donated Monetary
+# Group by: Property Asset - Vehicles
+# Time period annual - In:
+# Time period campaign - During:
+
+
   end
 
 end

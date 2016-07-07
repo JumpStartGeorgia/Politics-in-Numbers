@@ -1,25 +1,25 @@
 <footer class='footer'>
   <div class="footer-left">
     <%= link_to  root_path, class: 'footer-logo' do %>
-        <img alt="<%= t('shared.common.name') %>" title="<%= t('shared.common.name') %>" src="/assets/logo_<%= I18n.locale %>.svg">
-      <% end %>
+      <%= image_tag("logo_#{I18n.locale}.svg", alt: t('shared.common.name'), title: t('shared.common.name')) %>
+    <% end %>
     <div class="footer-share">
-      <a href="https://www.facebook.com/sharer/sharer.php?u=<%= root_url %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img alt="<%= t('shared.common.facebook') %>" title="<%= t('shared.common.facebook') %>" src="/assets/footer/fb.svg"></a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=<%= root_url %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><%= image_tag('footer/fb.svg', alt: t('shared.common.facebook'), title: t('shared.common.facebook')) %></a>
       <% title = content_for?(:page_title) ? "#{yield(:page_title)} | #{t("shared.common.name")}" : "#{t("shared.common.name")}".html_safe %>
-      <a href="https://twitter.com/share?text=<%= title %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img alt="<%= t('shared.common.twitter') %>" title="<%= t('shared.common.twitter') %>" src="/assets/footer/twitter.svg"></a>
+      <a href="https://twitter.com/share?text=<%= title %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><%= image_tag('footer/twitter.svg', alt: t('shared.common.twitter'), title: t('shared.common.twitter')) %></a>
     </div>
     <div class="footer-summary"><%= t('shared.common.summary') %></div>
   </div>
   <div class="footer-center">
     <div class="footer-share">
-      <a href="https://www.facebook.com/sharer/sharer.php?u=<%= root_url %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img alt="<%= t('shared.common.facebook') %>" title="<%= t('shared.common.facebook') %>" src="/assets/footer/fb.svg"></a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=<%= root_url %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><%= image_tag('footer/fb.svg', alt: t('shared.common.facebook'), title: t('shared.common.facebook')) %></a>
       <% title = content_for?(:page_title) ? "#{yield(:page_title)} | #{t("shared.common.name")}" : "#{t("shared.common.name")}".html_safe %>
-      <a href="https://twitter.com/share?text=<%= title %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><img alt="<%= t('shared.common.twitter') %>" title="<%= t('shared.common.twitter') %>" src="/assets/footer/twitter.svg"></a>
+      <a href="https://twitter.com/share?text=<%= title %>" class="pop" onclick:"javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><%= image_tag('footer/twitter.svg', alt: t('shared.common.twitter'), title: t('shared.common.twitter')) %></a>
     </div>
   </div>
   <div class="footer-right">
-    <div><div><img alt="<%= t('shared.common.phone') %>" src="/assets/footer/phone.svg" title="<%= t('shared.common.phone') %>"></div><a href="tel:<%= t('shared.common.actual_phone') %>"><%= t('shared.common.actual_phone') %></a></div>
-    <div><div><img alt="<%= t('shared.common.email') %>" src="/assets/footer/email.svg" title="<%= t('shared.common.email') %>"></div><a href="mailto:<%= t('shared.common.actual_email') %>"><%= t('shared.common.actual_email') %></a></div>
-    <div><div><img alt="<%= t('shared.common.address') %>" src="/assets/footer/address.svg" title="<%= t('shared.common.address') %>"></div><span><%= t('shared.common.actual_address') %></span></div>
+    <div><div><%= image_tag('footer/phone.svg', alt: t('shared.common.phone'), title: t('shared.common.phone')) %></div><a href="tel:<%= t('shared.common.actual_phone') %>"><%= t('shared.common.actual_phone') %></a></div>
+    <div><div><%= image_tag('footer/email.svg', alt: t('shared.common.email'), title: t('shared.common.email')) %></div><a href="mailto:<%= t('shared.common.actual_email') %>"><%= t('shared.common.actual_email') %></a></div>
+    <div><div><%= image_tag('footer/address.svg', alt: t('shared.common.address'), title: t('shared.common.address')) %></div><span><%= t('shared.common.actual_address') %></span></div>
   </div>
 </footer>

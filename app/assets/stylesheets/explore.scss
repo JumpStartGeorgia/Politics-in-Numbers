@@ -355,6 +355,9 @@
       //   display:none;
       // }
       .filter-input {
+        &[data-on='false'] {
+          display:none;
+        }
         .toggle {
           position:relative;
           display: inline-block;
@@ -399,6 +402,7 @@
             color:#F78E69;
             padding:4px 14px 4px 0;
             position:relative;
+            text-align:left;
             &:first-of-type { margin:12px 0 0; }
             i {
               display: inline-block;
@@ -487,6 +491,7 @@
         position:absolute;
         z-index:66;
         top:100%;
+        left:0;
         bottom:-500%;
         background-color:#fff;
         border: 1px solid #F78E69;
@@ -494,15 +499,63 @@
         max-height:700%;
         overflow-y:auto;
         width:100%;
+        > li {
+          .item { padding:8px 10px; }
+          li {
+            .item { padding:8px 2px; }
+          }
+        }
         li {
           font:14px firasans_book;
           color:#F78E69;
-          padding:8px 10px !important;
           cursor:pointer;
-          // outline:none;
-          &:hover {
-            background-color: #F5F7F5;
+          .item {
+            text-align:left;
+            width:100%;
+            &:hover {
+              background-color: #F5F7F5;
+            }
+
           }
+          &.l1 .item { padding-left:23px; }
+          &.l2 .item { padding-left:26px; }
+          &.l3 .item { padding-left:29px; }
+          &.l4 .item { padding-left:32px; }
+          &.l5 .item { padding-left:35px; }
+          &.l1 .tree-toggle { padding-left:3px; }
+          &.l2 .tree-toggle { padding-left:6px; }
+          &.l3 .tree-toggle { padding-left:9px; }
+          &.l4 .tree-toggle { padding-left:12px; }
+          &.l5 .tree-toggle { padding-left:15px; }
+          ul { display:none; }
+          // outline:none;
+          &.collapse {
+            > .tree-toggle {
+              position:relative;
+              display: inline-block;
+              padding-right: 16px;
+              background:transparent url(/assets/explore/expand.svg) no-repeat center;
+              width:16px;
+              height:32px;
+              cursor:pointer;
+              float:left;
+            }
+          }
+          &.expanded {
+            > .tree-toggle {
+              background:transparent url(/assets/explore/collapse.svg) no-repeat center;
+            }
+            > ul { display: inline-block; }
+          }
+
+          // &.expanded {
+          //   .toggle i{
+          //     background:transparent url(/assets/explore/collapse.svg) no-repeat center;
+          //   }
+          //   .input-group {
+          //     display: inline-block;
+          //   }
+          // }
         }
         &::-webkit-scrollbar-track {
           background-color: #F5F7F5;
