@@ -131,7 +131,7 @@
         </div>
       </div>
       <div class="finance filter-inputs" data-type="finance">
-        <% lists = Category.by_sym(@categories) %>
+        <% lists = Category.by_sym %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income", on: false, list: lists[:income].html_safe } %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income_campaign", on: false, list: lists[:income_campaign].html_safe } %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "expenses", on: false, list: lists[:expenses].html_safe } %>
