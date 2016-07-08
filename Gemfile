@@ -89,7 +89,7 @@ gem 'jquery-datatables-rails', '~> 3.3.0'
 
 gem 'gon'
 
-group :production do
+group :production, :staging do
 
   gem "daemons"
 
