@@ -193,7 +193,7 @@ class Job
         @donorset = Donorset.find(item_id)
         donors = []
         @user = User.find(user_id)
-
+        Rails.logger.debug("--------------------------------------------here")
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.donorset_not_found"))) if @donorset.nil?
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.operator_not_found"));) if @user.nil?
 
@@ -271,6 +271,7 @@ class Job
       rescue Exception => e
         @donorset.destroy if @donorset.present?
         lg.info e.inspect
+        puts "-------------------------------#{e.backtrace}"
         Notifier.about_donorset_file_process(e.message, @user);
       end
     end

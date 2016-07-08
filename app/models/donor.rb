@@ -23,7 +23,7 @@ class Donor
     tmp_party_ids = []
     donations.each{ |e|
       self.donated_amount += e.amount
-      tmp_party_ids[] = e.party_id.to_s
+      tmp_party_ids.push(e.party_id.to_s)
     }
     self.multiple = tmp_party_ids.uniq.size > 1
     save
