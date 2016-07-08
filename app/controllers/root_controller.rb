@@ -37,6 +37,9 @@ class RootController < ApplicationController
     gon.filter_item_close = t('.filter_item_close');
     gon.party_list = Party.each_with_index.map{|m| [m.id.to_s, m.title] }
     gon.donor_list = Donor.each_with_index.map{|m| [m.id.to_s, "#{m.first_name} #{m.last_name}"] }
+    @categories = Category.non_virtual
+    #@category_lists = Category.by_sym_local(@categories)
+    gon.category_list = @categories.map{|m| [m.id.to_s, m.title] }
     gon.all = t('.all')
     gon.campaign = t('.campaign')
 
@@ -223,7 +226,7 @@ class RootController < ApplicationController
     end
     def explore_filter_params
       params.permit(:donation => [:monetary, :multiple, :all, :locale, { donor: [], period: [], amount: [], party: []}],
-        :finance => [:all, :locale, :income])
+        :finance => [:all, :locale, { income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
     end
 end
 

@@ -1,5 +1,5 @@
 <div class="row filter-input" data-field="<%= input_field %>" data-type="autocomplete" data-on="<%= on %>">
-  <a href="#" class="toggle" tabindex="5"><%= t(label) %> <%= t('.category') %><i title="<%= t('.filter_toggle') %>"></i></a>
+  <a href="#" class="toggle" tabindex="5"><%= t("root.explore.#{input_field}") %> <%= t('root.explore.category') %><i title="<%= t('root.explore.filter_toggle') %>"></i></a>
   <ul id="<%= "#{input_for}_#{input_field}" %>" class="list" data-autocomplete-view="<%= "#{input_for}-#{input_field}" %>" data-type="autocomplete"></ul>
   <div class="input-group">
     <div class="autocomplete" data-autocomplete-id="<%= "#{input_for}-#{input_field}" %>" data-local="<%= input_field %>">

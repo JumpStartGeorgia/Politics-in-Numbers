@@ -106,7 +106,7 @@
             &[data-state='simple']:focus a.label:before {
               content:"";
               display:inline-block;
-              background:rgba(136,216,119,.8) url(/assets/explore/add.svg) no-repeat center;
+              background:rgba(136,216,119,.8) url("<%= asset_path('explore/add.svg') %>") no-repeat center;
               background-size:20px;
               position:absolute;
               top:0px;
@@ -150,7 +150,7 @@
                 &:hover:before {
                   content:"";
                   display:inline-block;
-                  background:rgba(136,216,119,.8) url(/assets/explore/add.svg) no-repeat center;
+                  background:rgba(136,216,119,.8) url("<%= asset_path('explore/add.svg') %>") no-repeat center;
                   background-size:13px;
                   position:absolute;
                   top:0px;
@@ -194,7 +194,7 @@
               a.label:before {
                 content:"";
                 display:inline-block;
-                background:rgba(247,142,105,.8) url(/assets/explore/remove.svg) no-repeat center;
+                background:rgba(247,142,105,.8) url("<%= asset_path('explore/remove.svg') %>") no-repeat center;
                 background-size:20px;
                 position:absolute;
                 top:0px;
@@ -278,7 +278,7 @@
       .close {
         float: right;
         vertical-align: middle;
-        background:transparent url(/assets/explore/close.svg) no-repeat center;
+        background:transparent url("<%= asset_path('explore/close.svg') %>") no-repeat center;
         width:20px;
         height:20px;
         position: relative;
@@ -306,7 +306,7 @@
         margin:12px auto 0;
         i.explore {
           display:inline-block;
-          background:transparent url(/assets/explore/compare.svg) no-repeat center;
+          background:transparent url("<%= asset_path('explore/compare.svg') %>") no-repeat center;
           width:20px;
           height:20px;
           vertical-align: middle;
@@ -373,7 +373,7 @@
           margin:15px 0 8px;
         }
         .toggle i {
-          background:transparent url(/assets/explore/expand.svg) no-repeat center;
+          background:transparent url("<%= asset_path('explore/expand.svg') %>") no-repeat center;
           float:right;
           width:16px;
           height:16px;
@@ -384,7 +384,7 @@
         }
         &.expanded {
           .toggle i{
-            background:transparent url(/assets/explore/collapse.svg) no-repeat center;
+            background:transparent url("<%= asset_path('explore/collapse.svg') %>") no-repeat center;
           }
           .input-group {
             display: inline-block;
@@ -408,7 +408,7 @@
               display: inline-block;
               width: 10px;
               height: 10px;
-              background: transparent url(/assets/explore/close_s.svg) no-repeat right top;
+              background: transparent url("<%= asset_path('explore/close_s.svg') %>") no-repeat right top;
               cursor:pointer;
             }
           }
@@ -472,7 +472,7 @@
     }
     i.filter {
       display: inline-block;
-      background:transparent url(/assets/explore/filter.svg) no-repeat center;
+      background:transparent url("<%= asset_path('explore/filter.svg') %>") no-repeat center;
       vertical-align: middle;
       width:20px;
       height:15px;
@@ -534,7 +534,7 @@
               position:relative;
               display: inline-block;
               padding-right: 16px;
-              background:transparent url(/assets/explore/expand.svg) no-repeat center;
+              background:transparent url("<%= asset_path('explore/expand.svg') %>") no-repeat center;
               width:16px;
               height:32px;
               cursor:pointer;
@@ -543,14 +543,14 @@
           }
           &.expanded {
             > .tree-toggle {
-              background:transparent url(/assets/explore/collapse.svg) no-repeat center;
+              background:transparent url("<%= asset_path('explore/collapse.svg') %>") no-repeat center;
             }
             > ul { display: inline-block; }
           }
 
           // &.expanded {
           //   .toggle i{
-          //     background:transparent url(/assets/explore/collapse.svg) no-repeat center;
+          //     background:transparent url("<%= asset_path('explore/collapse.svg') %>") no-repeat center;
           //   }
           //   .input-group {
           //     display: inline-block;
@@ -623,7 +623,7 @@
                   top:50%;
                   left:50%;
                   transform:translate(-50%, -50%);
-                  background:transparent url(/assets/explore/actions.svg) no-repeat top left;
+                  background:transparent url("<%= asset_path('explore/actions.svg') %>") no-repeat top left;
                   &:hover, &:focus, &:active {
                     cursor:pointer;
                   }
@@ -686,7 +686,7 @@
           .separator {
             min-width: 55px;
             height:80px;
-            background:#F78E69 url(/assets/explore/stats.svg) no-repeat center;
+            background:#F78E69 url("<%= asset_path('explore/stats.svg') %>") no-repeat center;
             background-size:33px;
             position: relative;
             &:after {
@@ -722,7 +722,7 @@
                   top:50%;
                   left:50%;
                   transform:translate(-50%, -50%);
-                  background:transparent url(/assets/explore/actions.svg) no-repeat top left;
+                  background:transparent url("<%= asset_path('explore/actions.svg') %>") no-repeat top left;
                   &:hover, &:focus, &:active {
                     cursor:pointer;
                   }
@@ -874,7 +874,7 @@
         transform: translateX(-50%);
         z-index: 77;
         i.filter {
-          background:transparent url(/assets/explore/filter_w.svg) no-repeat center;
+          background:transparent url("<%= asset_path('explore/filter_w.svg') %>") no-repeat center;
         }
         i.close { display:none; }
       }
@@ -933,7 +933,7 @@
               position:relative;
               min-width:330px;
               height:286px;
-              background:transparent url(/assets/explore/image.png) no-repeat center;
+              background:transparent url("<%= asset_path('explore/image.png') %>") no-repeat center;
               z-index:33;
               .donors {
                 font:20px firasans_b;
@@ -986,7 +986,7 @@
             .separator {
               min-width: 55px;
               height:80px;
-              background:#F78E69 url(/assets/explore/stats.svg) no-repeat center;
+              background:#F78E69 url("<%= asset_path('explore/stats.svg') %>") no-repeat center;
               background-size:33px;
               position: relative;
               &:after {
@@ -1012,7 +1012,7 @@
                 display:inline-block;
                 width:24px;
                 height:21px;
-                background:transparent url(/assets/explore/actions.svg) no-repeat top left;
+                background:transparent url("<%= asset_path('explore/actions.svg') %>") no-repeat top left;
                 &:hover, &:focus, &:active {
                   cursor:pointer;
                 }

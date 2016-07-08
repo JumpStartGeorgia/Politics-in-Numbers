@@ -1,6 +1,7 @@
 <div id="explore" data-type="donation">
   <div id="filter_type" class="filter-type" data-type="donation">
-    <div class="back"><img alt="<%= t('shared.common.back') %>" src="/assets/explore/back.svg" title="<%= t('shared.common.back') %>"></div>
+    <div class="back"><%= image_tag("explore/back.svg", alt: t('shared.common.back'), title: t('shared.common.back')) %>
+    </div>
     <div class="donation active" data-type="donation">
       <button type="button" id="donation_toggle" class="donation-toggle" tabindex="4"><%= t('.donations') %></button>
     </div>
@@ -10,36 +11,36 @@
         <button type="button" id="finance_toggle" class="finance-toggle" tabindex="4"><%= t('.party_finances').html_safe %><span>:</span></button><ul id="finance_category" >
           <li>
             <div class="finance-category-toggle" data-state="" data-cat="income">
-              <a href="#income" class="label" tabindex="4"><span class="f"><%= t('.all') %></span><span class="s"><%= t('.campaign') %></span><%= t('.income') %></a>
-              <a href="#income-all" class="sub" tabindex="4" data-sub="all"><%= t('.all') %></a>
-              <a href="#income-campaign" class="sub" tabindex="4" data-sub="campaign"><%= t('.campaign') %></a>
+              <a href="#income" class="label" tabindex="4"><span class="f"><%= t('.all') %></span><span class="s"><%= t('.campaign') %></span><%= t('.income').upcase %></a>
+              <a href="#income-all" class="sub" tabindex="4" data-sub="all" data-cat="income"><%= t('.all') %></a>
+              <a href="#income-campaign" class="sub" tabindex="4" data-sub="campaign" data-cat="income_campaign"><%= t('.campaign') %></a>
             </div>
           </li>
           <li>
-            <div class="finance-category-toggle" data-state="" data-cat="expense">
-              <a href="#expense" class="label" tabindex="4"><span class="f"><%= t('.all') %></span><span class="s"><%= t('.campaign') %></span><%= t('.expenses') %></a>
-              <a href="#expense-all" class="sub" tabindex="4" data-sub="all"><%= t('.all') %></a>
-              <a href="#expense-campaign" class="sub" tabindex="4" data-sub="campaign"><%= t('.campaign') %></a>
+            <div class="finance-category-toggle" data-state="" data-cat="expenses">
+              <a href="#expense" class="label" tabindex="4"><span class="f"><%= t('.all') %></span><span class="s"><%= t('.campaign') %></span><%= t('.expenses').upcase %></a>
+              <a href="#expense-all" class="sub" tabindex="4" data-sub="all" data-cat="expenses"><%= t('.all') %></a>
+              <a href="#expense-campaign" class="sub" tabindex="4" data-sub="campaign" data-cat="expenses_campaign"><%= t('.campaign') %></a>
             </div>
           </li>
           <li>
-            <div class="finance-category-toggle" data-state="simple" data-cat="reform_expense">
-              <a href="#reform_expense" class="label long" tabindex="4"><%= t('.reform_expense_button').html_safe %></a>
+            <div class="finance-category-toggle" data-state="simple" data-cat="reform_expenses">
+              <a href="#reform_expenses" class="label long" tabindex="4"><%= t('.reform_expenses_button').html_safe %></a>
             </div>
           </li>
           <li>
-            <div class="finance-category-toggle" data-state="simple" data-cat="property">
-              <a href="#property" class="label long" tabindex="4"><%= t('.property_assets_button').html_safe %></a>
+            <div class="finance-category-toggle" data-state="simple" data-cat="property_assets">
+              <a href="#property_assets" class="label long" tabindex="4"><%= t('.property_assets_button').html_safe %></a>
             </div>
           </li>
           <li>
-            <div class="finance-category-toggle" data-state="simple" data-cat="financial">
-              <a href="#financial" class="label long" tabindex="4"><%= t('.financial_assets_button').html_safe %></a>
+            <div class="finance-category-toggle" data-state="simple" data-cat="financial_assets">
+              <a href="#financial_assets" class="label long" tabindex="4"><%= t('.financial_assets_button').html_safe %></a>
             </div>
           </li>
           <li>
-            <div class="finance-category-toggle" data-state="simple" data-cat="debt">
-              <a href="#debt" class="label" tabindex="4"><%= t('.debts').html_safe %></a>
+            <div class="finance-category-toggle" data-state="simple" data-cat="debts">
+              <a href="#debts" class="label" tabindex="4"><%= t('.debts').html_safe %></a>
             </div>
           </li>
         </ul>
@@ -130,21 +131,15 @@
         </div>
       </div>
       <div class="finance filter-inputs" data-type="finance">
-        <div class="row filter-input" data-field="income" data-type="autocomplete" data-on="false">
-          <a href="#" class="toggle" tabindex="5"><%= t('.income') %> (<span></span>) <%= t('.category') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <ul id="finance_income" class="list" data-autocomplete-view="finance-income" data-type="autocomplete"></ul>
-          <div class="input-group">
-            <div class="autocomplete" data-autocomplete-id="finance-income" data-url="select/category">
-              <input type="text" placeholder="Select Category" tabindex="5">
-              <ul class="dropdown" id="filter_finance_by_income" tabindex="5">
-                <% Category.limit(10).each{|m| %>
-                  <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.title}" %></li>
-                <% } %>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "financial", label: "financial_assets", on: false, list: Category.by_sym(:financial_assets).html_safe } %>
+        <% lists = Category.by_sym_local(@categories) %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income", on: false, list: lists[:income].html_safe } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income_campaign", on: false, list: lists[:income_campaign].html_safe } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "expenses", on: false, list: lists[:expenses].html_safe } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "expenses_campaign", on: false, list: lists[:expenses_campaign].html_safe } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "reform_expenses", on: false, list: lists[:reform_expenses].html_safe } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "property_assets", on: false, list: lists[:property_assets].html_safe } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "financial_assets", on: false, list: lists[:financial_assets].html_safe } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "debts", on: false, list: lists[:debts].html_safe } %>
       </div>
       <div class="filter-footer">
         <button id="reset" class="reset"><%= t('.reset') %></button>

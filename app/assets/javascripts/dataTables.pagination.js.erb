@@ -33,10 +33,10 @@ $.extend( true, DataTable.defaults, {
   pagingType: "full_out_of",
   language: {
     paginate: {
-      first: "<img src='/assets/arrows_left.svg' alt='First'/>",
-      previous: "<img src='/assets/arrow_left.svg' alt='Previous'/>",
-      next: "<img src='/assets/arrow_right.svg' alt='Next'/>",
-      last: "<img src='/assets/arrows_right.svg' alt='Last'/>"
+      first: "<img src='<%= asset_path('arrows_left.svg') %>' alt='First'/>",
+      previous: "<img src='<%= asset_path('arrows_left.svg') %>' alt='Previous'/>",
+      next: "<img src='<%= asset_path('arrows_right.svg') %>' alt='Next'/>",
+      last: "<img src='<%= asset_path('arrows_right.svg') %>' alt='Last'/>"
     }
   }
 });

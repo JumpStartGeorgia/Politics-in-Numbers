@@ -5,17 +5,20 @@ en:
       title: About
     explore:
       title: Explore
+      category: Category
       donations: DONATIONS
       party_finances: PARTY <br/>FINANCES
-      income: INCOME
-      expenses: EXPENSES
-      reform_expense_button: REFORMS FUND <br/>EXPENSES
-      reform_expense: Reforms Fund Expenses
+      income: Income
+      income_campaign: Income Campaign
+      expenses: Expenses
+      expenses_campaign: Expenses Campaign
+      reform_expenses_button: REFORMS FUND <br/>EXPENSES
+      reform_expenses: Reforms Fund Expenses
       property_assets_button: PROPERTY <br/>ASSETS
       property_assets: Property Assets
       financial_assets_button: FINANCIAL <br/>ASSETS
       financial_assets: Financial Assets
-      debts: DEBTS
+      debts: Debts
       campaign: Campaign
       all: All
       add_hint: Add category to filter

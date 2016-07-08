@@ -1,11 +1,12 @@
 development:
   # Configure available database sessions. (required)
+  logger: false
   clients:
     # Defines the default session. (required)
     default:
       database: <%= ENV["DB_NAME"] %>
-      user: <%= ENV["DB_USER"] %>
-      password: <%= ENV["DB_PASSWORD"] %>
+      #user: <%= ENV["DB_USER"] %>
+      #password: <%= ENV["DB_PASSWORD"] %>
       # Provides the hosts the default session can connect to. Must be an array
       # of host:port pairs. (required)
       hosts:

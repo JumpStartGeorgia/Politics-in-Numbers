@@ -343,7 +343,13 @@ $(document).ready(function (){
     finance = {
       types: {
         income: "autocomplete",
-        financial: "autocomplete",
+        income_campaign: "autocomplete",
+        expenses: "autocomplete",
+        expenses_campaign: "autocomplete",
+        reform_expenses: "autocomplete",
+        property_assets: "autocomplete",
+        financial_assets: "autocomplete",
+        debts: "autocomplete"
         // period: "period",
         // amount: "range",
         // party: "autocomplete",
@@ -352,12 +358,26 @@ $(document).ready(function (){
       },
       states: {
         income: false,
-        financial: false
+        income_campaign: false,
+        expenses: false,
+        expenses_campaign: false,
+        reform_expenses: false,
+        property_assets: false,
+        financial_assets: false,
+        debts: false
       },
+      categories: ["income", "income_campaign", "expenses", "expenses_campaign", "reform_expenses", "property_assets", "financial_assets", "debts" ],
       //download: $("#donation_csv_download"),
       elem: {
-        income: $("#finance_income"),//,
-        financial: $("#finance_financial")//,
+        income: $("#finance_income"),
+        income_campaign:$("#finance_income_campaign"),
+        expenses:$("#finance_expenses"),
+        expenses_campaign:$("#finance_expenses_campaign"),
+        reform_expenses:$("#finance_reform_expenses"),
+        property_assets:$("#finance_property_assets"),
+        financial_assets:$("#finance_financial_assets"),
+        debts:$("#finance_debts"),
+
         // period: {
         //   from: $("#donation_period_from"),
         //   to: $("#donation_period_to")
@@ -378,7 +398,7 @@ $(document).ready(function (){
       },
       data: {},
       get: function() {
-        var t = this, tp, tmp, tmp_v, tmp_d, tmp_o, lnk;
+        var t = this, tp, tmp, tmp_v, tmp_d, lnk;
         t.data = {};
         Object.keys(this.elem).forEach(function(el){
           var is_elem = Object.keys(t.elem[el]).length;
@@ -438,45 +458,48 @@ $(document).ready(function (){
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
         console.log("set_by_url", gon.params);
-        // if(gon.params) {
-        //   Object.keys(gon.params).forEach(function(k) {
-        //                 // console.log(gon.params);
-        //     if(k == "filter" || !t.types.hasOwnProperty(k)) return;
-        //       el = t.elem[k];
-        //       tp = t.types[k];
-        //       v = gon.params[k];
+        if(gon.params) {
+          Object.keys(gon.params).forEach(function(k) {
+                        // console.log(gon.params);
+            if(k == "filter" || !t.types.hasOwnProperty(k)) return;
+              el = t.elem[k];
+              tp = t.types[k];
+              v = gon.params[k];
 
-        //     if(tp === "autocomplete") {
-        //       p = el.parent();
-        //       Object.keys(v).forEach(function(kk){
-        //         autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[p.attr("data-field")+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
-        //       });
-        //     }
-        //     else if(tp === "period") {
-        //       el.from.datepicker('setDate', new Date(+v[0]));
-        //       el.to.datepicker('setDate', new Date(+v[1]));
-        //       tmp = formatRange([el.from.datepicker("getDate").format("mm/dd/yyyy"), el.to.datepicker("getDate").format("mm/dd/yyyy")]);
-        //       create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
-        //     }
-        //     else if(tp === "range") {
-        //       el.from.val(+v[0]);
-        //       el.to.val(+v[1]);
-        //       tmp = formatRange(v);
-        //       create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
-        //     }
-        //     else if(tp === "radio") {
-        //       el = el[Object.keys(el)[0]];
-        //       p = el.closest(".filter-input");
-        //       tmp = p.find(".input-group input[type='radio'][value='" + v + "']").prop("checked", true);
-        //       create_list_item(p.find(".list"), tmp.next().text(), tmp.length);
-        //     }
-        //     else if(tp === "checkbox") {
-        //       tmp = el.prop("checked", el.val() === v ? true : false);
-        //       create_list_item(el.closest(".filter-input").find(".list"), tmp.next().text(), tmp.length);
-        //     }
-        //   });
-        //   console.log(gon.params);
-        // }
+            if(tp === "autocomplete") {
+              p = el.parent();
+              Object.keys(v).forEach(function(kk){
+                var tmp = p.attr("data-field");
+                if(t.categories.indexOf(tmp) !== -1) { tmp = "category"; }
+
+                autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[tmp+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
+              });
+            }
+            // else if(tp === "period") {
+            //   el.from.datepicker('setDate', new Date(+v[0]));
+            //   el.to.datepicker('setDate', new Date(+v[1]));
+            //   tmp = formatRange([el.from.datepicker("getDate").format("mm/dd/yyyy"), el.to.datepicker("getDate").format("mm/dd/yyyy")]);
+            //   create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
+            // }
+            // else if(tp === "range") {
+            //   el.from.val(+v[0]);
+            //   el.to.val(+v[1]);
+            //   tmp = formatRange(v);
+            //   create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
+            // }
+            // else if(tp === "radio") {
+            //   el = el[Object.keys(el)[0]];
+            //   p = el.closest(".filter-input");
+            //   tmp = p.find(".input-group input[type='radio'][value='" + v + "']").prop("checked", true);
+            //   create_list_item(p.find(".list"), tmp.next().text(), tmp.length);
+            // }
+            // else if(tp === "checkbox") {
+            //   tmp = el.prop("checked", el.val() === v ? true : false);
+            //   create_list_item(el.closest(".filter-input").find(".list"), tmp.next().text(), tmp.length);
+            // }
+          });
+          console.log(gon.params);
+        }
       },
       reset: function() {
         // $(".filter-inputs[data-type='donation'] .filter-input").each(function(i,d) {
@@ -513,8 +536,9 @@ $(document).ready(function (){
         // if(v.hasOwnProperty("amount")) {
         //   amount = v.amount;
         // }
-        // console.log(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple].join(";"));
-        return CryptoJS.MD5(["f", v.income, v.financial ].join(";")).toString(); //v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple
+        var tmp = ["f"];
+        this.categories.forEach(function(d){ tmp.push(v[d]); });
+        return CryptoJS.MD5(tmp.join(";")).toString(); //v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple
       },
       url: function(v) {
         var t = this, url = "?", params = [], tmp;
@@ -537,10 +561,10 @@ $(document).ready(function (){
       },
       toggle: function(element, turn_on) {
         var t = this;
+        console.log("toggle", t, element, turn_on);
         t.elem[element].parent().attr("data-on", turn_on);
         t.states[element] = turn_on;
 
-        //console.log("toggle", p, turn_on);
       }
     };
     dn = donation;
@@ -598,6 +622,7 @@ $(document).ready(function (){
       sub_state = sub.attr("data-sub");
       t.parent().next().find(".finance-category-toggle a").focus();
       t.attr("data-state", sub_state);
+      finance.toggle(sub.attr("data-cat"), true);
       // console.log("added", cat, sub_state);
       // TODO call filter with sub_state(all|campaign)
 
@@ -797,7 +822,7 @@ $(document).ready(function (){
     }
     else {
       if(gon.gonned) {
-        // finance.set_by_url();
+        finance.set_by_url();
       }
 
       tmp = finance.get();

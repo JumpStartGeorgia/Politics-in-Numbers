@@ -30,10 +30,22 @@ class Category
   index title: 1
   index parent_id: 1
   #index simple: 1
+  SYMS = [ :income, :income_campaign, :expenses, :expenses_campaign, :reform_expenses, :property_assets, :financial_assets, :debts ]
+  def self.by_sym_local(categories)
+    #*TODO* no more requests to db
+    out = {}
+    categories.each { |item|
+      out[item[:c][:sym]] = by_sym_helper(item[:sub], true) if item[:sub].present?
+    }
+    out
+  end
 
-  def self.by_sym(sym, vir = false)
-    out = ""
-    tree(vir, sym).each { |item| out += by_sym_helper(item[:sub], true) if item[:sub].present? }
+  def self.by_sym(sym = nil, vir = false)
+    out = {}
+    d = tree(vir, sym)
+    d.each { |item|
+      out[item[:c][:sym]] = by_sym_helper(item[:sub], true) if item[:sub].present?
+    }
     out
   end
 
