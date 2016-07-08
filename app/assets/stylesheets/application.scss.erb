@@ -427,12 +427,12 @@ input[type="checkbox"] + label span {
     width:14px;
     height:14px;
     vertical-align:middle;
-    background:url(checkbox.svg) no-repeat -15px top;
+    background:url("<%= asset_path('checkbox.svg') %>") no-repeat -15px top;
     cursor:pointer;
     margin-right:10px;
 }
 input[type="checkbox"]:checked + label span {
-  background:url(checkbox.svg) no-repeat 0px top;
+  background:url("<%= asset_path('checkbox.svg') %>") no-repeat 0px top;
 }
 
 input[type="radio"] {
@@ -448,12 +448,12 @@ input[type="radio"] + label span {
     width:15px;
     height:15px;
     vertical-align:middle;
-    background:url(radio.svg) no-repeat -16px top;
+    background:url("<%= asset_path('radio.svg') %>") no-repeat -16px top;
     cursor:pointer;
     margin-right:6px;
 }
 input[type="radio"]:checked + label span {
-  background:url(radio.svg) no-repeat 0px top;
+  background:url("<%= asset_path('radio.svg') %>") no-repeat 0px top;
 }
 
 input[type="radio"] + label{
@@ -524,7 +524,7 @@ input[type="radio"] + label{
     .ui-datepicker-next {
       border-right:0;
       span {
-        background:transparent url(/assets/arrow_right.svg) no-repeat center;
+        background:transparent url("<%= asset_path('arrow_right.svg') %>") no-repeat center;
       }
      &.ui-state-hover {
         border-right:0;
@@ -533,7 +533,7 @@ input[type="radio"] + label{
     .ui-datepicker-prev {
       border-left:0;
       span {
-        background:transparent url(/assets/arrow_left.svg) no-repeat center;
+        background:transparent url("<%= asset_path('arrow_left.svg') %>") no-repeat center;
       }
       &.ui-state-hover {
         border-left:0;

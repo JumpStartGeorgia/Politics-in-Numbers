@@ -89,6 +89,12 @@ gem 'jquery-datatables-rails', '~> 3.3.0'
 
 gem 'gon'
 
+group :production do
+
+  gem "daemons"
+
+end
+
 group :development do
   # Silences assets-related logging
   gem 'quiet_assets', '~> 1.0.3'
