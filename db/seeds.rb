@@ -26,10 +26,10 @@ if destroy_mode
   Detail.destroy_all
   puts "  category data"
   Category.destroy_all
-  puts "  role data"
-  Role.destroy_all
-  puts "  user data"
-  User.destroy_all
+  # puts "  role data"
+  # Role.destroy_all
+  # puts "  user data"
+  # User.destroy_all
   puts "Destroy phase end ------------------"
 
 end
