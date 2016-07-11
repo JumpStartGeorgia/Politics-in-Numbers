@@ -54,21 +54,9 @@
         <label><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></label>
         <i class="close" title="<%= t('.filter_close') %>"></i>
       </div>
+
       <div class="donation filter-inputs" data-type="donation">
-        <div class="row filter-input" data-field="donor" data-type="autocomplete">
-          <a href="#" class="toggle" tabindex="5"><%= t('.id_name') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <ul id="donation_donor" class="list" data-autocomplete-view="donation-donor" data-type="autocomplete"></ul>
-          <div class="input-group">
-            <div class="autocomplete" data-autocomplete-id="donation-donor" data-url="select/donors">
-              <input type="text" placeholder="Type Person Id or Name" tabindex="5">
-              <ul class="dropdown" id="filter_donation_by_donors" tabindex="5">
-                <% Donor.limit(10).each{|m| %>
-                  <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.first_name} #{m.last_name}" %></li>
-                <% } %>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "donor", on: true, list: generate_li_list(Donor.limit(10).map{|m| [m.id,"#{m.first_name} #{m.last_name}"]}), category_label: 0, remote_url: "select/donors" } %>
         <div class="row filter-input" data-field="period" data-type="period">
           <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
           <div class="list"></div>
@@ -91,20 +79,7 @@
             <input id="donation_amount_to" type="number" placeholder="<%= t('.to') %>" class="datepicker" data-type="range">
           </div>
         </div>
-        <div class="row filter-input" data-field="party" data-type="autocomplete">
-          <a href="#" class="toggle" tabindex="5"><%= t('.party') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <ul id="donation_party" class="list" data-autocomplete-view="donation-party" data-type="autocomplete"></ul>
-          <div class="input-group">
-            <div class="autocomplete" data-autocomplete-id="donation-party" data-local="party_list">
-              <input type="text" placeholder="Type Party Name" tabindex="5">
-              <ul class="dropdown" id="filter_donation_by_parties" tabindex="5">
-                <% Party.each{|m| %>
-                  <li data-id="<%= "#{m.id}" %>" tabindex="5"><%= "#{m.title}" %></li>
-                <% } %>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "party", on: true, list: generate_li_list(Party.all.map{|m| [m.id,m.title]}), category_label: 0 } %>
         <div class="row filter-input" data-field="type" data-type="radio">
           <a href="#" class="toggle" tabindex="5"><%= t('.donation_type') %><i title="<%= t('.filter_toggle') %>"></i></a>
           <div class="list hidden"></div>

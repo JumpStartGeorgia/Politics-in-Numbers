@@ -1035,10 +1035,54 @@
             #donation_table {
               width:100%;
               padding:0px 6px;
+              .dataTables_filter {
+                display:inline-block;
+                float:none;
+                input {
+                  border: 1px solid #88D877;
+                  padding: 6px 10px;
+                  margin: 0px 0 16px 0;
+                  &::-webkit-input-placeholder {
+                    font: 14px firasans_l;
+                    color: #5D675B;
+                  }
+                  &:-moz-placeholder {
+                    font: 14px firasans_l;
+                    color: #5D675B;
+                  }
+                  &::-moz-placeholder {  /* Firefox 19+ */
+                    font: 14px firasans_l;
+                    color: #5D675B;
+                  }
+                  &:-ms-input-placeholder {
+                    font: 14px firasans_l;
+                    color: #5D675B;
+                  }
+                }
+              }
+              .dataTables_length {
+                display:inline-block;
+                float:right;
+                text-align:right;
+                font: 14px firasans_l;
+                color: #5D675B;
+                select {
+                  border: 1px solid #88D877;
+                  padding: 6px 10px;
+                  background:transparent url("<%= asset_path('caret_a.svg') %>") no-repeat right;
+                  background-origin: content-box;
+                  background-position-x: 25px;
+                  background-size: 12px;
+                  padding-right: 12px;
+                  -webkit-appearance: none;
+                  appearance: none;
+                }
+              }
               table {
                 width:100%;
+                border:1px solid #e2e6e0;
                 thead {
-                  border:1px solid #c5cec2;
+                  border:0 !important; //1px solid #c5cec2;
                   background-color:#f3f9f2;
                   // e2e6e0
                   //
@@ -1046,7 +1090,9 @@
                     font:16px firasans_r;
                     color:#5D675B;
                     text-align:left;
-                    padding:15px 13px;
+                    padding:15px 20px 15px 13px;
+                    border:0px;
+                    border-bottom:1px solid #C5CEC2;
                     &:not(:last-of-type) {
                       border-right:1px solid #e2e6e0;
                     }
@@ -1054,14 +1100,13 @@
                 }
                 tbody {
                   tr {
-                    border:1px solid #e2e6e0;
-                    border-top:0;
                     td {
                       font:14px firasans_l;
                       color:#5D675B;
                       text-align:left;
                       padding:15px 13px;
                       vertical-align:top;
+                      border-bottom:1px solid #e2e6e0;
                       &:not(:last-of-type) {
                         border-right:1px solid #e2e6e0;
                       }
@@ -1078,7 +1123,9 @@
                         }
                       }
                     }
-
+                    &:last-of-type td {
+                      border-bottom:0;
+                    }
                   }
                 }
               }

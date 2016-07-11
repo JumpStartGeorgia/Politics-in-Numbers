@@ -21,7 +21,7 @@ class Party
     if d.permalink_changed?
       d.permalink.to_url
     elsif d.title_changed?
-      d.title.to_url
+      d.title_translations[I18n.locale].to_url
     else
       d.id.to_s
     end

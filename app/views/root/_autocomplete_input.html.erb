@@ -1,9 +1,10 @@
+<% category_label = 1 if category_label != 0 %>
 <div class="row filter-input" data-field="<%= input_field %>" data-type="autocomplete" data-on="<%= on %>">
-  <a href="#" class="toggle" tabindex="5"><%= t("root.explore.#{input_field}") %> <%= t('root.explore.category') %><i title="<%= t('root.explore.filter_toggle') %>"></i></a>
+  <a href="#" class="toggle" tabindex="5"><%= t("root.explore.#{input_field}") %><%= " #{t('root.explore.category')}" if category_label == 1 %><i title="<%= t('root.explore.filter_toggle') %>"></i></a>
   <ul id="<%= "#{input_for}_#{input_field}" %>" class="list" data-autocomplete-view="<%= "#{input_for}-#{input_field}" %>" data-type="autocomplete"></ul>
   <div class="input-group">
-    <div class="autocomplete" data-autocomplete-id="<%= "#{input_for}-#{input_field}" %>" data-local="<%= input_field %>">
-      <input type="text" placeholder="Select Category" tabindex="5">
+    <div class="autocomplete" data-autocomplete-id="<%= "#{input_for}-#{input_field}" %>" data-local="<%= input_field %>"<%= "data-url='#{remote_url}'" if defined?(remote_url) %>>
+      <input type="text" placeholder='<%= t("root.explore.placeholder.#{input_field}") %>' tabindex="5">
       <ul class="dropdown" id="filter_<%= input_for %>_by_<%= input_field %>" tabindex="5"><%= list %></ul>
     </div>
   </div>

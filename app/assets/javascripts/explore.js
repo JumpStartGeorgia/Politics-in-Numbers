@@ -101,6 +101,7 @@ $(document).ready(function (){
       bind: function() {
         $(".autocomplete input").on("change paste keyup", this.onchange);
         $(".autocomplete input").on("click", function() {
+          console.log("here");
           var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul");
           p.addClass("active");
           global_click_callback = function(target) {
@@ -118,7 +119,7 @@ $(document).ready(function (){
         });
 
         $(document).on("click keypress", ".autocomplete .dropdown li .item", function(event) {
-           //console.log("click keypress autocomplete name");
+           console.log("click keypress autocomplete name");
           if(event.type === "keypress" && event.keyCode !== 13) { return; }
           var t = $(this), dropdown = t.closest(".dropdown"), p = dropdown.parent(), is_selected = t.hasClass("selected");
 
@@ -878,7 +879,9 @@ $(document).ready(function (){
       "aaData": table.data,
       "aoColumns": table.header.map(function(m,i) {
         return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
-      })
+      }),
+      "info": false,
+      dom: "fltrp"
     });
 
   }

@@ -104,7 +104,7 @@ $(document).ready(function(){
     });
 
     $("#user-dropdown").click(function(){
-      $(this).find(".badge-notifier").removeClass("badge-notifier");
+      // $(this).find(".badge-notifier").removeClass("badge-notifier");
     });
     $(".tree ul .box.inner").click(function(){ $(this).toggleClass("closed"); });
 

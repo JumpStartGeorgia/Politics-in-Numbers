@@ -21,4 +21,11 @@ module ApplicationHelper
     field_locales = obj.send("#{field}_translations").keys.map{|k|"#{k.upcase}"}
     "<div class='available-locales'><span>#{field_locales.join(' | ')}</span></div>"
   end
+  def generate_li_list(arr=[], tabindex = 5) # format[[id,value]]
+    html = ""
+    arr.each{|e|
+      html += "<li tabindex='5'><div class='item' data-id='#{e[0]}'>#{e[1]}</div></li>"
+    }
+    html.html_safe
+  end
 end

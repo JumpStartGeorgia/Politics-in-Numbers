@@ -16,8 +16,8 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 
   *= require jquery-ui/datepicker
 
-  require dataTables/jquery.dataTables
-  *= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+  *= require dataTables/jquery.dataTables
+  * require dataTables/bootstrap/3/jquery.dataTables.bootstrap
   *= require dataTables/extras/dataTables.responsive
 */
 
@@ -25,6 +25,38 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 @import 'variables';
 @import 'media-queries';
 
+body, html {
+  margin:0;
+  padding:0;
+  height:100%;
+}
+body {
+  // display:flex;
+  // flex-direction: column;
+
+  // justify-content: flex-start; /* align items in Main Axis */
+  // align-items: stretch; /* align items in Cross Axis */
+  // align-content: stretch; /* Extra space in Cross Axis */
+}
+main {
+  // flex: 1;
+  // height:100%; /* same as flex: 1 1 auto; */
+    // display: flex;
+    // flex-direction: row;
+
+    // justify-content: flex-start; /* align items in Main Axis */
+    // align-items: stretch; /* align items in Cross Axis */
+    // align-content: stretch; /* Extra space in Cross Axis */
+  padding:0 60px;
+}
+.primary-header {
+  display:inline-block;
+  padding:110px 60px 30px 0;
+  margin:0 0 50px 0;
+  font:28px firasans_b;
+  color:#2F332F;
+  border-bottom: 1px solid #F78E69;
+}
 * {
   box-sizing:border-box;
 }
@@ -198,7 +230,7 @@ a, button {
 //   padding:50px 0;
 // }
 .footer {
-  background:#F4F3EA url("<%= asset_path('footer/pattern.svg') %>");
+  background:transparent url("<%= asset_path('footer/pattern.png') %>");
   padding:26px 24px 34px;
   .footer-left {
     .footer-logo {
@@ -322,7 +354,7 @@ a, button {
       }
       .navbar-nav {
         margin-left:209px;
-        li {
+        > li {
           display:table-cell;
           width:auto;
           text-align:center;
@@ -687,6 +719,87 @@ input[type="radio"] + label{
     top: -10px;
     &:hover {
 
+    }
+  }
+}
+
+.navbar-nav {
+  > li {
+    // .badge {
+    //   position:relative;
+    //   display:inline-block;
+    //   background-color: #30D845;
+    //   span {
+    //    position: absolute;
+    //     top:-5px;
+    //     right: -8px;
+    //     padding: 3px 9px;
+    //     border: 1px solid white;
+    //     border-radius:100px;
+    //     font:bold 16px/20px "Helvetica Neue", sans-serif;
+    //     color: white;
+    //     text-decoration: none;
+
+    //     -webkit-animation-name: blinker;
+    //     -webkit-animation-duration: 1s;
+    //     -webkit-animation-timing-function: linear;
+    //     -webkit-animation-iteration-count: infinite;
+
+    //     -moz-animation-name: blinker;
+    //     -moz-animation-duration: 1s;
+    //     -moz-animation-timing-function: linear;
+    //     -moz-animation-iteration-count: infinite;
+
+    //     animation-name: blinker;
+    //     animation-duration: 1s;
+    //     animation-timing-function: linear;
+    //     animation-iteration-count: infinite;
+    //   }
+    //   @-moz-keyframes blinker {
+    //       0% { opacity: 1.0; }
+    //       50% { opacity: 0.0; }
+    //       100% { opacity: 1.0; }
+    //   }
+    //   @-webkit-keyframes blinker {
+    //       0% { opacity: 1.0; }
+    //       50% { opacity: 0.0; }
+    //       100% { opacity: 1.0; }
+    //   }
+    //   @keyframes blinker {
+    //       0% { opacity: 1.0; }
+    //       50% { opacity: 0.0; }
+    //       100% { opacity: 1.0; }
+    //   }
+    // }
+  }
+  .caret {
+    width: 15px;
+    height: 9px;
+    background:transparent url("<%= asset_path('caret.svg') %>") no-repeat center;
+    display: inline-block;
+    margin-left:10px;
+  }
+  .dropdown {
+    .dropdown-menu {
+      display:none;
+      position:absolute;
+      top:100%;
+      z-index: 9999;
+      background-color:#88D877;
+      color:white;
+      li a {
+        padding: 8px 16px;
+        height: auto;
+        font-size: 18px;
+      }
+    }
+    &:hover {
+      .dropdown-menu {
+        display:block;
+      }
+      .caret {
+        background:transparent url("<%= asset_path('caret_a.svg') %>") no-repeat center;
+      }
     }
   }
 }

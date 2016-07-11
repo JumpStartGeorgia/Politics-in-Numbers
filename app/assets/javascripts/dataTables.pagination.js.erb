@@ -37,7 +37,10 @@ $.extend( true, DataTable.defaults, {
       previous: "<img src='<%= asset_path('arrow_left.svg') %>' alt='Previous'/>",
       next: "<img src='<%= asset_path('arrow_right.svg') %>' alt='Next'/>",
       last: "<img src='<%= asset_path('arrows_right.svg') %>' alt='Last'/>"
-    }
+    },
+    search: "",
+    searchPlaceholder: gon.search,
+    lengthMenu: gon.table_length
   }
 });
 

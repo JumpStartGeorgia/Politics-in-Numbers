@@ -1,6 +1,7 @@
 # Non-resource pages
 class RootController < ApplicationController
   def index
+    redirect_to('/explore')
     # dd = nil
     #  Donor.each{|e| e.donations.each{|ee|
     #     if ee.amount == 800
@@ -42,7 +43,8 @@ class RootController < ApplicationController
     gon.category_list = @categories.map{|m| [m.id.to_s, m.title] }
     gon.all = t('.all')
     gon.campaign = t('.campaign')
-
+    gon.search = t('.search')
+    gon.table_length = t('.table_length')
     dt = []
     pars = explore_params
     pars = pars

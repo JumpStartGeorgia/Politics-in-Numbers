@@ -13,14 +13,9 @@
         <ul class="nav navbar-nav">
           <!-- <li><%#= link_to t('.parties').upcase, parties_path  %></li> -->
           <li><%= link_to t('.explore').upcase, explore_path, { tabindex: 2 }.merge(current_page?(explore_path) ? { :class => "active" } : {}) %></li><li><%= link_to t('.about').upcase, about_path, { tabindex: 2 }.merge(current_page?(about_path) ? { :class => "active" } : {}) %></li><li><%= link_to t('.media').upcase, media_path, { tabindex: 2 }.merge(current_page?(media_path) ? { :class => "active" } : {}) %></li><li><%= link_to t('.download').upcase, download_path, { tabindex: 2 }.merge(current_page?(download_path) ? { :class => "active" } : {}) %></li>
-          <!-- <li><%#= link_to t('.api').upcase, api_path  %></li> -->
-          <% if user_signed_in? %>
+          <%- if user_signed_in? %>
             <li class="dropdown">
-              <a href="#" id="user-dropdown" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                <%= icon('user')%>
-                <% if current_user.deffereds.present? %>
-                  <span class="badge badge-notifier"><%= current_user.deffereds.length %></span>
-                <% end %>
+              <a href="#" id="user-dropdown" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><%= t('.settings').upcase %><%- if current_user.deffereds.present? %><span> (<%= current_user.deffereds.length %>)</span><%- end %>
                 <span class="caret"></span>
               </a>
               <ul class="dropdown-menu" role="menu">

@@ -2,10 +2,7 @@
 # with its default values. The data can then be loaded with the rake db:seed
 # (or created alongside the db with db:setup).
 
-roles = %w(super_admin site_admin content_manager)
-roles.each do |role|
-  Role.find_or_create_by(name: role)
-end
+
 
 def is_numeric?(obj)
    obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
@@ -29,7 +26,12 @@ if destroy_mode
   Detail.destroy_all
   puts "  category data"
   Category.destroy_all
+  puts "  role data"
+  Role.destroy_all
+  puts "  user data"
+  User.destroy_all
   puts "Destroy phase end ------------------"
+
 end
 
 
@@ -46,6 +48,11 @@ if (Language.count == 0)
 
   langs = langs.map{|x| {locale: x[0], name: x[1]}}
   Language.collection.insert_many(langs)
+end
+
+roles = %w(super_admin site_admin content_manager)
+roles.each do |role|
+  Role.find_or_create_by(name: role)
 end
 
 ## Create app user and api key
@@ -107,7 +114,7 @@ parent_id = nil
 workbook[0].each_with_index { |row, row_i|
   next if row_i == 0
   if row && row.cells
-    cells = Array.new(10, nil) # Level0  Level1  Level2  Level3  Level4  Cells Codes Details Short Alias
+    cells = Array.new(12, nil) # Level0  Level1  Level2  Level3  Level4  Cells Codes Details Short Alias ka ru
     row.cells.each_with_index do |c, c_i|
       if c && c.value.present?
         cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
@@ -140,7 +147,7 @@ workbook[0].each_with_index { |row, row_i|
     (puts "Code is empty";) if codes.nil?
 
     dt = cells[7].present? ? cells[7] : nil
-    tmp = { tmp_id: cat_id, virtual: false, level: level, parent_id: parent_id, forms: forms_and_cells[0], cells: forms_and_cells[1], codes: codes, title_translations: { en: cells[level].strip }, detail_id: dt, order: orders[level], sym: cells[9] }
+    tmp = { tmp_id: cat_id, virtual: false, level: level, parent_id: parent_id, forms: forms_and_cells[0], cells: forms_and_cells[1], codes: codes, title_translations: { en: cells[level].strip, ka: (cells[10].present? ? cells[10].strip : nil), ru: (cells[11].present? ? cells[10].strip : nil) }, detail_id: dt, order: orders[level], sym: cells[9] }
     categories_cell << (cells << cat_id)
     categories_data << tmp
     cat_id += 1
@@ -158,7 +165,7 @@ others = []
 categories_cell.each_with_index { |cells, row_i|
     next if !(cells[8].present? && is_numeric?(cells[8]))
     virt = cells[8]
-    (others << cells[9]; next; ) if virt == 99
+    (others << cells[12]; next; ) if virt == 99
 
     val = ""
     has_level = false
@@ -167,7 +174,7 @@ categories_cell.each_with_index { |cells, row_i|
         val = cells[lvl]
         if lvl == 0
           if row_i != 0
-            virtuals_data << { tmp_id: cat_id, virtual: true, complex: true, level: 1, parent_id: parenting[0], virtual_ids: others, title_translations: { en: "Other" }, order: orders[1]+1}
+            virtuals_data << { tmp_id: cat_id, virtual: true, complex: true, level: 1, parent_id: parenting[0], virtual_ids: others, title_translations: { en: "Other", ka: "Other ka", ru: "Other ru" }, order: orders[1]+1, sym: cells[9] }
             cat_id += 1
           end
           others = []
@@ -194,11 +201,11 @@ categories_cell.each_with_index { |cells, row_i|
     (puts "Code is empty";) if codes.nil?
 
     dt = cells[7].present? ? cells[7] : nil
-    tmp = { tmp_id: cat_id, virtual: true, level: level, parent_id: parent_id, virtual_ids: [cells[9]], title_translations: { en: val.strip }, detail_id: dt, order: orders[level]}
+    tmp = { tmp_id: cat_id, virtual: true, level: level, parent_id: parent_id, virtual_ids: [cells[9]], title_translations: { en: val.strip,  ka: (cells[10].present? ? cells[10].strip : nil), ru: (cells[11].present? ? cells[11].strip : nil) }, detail_id: dt, order: orders[level], sym: cells[9] }
     virtuals_data << tmp
     cat_id += 1
 }
-virtuals_data << { tmp_id: cat_id, virtual: true, complex: true, level: 1, parent_id: parenting[0], forms: nil, cells: nil, title_translations: { en: "Other" }, order: orders[1]+1, virtual_ids: others} if others.present?
+virtuals_data << { tmp_id: cat_id, virtual: true, complex: true, level: 1, parent_id: parenting[0], forms: nil, cells: nil, title_translations: { en: "Other", ka: "Other ka", ru: "Other ru" }, order: orders[1]+1, virtual_ids: others } if others.present?
 # virtuals_data.each {|r|
 #   puts "#{'  '*r[:level]}#{r[:title_translations][:en]} #{r[:tmp_id]} #{r[:parent_id]} #{r[:order]} #{r[:virtual_ids].inspect}"
 # }
@@ -209,7 +216,7 @@ parties_data = []
 workbook = RubyXL::Parser.parse("#{up_path}/parties.xlsx")
 workbook[0].each_with_index { |row, row_i|
   if row && row.cells
-    cells = Array.new(3, nil)
+    cells = Array.new(5, nil)
     row.cells.each_with_index do |c, c_i|
       if c && c.value.present?
         cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
@@ -217,7 +224,9 @@ workbook[0].each_with_index { |row, row_i|
     end
     tmp = { }
     tmp[:tmp_id] = cells[0] if cells[0].present?
-    tmp[:title] = cells[1].present? ? cells[1] : cells[2]
+    tmp[:title_translations] = { ka: (cells[1].present? ? cells[1] : cells[2]) }
+    tmp[:title_translations][:en] = cells[3] if cells[3].present?
+    tmp[:title_translations][:ru] = cells[4] if cells[4].present?
     tmp[:description] = "პარტია #{cells[1].present? ? cells[1] : cells[2]}"
     tmp[:name] = cells[2]
 

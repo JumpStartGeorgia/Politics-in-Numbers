@@ -7,8 +7,8 @@ class Donor
 
   NATURE_TYPES = ["private", "organization"]
 
-  field :first_name, type: String
-  field :last_name, type: String
+  field :first_name, type: String, localize: true
+  field :last_name, type: String, localize: true
   field :tin, type: String
   field :donated_amount, type: Float
   field :nature, type: Integer, default: 0
@@ -22,7 +22,7 @@ class Donor
     self.donated_amount = 0
     tmp_party_ids = []
     donations.each{ |e|
-      self.donated_amount += e.amount
+      self.donated_amount += e.amount.round(2)
       tmp_party_ids.push(e.party_id.to_s)
     }
     self.multiple = tmp_party_ids.uniq.size > 1
@@ -35,7 +35,7 @@ class Donor
 
   def self.filter(params)
     #Rails.logger.debug("****************************************#{params}")
-
+    lang = I18n.locale
     result = []
     options = []
     matches = []
@@ -87,7 +87,7 @@ class Donor
     #if !conditions.blank?
       options.push({
         "$project": {
-          name: { "$concat": ["$first_name", " ", "$last_name"] },
+          name: { "$concat": ["$first_name.#{lang}", " ", "$last_name.#{lang}"] },
           tin: 1,
           nature: 1,
           donated_amount: 1,
@@ -111,7 +111,7 @@ class Donor
   end
   def self.explore(params)
     limiter = 5
-
+     Rails.logger.debug("--------------------------------------------#{}")
     f = {
       donor_ids: nil,
       parties: nil,
@@ -179,9 +179,9 @@ class Donor
 
     data.each{|e|
       e[:partial_donated_amount] = 0
-
       e[:donations].each { |ee|
-        am = ee[:amount].round(2)
+        am = ee[:amount]
+
         parties[ee[:party_id]][:value] += am if chart_type == 0
 
 
@@ -198,9 +198,13 @@ class Donor
         e[:partial_donated_amount] += am
         total_amount += am
         total_donations += 1
-        table.push(["#{ee[:_id]}", e[:name], nature_values[e[:nature]], I18n.l(ee[:give_date]), am, parties[ee[:party_id]][:name], monetary_values[ee[:monetary] ? 0 : 1] ])
+        table.push(["#{ee[:_id]}", e[:name], nature_values[e[:nature]], I18n.l(ee[:give_date], format: :date), am, parties[ee[:party_id]][:name], monetary_values[ee[:monetary] ? 0 : 1] ])
       }
+      e[:partial_donated_amount] = e[:partial_donated_amount].round(2)
     }
+    parties.each_pair { |k, v| parties[k][:value] = v[:value].round(2) }
+    parties_list.each_pair { |k, v| parties_list[k][:value] = v[:value].round(2) }
+    total_amount = total_amount.round(2)
 
     if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
 
@@ -244,7 +248,7 @@ class Donor
       table: {
         data: table,
         header: [human_attribute_name(:id), human_attribute_name(:name),
-          human_attribute_name(:nature), human_attribute_name(:give_date),
+          human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
           Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
           Donation.human_attribute_name(:monetary)],
         classes: ["center", "", "", "center", "right", "", ""],

@@ -43,21 +43,21 @@ en:
         period_end: *end_date
       donor:
         id: Donor Id
-        name: Name
+        name: Donor
         first_name: First name
         last_name: Last name
         tin: "Person I/N"
         donated_amount: "Overall amount"
-        nature: Type
+        nature: Donor Type
         nature_values:
-          private: Private
+          private: Individual
           organization: Organization
       donation:
-        amount: Donated amount
+        amount: Amount
         party_id: Party
         give_date: Date
         comment: Comment
-        monetary: Type
+        monetary: Donation Type
         monetary_values:
           t: Monetary
           f: Non-Monetary

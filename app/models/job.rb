@@ -234,9 +234,9 @@ class Job
               end
               donor = Donor.by_tin(cells[4]).first
               if !donor.present?
-                donor = Donor.new({ first_name: cells[2], last_name: cells[3], tin: cells[4], nature: cells[3].present? ? 0 : 1 }) # private or organization
+                donor = Donor.new({ first_name_translations: { ka: cells[2], en: cells[2].latinize.capitalize }, last_name_translations: { ka: cells[3], en: cells[3].latinize.capitalize }, tin: cells[4], nature: cells[3].present? ? 0 : 1 }) # private or organization
               end
-              donation = Donation.new({ give_date: cells[1], amount: cells[5], party_id: p._id, comment: cells[7], monetary: cells[7] != "არაფულადი",
+              donation = Donation.new({ give_date: cells[1], amount: cells[5].round(2), party_id: p._id, comment: cells[7], monetary: cells[7] != "არაფულადი",
               donorset_id: @donorset.id })
               donor.donations << donation
               donors << donor

@@ -27,7 +27,7 @@ en:
       filter_toggle: Toggle to add new filtering option
       filter_close: Close Filter Window
       filter_item_close: Remove item from filter
-      id_name: ID/Name
+      donor: ID/Name
       time_period: Time Period
       amount: Amount
       party: Party
@@ -52,9 +52,6 @@ en:
       share_table: Share table
       embed_table: Embed table
       download_table: Download table
-      top5_donors: TOP 5 DONORS
-      top5_parties_by_donations: TOP 5 PARTIES BY DONATIONS
-      donor: DONOR
       donors: DONORS
       party_donations: PARTY <br/>DONATIONS
       view: View
@@ -62,3 +59,16 @@ en:
       view_as: View as
       view_as_chart: Chart view
       view_as_table: Table view
+      search: Search
+      table_length: Show _MENU_ entries
+      placeholder:
+        donor: Select donor
+        party: Select party
+        income: Select category
+        income_campaign: Select category
+        expenses: Select category
+        expenses_campaign: Select category
+        reform_expenses: Select category
+        property_assets: Select category
+        financial_assets: Select category
+        debts: Select category
