@@ -5,13 +5,20 @@ ka:
       title: About
     explore:
       title: Explore
+      category: Category
       donations: DONATIONS
       party_finances: PARTY <br/>FINANCES
-      income: INCOME
-      expenses: EXPENSES
-      property_assets: PROPERTY <br/>ASSETS
-      financial_assets: FINANCIAL <br/>ASSETS
-      debts: DEBTS
+      income: Income
+      income_campaign: Income Campaign
+      expenses: Expenses
+      expenses_campaign: Expenses Campaign
+      reform_expenses_button: REFORMS FUND <br/>EXPENSES
+      reform_expenses: Reforms Fund Expenses
+      property_assets_button: PROPERTY <br/>ASSETS
+      property_assets: Property Assets
+      financial_assets_button: FINANCIAL <br/>ASSETS
+      financial_assets: Financial Assets
+      debts: Debts
       campaign: Campaign
       all: All
       add_hint: Add category to filter
@@ -39,3 +46,19 @@ ka:
       time: Time
       annual: Annual
       explore: EXPLORE
+      share_chart: Share chart
+      embed_chart: Embed chart
+      download_chart: Download chart
+      share_table: Share table
+      embed_table: Embed table
+      download_table: Download table
+      top5_donors: TOP 5 DONORS
+      top5_parties_by_donations: TOP 5 PARTIES BY DONATIONS
+      donor: DONOR
+      donors: DONORS
+      party_donations: PARTY <br/>DONATIONS
+      view: View
+      donation_caption: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia expedita enim fugiat"
+      view_as: View as
+      view_as_chart: Chart view
+      view_as_table: Table view
