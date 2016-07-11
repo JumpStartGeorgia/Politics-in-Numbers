@@ -70,7 +70,16 @@ email = 'antarya@gmail.com'
 if User.where(email: email).count == 0
   puts 'Creating antarya user'
   #User.where(email: email).destroy
-  u = User.new(email: email, password: "rootroot1", role_id: Role.first._id)#, is_user: false)
+  u = User.new(email: email, encrypted_password: "$2a$10$/bJUUzr2GhJRj6WyojabVO4rGS/xwPQGgTlmazxfdmNz82cEftWQC", role_id: Role.first._id)#, is_user: false)
+  u.save(validate: false)
+  #u.api_keys.create
+end
+
+email = "jason.addie@jumpstart.ge"
+if User.where(email: email).count == 0
+  puts 'Creating jason user'
+  #User.where(email: email).destroy
+  u = User.new(email: email, encrypted_password: "$2a$10$o9jqY6XhuJ4vN19EzM8Sp.RHePyDCnmOmxYzV9RUVoD6lhTJE19qi", role_id: Role.first._id)#, is_user: false)
   u.save(validate: false)
   #u.api_keys.create
 end
