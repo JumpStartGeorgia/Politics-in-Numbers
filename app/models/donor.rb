@@ -181,24 +181,24 @@ class Donor
       e[:partial_donated_amount] = 0
 
       e[:donations].each { |ee|
-
-        parties[ee[:party_id]][:value] += ee[:amount] if chart_type == 0
+        am = ee[:amount].round(2)
+        parties[ee[:party_id]][:value] += am if chart_type == 0
 
 
         if chart_type == 2 || chart_type == 3 || chart_type == 4 || chart_type == 5
           if !parties_list[ee[:party_id]].present?
             parties_list[ee[:party_id]] = { value: 0, name: parties[ee[:party_id]][:name] }
           end
-          parties_list[ee[:party_id]][:value] += ee[:amount]
+          parties_list[ee[:party_id]][:value] += am
         end
 
-        recent_donations.push({ date: ee[:give_date], out: [e[:name], ee[:amount]] }) if chart_type == 1
-        recent_donations.push({ date: ee[:give_date], out: [parties[ee[:party_id]][:name], ee[:amount]] }) if chart_type == 3
+        recent_donations.push({ date: ee[:give_date], out: [e[:name], am] }) if chart_type == 1
+        recent_donations.push({ date: ee[:give_date], out: [parties[ee[:party_id]][:name], am] }) if chart_type == 3
 
-        e[:partial_donated_amount] += ee[:amount]
-        total_amount += ee[:amount]
+        e[:partial_donated_amount] += am
+        total_amount += am
         total_donations += 1
-        table.push(["#{ee[:_id]}", e[:name], nature_values[e[:nature]], I18n.l(ee[:give_date]), ee[:amount], parties[ee[:party_id]][:name], monetary_values[ee[:monetary] ? 0 : 1] ])
+        table.push(["#{ee[:_id]}", e[:name], nature_values[e[:nature]], I18n.l(ee[:give_date]), am, parties[ee[:party_id]][:name], monetary_values[ee[:monetary] ? 0 : 1] ])
       }
     }
 
