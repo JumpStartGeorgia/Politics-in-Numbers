@@ -83,6 +83,14 @@ namespace :populate do
       end
     }
 
+    upload_path = Rails.public_path.join("upload/elections/2016")
+    Dir.entries(upload_path).each {|f|
+      if File.file?("#{upload_path}/#{f}") && f != ".gitkeep"
+        files << "#{upload_path}/#{f}"
+        filenames << f.to_s.gsub(".xlsx","")
+      end
+    }
+
     puts files.length
       ps = []
     files.each_with_index {|f,f_i|

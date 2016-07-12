@@ -32,12 +32,14 @@ module StarterTemplate
     config.i18n.load_path += Dir[
       Rails.root.join('config', 'locales', '**', '*.{rb,yml}')
     ]
-
-    config.i18n.fallbacks = [:ka, :en, :ru]
-
+    # config.i18n.fallbacks = [:en, :ka, :ru]
+    # config.i18n.fallbacks[:ka] = [:en, :ru]
+    # config.i18n.fallbacks[:en] = [:ka, :ru]
+    # config.i18n.fallbacks[:ru] = [:ka, :en]
     config.i18n.default_locale = :ka
-
     config.i18n.available_locales = [:ka, :en, :ru]
+    config.i18n.fallbacks = {'en' => ['ka', 'ru'], 'ka' => ['en', 'ru'], 'ru' => ['ka', 'en']}
+
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     #config.active_record.raise_in_transactional_callbacks = true
@@ -49,5 +51,10 @@ module StarterTemplate
     config.assets.precompile += %w( admin.js admin.css explore.js explore.css crypto.min.js )
 
     config.active_job.queue_adapter = :delayed_job
+
+    # Custom I18n fallbacks
+    config.after_initialize do
+      I18n.fallbacks = I18n::Locale::Fallbacks.new(en: :ka, ka: :en, ru: :ka)
+    end
   end
 end

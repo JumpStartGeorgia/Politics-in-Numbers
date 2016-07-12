@@ -148,7 +148,7 @@ workbook[0].each_with_index { |row, row_i|
     (puts "Code is empty";) if codes.nil?
 
     dt = cells[7].present? ? cells[7] : nil
-    tmp = { tmp_id: cat_id, virtual: false, level: level, parent_id: parent_id, forms: forms_and_cells[0], cells: forms_and_cells[1], codes: codes, title_translations: { en: cells[level].strip, ka: (cells[10].present? ? cells[10].strip : nil), ru: (cells[11].present? ? cells[10].strip : nil) }, detail_id: dt, order: orders[level], sym: cells[9] }
+    tmp = { tmp_id: cat_id, virtual: false, level: level, parent_id: parent_id, forms: forms_and_cells[0], cells: forms_and_cells[1], codes: codes, title_translations: { en: cells[level].strip }.merge!(cells[10].present? ? {ka: cells[10].strip} : { }).merge!(cells[11].present? ? {ru: cells[11].strip} : { }), detail_id: dt, order: orders[level], sym: cells[9] }
     categories_cell << (cells << cat_id)
     categories_data << tmp
     cat_id += 1

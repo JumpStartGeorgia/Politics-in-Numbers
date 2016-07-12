@@ -104,14 +104,14 @@ class Donor
     #end
     options.push({ "$sort": { donated_amount: -1, name: 1 } })
     #if !matches.blank? || !conditions.blank?
-      Rails.logger.debug("-------------------------------------aggregate options-------#{options}")
+      # Rails.logger.debug("-------------------------------------aggregate options-------#{options}")
       result = collection.aggregate(options)
     #end
     result
   end
   def self.explore(params)
     limiter = 5
-     Rails.logger.debug("--------------------------------------------#{}")
+     # Rails.logger.debug("--------------------------------------------#{}")
     f = {
       donor_ids: nil,
       parties: nil,
@@ -140,7 +140,7 @@ class Donor
 
 
     data = filter(f).to_a
-    Rails.logger.debug("-----------------------------------------return size---#{data.size}")
+    # Rails.logger.debug("-----------------------------------------return size---#{data.size}")
     # TODO refactor code to remove ambitious code
     chart1 = []
     chart2 = []

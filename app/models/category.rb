@@ -31,23 +31,43 @@ class Category
   index parent_id: 1
   #index simple: 1
   SYMS = [ :income, :income_campaign, :expenses, :expenses_campaign, :reform_expenses, :property_assets, :financial_assets, :debts ]
-  def self.by_sym_local(categories)
-    #*TODO* no more requests to db
+  def self.by_sym(cats, sym = nil, vir = false)
     out = {}
-    categories.each { |item|
-      out[item[:c][:sym]] = by_sym_helper(item[:sub], true) if item[:sub].present?
-    }
-    out
-  end
-
-  def self.by_sym(sym = nil, vir = false)
-    out = {}
-    d = tree(vir, sym)
+    d = tree_local(cats.to_a, vir, sym)
     d.each { |item|
       out[item[:c][:sym]] = by_sym_helper(item[:sub], true) if item[:sub].present?
     }
     out
   end
+
+
+  # def self.by_sym(sym = nil, vir = false)
+  #   out = {}
+  #   d = tree(vir, sym)
+  #   d.each { |item|
+  #     out[item[:c][:sym]] = by_sym_helper(item[:sub], true) if item[:sub].present?
+  #   }
+  #   out
+  # end
+  def self.tree_local(cats, vir = false, sym = nil)
+    list = []
+    cats.select{|s| s.level == 0 }.sort { |x,y| x.order <=> x.order }.each{|cat|
+      list << { c: cat, sub: sub_tree_local(cats, cat.id, 1, vir) }
+    }
+    list
+  end
+  def self.sub_tree_local(cats, par_id, lvl, vir = false)
+    # puts par_id
+    # puts lvl
+    list = nil
+    if lvl != 6
+      list = []
+      cats.select{|s| s.level == lvl && s.parent_id == par_id && s.virtual == vir }.sort { |x,y| x.order <=> x.order }.each{ |cat|
+        list << { c: cat, sub: sub_tree_local(cats, cat.id, lvl+1, vir)} }
+    end
+    list
+  end
+
 
   def self.tree(vir = false, sym = nil)
     cats = Category.all

@@ -64,7 +64,7 @@ class RootController < ApplicationController
         gon.donation_data = dt
         #pars[:donor] = dt[:donor_info] if dt[:donor_info].present?
       else
-        dt = Dataset.explore(pars)
+        dt = CategoryData.explore(pars)
         gon.finance_data = dt
       end
       pars.delete(:locale)
@@ -127,7 +127,7 @@ class RootController < ApplicationController
     if pars[:donation].present?
       res[:donation] = Donor.explore(pars[:donation])
     elsif pars[:finance].present?
-      res[:finance] = Dataset.explore(pars[:finance])
+      res[:finance] = CategoryData.explore(pars[:finance])
     end
     Rails.logger.debug("--------------------------------------------#{pars.inspect}")
     #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
