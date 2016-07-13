@@ -18,7 +18,8 @@ class Period
 
   #default_scope ->{ order_by([[:type, :desc], [:title, :asc]]) }
   #
-  scope :campaigns, ->{ where(type: type_is(:election)) }
+  scope :annual, ->{ where(type: type_is(:annual)).order_by([[:start_date, :desc]]) }
+  scope :campaigns, ->{ where(type: type_is(:election)).order_by([[:start_date, :desc]]) }
 
   index({ type: 1, start_date: 1, end_date: 1 }, unique: true)
   # rake db:mongoid:create_indexes

@@ -457,7 +457,33 @@
           }
         }
 
-
+        .input-radio-group {
+          text-align:center;
+          input[type="radio"] + label {
+            font:12px firasans_r;
+            color:#5D675B;
+            display:inline-block;
+            margin-right:0px;
+            padding:0 10px;
+          }
+          input[type="radio"]:checked + label {
+            font:12px firasans_b;
+          }
+          .or {
+            font:14px firasans_book;
+            color:#F78E69;
+          }
+        }
+        .input-checkbox-group {
+          margin-top:12px;
+          ul {
+            text-align: left;
+            li {
+              display:block;
+              padding:4px 0;
+            }
+          }
+        }
       }
     }
     &.active[data-type='donation'] {
@@ -817,7 +843,8 @@
   }
   &[data-type='donation'] #content .pane[data-type='donation'],
   &[data-type='finance'] #content .pane[data-type='finance'] {
-    display:table-cell;
+    display:block;
+    width:100%;
   }
   @media (min-width: 768px) {
 
@@ -907,6 +934,9 @@
       display:table-cell;
       padding: 10px 10px 10px 42px;
       .panes {
+        .pane {
+          width:100%;
+        }
         .pane[data-type='donation'] {
           .caption {
             padding:45px 10px 55px;
@@ -1130,6 +1160,12 @@
                 }
               }
             }
+          }
+        }
+        .pane[data-type='finance'] {
+          .charts {
+            width:100%;
+
           }
         }
       }

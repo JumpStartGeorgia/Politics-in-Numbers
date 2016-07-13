@@ -43,6 +43,7 @@ en:
       summary: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Reprehenderit, voluptatum! Magnam quas consequatur nihil quo reiciendis asperiores vitae obcaecati quam, quidem ratione delectus, veritatis nulla maiores quae nemo debitis. Sed."
       back: Back
       ns: Not Specified
+      or: or
     locale:
       short:
         en: En

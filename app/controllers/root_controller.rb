@@ -64,8 +64,9 @@ class RootController < ApplicationController
         gon.donation_data = dt
         #pars[:donor] = dt[:donor_info] if dt[:donor_info].present?
       else
-        dt = CategoryData.explore(pars)
+        dt = Dataset.explore(pars)
         gon.finance_data = dt
+         Rails.logger.debug("------------finance--------------------------------#{dt}")
       end
       pars.delete(:locale)
       @download_link = request.path + "?" +  pars.to_param  + "#{pars.empty? ? '' : '&'}#{'format=csv'}"
@@ -127,9 +128,9 @@ class RootController < ApplicationController
     if pars[:donation].present?
       res[:donation] = Donor.explore(pars[:donation])
     elsif pars[:finance].present?
-      res[:finance] = CategoryData.explore(pars[:finance])
+      res[:finance] = Dataset.explore(pars[:finance])
     end
-    Rails.logger.debug("--------------------------------------------#{pars.inspect}")
+    Rails.logger.debug("--------------------------------------------#{res.inspect}")
     #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
 
     # q = params[:q].split
@@ -224,7 +225,7 @@ class RootController < ApplicationController
     #      "multiple"=>"yes"},
     #       "locale"=>"en"}
     def explore_params
-      params.permit([:filter, :monetary, :multiple, :locale, :format, { donor: [], period: [], amount: [], party: [] }])
+      params.permit([:filter, :monetary, :multiple, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
     end
     def explore_filter_params
       params.permit(:donation => [:monetary, :multiple, :all, :locale, { donor: [], period: [], amount: [], party: []}],

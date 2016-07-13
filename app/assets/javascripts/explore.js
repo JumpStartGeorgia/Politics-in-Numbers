@@ -149,6 +149,11 @@ $(document).ready(function (){
           autocomplete.pop(autocomplete_id, t.attr("data-id"));
           event.stopPropagation();
         });
+        $(document).on("click", ".filter-input[data-type='period_mix'] .input-radio-group input + label", function(event) {
+          var t = $(this), tp = t.attr("data-type"), group = t.closest(".filter-input").find(".input-checkbox-group");
+          group.find("ul[data-type]").addClass("hidden");
+          group.find("ul[data-type='" + tp + "']").removeClass("hidden");
+        });
       }
     },
     donation = {
@@ -309,7 +314,6 @@ $(document).ready(function (){
             event.stopPropagation();
         });
       },
-      validate: function() {},
       id: function(v) {
         var period = [-1, -1], amount = [-1, -1];
         if(v.hasOwnProperty("period")) {
@@ -343,6 +347,7 @@ $(document).ready(function (){
     },
     finance = {
       types: {
+        party: "autocomplete",
         income: "autocomplete",
         income_campaign: "autocomplete",
         expenses: "autocomplete",
@@ -350,12 +355,8 @@ $(document).ready(function (){
         reform_expenses: "autocomplete",
         property_assets: "autocomplete",
         financial_assets: "autocomplete",
-        debts: "autocomplete"
-        // period: "period",
-        // amount: "range",
-        // party: "autocomplete",
-        // monetary: "radio",
-        // multiple: "checkbox"
+        debts: "autocomplete",
+        period: "period_mix"
       },
       states: {
         income: false,
@@ -370,6 +371,7 @@ $(document).ready(function (){
       categories: ["income", "income_campaign", "expenses", "expenses_campaign", "reform_expenses", "property_assets", "financial_assets", "debts" ],
       //download: $("#donation_csv_download"),
       elem: {
+        party: $("#finance_party"),
         income: $("#finance_income"),
         income_campaign:$("#finance_income_campaign"),
         expenses:$("#finance_expenses"),
@@ -378,24 +380,7 @@ $(document).ready(function (){
         property_assets:$("#finance_property_assets"),
         financial_assets:$("#finance_financial_assets"),
         debts:$("#finance_debts"),
-
-        // period: {
-        //   from: $("#donation_period_from"),
-        //   to: $("#donation_period_to")
-        // },
-        // amount: {
-        //   from: $("#donation_amount_from"),
-        //   to: $("#donation_amount_to")
-        // },
-        // party: $("#donation_party"),
-        // monetary: {
-        //   yes: $("#donation_monetary_yes"),
-        //   no: $("#donation_monetary_no")
-        // },
-        // multiple: $("#donation_multiple_yes")
-
-        // reset: $("#donation_reset"),
-        // explore: $("#donation_explore")
+        period: $("finance_period")
       },
       data: {},
       get: function() {
@@ -413,19 +398,20 @@ $(document).ready(function (){
                 t.data[el] = Object.keys(autocomplete[lnk]);
               }
             }
-            // else if(tp === "period") {
-            //   tmp_v = tmp.datepicker('getDate');
-            //   tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
-            //   if(isDate(tmp_v)) {
-            //     tmp_d[elem_i] = tmp_v.getTime();
-            //   }
-            //   if(tmp_d.toString() === [-1, -1].toString()) {
-            //     delete t.data[el];
-            //   }
-            //   else {
-            //     t.data[el] = tmp_d;
-            //   }
-            // }
+            else if(tp === "period_mix") {
+              console.log("mix");
+              // tmp_v = tmp.datepicker('getDate');
+              // tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
+              // if(isDate(tmp_v)) {
+              //   tmp_d[elem_i] = tmp_v.getTime();
+              // }
+              // if(tmp_d.toString() === [-1, -1].toString()) {
+              //   delete t.data[el];
+              // }
+              // else {
+              //   t.data[el] = tmp_d;
+              // }
+            }
             // else if(tp === "range") {
             //   tmp_v = tmp.val();
             //   tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
@@ -470,18 +456,19 @@ $(document).ready(function (){
             if(tp === "autocomplete") {
               p = el.parent();
               Object.keys(v).forEach(function(kk){
-                var tmp = p.attr("data-field");
-                if(t.categories.indexOf(tmp) !== -1) { tmp = "category"; }
-
+                var fld = p.attr("data-field"), tmp = fld, fl = false;
+                if(t.categories.indexOf(fld) !== -1) { fl = true; tmp = "category"; }
                 autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[tmp+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
+                if(fl) { emulate_category_click(fld); }
               });
             }
-            // else if(tp === "period") {
-            //   el.from.datepicker('setDate', new Date(+v[0]));
-            //   el.to.datepicker('setDate', new Date(+v[1]));
-            //   tmp = formatRange([el.from.datepicker("getDate").format("mm/dd/yyyy"), el.to.datepicker("getDate").format("mm/dd/yyyy")]);
-            //   create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
-            // }
+            else if(tp === "period_mix") {
+              console.log("period mix set url");
+              // el.from.datepicker('setDate', new Date(+v[0]));
+              // el.to.datepicker('setDate', new Date(+v[1]));
+              // tmp = formatRange([el.from.datepicker("getDate").format("mm/dd/yyyy"), el.to.datepicker("getDate").format("mm/dd/yyyy")]);
+              // create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
+            }
             // else if(tp === "range") {
             //   el.from.val(+v[0]);
             //   el.to.val(+v[1]);
@@ -503,32 +490,23 @@ $(document).ready(function (){
         }
       },
       reset: function() {
-        // $(".filter-inputs[data-type='donation'] .filter-input").each(function(i,d) {
-        //   var t = $(this);
-        //     field = t.attr("data-field"),
-        //     type = t.attr("data-type");
-        //      list = t.find(".list");
+        $(".filter-inputs[data-type='finance'] .filter-input").each(function(i,d) {
+          var t = $(this);
+            field = t.attr("data-field"),
+            type = t.attr("data-type");
+             list = t.find(".list");
 
-        //     if(type === "autocomplete") {
-        //       autocomplete.clear(t.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"));
-        //     }
-        //     else if(type === "period") {
-        //       t.find(".input-group input[type='text'].datepicker").datepicker('setDate', null);
-        //     }
-        //     else if(type === "range") {
-        //       t.find(".input-group input[type='number']").val(null);
-        //     }
-        //     else if(type === "radio") {
-        //       t.find(".input-group input[type='radio']:checked").prop("checked", false);
-        //     }
-        //     else if(type === "checkbox") {
-        //       t.find(".input-group input[type='checkbox']:checked").prop("checked", false);
-        //     }
-        //     list.empty();
-        //     event.stopPropagation();
-        // });
+            if(type === "autocomplete") {
+              autocomplete.clear(t.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"));
+            }
+            else if(type === "period_mix") {
+              //t.find(".input-group input[type='text'].datepicker").datepicker('setDate', null);
+              console.log("period_mix reset");
+            }
+            list.empty();
+            event.stopPropagation();
+        });
       },
-      validate: function() {},
       id: function(v) {
         // var period = [-1, -1], amount = [-1, -1];
         // if(v.hasOwnProperty("period")) {
@@ -537,9 +515,10 @@ $(document).ready(function (){
         // if(v.hasOwnProperty("amount")) {
         //   amount = v.amount;
         // }
-        var tmp = ["f"];
+        var tmp = ["f", v.party];
         this.categories.forEach(function(d){ tmp.push(v[d]); });
-        return CryptoJS.MD5(tmp.join(";")).toString(); //v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple
+        tmp.push(v.period);
+        return CryptoJS.MD5(tmp.join(";")).toString();
       },
       url: function(v) {
         var t = this, url = "?", params = [], tmp;
@@ -565,13 +544,8 @@ $(document).ready(function (){
         console.log("toggle", t, element, turn_on);
         t.elem[element].parent().attr("data-on", turn_on);
         t.states[element] = turn_on;
-
       }
     };
-    dn = donation;
-     // console.log(donation.get(), donation);
-  // gon.donation_period_min = new Date(gon.donation_period_min);
-  // gon.donation_period_max = new Date(gon.donation_period_max);
   finance_toggle.click(function (event){
     is_type_donation = false;
     var p = finance_toggle.parent().parent();
@@ -608,7 +582,7 @@ $(document).ready(function (){
 
   finance_category.find(".finance-category-toggle").click(function(event) {
     console.log("toggle");
-    if(is_type_donation) { finance_toggle.trigger("click"); }
+    if(!is_type_donation) { finance_toggle.trigger("click"); }
     var t = $(this), state = t.attr("data-state"), sub, sub_state, cat = t.attr("data-cat");
     global_click_callback = undefined;
     if(typeof state === "undefined" || state === "") {
@@ -624,28 +598,19 @@ $(document).ready(function (){
       t.parent().next().find(".finance-category-toggle a").focus();
       t.attr("data-state", sub_state);
       finance.toggle(sub.attr("data-cat"), true);
-      // console.log("added", cat, sub_state);
-      // TODO call filter with sub_state(all|campaign)
-
     }
-    else if(state === "all" || state === "campaign") {
-      t.find(".sub").removeClass("selected");
+    else if(state === "all" || state === "campaign") { // unselect multy select
+      sub = t.find(".sub[data-sub='" + state + "']");
       t.attr("data-state", "");
-      // console.log("remove", cat);
-      // TODO call filter with removing this category with state option
+      finance.toggle(sub.attr("data-cat"), false);
     }
     else if(state === "simple") {
       t.attr("data-state", "simpled");
-      console.log("change filter to reflect new category");
       finance.toggle(cat, true);
-      // show or create autocomplete with sub category list
-      // TODO call filter with sub_state(all|campaign)
-      // console.log("added", cat);
     }
     else if(state === "simpled") {
       t.attr("data-state", "simple");
       finance.toggle(cat, false);
-      // console.log("removed", cat);
     }
     event.preventDefault();
     event.stopPropagation();
@@ -656,7 +621,24 @@ $(document).ready(function (){
 
 
 
+  function emulate_category_click(cat) {
 
+    finance_toggle.trigger("click");
+    console.log("emulate", cat);
+    var t = $(".finance-category-toggle[data-cat='" + cat + "']"), tp = t.attr("data-state");
+    console.log("emulate", t, tp);
+    if(tp === "simple" || tp === "simpled") {
+      t.trigger("click");
+    }
+    else {
+      t.parent().next().find(".finance-category-toggle a").focus();
+      t.attr("data-state", t.find("[data-cat='" + cat + "']").attr("data-sub"));
+      finance.toggle(cat, true);
+    }
+  }
+  function hide_filter_input(cat) {
+        // * TODO * catch removing category from filter
+  }
   function create_list_item(list, text, vbool) {
     list.html(vbool ? "<span>" + text + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !vbool);
   }
@@ -834,6 +816,7 @@ $(document).ready(function (){
         finance.url(tmp);
       }
       else {
+        console.log("finance_data is", gon.finance_data );
         js.cache[finance_id] = gon.finance_data;
         gon.gonned = false;
       }
@@ -893,7 +876,8 @@ $(document).ready(function (){
       bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
     }
     else {
-      console.log("finance");
+      grouped_bar_chart("#finance_chart", data, "#fff")
+      console.log("#finance_chart", data, partial);
     }
   }
 
@@ -959,6 +943,234 @@ $(document).ready(function (){
       series: [{ data: series_data }]
     });
   }
+  function grouped_bar_chart(elem, series_data, bg) {
+    console.log("chart", elem, series_data);
+    $(elem).highcharts({
+      chart: {
+          type: 'column',
+          backgroundColor: bg,
+          height: 400,
+          colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"]
+      },
+      exporting: {
+        buttons: {
+          contextButton: {
+            enabled: false
+          }
+        }
+      },
+      title: { text: "Test main" },
+      subtitle: { text: "Test main sub" },
+      xAxis: {
+        type: "category",
+        categories: series_data.chart1_categories,
+        // gridLineColor: "#5D675B",
+        // gridLineWidth:1,
+        // gridLineDashStyle: "Dash",
+        lineWidth: 1,
+        lineColor: "#5D675B",
+        tickWidth: 0,
+        // tickColor: "#5D675B",
+        // tickLength: 50,
+        // tickPosition: "outside",
+        min: 0,
+        labels: {
+          style: {
+            color: "#5d675b",
+            fontSize:"14px",
+            fontFamily: "firasans_book",
+            textShadow: 'none'
+          }
+        }
+      },
+      yAxis: [
+      {
+        title: { enabled: false },
+        gridLineColor: "#eef0ee",
+        gridLineWidth:1,
+        style: {
+          color: "#5d675b",
+          fontSize:"14px",
+          fontFamily: "firasans_book",
+          textShadow: 'none'
+        }
+      },
+      {
+        linkedTo:0,
+        title: { enabled: false },
+        opposite: true,
+        style: {
+          color: "#7F897D",
+          fontSize:"12px",
+          fontFamily: "firasans_r",
+          textShadow: 'none'
+        }
+      }
+      ],
+      legend: {
+          enabled: true,
+          symbolWidth:10,
+          symbolHeight:10,
+          shadow: false,
+          itemStyle: {
+            color: "#5d675b",
+            fontSize:"14px",
+            fontFamily: "firasans_book",
+            textShadow: 'none',
+            fontWeight:'normal'
+          }
+       },
+
+      plotOptions: {
+          // bar: {
+          //     color:"#ffffff",
+          //     dataLabels: {
+          //         enabled: true,
+          //         padding: 6,
+          //         style: {
+          //           color: "#5d675b",
+          //           fontSize:"14px",
+          //           fontFamily: "firasans_r",
+          //           textShadow: 'none'
+          //         }
+          //     },
+          //     pointInterval:1,
+          //     pointWidth:17,
+          //     pointPadding: 0,
+          //     groupPadding: 0,
+          //     borderWidth: 0,
+          //     shadow: false
+          // }
+      },
+      credits: { enabled: false },
+      series: series_data.chart1,
+      tooltip: {
+        backgroundColor: "#DCE0DC",
+        followPointer: true,
+        shadow: false,
+        borderWidth:0,
+        style: {
+          color: "#5D675B",
+          fontSize:"14px",
+          fontFamily: "firasans_r",
+          textShadow: 'none',
+          fontWeight:'normal'
+        }
+        * TODO * finalize chart styling only for one category yet
+      }
+    });
+    // $('#container').highcharts({
+
+    //     chart: {
+    //         type: 'column',
+    //         colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"]
+    //     },
+
+    //     title: {
+    //         text: 'Total fruit consumtion, grouped by gender'
+    //     },
+1
+    //     xAxis: {
+    //         categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas'],
+    //         min: 0
+    //     },
+
+    //     yAxis: {
+    //         allowDecimals: false,
+    //         min: 0,
+    //         title: {
+    //             text: 'Number of fruits'
+    //         }
+    //     },
+
+    //     tooltip: {
+    //         formatter: function () {
+    //             return '<b>' + this.x + '</b><br/>' +
+    //                 this.series.name + ': ' + this.y + '<br/>' +
+    //                 'Total: ' + this.point.stackTotal;
+    //         }
+    //     },
+
+    //     plotOptions: {
+    //         column: {
+    //             stacking: 'normal'
+    //         }
+    //     },
+
+    //     series: [{
+    //         name: 'John',
+    //         data: [5, 3, 4, 7, 2],
+    //         stack: 'male'
+    //     }, {
+    //         name: 'Joe',
+    //         data: [3, 4, 4, 2, 5],
+    //         stack: 'male'
+    //     }, {
+    //         name: 'Jane',
+    //         data: [2, 5, 6, 2, 1],
+    //         stack: 'female'
+    //     }, {
+    //         name: 'Janet',
+    //         data: [3, 0, 4, 4, 3],
+    //         stack: 'female'
+    //     }]
+    // });
+    // console.log("chart", elem, series_data);
+    // $(elem).highcharts({
+    //   chart: {
+    //       type: 'bar',
+    //       backgroundColor: bg,
+    //       height: 200
+    //   },
+    //   exporting: {
+    //     buttons: {
+    //       contextButton: {
+    //         enabled: false
+    //       }
+    //     }
+    //   },
+    //   title: { text: title },
+    //   xAxis: {
+    //     type: "category",
+    //     lineWidth: 0,
+    //     tickWidth: 0,
+    //     labels: {
+    //       style: {
+    //         color: "#5d675b",
+    //         fontSize:"14px",
+    //         fontFamily: "firasans_book",
+    //         textShadow: 'none'
+    //       }
+    //     }
+    //   },
+    //   yAxis: { visible: false },
+    //   legend: { enabled: false },
+    //   plotOptions: {
+    //       bar: {
+    //           color:"#ffffff",
+    //           dataLabels: {
+    //               enabled: true,
+    //               padding: 6,
+    //               style: {
+    //                 color: "#5d675b",
+    //                 fontSize:"14px",
+    //                 fontFamily: "firasans_r",
+    //                 textShadow: 'none'
+    //               }
+    //           },
+    //           pointInterval:1,
+    //           pointWidth:17,
+    //           pointPadding: 0,
+    //           groupPadding: 0,
+    //           borderWidth: 0,
+    //           shadow: false
+    //       }
+    //   },
+    //   credits: { enabled: false },
+    //   series: [{ data: series_data }]
+    // });
+  }
+
 
   // dev block
   // filter_extended.find(".filter-toggle").trigger("click");

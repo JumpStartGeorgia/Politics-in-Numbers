@@ -1,3 +1,4 @@
+<% party_list = Party.all.map{|m| [m.id,m.title]} %>
 <div id="explore" data-type="donation">
   <div id="filter_type" class="filter-type" data-type="donation">
     <div class="back"><%= image_tag("explore/back.svg", alt: t('shared.common.back'), title: t('shared.common.back')) %>
@@ -79,7 +80,7 @@
             <input id="donation_amount_to" type="number" placeholder="<%= t('.to') %>" class="datepicker" data-type="range">
           </div>
         </div>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "party", on: true, list: generate_li_list(Party.all.map{|m| [m.id,m.title]}), category_label: 0 } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "party", on: true, list: generate_li_list(party_list), category_label: 0 } %>
         <div class="row filter-input" data-field="type" data-type="radio">
           <a href="#" class="toggle" tabindex="5"><%= t('.donation_type') %><i title="<%= t('.filter_toggle') %>"></i></a>
           <div class="list hidden"></div>
@@ -106,6 +107,7 @@
         </div>
       </div>
       <div class="finance filter-inputs" data-type="finance">
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true, list: generate_li_list(party_list), category_label: 0 } %>
         <% lists = Category.by_sym(@categories) %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income", on: false, list: lists[:income].html_safe } %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income_campaign", on: false, list: lists[:income_campaign].html_safe } %>
@@ -115,6 +117,35 @@
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "property_assets", on: false, list: lists[:property_assets].html_safe } %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "financial_assets", on: false, list: lists[:financial_assets].html_safe } %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "debts", on: false, list: lists[:debts].html_safe } %>
+
+        <div class="row filter-input" data-field="period" data-type="period_mix">
+          <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <ul id="finance_period" class="list hidden"></ul>
+          <div class="input-group">
+            <div class="input-radio-group">
+              <input type="radio" id="finance_period_annual" name="finance_period" value="annual" data-type="period_mix" checked>
+              <label for="finance_period_annual" data-type="annual"><%= t('.annual') %></label>
+              <span class="or"><%= t('shared.common.or') %></span>
+              <input type="radio" id="finance_period_campaign" name="finance_period" value="yes" data-type="period_mix">
+              <label for="finance_period_campaign" data-type="campaign"><%= t('.campaign') %></label>
+            </div>
+            <div class="input-checkbox-group">
+              <ul data-type="annual">
+                <% Period.annual.each{|e| %>
+                  <li><input type="checkbox" id='finance_period_annual_<%= "#{e.id}" %>' name='finance_period_annual' value="<%= "#{e.id}" %>">
+                  <label for='finance_period_annual_<%= "#{e.id}" %>'><span></span><%= "#{e.title}" %></label></li>
+                <% } %>
+              </ul>
+              <ul class="hidden" data-type="campaign">
+                <% Period.campaigns.each{|e| %>
+                  <li><input type="checkbox" id='finance_period_campaign_<%= "#{e.id}" %>' name='finance_period_campaign' value="<%= "#{e.id}" %>">
+                  <label for='finance_period_campaign_<%= "#{e.id}" %>'><span></span><%= "#{e.title}" %></label></li>
+                <% } %>
+              </ul>
+            </div>
+
+          </div>
+        </div>
       </div>
       <div class="filter-footer">
         <button id="reset" class="reset"><%= t('.reset') %></button>
@@ -223,5 +254,5 @@
   </div>
 </div>
 <% content_for :custom_js,  "explore"  %>
-<% @custom_js = ["https://code.highcharts.com/highcharts.js", "https://code.highcharts.com/modules/exporting.js", "https://code.highcharts.com/modules/offline-exporting.js", "crypto.min.js" ] %>
+<% @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "crypto.min.js" ] %>
 <% content_for :custom_css, "explore" %>
