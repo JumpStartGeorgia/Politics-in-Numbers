@@ -89,8 +89,8 @@ class Dataset
     matches = []
     conditions = []
 
-    # matches.push({ "_id": { "$in": params[:donor_ids].map{|m| BSON::ObjectId(m)} } }) if params[:donor_ids].present?
-    # matches.push({ "multiple": { "$eq": params[:multiple] } }) if params[:multiple] == true
+    matches.push({ "party_id": { "$in": params[:parties].map{|m| BSON::ObjectId(m)} } }) if params[:parties].present?
+    matches.push({ "period_id": { "$in": params[:period].map{|m| BSON::ObjectId(m)} } }) if params[:period].present?
 
     SYMS.each { |e|
       if params[e].present?
@@ -101,46 +101,6 @@ class Dataset
         conditions.push({ "$or": ors });
       end
     }
-
-
-
-    # if params[:parties].present?
-    #   tmp = params[:parties].map{|m| BSON::ObjectId(m) }
-    #   matches.push({ "donations.party_id": { "$in": tmp } })
-    #   ors = []
-    #   tmp.each{|e| ors.push({ "$eq": ["$$donation.party_id", e ] }) }
-    #   conditions.push({ "$or": ors });
-    # end
-
-    # tmp = params[:period][0]
-    # if tmp.present? && tmp != -1
-    #   matches.push({ "donations.give_date": { "$gte": tmp } })
-    #   conditions.push({"$gte": [ "$$donation.give_date", tmp ]})
-    # end
-
-    # tmp = params[:period][1]
-    # if tmp.present? && tmp != -1
-    #   matches.push({ "donations.give_date": { "$lte": tmp } })
-    #   conditions.push({"$lte": [ "$$donation.give_date", tmp ]})
-    # end
-
-    # tmp = params[:amount][0]
-    # if tmp.present? && tmp != -1
-    #   matches.push({ "donations.amount": { "$gte": tmp } })
-    #   conditions.push({"$gte": [ "$$donation.amount", tmp ]})
-    # end
-
-    # tmp = params[:amount][1]
-    # if tmp.present? && tmp != -1
-    #   matches.push({ "donations.amount": { "$lte": tmp } })
-    #   conditions.push({"$lte": [ "$$donation.amount", tmp ]})
-    # end
-
-    # tmp = params[:monetary]
-    # if tmp.present? && tmp == true || tmp == false
-    #   matches.push({ "donations.monetary": { "$eq": tmp } })
-    #   conditions.push({"$eq": [ "$$donation.monetary", tmp ]})
-    # end
 
     options.push({ "$match": { "$and": matches } }) if !matches.blank?
 
@@ -179,14 +139,14 @@ class Dataset
 
     f = {
       parties: nil,
-      period: [-1,-1]
+      period: nil
     }
 
     tmp = params[:party]
     f[:parties] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
 
     tmp = params[:period]
-    f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
+    f[:period] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
 
     #{ category: Category.tree(false) }
     ln = 0
@@ -196,8 +156,9 @@ class Dataset
       ln += f[e].size if f[e].present?
     }
 
+
     data = filter(f).to_a
-    Rails.logger.debug("-----------------------------------------return size---#{data.size}")
+    #Rails.logger.debug("-----------------------------------------return size---#{data.size}")
     chart1 = []
     # table = []
     # total_amount = 0
@@ -206,19 +167,11 @@ class Dataset
     # nature_values = [I18n.t("mongoid.attributes.donor.nature_values.private"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
     parties = {}
     periods = {}
+    categories = {}
     Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
-    Period.each{|e| periods[e.id] = { name: e.title, date: e.start_date } }
-    # chart_meta = [
-    #   ["top_5_donors", "top_5_parties"],
-    #   ["top_5_donors_for_party", "last_5_donations_for_party"],
-    #   ["top_5_donors_for_parties", "total_donations_for_parties"],
-    #   ["last_5_donations_for_donor", "top_5_parties_donated_to"],
-    #   ["total_donations_for_each_donor", "top_5_parties_donated_to"],
-    #   ["donors_donations_sorted_by_amount", "parties_donations_sorted_by_amount"]
-    # ]
-    # chart_meta_obj = { n: limiter, obj: nil, objb: nil }
+    Period.each{|e| periods[e.id] = { name: e.title, date: e.start_date, type: e.type } }
+    Category.each{|e| categories[e.id.to_s] = { title: e.title, parent_id: e.parent_id.to_s } }
 
-    # ds = f[:donor_ids].nil? ? 0 : f[:donor_ids].length
     cs = ln
     ps = f[:parties].nil? ? 0 : f[:parties].length
 
@@ -235,7 +188,7 @@ class Dataset
     #   e[:partial_donated_amount] = 0
       if !period_list[e[:period_id]].present?
         per = periods[e[:period_id]]
-        period_list[e[:period_id]] = { id: e[:period_id], name: per[:name], date: per[:date] }
+        period_list[e[:period_id]] = { id: e[:period_id], name: per[:name], date: per[:date], type: per[:type]  }
       end
 
       if !parties_list[e[:party_id]].present?
@@ -266,30 +219,41 @@ class Dataset
       # }
     }
     tmp = []
-    period_list.each{|k,v| tmp.push({ id: v[:id], name: v[:name], date: v[:date] }) }
+    period_list.each{|k,v| tmp.push({ id: v[:id], name: v[:name], date: v[:date], type: v[:type] }) }
     period_list = tmp
     tmp.sort!{ |x,y| y[:date] <=> x[:date] }
 
-     Rails.logger.debug("--------------------------------------------#{period_list.length}")
+     #Rails.logger.debug("--------------------------------------------#{period_list.length}")
     parties_list.each{|k,v| parties_list[k][:data] = Array.new(period_list.size, 0) }
 
     data.each{|e|
-    #   e[:partial_donated_amount] = 0
-      # per = periods[e[:period_id]]
-      # period_list.push({ id: per._id, name: per.title, date: per.give_date })
-
-      # if !parties_list[e[:party_id]].present?
-      #   parties_list[e[:party_id]] = { name: parties[e[:party_id]][:name], data: {  } }
-      # end
-
 
       pp = period_list.index{ |s| s[:id] == e[:period_id] }
       e[:category_datas].each { |ee|
-       Rails.logger.debug("3==================#{period_list}===================#{parties_list[e[:party_id]][:data]} #{pp}")
+       #Rails.logger.debug("3==================#{period_list}===================#{parties_list[e[:party_id]][:data]} #{pp}")
          #Rails.logger.debug("--------------------------------------------#{parties_list[e[:party_id]][:data][pp]}") if parties_list[e[:party_id]][:data][pp].present?
         parties_list[e[:party_id]][:data][pp] = ee[:value]
       }
     }
+
+    chart_title = ""
+    chart_title += "#{I18n.t('shared.chart.finance.title.party_donations_for')}: #{f[:parties].map{|m| parties[BSON::ObjectId(m)][:name] }.join(', ')}<br/>" if f[:parties].present?
+
+    if ln >= 1
+      chart_title += I18n.t("shared.chart.finance.title.#{ln == 1 ? 'category' : 'category_grouped_by'}")+": "
+      SYMS.each { |e|
+        if f[e].present?
+          chart_title += Category.full_names(categories, f[e]).join(',<br/>')
+        end
+      }
+    end
+
+    if f[:period].present?
+      period_first = periods[BSON::ObjectId(f[:period][0])]
+      chart_title += I18n.t("shared.chart.finance.title.time_period_#{Period::TYPES[period_first[:type]] == :annual ? 'annual' : 'campaign'}")+": "
+      chart_title += f[:period].map{|m| periods[BSON::ObjectId(m)][:name] }.join(",<br/>")
+    end
+
 
     if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
 
@@ -325,12 +289,14 @@ class Dataset
 
     {
       data: nil,#data,
-      chart1_categories: chart1_categories,
-      chart1: chart1,
+      chart1: {
+        categories: chart1_categories,
+        series: chart1,
+        title: chart_title
+      }
       # parties_list: parties_list,
       # period_list: period_list
     #   chart1: chart1,
-      chart1_title: I18n.t("shared.common.or")
     #   chart2: chart2,
     #   chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart_meta_obj),
     #   table: {
@@ -348,12 +314,6 @@ class Dataset
 
 
 
-    #     Party - Donations for:
-    # Category - Grouped by:
-    # Grouped by: Income - Donated Monetary
-    # Group by: Property Asset - Vehicles
-    # Time period annual - In:
-    # Time period campaign - During:
 
 
   end

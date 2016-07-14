@@ -9,6 +9,7 @@ $(document).ready(function (){
       cache: {}
     },
     explore = $("#explore"),
+    explore_button = $("#explore_button"),
     finance_toggle = $("#finance_toggle"),
     donation_toggle = $("#donation_toggle"),
     filter_type = $("#filter_type"),
@@ -23,10 +24,10 @@ $(document).ready(function (){
           this[autocomplete_id] = {};
         }
         if(!this[autocomplete_id].hasOwnProperty(key)) {
-          $("[data-autocomplete-view='" + autocomplete_id + "']").append("<li data-id='"+key+"'>"+value+"<i class='close' title='" + gon.filter_item_close + "'></i></li>");
+          $("[data-autocomplete-view='" + autocomplete_id + "']").append(li(key, value));
           this[autocomplete_id][key] = value;
         }
-        console.log(autocomplete);
+        //console.log(autocomplete);
       },
       pop: function(autocomplete_id, key) {
         if(this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key)) {
@@ -54,7 +55,7 @@ $(document).ready(function (){
             tmp.addClass("focus").focus();
           };
           global_keyup_down_callback = function() {
-            console.log("down");
+            //console.log("down");
             var tmp = ul.find("li.focus").removeClass("focus").next();
             if(!tmp.length) { tmp = ul.find("li:first"); }
             tmp.addClass("focus").focus();
@@ -67,16 +68,16 @@ $(document).ready(function (){
             if(p.is("[data-local]")) {
               ul.find("li .item").hide();
               var regex = new RegExp(".*" + v + ".*", "i");
-              gon[p.attr("data-local")].forEach(function(d) {
+              gon[p.attr("data-local") + "_list"].forEach(function(d) {
                 if(d[1].match(regex) !== null) {
                   ul.find("li .item[data-id='" + d[0] + "']").show();
                 }
 
               });
-              console.log("local");
+              //console.log("local");
             }
             else {
-              console.log("ajax");
+              //console.log("ajax");
               $.ajax({
                 url: p.attr("data-url"),
                 dataType: 'json',
@@ -87,7 +88,7 @@ $(document).ready(function (){
                     html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
                   });
                   p.find("ul").html(html).addClass("active");
-                  console.log("ajax success");
+                  //console.log("ajax success");
                 }
               });
             }
@@ -101,14 +102,14 @@ $(document).ready(function (){
       bind: function() {
         $(".autocomplete input").on("change paste keyup", this.onchange);
         $(".autocomplete input").on("click", function() {
-          console.log("here");
+          //console.log("here");
           var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul");
           p.addClass("active");
           global_click_callback = function(target) {
             target = $(target);
-             console.log("here", target.hasClass(".autocomplete"), target.closest(".autocomplete").length);
+             //console.log("here", target.hasClass(".autocomplete"), target.closest(".autocomplete").length);
             if(!target.hasClass(".autocomplete") && !target.closest(".autocomplete").length) {
-               console.log("inner");
+               //console.log("inner");
               p.removeClass("active");
               global_click_callback = undefined;
               global_keyup_up_callback = undefined;
@@ -119,7 +120,7 @@ $(document).ready(function (){
         });
 
         $(document).on("click keypress", ".autocomplete .dropdown li .item", function(event) {
-           console.log("click keypress autocomplete name");
+          // console.log("click keypress autocomplete name");
           if(event.type === "keypress" && event.keyCode !== 13) { return; }
           var t = $(this), dropdown = t.closest(".dropdown"), p = dropdown.parent(), is_selected = t.hasClass("selected");
 
@@ -143,16 +144,11 @@ $(document).ready(function (){
         });
 
 
-        $(document).on("click", ".list li .close", function(event) {
+        $(document).on("click", "[data-type='autocomplete'] .list li .close", function(event) {
           var t = $(this).parent(), list = t.parent(), autocomplete_id = list.attr("data-autocomplete-view");
           $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li[data-id='" + t.attr("data-id") + "'] .item").toggleClass("selected");
           autocomplete.pop(autocomplete_id, t.attr("data-id"));
           event.stopPropagation();
-        });
-        $(document).on("click", ".filter-input[data-type='period_mix'] .input-radio-group input + label", function(event) {
-          var t = $(this), tp = t.attr("data-type"), group = t.closest(".filter-input").find(".input-checkbox-group");
-          group.find("ul[data-type]").addClass("hidden");
-          group.find("ul[data-type='" + tp + "']").removeClass("hidden");
         });
       }
     },
@@ -163,7 +159,8 @@ $(document).ready(function (){
         amount: "range",
         party: "autocomplete",
         monetary: "radio",
-        multiple: "checkbox"
+        multiple: "checkbox",
+        nature: "radio"
       },
       download: $("#donation_csv_download"),
       elem: {
@@ -181,19 +178,20 @@ $(document).ready(function (){
           yes: $("#donation_monetary_yes"),
           no: $("#donation_monetary_no")
         },
-        multiple: $("#donation_multiple_yes")
-
-        // reset: $("#donation_reset"),
-        // explore: $("#donation_explore")
+        multiple: $("#donation_multiple_yes"),
+        nature: {
+          individual: $("#donor_nature_individual"),
+          organization: $("#donor_nature_organization")
+        }
       },
       data: {},
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, tmp_o, lnk;
         t.data = {};
         Object.keys(this.elem).forEach(function(el){
-          var is_elem = Object.keys(t.elem[el]).length;
+          var is_elem = ["period", "amount", "monetary", "nature"].indexOf(el) == -1;
 
-          (is_elem ? Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; }) : [t.elem[el]]).forEach(function(elem, elem_i){
+          (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
             tmp = $(elem);
             tp = tmp.attr("data-type");
             if(tp === "autocomplete") {
@@ -247,7 +245,7 @@ $(document).ready(function (){
       },
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
-        console.log("set_by_url", gon.params);
+        //console.log("set_by_url", gon.params);
         if(gon.params) {
           Object.keys(gon.params).forEach(function(k) {
                         // console.log(gon.params);
@@ -285,7 +283,7 @@ $(document).ready(function (){
               create_list_item(el.closest(".filter-input").find(".list"), tmp.next().text(), tmp.length);
             }
           });
-          console.log(gon.params);
+          //console.log(gon.params);
         }
       },
       reset: function() {
@@ -322,8 +320,8 @@ $(document).ready(function (){
         if(v.hasOwnProperty("amount")) {
           amount = v.amount;
         }
-        console.log(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple].join(";"));
-        return CryptoJS.MD5(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple].join(";")).toString();
+        //console.log(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple].join(";"));
+        return CryptoJS.MD5(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary, v.multiple, v.nature].join(";")).toString();
       },
       url: function(v) {
         var t = this, url = "?", params = [], tmp;
@@ -331,7 +329,7 @@ $(document).ready(function (){
         Object.keys(this.elem).forEach(function(el){
           if(v.hasOwnProperty(el)) {
             tmp = v[el];
-            if(el !== "monetary" && el !== "multiple" && Array.isArray(tmp)) {
+            if(el !== "monetary" && el !== "multiple" && el !== "nature" && Array.isArray(tmp)) {
               tmp.forEach(function(r){
                 params.push(el + "[]=" + r);
               });
@@ -369,7 +367,6 @@ $(document).ready(function (){
         debts: false
       },
       categories: ["income", "income_campaign", "expenses", "expenses_campaign", "reform_expenses", "property_assets", "financial_assets", "debts" ],
-      //download: $("#donation_csv_download"),
       elem: {
         party: $("#finance_party"),
         income: $("#finance_income"),
@@ -380,16 +377,15 @@ $(document).ready(function (){
         property_assets:$("#finance_property_assets"),
         financial_assets:$("#finance_financial_assets"),
         debts:$("#finance_debts"),
-        period: $("finance_period")
+        period: $("#finance_period")
       },
       data: {},
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, lnk;
         t.data = {};
         Object.keys(this.elem).forEach(function(el){
-          var is_elem = Object.keys(t.elem[el]).length;
-
-          (is_elem ? Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; }) : [t.elem[el]]).forEach(function(elem, elem_i){
+          var is_elem = [].indexOf(el) == -1;
+          (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
             tmp = $(elem);
             tp = tmp.attr("data-type");
             if(tp === "autocomplete") {
@@ -397,57 +393,38 @@ $(document).ready(function (){
               if(autocomplete.hasOwnProperty(lnk)) {
                 t.data[el] = Object.keys(autocomplete[lnk]);
               }
+              else if(t.states[el]) {
+                t.data[el] = ['all'];
+              }
             }
             else if(tp === "period_mix") {
-              console.log("mix");
-              // tmp_v = tmp.datepicker('getDate');
-              // tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
-              // if(isDate(tmp_v)) {
-              //   tmp_d[elem_i] = tmp_v.getTime();
-              // }
-              // if(tmp_d.toString() === [-1, -1].toString()) {
-              //   delete t.data[el];
-              // }
-              // else {
-              //   t.data[el] = tmp_d;
-              // }
+              tmp_d = tmp.find("li[data-id]");
+              tmp_v = [];
+              if(tmp_d.length) {
+                tmp_d.each(function(){ tmp_v.push(this.dataset.id); });
+                t.data[el] = tmp_v;
+              }
             }
-            // else if(tp === "range") {
-            //   tmp_v = tmp.val();
-            //   tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
-            //   if(isNumber(tmp_v)) {
-            //     tmp_d[elem_i] = tmp_v;
-            //   }
-            //   if(tmp_d.toString() === [-1, -1].toString()) {
-            //     delete t.data[el];
-            //   }
-            //   else {
-            //     t.data[el] = tmp_d;
-            //   }
-            // }
-            // else if(tp === "radio") {
-            //   if(tmp.is(":checked")) {
-            //     t.data[el] = tmp.val();
-            //   }
-            // }
-            // else if(tp === "checkbox") {
-            //   if(tmp.is(":checked")) {
-            //     t.data[el] = tmp.val();
-            //   }
-            // }
-            // else {
-            //   //console.log("Type is not specified", t.elem[el]);
-            // }
+            else {
+              console.log("Type is not specified", t.elem[el]);
+            }
           });
         });
+        at_least_one = false;
+        t.categories.forEach(function(d){
+          if(t.data.hasOwnProperty(d)) {
+            at_least_one = true;
+            return;
+          }
+        });
+        if(!at_least_one) { return null; }
         return Object.keys(t.data).length ? t.data : { "all": true };
       },
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
-        console.log("set_by_url", gon.params);
+        // console.log("set_by_url", gon.params);
         if(gon.params) {
           Object.keys(gon.params).forEach(function(k) {
-                        // console.log(gon.params);
             if(k == "filter" || !t.types.hasOwnProperty(k)) return;
               el = t.elem[k];
               tp = t.types[k];
@@ -458,35 +435,28 @@ $(document).ready(function (){
               Object.keys(v).forEach(function(kk){
                 var fld = p.attr("data-field"), tmp = fld, fl = false;
                 if(t.categories.indexOf(fld) !== -1) { fl = true; tmp = "category"; }
-                autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[tmp+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
+                 console.log(kk,v,fld,fl,tmp);
+                if(v[kk] !== "all") {
+                  autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[tmp+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
+                }
                 if(fl) { emulate_category_click(fld); }
               });
             }
             else if(tp === "period_mix") {
-              console.log("period mix set url");
-              // el.from.datepicker('setDate', new Date(+v[0]));
-              // el.to.datepicker('setDate', new Date(+v[1]));
-              // tmp = formatRange([el.from.datepicker("getDate").format("mm/dd/yyyy"), el.to.datepicker("getDate").format("mm/dd/yyyy")]);
-              // create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
+              p = el.parent();
+              var group = p.find(".input-group .input-checkbox-group"),
+                group_list = group.find("li input[value='" + v[0] + "']").parent().parent();
+                group_type = group_list.attr("data-type");
+
+              p.find(".input-group .input-radio-group input[value='" + group_type + "']").prop("checked", true);
+              group.find("ul").addClass("hidden");
+              v.forEach(function(d){
+                group.find("li input[value='" + d + "']").prop("checked", true);
+                el.append(li(d, gon.period_list.filter(function(f){ return f[0] == d; })[0][1]));
+              });
+              group_list.removeClass("hidden");
             }
-            // else if(tp === "range") {
-            //   el.from.val(+v[0]);
-            //   el.to.val(+v[1]);
-            //   tmp = formatRange(v);
-            //   create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
-            // }
-            // else if(tp === "radio") {
-            //   el = el[Object.keys(el)[0]];
-            //   p = el.closest(".filter-input");
-            //   tmp = p.find(".input-group input[type='radio'][value='" + v + "']").prop("checked", true);
-            //   create_list_item(p.find(".list"), tmp.next().text(), tmp.length);
-            // }
-            // else if(tp === "checkbox") {
-            //   tmp = el.prop("checked", el.val() === v ? true : false);
-            //   create_list_item(el.closest(".filter-input").find(".list"), tmp.next().text(), tmp.length);
-            // }
           });
-          console.log(gon.params);
         }
       },
       reset: function() {
@@ -494,27 +464,23 @@ $(document).ready(function (){
           var t = $(this);
             field = t.attr("data-field"),
             type = t.attr("data-type");
-             list = t.find(".list");
+            list = t.find(".list");
 
             if(type === "autocomplete") {
               autocomplete.clear(t.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"));
             }
             else if(type === "period_mix") {
-              //t.find(".input-group input[type='text'].datepicker").datepicker('setDate', null);
-              console.log("period_mix reset");
+              t.find(".input-group .input-radio-group input:first-of-type").prop("checked", true);
+              var group = t.find(".input-group .input-checkbox-group");
+              group.find("input[type='checkbox']:checked").prop("checked", false);
+              group.find("ul[data-type='annual']").removeClass("hidden");
+              group.find("ul[data-type='campaign']").addClass("hidden");
             }
             list.empty();
             event.stopPropagation();
         });
       },
       id: function(v) {
-        // var period = [-1, -1], amount = [-1, -1];
-        // if(v.hasOwnProperty("period")) {
-        //   period = v.period;
-        // }
-        // if(v.hasOwnProperty("amount")) {
-        //   amount = v.amount;
-        // }
         var tmp = ["f", v.party];
         this.categories.forEach(function(d){ tmp.push(v[d]); });
         tmp.push(v.period);
@@ -522,7 +488,8 @@ $(document).ready(function (){
       },
       url: function(v) {
         var t = this, url = "?", params = [], tmp;
-
+        console.log(v);
+        console.log("here");
         Object.keys(this.elem).forEach(function(el){
           if(v.hasOwnProperty(el)) {
             tmp = v[el];
@@ -536,12 +503,13 @@ $(document).ready(function (){
             }
           }
         });
+        //console.log(window.location.pathname + (params.length ? ("?filter=finance&" + params.join("&")) : ""));
         window.history.pushState(v, null, window.location.pathname + (params.length ? ("?filter=finance&" + params.join("&")) : ""));
         //t.download.attr("href", window.location.pathname + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "")) + "format=csv"
       },
       toggle: function(element, turn_on) {
+        console.log(element, turn_on);
         var t = this;
-        console.log("toggle", t, element, turn_on);
         t.elem[element].parent().attr("data-on", turn_on);
         t.states[element] = turn_on;
       }
@@ -579,9 +547,8 @@ $(document).ready(function (){
   filter_type.find(".back").click(function () {1
     filter_type.toggleClass("in-depth");
   });
-
   finance_category.find(".finance-category-toggle").click(function(event) {
-    console.log("toggle");
+    //console.log("toggle");
     if(!is_type_donation) { finance_toggle.trigger("click"); }
     var t = $(this), state = t.attr("data-state"), sub, sub_state, cat = t.attr("data-cat");
     global_click_callback = undefined;
@@ -622,29 +589,30 @@ $(document).ready(function (){
 
 
   function emulate_category_click(cat) {
-
+    * TODO * emulate income and expense click
     finance_toggle.trigger("click");
     console.log("emulate", cat);
     var t = $(".finance-category-toggle[data-cat='" + cat + "']"), tp = t.attr("data-state");
-    console.log("emulate", t, tp);
+    //console.log("emulate", t, tp);
     if(tp === "simple" || tp === "simpled") {
       t.trigger("click");
     }
     else {
       t.parent().next().find(".finance-category-toggle a").focus();
+      console.log(t, cat, t.find("[data-cat='" + cat + "']").attr("data-sub"));
       t.attr("data-state", t.find("[data-cat='" + cat + "']").attr("data-sub"));
       finance.toggle(cat, true);
     }
   }
-  function hide_filter_input(cat) {
-        // * TODO * catch removing category from filter
-  }
   function create_list_item(list, text, vbool) {
     list.html(vbool ? "<span>" + text + "<i class='close' title='" + gon.filter_item_close + "'></i></span>" : "").toggleClass("hidden", !vbool);
   }
+  function li(id, text) {
+    return "<li data-id='"+id+"'>"+text+"<i class='close' title='" + gon.filter_item_close + "'></i></li>";
+  }
   function bind() {
     window.onpopstate = function(event) {
-       console.log("onpopstate location: " + window.location + ", state: " + JSON.stringify(event.state));
+       //console.log("onpopstate location: " + window.location + ", state: " + JSON.stringify(event.state));
     };
     filter_extended.find(".filter-toggle").click(function(){
       filter_extended.toggleClass("active");
@@ -692,6 +660,19 @@ $(document).ready(function (){
           tmp = t.find(".input-group input[type='checkbox']:checked");
           create_list_item(list, tmp.next().text(), tmp.length);
         }
+        // else if(type === "period_mix") {
+          // list.empty();
+          // tmp = t.find(".input-radio-group input:checked").val();
+          // t.find(".input-checkbox-group ul[data-type='" + tmp + "'] input:checked").each(function(i, d){
+          //   list.append("<li data-id='" + d.value + "'>" + $(d).parent().find("label").text() + "<i class='close' title='" + gon.filter_item_close + "'></i></li>");
+          // });
+          // list.removeClass("hidden");
+        // }
+      }
+      else {
+        // if(type === "period_mix" || type === "radio") {
+        //   list.addClass("hidden");
+        // }
       }
       t.toggleClass("expanded", !state);
     });
@@ -722,12 +703,13 @@ $(document).ready(function (){
       donation.elem.period.from.datepicker('setDate', new Date(v[0]));
       donation.elem.period.to.datepicker('setDate', new Date(v[1]));
     });
-    $(document).on("click", ".list > span .close", function(event) {
+    $(document).on("click", ".list > span .close, .list > li .close", function(event) {
       var t = $(this);
         p = t.closest(".filter-input"),
         field = p.attr("data-field"),
-        type = p.attr("data-type");
-        t.parent().remove();
+        type = p.attr("data-type"),
+        li_span = t.parent();
+
 
       if(type === "period") {
         p.find(".input-group input[type='text'].datepicker").datepicker('setDate', null);
@@ -742,6 +724,11 @@ $(document).ready(function (){
       else if(type === "checkbox") {
         p.find(".input-group input[type='checkbox']:checked").prop("checked", false);
       }
+      else if(type === "period_mix") {
+        p.find(".input-group .input-checkbox-group input[type='checkbox'][value='" + li_span.attr("data-id") + "']:checked").prop("checked", false);
+      }
+
+      li_span.remove();
       event.stopPropagation();
     });
     $("#reset").click(function(){
@@ -752,7 +739,7 @@ $(document).ready(function (){
         finance.reset();
       }
     });
-    $("#explore_button").click(function(){ filter(); });
+    explore_button.click(function(){ filter(); });
     $(".chart_download a").click(function(){
       var t = $(this), type = t.attr("data-type"), p = t.parent().parent(), target = p.attr("data-target"),
       chart = $(target).highcharts(),
@@ -762,7 +749,7 @@ $(document).ready(function (){
         "svg": "image/svg+xml",
         "pdf": "application/pdf",
       };
-      console.log(target, type, mimes[type]);
+      //console.log(target, type, mimes[type]);
       if(type === "print") {
         chart.print();
       }
@@ -771,10 +758,34 @@ $(document).ready(function (){
       }
     });
     autocomplete.bind();
+
+    $(document).on("click", ".filter-input[data-type='period_mix'] .input-radio-group input + label", function(event) {
+      var t = $(this), tp = t.attr("data-type"), filter_input = t.closest(".filter-input"),
+        group = filter_input.find(".input-checkbox-group"), list = filter_input.find("> ul.list");
+      list.empty();
+
+      group.find("ul[data-type]").addClass("hidden");
+      group.find("ul[data-type='" + tp + "']").removeClass("hidden");
+      group.find("ul[data-type='" + tp + "'] input:checked").each(function(i, d){
+        var d = $(d), p = d.parent(), text = p.find("label").text(), id = d.val();
+        list.append(li(id,text));
+      });
+    });
+    $(document).on("click", ".filter-input[data-type='period_mix'] .input-checkbox-group input + label", function(event) {
+      var t = $(this), p = t.parent(), input = p.find("input"), text = t.text(), id = input.val(),
+        list = p.closest(".filter-input").find("> ul.list");
+      if(input.is(":checked")) {
+        list.find("li[data-id='" + id + "']").remove();
+      }
+      else {
+        list.append(li(id,text));
+      }
+
+    });
   }
 
   function filter() {
-    console.log("start filter", is_type_donation);
+    //console.log("start filter", is_type_donation);
     var filters = {},
       remote_required = false, tmp, cacher_id, donation_id, finance_id;
 
@@ -785,7 +796,7 @@ $(document).ready(function (){
 
       tmp = donation.get();
       donation_id = donation.id(tmp);
-      console.log("donation",tmp, donation_id);
+      //console.log("donation",tmp, donation_id);
 
       if(!gon.gonned) {
         donation.url(tmp);
@@ -809,8 +820,17 @@ $(document).ready(function (){
       }
 
       tmp = finance.get();
+      if(tmp === null) {
+        finance_category.find("li div")
+          .one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() { $(this).removeClass("swing animated"); })
+          .addClass("swing animated");
+        explore_button
+          .one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() { $(this).removeClass("shake animated"); })
+          .addClass("shake animated");
+        return;
+      }
       finance_id = finance.id(tmp);
-      console.log("finance",tmp, finance_id);
+      // console.log("finance",tmp, finance_id);
 
       if(!gon.gonned) {
         finance.url(tmp);
@@ -833,13 +853,13 @@ $(document).ready(function (){
 
 
     if(remote_required) {
-      console.log("remote explore", filters);
+      //console.log("remote explore", filters);
       $.ajax({
         url: "explore_filter",
         dataType: 'json',
         data: filters,
         success: function(data) {
-          console.log("remote filtered data", data);
+          //console.log("remote filtered data", data);
           if(data.hasOwnProperty("donation")) { filter_callback(js.cache[donation_id] = data.donation, "donation"); }
           if(data.hasOwnProperty("finance")) { filter_callback(js.cache[finance_id] = data.finance, "finance"); }
           //console.log(js.cache);
@@ -876,19 +896,26 @@ $(document).ready(function (){
       bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
     }
     else {
-      grouped_bar_chart("#finance_chart", data, "#fff")
-      console.log("#finance_chart", data, partial);
+      grouped_bar_chart("#finance_chart", data.chart1, "#fff")
     }
   }
+  (function init() {
+    Highcharts.setOptions({
+      lang: {
+        numericSymbols: [ "k" , "მ" , "G" , "T" , "P" , "E"]
+      }
+    });
 
-  bind();
-  if(gon.gonned) {
-    is_type_donation = gon.hasOwnProperty("donation_data")
-  }
+    bind();
+    if(gon.gonned) {
+      is_type_donation = gon.hasOwnProperty("donation_data")
+    }
 
-  filter();
+    filter();
+  })();
+
   function bar_chart(elem, series_data, title, bg) {
-    console.log("chart", elem, series_data);
+    //console.log("chart", elem, series_data);
     $(elem).highcharts({
       chart: {
           type: 'bar',
@@ -943,8 +970,8 @@ $(document).ready(function (){
       series: [{ data: series_data }]
     });
   }
-  function grouped_bar_chart(elem, series_data, bg) {
-    console.log("chart", elem, series_data);
+  function grouped_bar_chart(elem, resource, bg) {
+    //console.log("chart", elem, resource);
     $(elem).highcharts({
       chart: {
           type: 'column',
@@ -959,11 +986,19 @@ $(document).ready(function (){
           }
         }
       },
-      title: { text: "Test main" },
-      subtitle: { text: "Test main sub" },
+      title: {
+        text: resource.title,
+        margin: 40,
+        style: {
+            fontFamily:"firasans_r",
+            fontSize:"18px",
+            color: "#5d675b"
+        },
+        useHTML: true
+      },
       xAxis: {
         type: "category",
-        categories: series_data.chart1_categories,
+        categories: resource.categories,
         // gridLineColor: "#5D675B",
         // gridLineWidth:1,
         // gridLineDashStyle: "Dash",
@@ -1043,7 +1078,7 @@ $(document).ready(function (){
           // }
       },
       credits: { enabled: false },
-      series: series_data.chart1,
+      series: resource.series,
       tooltip: {
         backgroundColor: "#DCE0DC",
         followPointer: true,
@@ -1056,119 +1091,8 @@ $(document).ready(function (){
           textShadow: 'none',
           fontWeight:'normal'
         }
-        * TODO * finalize chart styling only for one category yet
       }
     });
-    // $('#container').highcharts({
-
-    //     chart: {
-    //         type: 'column',
-    //         colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"]
-    //     },
-
-    //     title: {
-    //         text: 'Total fruit consumtion, grouped by gender'
-    //     },
-1
-    //     xAxis: {
-    //         categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas'],
-    //         min: 0
-    //     },
-
-    //     yAxis: {
-    //         allowDecimals: false,
-    //         min: 0,
-    //         title: {
-    //             text: 'Number of fruits'
-    //         }
-    //     },
-
-    //     tooltip: {
-    //         formatter: function () {
-    //             return '<b>' + this.x + '</b><br/>' +
-    //                 this.series.name + ': ' + this.y + '<br/>' +
-    //                 'Total: ' + this.point.stackTotal;
-    //         }
-    //     },
-
-    //     plotOptions: {
-    //         column: {
-    //             stacking: 'normal'
-    //         }
-    //     },
-
-    //     series: [{
-    //         name: 'John',
-    //         data: [5, 3, 4, 7, 2],
-    //         stack: 'male'
-    //     }, {
-    //         name: 'Joe',
-    //         data: [3, 4, 4, 2, 5],
-    //         stack: 'male'
-    //     }, {
-    //         name: 'Jane',
-    //         data: [2, 5, 6, 2, 1],
-    //         stack: 'female'
-    //     }, {
-    //         name: 'Janet',
-    //         data: [3, 0, 4, 4, 3],
-    //         stack: 'female'
-    //     }]
-    // });
-    // console.log("chart", elem, series_data);
-    // $(elem).highcharts({
-    //   chart: {
-    //       type: 'bar',
-    //       backgroundColor: bg,
-    //       height: 200
-    //   },
-    //   exporting: {
-    //     buttons: {
-    //       contextButton: {
-    //         enabled: false
-    //       }
-    //     }
-    //   },
-    //   title: { text: title },
-    //   xAxis: {
-    //     type: "category",
-    //     lineWidth: 0,
-    //     tickWidth: 0,
-    //     labels: {
-    //       style: {
-    //         color: "#5d675b",
-    //         fontSize:"14px",
-    //         fontFamily: "firasans_book",
-    //         textShadow: 'none'
-    //       }
-    //     }
-    //   },
-    //   yAxis: { visible: false },
-    //   legend: { enabled: false },
-    //   plotOptions: {
-    //       bar: {
-    //           color:"#ffffff",
-    //           dataLabels: {
-    //               enabled: true,
-    //               padding: 6,
-    //               style: {
-    //                 color: "#5d675b",
-    //                 fontSize:"14px",
-    //                 fontFamily: "firasans_r",
-    //                 textShadow: 'none'
-    //               }
-    //           },
-    //           pointInterval:1,
-    //           pointWidth:17,
-    //           pointPadding: 0,
-    //           groupPadding: 0,
-    //           borderWidth: 0,
-    //           shadow: false
-    //       }
-    //   },
-    //   credits: { enabled: false },
-    //   series: [{ data: series_data }]
-    // });
   }
 
 

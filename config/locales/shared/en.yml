@@ -79,6 +79,13 @@ en:
         total_donations_for_each_donor: Total Donations for Each Donor
         donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb}
         parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj}
+      finance:
+        title:
+          party_donations_for: "Party - Donations for"
+          category: Category
+          category_grouped_by: "Category - Grouped by"
+          time_period_annual: "Time period annual - In"
+          time_period_campaign: "Time period campaign - During"
   notifier:
     job:
       donorset_file_process:

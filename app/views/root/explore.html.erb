@@ -1,5 +1,5 @@
 <% party_list = Party.all.map{|m| [m.id,m.title]} %>
-<div id="explore" data-type="donation">
+<div id="explore" data-type="<%= @filter_type %>">
   <div id="filter_type" class="filter-type" data-type="donation">
     <div class="back"><%= image_tag("explore/back.svg", alt: t('shared.common.back'), title: t('shared.common.back')) %>
     </div>
@@ -105,6 +105,20 @@
             </div>
           </div>
         </div>
+        <div class="row filter-input" data-field="nature" data-type="radio">
+          <a href="#" class="toggle" tabindex="5"><%= t('.donor_nature') %><i title="<%= t('.filter_toggle') %>"></i></a>
+          <div class="list hidden"></div>
+          <div class="input-group">
+            <div class="block b1">
+              <input type="radio" id="donor_nature_individual" name="donor_nature" value="individual" data-type="radio">
+              <label for="donor_nature_individual"><span></span><%= t('.individual') %></label>
+            </div>
+            <div class="block">
+              <input type="radio"  id="donor_nature_organization" name="donor_nature" value="organization" data-type="radio">
+              <label for="donor_nature_organization"><span></span><%= t('.organization') %></label>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="finance filter-inputs" data-type="finance">
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true, list: generate_li_list(party_list), category_label: 0 } %>
@@ -120,13 +134,13 @@
 
         <div class="row filter-input" data-field="period" data-type="period_mix">
           <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <ul id="finance_period" class="list hidden"></ul>
+          <ul id="finance_period" class="list" data-type="period_mix"></ul>
           <div class="input-group">
             <div class="input-radio-group">
               <input type="radio" id="finance_period_annual" name="finance_period" value="annual" data-type="period_mix" checked>
               <label for="finance_period_annual" data-type="annual"><%= t('.annual') %></label>
               <span class="or"><%= t('shared.common.or') %></span>
-              <input type="radio" id="finance_period_campaign" name="finance_period" value="yes" data-type="period_mix">
+              <input type="radio" id="finance_period_campaign" name="finance_period" value="campaign" data-type="period_mix">
               <label for="finance_period_campaign" data-type="campaign"><%= t('.campaign') %></label>
             </div>
             <div class="input-checkbox-group">

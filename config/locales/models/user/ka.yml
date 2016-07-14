@@ -50,7 +50,7 @@ ka:
         donated_amount: "Overall amount"
         nature: Donor Type
         nature_values:
-          private: Individual
+          individual: Individual
           organization: Organization
       donation:
         amount: Amount

@@ -5,7 +5,7 @@ class Donor
 
   embeds_many :donations, after_add: :calculate_donated_amount, after_remove: :calculate_donated_amount
 
-  NATURE_TYPES = ["private", "organization"]
+  NATURE_TYPES = ["individual", "organization"]
 
   field :first_name, type: String, localize: true
   field :last_name, type: String, localize: true
@@ -82,6 +82,9 @@ class Donor
       conditions.push({"$eq": [ "$$donation.monetary", tmp ]})
     end
 
+    tmp = params[:nature]
+    matches.push({ "nature": { "$eq": tmp } }) if tmp == 0 || tmp == 1
+
     options.push({ "$match": { "$and": matches } }) if !matches.blank?
 
     #if !conditions.blank?
@@ -118,7 +121,8 @@ class Donor
       monetary: nil,
       multiple: nil,
       period: [-1,-1],
-      amount: [-1,-1]
+      amount: [-1,-1],
+      nature: nil
     }
 
     tmp = params[:donor]
@@ -138,6 +142,8 @@ class Donor
 
     f[:multiple] = true if params[:multiple] == "yes"
 
+    tmp = params[:nature]
+    f[:nature] = tmp == "individual" ? 0 : 1 if tmp == "individual" || tmp == "organization"
 
     data = filter(f).to_a
     # Rails.logger.debug("-----------------------------------------return size---#{data.size}")
@@ -148,7 +154,7 @@ class Donor
     total_amount = 0
     total_donations = 0
     monetary_values = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
-    nature_values = [I18n.t("mongoid.attributes.donor.nature_values.private"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
+    nature_values = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
     parties = {}
     Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
 

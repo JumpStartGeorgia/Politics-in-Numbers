@@ -48,7 +48,7 @@ module StarterTemplate
       g.orm :mongoid
     end
 
-    config.assets.precompile += %w( admin.js admin.css explore.js explore.css crypto.min.js vendor/highcharts.js vendor/highcharts-exporting.js vendor/highcharts-offline-exporting.js)
+    config.assets.precompile += %w( admin.js admin.css explore.js explore.css crypto.min.js )
 
     config.active_job.queue_adapter = :delayed_job
 

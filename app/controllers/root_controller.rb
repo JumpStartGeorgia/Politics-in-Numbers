@@ -36,10 +36,14 @@ class RootController < ApplicationController
 
   def explore
     gon.filter_item_close = t('.filter_item_close');
-    gon.party_list = Party.each_with_index.map{|m| [m.id.to_s, m.title] }
-    gon.donor_list = Donor.each_with_index.map{|m| [m.id.to_s, "#{m.first_name} #{m.last_name}"] }
-    @categories = Category.non_virtual
-    #@category_lists = Category.by_sym_local(@categories)
+    gon.party_list = Party.each.map{|m| [m.id.to_s, m.title] }
+    gon.donor_list = Donor.each.map{|m| [m.id.to_s, "#{m.first_name} #{m.last_name}"] }
+    gon.period_list = Period.each.map{|m| [m.id.to_s, m.title] }
+
+    @categories = Category.non_virtual # required for object explore calls
+    # @main_categories = {}
+    # @categories.only_sym.each{|m| @main_categories[m[:sym]] = m[:id] }
+
     gon.category_list = @categories.map{|m| [m.id.to_s, m.title] }
     gon.all = t('.all')
     gon.campaign = t('.campaign')
@@ -47,12 +51,19 @@ class RootController < ApplicationController
     gon.table_length = t('.table_length')
     dt = []
     pars = explore_params
-    pars = pars
+    #pars = pars
     gon.gonned = false
     which_filter = pars[:filter]
+    @filter_type = which_filter == "finance" ? "finance" : "donation"
     has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
 
 
+    if !has_filters
+      has_filters = true
+      @filter_type = "finance"
+      which_filter = "finance"
+      * TODO * emulate default income for gd and unm
+    end
 
     if has_filters
       gon.gonned = true
@@ -225,10 +236,10 @@ class RootController < ApplicationController
     #      "multiple"=>"yes"},
     #       "locale"=>"en"}
     def explore_params
-      params.permit([:filter, :monetary, :multiple, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
+      params.permit([:filter, :monetary, :multiple, :nature, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
     end
     def explore_filter_params
-      params.permit(:donation => [:monetary, :multiple, :all, :locale, { donor: [], period: [], amount: [], party: []}],
+      params.permit(:donation => [:monetary, :multiple, :nature, :all, :locale, { donor: [], period: [], amount: [], party: []}],
         :finance => [:all, :locale, { income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
     end
 end

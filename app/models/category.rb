@@ -25,12 +25,29 @@ class Category
 
   scope :virtual, ->{ where(virtual: true) }
   scope :non_virtual, ->{ where(virtual: false) }
+  scope :only_sym, ->{ where(:sym.ne => nil) }
 
   index code: 1
   index title: 1
   index parent_id: 1
   #index simple: 1
   SYMS = [ :income, :income_campaign, :expenses, :expenses_campaign, :reform_expenses, :property_assets, :financial_assets, :debts ]
+
+  def self.full_names(cats, ids)
+    names = []
+    ids.each{|e|
+      cat = cats[e]
+      rev = [cat[:title]]
+      while(cat[:parent_id].present?)
+        cat = cats[cat[:parent_id]]
+        rev.unshift(cat[:title])
+      end
+      names << rev.join(' - ')
+      names << rev.join(' - ')
+    }
+    return names
+  end
+
   def self.by_sym(cats, sym = nil, vir = false)
     out = {}
     d = tree_local(cats.to_a, vir, sym)
