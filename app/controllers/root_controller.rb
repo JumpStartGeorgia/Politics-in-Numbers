@@ -2,6 +2,8 @@
 class RootController < ApplicationController
   def index
     redirect_to('/explore')
+
+
     # dd = nil
     #  Donor.each{|e| e.donations.each{|ee|
     #     if ee.amount == 800
@@ -41,9 +43,9 @@ class RootController < ApplicationController
     gon.period_list = Period.each.map{|m| [m.id.to_s, m.title] }
 
     @categories = Category.non_virtual # required for object explore calls
-    # @main_categories = {}
-    # @categories.only_sym.each{|m| @main_categories[m[:sym]] = m[:id] }
-
+    gon.main_categories = {}
+    @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m[:id].to_s }
+    gon.main_categories_ids = gon.main_categories.map{|k,v| v}
     gon.category_list = @categories.map{|m| [m.id.to_s, m.title] }
     gon.all = t('.all')
     gon.campaign = t('.campaign')
@@ -62,7 +64,10 @@ class RootController < ApplicationController
       has_filters = true
       @filter_type = "finance"
       which_filter = "finance"
-      * TODO * emulate default income for gd and unm
+      pars[:income] = [gon.main_categories[:income]]
+      pars[:party] = Party.only(:_id).where(:tmp_id.in => [1,2]).map{|m| m[:_id].to_s }
+      pars[:period] = Period.annual.only(:_id).limit(3).map{|m| m[:_id].to_s }
+      Rails.logger.debug("---------default filter------------")
     end
 
     if has_filters
@@ -77,7 +82,7 @@ class RootController < ApplicationController
       else
         dt = Dataset.explore(pars)
         gon.finance_data = dt
-         Rails.logger.debug("------------finance--------------------------------#{dt}")
+         # Rails.logger.debug("------------finance--------------------------------#{dt}")
       end
       pars.delete(:locale)
       @download_link = request.path + "?" +  pars.to_param  + "#{pars.empty? ? '' : '&'}#{'format=csv'}"

@@ -394,7 +394,7 @@ $(document).ready(function (){
                 t.data[el] = Object.keys(autocomplete[lnk]);
               }
               else if(t.states[el]) {
-                t.data[el] = ['all'];
+                t.data[el] = [gon.main_categories[el]];
               }
             }
             else if(tp === "period_mix") {
@@ -435,8 +435,8 @@ $(document).ready(function (){
               Object.keys(v).forEach(function(kk){
                 var fld = p.attr("data-field"), tmp = fld, fl = false;
                 if(t.categories.indexOf(fld) !== -1) { fl = true; tmp = "category"; }
-                 console.log(kk,v,fld,fl,tmp);
-                if(v[kk] !== "all") {
+                 console.log("set by url",kk,v,fld,fl,tmp);
+                if(gon.main_categories_ids.indexOf(v[kk]) === -1) {
                   autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[tmp+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
                 }
                 if(fl) { emulate_category_click(fld); }
@@ -589,18 +589,22 @@ $(document).ready(function (){
 
 
   function emulate_category_click(cat) {
-    * TODO * emulate income and expense click
+    var t, tmp, subcat = "all";
+
     finance_toggle.trigger("click");
-    console.log("emulate", cat);
-    var t = $(".finance-category-toggle[data-cat='" + cat + "']"), tp = t.attr("data-state");
-    //console.log("emulate", t, tp);
+    if(["income_campaign", "expenses_campaign"].indexOf(cat) !== -1) {
+      var tmp = cat.split("_");
+      cat = tmp[0];
+      subcat = tmp[1];
+    }
+
+    t = $(".finance-category-toggle[data-cat='" + cat + "']"), tp = t.attr("data-state");
+
     if(tp === "simple" || tp === "simpled") {
       t.trigger("click");
     }
     else {
-      t.parent().next().find(".finance-category-toggle a").focus();
-      console.log(t, cat, t.find("[data-cat='" + cat + "']").attr("data-sub"));
-      t.attr("data-state", t.find("[data-cat='" + cat + "']").attr("data-sub"));
+      t.attr("data-state", subcat);
       finance.toggle(cat, true);
     }
   }
@@ -832,11 +836,10 @@ $(document).ready(function (){
       finance_id = finance.id(tmp);
       // console.log("finance",tmp, finance_id);
 
-      if(!gon.gonned) {
-        finance.url(tmp);
-      }
-      else {
-        console.log("finance_data is", gon.finance_data );
+      finance.url(tmp);
+
+      if(gon.gonned) {
+        //console.log("finance_data is", gon.finance_data );
         js.cache[finance_id] = gon.finance_data;
         gon.gonned = false;
       }
@@ -896,14 +899,15 @@ $(document).ready(function (){
       bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
     }
     else {
-      grouped_bar_chart("#finance_chart", data.chart1, "#fff")
+      grouped_column_chart("#finance_chart", data.chart1, "#fff")
     }
   }
   (function init() {
     Highcharts.setOptions({
       lang: {
         numericSymbols: [ "k" , "მ" , "G" , "T" , "P" , "E"]
-      }
+      },
+      colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"]
     });
 
     bind();
@@ -970,14 +974,14 @@ $(document).ready(function (){
       series: [{ data: series_data }]
     });
   }
-  function grouped_bar_chart(elem, resource, bg) {
+  function grouped_column_chart(elem, resource, bg) {
     //console.log("chart", elem, resource);
     $(elem).highcharts({
       chart: {
           type: 'column',
           backgroundColor: bg,
           height: 400,
-          colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"]
+          width:800
       },
       exporting: {
         buttons: {
@@ -1057,6 +1061,9 @@ $(document).ready(function (){
        },
 
       plotOptions: {
+        column:{
+          pointWidth: 10
+        }
           // bar: {
           //     color:"#ffffff",
           //     dataLabels: {
@@ -1094,7 +1101,21 @@ $(document).ready(function (){
       }
     });
   }
+  function grouped_advanced_column_chart() {
+    // xAxis: {
+    //   categories: [{
+    //       name: "Fruit",
+    //       categories: ["Apple", "Banana", "Orange"]
+    //   }, {
+    //       name: "Vegetable",
+    //       categories: ["Carrot", "Potato", "Tomato"]
+    //   }, {
+    //       name: "Fish",
+    //       categories: ["Cod", "Salmon", "Tuna"]
+    //   }]
+    // }
 
+  }
 
   // dev block
   // filter_extended.find(".filter-toggle").trigger("click");

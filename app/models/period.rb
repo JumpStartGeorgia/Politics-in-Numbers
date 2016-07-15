@@ -9,7 +9,8 @@ class Period
   field :type, type: Integer
   field :start_date, type: Date
   field :end_date, type: Date
-  field :title, type: String, localize: true, default: ->{ "#{start_date.strftime('%d/%m/%Y')} - #{end_date.strftime('%d/%m/%Y')}" }
+  field :title, type: String, localize: true
+  # not working date is nill, default: ->{"#{self.start_date.strftime('%d/%m/%Y')}" << self.end_date.present? ? " - #{self.end_date.strftime('%d/%m/%Y')}" : "" }
   field :description, type: String, localize: true
 
   validate :validate_dates

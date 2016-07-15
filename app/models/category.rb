@@ -43,7 +43,6 @@ class Category
         rev.unshift(cat[:title])
       end
       names << rev.join(' - ')
-      names << rev.join(' - ')
     }
     return names
   end
