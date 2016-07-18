@@ -899,7 +899,8 @@ $(document).ready(function (){
       bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
     }
     else {
-      grouped_column_chart("#finance_chart", data.chart1, "#fff")
+      //grouped_column_chart("#finance_chart", data.chart1, "#fff");
+      grouped_advanced_column_chart("#finance_chart", data.chart1, "#fff");
     }
   }
   (function init() {
@@ -1064,25 +1065,6 @@ $(document).ready(function (){
         column:{
           pointWidth: 10
         }
-          // bar: {
-          //     color:"#ffffff",
-          //     dataLabels: {
-          //         enabled: true,
-          //         padding: 6,
-          //         style: {
-          //           color: "#5d675b",
-          //           fontSize:"14px",
-          //           fontFamily: "firasans_r",
-          //           textShadow: 'none'
-          //         }
-          //     },
-          //     pointInterval:1,
-          //     pointWidth:17,
-          //     pointPadding: 0,
-          //     groupPadding: 0,
-          //     borderWidth: 0,
-          //     shadow: false
-          // }
       },
       credits: { enabled: false },
       series: resource.series,
@@ -1101,21 +1083,115 @@ $(document).ready(function (){
       }
     });
   }
-  function grouped_advanced_column_chart() {
-    // xAxis: {
-    //   categories: [{
-    //       name: "Fruit",
-    //       categories: ["Apple", "Banana", "Orange"]
-    //   }, {
-    //       name: "Vegetable",
-    //       categories: ["Carrot", "Potato", "Tomato"]
-    //   }, {
-    //       name: "Fish",
-    //       categories: ["Cod", "Salmon", "Tuna"]
-    //   }]
-    // }
+  function grouped_advanced_column_chart(elem, resource, bg) {
+    console.log(resource);
+    $(elem).highcharts({
+      chart: {
+          type: 'column',
+          backgroundColor: bg,
+          height: 400,
+          width:800
+      },
+      exporting: {
+        buttons: {
+          contextButton: {
+            enabled: false
+          }
+        }
+      },
+      title: {
+        text: resource.title,
+        margin: 40,
+        style: {
+            fontFamily:"firasans_r",
+            fontSize:"18px",
+            color: "#5d675b"
+        },
+        useHTML: true
+      },
+      xAxis: {
+        type: "category",
+        categories: resource.categories,
+        gridLineColor: "#5D675B",
+        gridLineWidth:1,
+        gridLineDashStyle: "Dash",
+        lineWidth: 1,
+        lineColor: "#5D675B",
+        tickWidth: 1,
+        tickColor: "#5D675B",
 
+        labels: {
+          style: {
+            color: "#5d675b",
+            fontSize:"14px",
+            fontFamily: "firasans_book",
+            textShadow: 'none'
+          },
+          //useHTML: true,
+          step:1
+        }
+      },
+      yAxis: [
+      {
+        title: { enabled: false },
+        gridLineColor: "#eef0ee",
+        gridLineWidth:1,
+        style: {
+          color: "#5d675b",
+          fontSize:"14px",
+          fontFamily: "firasans_book",
+          textShadow: 'none'
+        }
+      },
+      {
+        linkedTo:0,
+        title: { enabled: false },
+        opposite: true,
+        style: {
+          color: "#7F897D",
+          fontSize:"12px",
+          fontFamily: "firasans_r",
+          textShadow: 'none'
+        }
+      }
+      ],
+      legend: {
+          enabled: true,
+          symbolWidth:10,
+          symbolHeight:10,
+          shadow: false,
+          itemStyle: {
+            color: "#5d675b",
+            fontSize:"14px",
+            fontFamily: "firasans_book",
+            textShadow: 'none',
+            fontWeight:'normal'
+          }
+       },
+
+      plotOptions: {
+        column:{
+          pointWidth: 10
+        }
+      },
+      credits: { enabled: false },
+      series: resource.series,
+      tooltip: {
+        backgroundColor: "#DCE0DC",
+        followPointer: true,
+        shadow: false,
+        borderWidth:0,
+        style: {
+          color: "#5D675B",
+          fontSize:"14px",
+          fontFamily: "firasans_r",
+          textShadow: 'none',
+          fontWeight:'normal'
+        }
+      }
+    });
   }
+
 
   // dev block
   // filter_extended.find(".filter-toggle").trigger("click");

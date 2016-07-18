@@ -34,17 +34,28 @@ class Category
   SYMS = [ :income, :income_campaign, :expenses, :expenses_campaign, :reform_expenses, :property_assets, :financial_assets, :debts ]
 
   def self.full_names(cats, ids)
-    names = []
-    ids.each{|e|
-      cat = cats[e]
-      rev = [cat[:title]]
-      while(cat[:parent_id].present?)
-        cat = cats[cat[:parent_id]]
-        rev.unshift(cat[:title])
-      end
-      names << rev.join(' - ')
-    }
-    return names
+    # names = []
+    # ids.each{|e|
+    #   cat = cats[e]
+    #   rev = [cat[:title]]
+    #   while(cat[:parent_id].present?)
+    #     cat = cats[cat[:parent_id]]
+    #     rev.unshift(cat[:title])
+    #   end
+    #   names << rev.join(' - ')
+    # }
+    # return names
+    return ids.map{ |m| cats[m][:title] }
+  end
+
+  def self.main_category_id(cats, id)
+    p = cats[id][:parent_id]
+    p_id = id
+    while(p.present?)
+      p_id = p
+      p = cats[p][:parent_id]
+    end
+    return p_id
   end
 
   def self.by_sym(cats, sym = nil, vir = false)
