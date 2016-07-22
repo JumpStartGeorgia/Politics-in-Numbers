@@ -18,6 +18,10 @@ $(document).ready(function (){
     finance_category = $("#finance_category"),
     content = $("#content"),
     overlay = $(".overlay"),
+    donation_total_amount = $("#donation_total_amount span"),
+    donation_total_donations = $("#donation_total_donations span"),
+    donation_table = $("#donation_table table"),
+    finance_table = $("#finance_table table"),
     autocomplete = {
       push: function(autocomplete_id, key, value) {
         if(!this.hasOwnProperty(autocomplete_id)) {
@@ -786,6 +790,11 @@ $(document).ready(function (){
       }
 
     });
+
+    // bind finance view_as buttons click event
+    $(".pane[data-type='finance'] .actions .left > div[data-view-toggle]").on("click", function() {
+      $(".pane[data-type='finance']").attr("data-view-current", $(this).attr("data-view-toggle"));
+    });
   }
 
   function filter() {
@@ -872,29 +881,73 @@ $(document).ready(function (){
 
   }
 
-  var donation_total_amount = $("#donation_total_amount span"),
-    donation_total_donations = $("#donation_total_donations span"),
-    donation_table = $("#donation_table table");
 
-  function render_table(table) {
-    donation_total_amount.text(table.total_amount);
-    donation_total_donations.text(table.total_donations);
+  function render_table(type, table) {
+    if(type === "donation") {
+      donation_total_amount.text(table.total_amount);
+      donation_total_donations.text(table.total_donations);
 
-    donation_table.DataTable({
-      destroy: true,
-      "aaData": table.data,
-      "aoColumns": table.header.map(function(m,i) {
-        return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
-      }),
-      "info": false,
-      dom: "fltrp"
-    });
+      donation_table.DataTable({
+        destroy: true,
+        "aaData": table.data,
+        "aoColumns": table.header.map(function(m,i) {
+          return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
+        }),
+        "info": false,
+        dom: "fltrp"
+      });
+    }
+    else if(type === "finance") {
+      var table_html = "<thead>", colspan = 0, tmp, klass;
+      table.header.forEach(function(row, row_i) {
+
+        table_html += "<tr>";
+        row.forEach(function(col, col_i) {
+          if(col === null) {
+            ++colspan;
+          }
+          else {
+            tmp = "";
+            klass = table.header_classes[row_i][col_i];
+            klass = klass !== null ? " class='" + klass + "'" : "";
+
+            if(colspan) {
+              tmp = " colspan='" + (colspan+1) + "'";
+              colspan = 0;
+            }
+            table_html += "<th" + klass + tmp +">" + col + "</th>";
+          }
+        });
+        table_html += "</tr>";
+      });
+      table_html += "</thead><tbody>";
+
+
+      table.data.forEach(function(row, row_i) {
+        table_html += "<tr>";
+        row.forEach(function(col, col_i) {
+          table_html += "<td>" + col + "</th>";
+        });
+        table_html += "</td>";
+      });
+      table_html += "</tbody>";
+
+      finance_table.append(table_html);
+      finance_table.DataTable({
+        destroy: true,
+        //"aaData": table.data,
+        // "aoColumns": table.header.map(function(m,i) {
+        //   return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
+        // }),
+        "info": false,
+        dom: "fltrp"
+      });
+    }
 
   }
   function filter_callback(data, partial) {
      // console.log("filter_callback", partial);
     if(partial === "donation") {
-      render_table(data.table);
       bar_chart("#donation_chart_1", data.chart1, data.chart1_title, "#EBE187");
       bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
     }
@@ -902,11 +955,12 @@ $(document).ready(function (){
       //grouped_column_chart("#finance_chart", data.chart1, "#fff");
       grouped_advanced_column_chart("#finance_chart", data.chart1, "#fff");
     }
+    render_table(partial, data.table);
   }
   (function init() {
     Highcharts.setOptions({
       lang: {
-        numericSymbols: [ "k" , "მ" , "G" , "T" , "P" , "E"]
+        numericSymbols: [ "k" , "M" , "G" , "T" , "P" , "E"]
       },
       colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"]
     });

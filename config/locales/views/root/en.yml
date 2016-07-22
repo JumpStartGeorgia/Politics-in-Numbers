@@ -64,6 +64,12 @@ en:
       view_as_table: Table view
       search: Search
       table_length: Show _MENU_ entries
+      export_type:
+        print: Print
+        pdf: Pdf document
+        svg: Svg image
+        jpeg: Jpeg image
+        png: Png image
       placeholder:
         donor: Select donor
         party: Select party

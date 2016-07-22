@@ -829,6 +829,126 @@
           }
         }
       }
+      .pane[data-type='finance'] {
+        .actions {
+          padding:26px 59px 0;
+          .left {
+            label {
+              display: inline-block;
+              font:14px firasans_l;
+              color: #5D675B;
+              vertical-align: top;
+              margin:10px 0 8px 0;
+            }
+            > div[data-view-toggle] {
+              display:inline-block;
+              width: 40px;
+              height: 36px;
+              padding:8px 10px;
+              cursor:pointer;
+              border:1px dashed transparent;
+              &:hover, &:focus, &:active {
+                border:1px dashed #AEB3AD;
+              }
+
+            }
+            > div[data-view-toggle='chart'] {
+              background:transparent url("<%= asset_path('explore/chart.svg') %>") no-repeat center/ 20px;
+            }
+            > div[data-view-toggle='table'] {
+              background:transparent url("<%= asset_path('explore/table.svg') %>") no-repeat center/ 20px;
+            }
+          }
+        }
+        [data-view] {
+          display:none;
+        }
+        &[data-view-current='chart'] {
+          .actions .left [data-view-toggle='chart'] {
+            border:1px dashed #AEB3AD;
+            background-image:url("<%= asset_path('explore/chart_a.svg') %>");
+          }
+          [data-view='chart'] {
+            display:initial;
+          }
+        }
+        &[data-view-current='table'] {
+          .actions .left [data-view-toggle='table'] {
+            border:1px dashed #AEB3AD;
+            background-image:url("<%= asset_path('explore/table_a.svg') %>");
+          }
+          [data-view='table'] {
+            margin-top: 20px;
+            display:initial;
+          }
+        }
+        table {
+          width:100%;
+          border-bottom:1px solid #DEE2DC;
+          thead {
+            // border:1px solid #DEE2DC;
+            th {
+              font:16px firasans_r;
+              color:#5D675B;
+              text-align:left;
+              background-color:#F3F9F2;
+              padding:15px 13px;
+              border:1px solid #DEE2DC;
+              border-left:0;
+              border-bottom:0;
+              &:first-of-type {
+                border-left:1px solid #DEE2DC;
+              }
+              &.empty {
+                background-color:#fff;
+                border:0;
+              }
+              &.outer {
+                background-color:#fff;
+              }
+              &:first-of-type {
+                border-right:2px solid #DEE2DC;
+              }
+              &.center { text-align:center; }
+            }
+          }
+          tbody {
+            tr {
+              td {
+                font:14px firasans_l;
+                color:#5D675B;
+                text-align:left;
+                padding:15px 13px;
+                vertical-align:top;
+                background-color:#fff;
+                border:1px solid #DEE2DC;
+                border-bottom:0;
+                border-left:0;
+                &:first-of-type {
+                  border-left:1px solid #DEE2DC;
+                  border-right:2px solid #DEE2DC;
+                  background-color:#F3F9F2;
+                }
+                button.view {
+                  font:12px firasans_r;
+                  color:#383d37;
+                  background-color: #ddcd37;
+                  padding:9px 12px;
+                  border:0;
+                  float:right;
+                  &:hover, &:focus, &:active {
+                    text-decoration:none;
+                    color:#383d37;
+                  }
+                }
+                &.right { text-align: right; }
+                &.center { text-align: center; }
+              }
+
+            }
+          }
+        }
+      }
     }
     .overlay {
       background-color:#5D675B;
@@ -1040,79 +1160,9 @@
             }
           }
           .table {
-            .actions {
-              text-align:right;
-              padding:0 16px 18px;
-              > div {
-                display:inline-block;
-                width:24px;
-                height:21px;
-                background:transparent url("<%= asset_path('explore/actions.svg') %>") no-repeat top left;
-                &:hover, &:focus, &:active {
-                  cursor:pointer;
-                }
-              }
-
-              .share {
-                background-position: 0px -43px;
-                &:hover { background-position: 0px -65px; }
-              }
-              .embed {
-                background-position: -25px -43px;
-                margin:0 20px;
-                &:hover { background-position: -25px -65px; }
-              }
-              .download {
-                background-position: -49px -43px;
-                &:hover { background-position: -49px -65px; }
-              }
-            }
             #donation_table {
               width:100%;
               padding:0px 6px;
-              .dataTables_filter {
-                display:inline-block;
-                float:none;
-                input {
-                  border: 1px solid #88D877;
-                  padding: 6px 10px;
-                  margin: 0px 0 16px 0;
-                  &::-webkit-input-placeholder {
-                    font: 14px firasans_l;
-                    color: #5D675B;
-                  }
-                  &:-moz-placeholder {
-                    font: 14px firasans_l;
-                    color: #5D675B;
-                  }
-                  &::-moz-placeholder {  /* Firefox 19+ */
-                    font: 14px firasans_l;
-                    color: #5D675B;
-                  }
-                  &:-ms-input-placeholder {
-                    font: 14px firasans_l;
-                    color: #5D675B;
-                  }
-                }
-              }
-              .dataTables_length {
-                display:inline-block;
-                float:right;
-                text-align:right;
-                font: 14px firasans_l;
-                color: #5D675B;
-                select {
-                  border: 1px solid #88D877;
-                  padding: 6px 10px;
-                  background:transparent url("<%= asset_path('caret_a.svg') %>") no-repeat right;
-                  background-origin: content-box;
-                  background-position-x: 25px;
-                  background-size: 12px;
-                  padding-right: 12px;
-                  -webkit-appearance: none;
-                  appearance: none;
-                }
-              }
               table {
                 width:100%;
                 border:1px solid #e2e6e0;
@@ -1168,14 +1218,88 @@
           }
         }
         .pane[data-type='finance'] {
-          .charts {
-            width:100%;
-
-          }
+          width:100%;
         }
       }
       .overlay {
         display:none;
+      }
+      .actions {
+        display:flex;
+        width:100%;
+        flex-direction: row;
+        .left, .right {
+          white-space:nowrap;
+        }
+        .right {
+          width:100%;
+          text-align:right;
+        }
+        .share, .embed, .download {
+          display:inline-block;
+          width: 40px;
+          height: 36px;
+          padding:7px 8px;
+          border:1px dashed transparent;
+          i {
+            display:block;
+            width:24px;
+            height:21px;
+            background:transparent url("<%= asset_path('explore/actions.svg') %>") no-repeat;
+          }
+          &:hover, &:focus, &:active {
+            cursor:pointer;
+            border:1px dashed #AEB3AD;
+          }
+        }
+
+        .share {
+          position:relative;
+          i { background-position: 0px -43px; }
+          .addthis_sharing_toolbox {
+            display:none;
+            position: absolute;
+            top: 100%;
+            border:1px dashed #AEB3AD;
+            right:-1px;
+            .at-share-btn {
+              display:block;
+              max-width: 38px;
+              max-height: 36px;
+              margin: 0;
+              .at-icon-wrapper {
+                // padding:7px 8px;
+                background-color:transparent !important;
+                line-height: 36px !important;
+                height: 36px !important;
+                width: 38px !important;
+                padding: 8px 10px !important;
+              }
+              &.at-svc-facebook {
+                svg { fill: #355EA8; }
+              }
+              &.at-svc-twitter {
+                svg { fill: #0EA3C6; }
+              }
+              &.at-svc-compact {
+                svg { fill: #88D877; }
+              }
+            }
+          }
+          &:hover {
+            .addthis_sharing_toolbox { display:initial; }
+            i { background-position: 0px -65px; }
+          }
+        }
+        .embed {
+          i { background-position: -25px -43px; }
+          margin:0 20px;
+          &:hover i { background-position: -25px -65px; }
+        }
+        .download {
+          i { background-position: -50px -44px; }
+          &:hover i { background-position: -50px -66px; }
+        }
       }
     }
   }
@@ -1205,7 +1329,7 @@
         font: 14px firasans_l;
         color: #5D675B;
         padding:6px 10px;
-        text-align:center;
+        text-align:left;
         &:hover {
           background-color: #F5F5F5;
         }

@@ -228,45 +228,37 @@
           </div>
         </div>
       </div>
-      <div class="pane" data-type="finance">
-        <div class="charts">
-          <div class="chart-container">
-            <div class="actions">
-              <div class="left">
-                <label>View as:</label>
-                <div class="view-chart" title="<%= t('.view_as_chart') %>"><i></i></div>
-                <div class="view-table" title="<%= t('.view_as_table') %>"><i></i></div>
-              </div>
-              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
-              <div class="download download_menu" title="<%= t('.download_chart') %>">
-                <i></i>
-                <ul class="chart_download" data-target="#donation_chart_1">
-                  <li><a href="#" data-type="print">print</a></li>
-                  <li><a href="#" data-type="pdf">pdf</a></li>
-                  <li><a href="#" data-type="svg">svg</a></li>
-                  <li><a href="#" data-type="jpeg">jpeg</a></li>
-                  <li><a href="#" data-type="png">png</a></li>
-                </ul>
-              </div>
+      <div class="pane" data-type="finance" data-view-current="chart">
+        <div class="actions">
+          <div class="left">
+            <label><%= t('.view_as') %>:</label>
+            <div data-view-toggle="chart" title="<%= t('.view_as_chart') %>"></div>
+            <div data-view-toggle="table" title="<%= t('.view_as_table') %>"></div>
+          </div>
+          <div class="right">
+            <div class="share" title="<%= t('.share_chart') %>"><i></i>
+                <div class="addthis_sharing_toolbox"></div>
             </div>
-            <div id="finance_chart"></div>
+            <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+            <div class="download download_menu" title="<%= t('.download_chart') %>">
+              <i></i>
+              <ul class="chart_download" data-target="#finance_chart">
+                <li><a href="#" data-type="print"><%= t('.export_type.print') %></a></li>
+                <li><a href="#" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
+                <li><a href="#" data-type="svg"><%= t('.export_type.svg') %></a></li>
+                <li><a href="#" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
+                <li><a href="#" data-type="png"><%= t('.export_type.png') %></a></li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div class="table">
-            <div class="actions">
-              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
-              <a href="" id="donation_csv_download" class="download" title="<%= t('.download_chart') %>"><i></i></a>
-            </div>
-          <div id="finance_table">
-            <table></table>
-          </div>
-        </div>
+        <div data-view="chart"><div id="finance_chart"></div></div>
+        <div data-view="table"><div id="finance_table"><table></table></div></div>
+
       </div>
     </div>
   </div>
 </div>
 <% content_for :custom_js,  "explore"  %>
-<% @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "highcharts-grouped-categories.js", "crypto.min.js" ] %>
+<% @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "highcharts-grouped-categories.js", "crypto.min.js", "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5554a5643f1d9065" ] %>
 <% content_for :custom_css, "explore" %>

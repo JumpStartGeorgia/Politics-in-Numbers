@@ -194,7 +194,6 @@ class Dataset
     ps = f[:parties].nil? ? 0 : f[:parties].length
 
           # Rails.logger.debug("-------------------------------------------test4-#{category_grouped_period_party}")
-    * TODO refactor code, create table
     chart_type = cs == 1 ? 0 : ( main_categories_count == 1 ? 1 : 2 )
 
     chart1 = []
@@ -290,12 +289,13 @@ class Dataset
 
     # prepaire data for charts
     if chart_type == 0 # one category
-
+      Rails.logger.debug("--------------------------------------------sdfsdf0")
       chart1 = parties_list.map{|k,v| { name: v[:name], data: v[:data] } }
       period_list.each{|e| chart1_categories << e[:name] }
 
     elsif chart_type == 1 # multiple categories for same main category
 
+      Rails.logger.debug("--------------------------------------------sdfsdf1")
       selected_categories.each_with_index{|cat, cat_i|
         chart1.push({
           name: categories[cat][:title],
@@ -320,7 +320,7 @@ class Dataset
       }
 
     elsif chart_type == 2 # multiple categories for different main categories
-
+      Rails.logger.debug("--------------------------------------------sdfsdf2")
       cat_i = 0
       main_categories.each{|cat_k, cat_v|
          Rails.logger.debug("-------------------------------#{main_categories}---------#{cat_k}----#{cat_v}")
@@ -355,11 +355,25 @@ class Dataset
 
     # returned data
     {
-      data: nil,#data,
+      #data: nil,#data,
       chart1: {
         categories: chart1_categories,
         series: chart1,
         title: chart_title
+      },
+      table: {
+        data: [
+          ["UNM", "1000", "2000", "4000"],
+          ["Georgian Dream", "1000", "2000", "4000"]
+        ],
+        header: [["", nil, nil, "Income Category1"], ["Parties", "2012", "2013", "2014"]],
+        header_classes: [["empty", nil, nil, "outer center"], ["outer", nil, nil, nil]],
+        classes: ["header center", "", "", ""]
+
+        # header: [human_attribute_name(:id), human_attribute_name(:name),
+        #   human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
+        #   Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
+        #   Donation.human_attribute_name(:monetary)],
       }
       # parties_list: parties_list,
       # period_list: period_list
