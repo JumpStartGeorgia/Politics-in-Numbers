@@ -197,7 +197,7 @@ class Dataset
     chart_type = cs == 1 ? 0 : ( main_categories_count == 1 ? 1 : 2 )
 
     chart1 = []
-    # table = []
+    table = []
     # total_amount = 0
     # total_donations = 0
     # monetary_values = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
@@ -255,7 +255,7 @@ class Dataset
       e[:category_datas].each { |ee|
 
         #one category and common
-        parties_list[e[:party_id]][:data][pp] = ee[:value]
+        parties_list[e[:party_id]][:data][pp] = ee[:value].round(2)
 
         # one main multiple sub
         category_period_party[ee[:category_id]][e[:period_id]] = {}
@@ -267,17 +267,21 @@ class Dataset
       }
     }
 
+    categories_list = []
     # title generator
     chart_title = ""
-    chart_title += "#{I18n.t('shared.chart.finance.title.party_donations_for')}: #{f[:parties].map{|m| parties[BSON::ObjectId(m)][:name] }.join(', 1')}<br/>" if f[:parties].present?
+    chart_title += "#{I18n.t('shared.chart.finance.title.party_donations_for')}: #{f[:parties].map{|m| parties[BSON::ObjectId(m)][:name] }.join(', ')}<br/>" if f[:parties].present?
 
     if ln >= 1
       chart_title += I18n.t("shared.chart.finance.title.#{ln == 1 ? 'category' : 'category_grouped_by'}")+": "
       SYMS.each { |e|
         if f[e].present?
-          chart_title += Category.full_names(categories, f[e]).join(', ') + "<br/>"
+          tmp = Category.full_names(categories, f[e])
+          chart_title += tmp.join(', ') + (chart_type == 2 ? "; " : ", ")
+          tmp.each{|ee| categories_list << ee }
         end
       }
+      chart_title = chart_title[0...-2] + "<br/>"
     end
 
     if f[:period].present?
@@ -286,17 +290,32 @@ class Dataset
       chart_title += f[:period].map{|m| periods[BSON::ObjectId(m)][:name] }.join(", ")
     end
 
-
+    headers = [[""],[I18n.t("shared.common.parties")]]
+    header_classes = [["empty"], ["outer"]]
+    classes = [nil]
     # prepaire data for charts
     if chart_type == 0 # one category
-      Rails.logger.debug("--------------------------------------------sdfsdf0")
-      chart1 = parties_list.map{|k,v| { name: v[:name], data: v[:data] } }
-      period_list.each{|e| chart1_categories << e[:name] }
+      chart1 = parties_list.map{|k,v|
+        table << ( [v[:name]] + v[:data] ) # data for table
+        { name: v[:name], data: v[:data] } # data for chart
+      }
+
+      period_list.each_with_index{|e, i|
+        chart1_categories << e[:name] # chart categories (years)
+        headers[0] << nil # table header first row
+        headers[1] << e[:name] # table header second row
+        header_classes[0] << nil # table header class first row
+        header_classes[1] << nil # table header class second row
+        classes << "right" # table data class
+      }
+      headers[0][headers[0].size-1] = categories_list[0] # custom header label for first row category label
+      header_classes[0][headers[0].size-1] = "outer center" # custom header class for first row category label
 
     elsif chart_type == 1 # multiple categories for same main category
 
-      Rails.logger.debug("--------------------------------------------sdfsdf1")
+      # Rails.logger.debug("--------------------------------------------sdfsdf1")
       selected_categories.each_with_index{|cat, cat_i|
+
         chart1.push({
           name: categories[cat][:title],
           data: []
@@ -304,6 +323,16 @@ class Dataset
         period_list.each { |per|
           parties_list.each{ |k,v|
             chart1[cat_i][:data] << category_period_party[cat][per[:id]][BSON.ObjectId(k)]
+          }
+        }
+      }
+
+      parties_list.each{ |k,v|
+        table << [v[:name]]
+        period_list.each { |per|
+          selected_categories.each_with_index{|cat|
+            tmp = category_period_party[cat][per[:id]][BSON.ObjectId(k)]
+            table[table.size-1] << (tmp.present? ? tmp : 0)
           }
         }
       }
@@ -317,6 +346,17 @@ class Dataset
           item[:categories].push(v[:name])
         }
         chart1_categories.push(item)
+
+
+        selected_categories.each{|cat|
+          headers[0] << nil # table header first row
+          headers[1] << categories[cat][:title] # table header first row
+          header_classes[0] << nil # table header class first row
+          header_classes[1] << nil # table header class second row
+          classes << "right" # table data class
+        }
+        headers[0][headers[0].size-1] = e[:name]
+        header_classes[0][headers[0].size-1] = "outer center"
       }
 
     elsif chart_type == 2 # multiple categories for different main categories
@@ -339,6 +379,16 @@ class Dataset
         cat_i += 1
       }
 
+      parties_list.each{ |k,v|
+        table << [v[:name]]
+        period_list.each { |per|
+          main_categories.each{|cat_k, cat_v|
+            tmp = category_grouped_period_party[cat_k][per[:id]][k]
+            table[table.size-1] << (tmp.present? ? tmp : 0)
+          }
+        }
+      }
+
       period_list.each { |e|
         item = {
           name: e[:name],
@@ -348,48 +398,33 @@ class Dataset
           item[:categories].push(v[:name])
         }
         chart1_categories.push(item)
-      }
 
+        main_categories.each{|cat_k, cat_v|
+          headers[0] << nil # table header first row
+          headers[1] << cat_v.map{|m| categories[m][:title] }.join(", ")# table header first row
+          header_classes[0] << nil # table header class first row
+          header_classes[1] << nil # table header class second row
+          classes << "right" # table data class
+        }
+        headers[0][headers[0].size-1] = e[:name]
+        header_classes[0][headers[0].size-1] = "outer center"
+      }
 
     end
 
     # returned data
     {
-      #data: nil,#data,
       chart1: {
         categories: chart1_categories,
         series: chart1,
         title: chart_title
       },
       table: {
-        data: [
-          ["UNM", "1000", "2000", "4000"],
-          ["Georgian Dream", "1000", "2000", "4000"]
-        ],
-        header: [["", nil, nil, "Income Category1"], ["Parties", "2012", "2013", "2014"]],
-        header_classes: [["empty", nil, nil, "outer center"], ["outer", nil, nil, nil]],
-        classes: ["header center", "", "", ""]
-
-        # header: [human_attribute_name(:id), human_attribute_name(:name),
-        #   human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
-        #   Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
-        #   Donation.human_attribute_name(:monetary)],
+        data: table,
+        header: headers,
+        header_classes: header_classes,
+        classes: classes
       }
-      # parties_list: parties_list,
-      # period_list: period_list
-    #   chart1: chart1,
-    #   chart2: chart2,
-    #   chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart_meta_obj),
-    #   table: {
-    #     data: table,
-    #     header: [human_attribute_name(:id), human_attribute_name(:name),
-    #       human_attribute_name(:nature), human_attribute_name(:give_date),
-    #       Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
-    #       Donation.human_attribute_name(:monetary)],
-    #     classes: ["center", "", "", "center", "right", "", ""],
-    #     total_amount: total_amount,
-    #     total_donations: total_donations
-    #   }
     }
   end
 end

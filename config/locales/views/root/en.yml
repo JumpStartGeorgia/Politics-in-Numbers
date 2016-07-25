@@ -70,6 +70,7 @@ en:
         svg: Svg image
         jpeg: Jpeg image
         png: Png image
+        csv: Csv document
       placeholder:
         donor: Select donor
         party: Select party

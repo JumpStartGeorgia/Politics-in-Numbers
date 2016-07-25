@@ -1,5 +1,6 @@
 # Non-resource pages
 class RootController < ApplicationController
+  layout "embed", only: [:embed]
   def index
     redirect_to('/explore')
 
@@ -89,18 +90,91 @@ class RootController < ApplicationController
       gon.params = pars
     end
 
-    if which_filter == "donation" && pars[:format] == 'csv'
-      csv_file = CSV.generate do |csv|
-        csv << dt[:table][:header]
-        dt[:table][:data].each { |r| csv << r }
+    if pars[:format] == 'csv'
+      if which_filter == "donation"
+        csv_file = CSV.generate do |csv|
+          csv << dt[:table][:header]
+          dt[:table][:data].each { |r| csv << r }
+        end
+      elsif which_filter == "finance"
+         csv_file = CSV.generate do |csv|
+          dt[:table][:header].each{|e|
+            tmp = []
+            tmp_prev = ""
+            e.reverse_each{|ee|
+              tmp.unshift(ee.present? ? ee : tmp_prev)
+              tmp_prev = ee
+            }
+            csv << tmp
+          }
+          dt[:table][:data].each { |r| csv << r }
+        end
       end
     end
 
     respond_to do |format|
       format.html
-      format.csv { send_data csv_file, filename: "Explore-#{Date.today}.csv" }
+      format.csv { send_data csv_file, filename: "explore_#{which_filter}_#{Date.today}.csv" }
     end
   end
+
+  def explore_filter
+    res = {}
+    pars = explore_filter_params
+
+    if pars[:donation].present?
+      res[:donation] = Donor.explore(pars[:donation])
+    elsif pars[:finance].present?
+      res[:finance] = Dataset.explore(pars[:finance])
+    end
+
+    render :json => res
+  end
+
+
+
+
+
+  # show the embed chart if the id was provided and can be decoded and parsed into hash
+  # id - base64 encoded string of a hash of parameters
+  def embed
+
+    # @highlight_data = get_highlight_data(params[:id])
+    # puts @highlight_data.inspect
+    # if !@highlight_data[:error]
+    # puts "here"
+    #   # save the js data into gon
+    #   gon.highlight_data = {}
+    #   gon.highlight_data[@highlight_data[:highlight_id].to_s] = @highlight_data[:js]
+
+    #   set_gon_highcharts
+
+    #   gon.update_page_title = true
+
+    #   gon.get_highlight_desc_link = highlights_get_description_path
+    #   gon.powered_by_link = @xtraktr_url
+    #   gon.powered_by_text = I18n.t('app.common.powered_by_xtraktr')
+    #   gon.powered_by_title = I18n.t('app.common.powered_by_xtraktr_title')
+
+    #   gon.visual_type = @highlight_data[:visual_type]
+    #   if @highlight_data[:visual_type] != Highlight::VISUAL_TYPES[:map] # if the visual is a chart, include the highcharts file
+    #     @js.push('highcharts.js')
+    #   elsif @highlight_data[:visual_type] == Highlight::VISUAL_TYPES[:map] # if the visual is a map, include the highmaps file
+    #     @js.push('highcharts.js', 'highcharts-map.js')
+
+    #     if @highlight_data[:type] == 'dataset'
+    #       @shapes_url = Dataset.shape_file_url(@highlight_data[:id]) # have to get the shape file url for this dataset
+    #     end
+    #   end
+    #   @js.push('highcharts-exporting.js')
+    # end
+    puts "here1"
+    respond_to do |format|
+      format.html # index.html.erb
+    end
+  # end
+  end
+
 
   def about
     @page_content = PageContent.by_name('about')
@@ -137,42 +211,13 @@ class RootController < ApplicationController
     render :json => donors
   end
 
-  def explore_filter
-    res = {}
-    pars = explore_filter_params
-
-    if pars[:donation].present?
-      res[:donation] = Donor.explore(pars[:donation])
-    elsif pars[:finance].present?
-      res[:finance] = Dataset.explore(pars[:finance])
-    end
-    Rails.logger.debug("--------------------------------------------#{res.inspect}")
-    #res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
-
-    # q = params[:q].split
-    # donors = []
-    # if q.length == 1
-    #   regex1 =  /^#{Regexp.escape(q[0])}/i
-    #   regex2 = /.*/i
-    # else
-    #   regex1 =  /^#{Regexp.escape(q[0])}/i
-    #   regex2 = /^#{Regexp.escape(q[1])}/i
-    # end
-    # Donorset.all.each{ |set|
-    #   set.donors.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
-    #     donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
-    #   }
-    # }
-    #
-    # {"donor"=>["574422cffbb6bd5450000001", "574422cffbb6bd5450000000"], "period"=>{"0"=>"Thu Jan 01 2015 00:00:00 GMT+0400 (GET)", "1"=>"Tue Mar 31 2015 00:00:00 GMT+0400 (GET)"}, "amount"=>["2", "3"], "party"=>["5748093cfbb6bd3781000016"], "type"=>"non_monetary", "multiple"=>"no",
-    render :json => res
-  end
+#options = Rack::Utils.parse_query(Base64.urlsafe_decode64(embed_id))
   # def select_parties
   #   q = params[:q]
   #   parties = []
   #   regex1 =  /^#{Regexp.escape(q[0])}/i
   #   # Party.all.each{ |set|
-  #   #   set.donors.any_of({ title: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
+  #   #   set.donors.any_of({ title: regex1 , last_name: regex2 }, 1{ first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
   #   #     parties << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
   #   #   }
   #   # }

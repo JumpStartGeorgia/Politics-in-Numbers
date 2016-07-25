@@ -22,6 +22,7 @@ $(document).ready(function (){
     donation_total_donations = $("#donation_total_donations span"),
     donation_table = $("#donation_table table"),
     finance_table = $("#finance_table table"),
+    finance_datatable,
     autocomplete = {
       push: function(autocomplete_id, key, value) {
         if(!this.hasOwnProperty(autocomplete_id)) {
@@ -344,7 +345,7 @@ $(document).ready(function (){
           }
         });
         window.history.pushState(v, null, window.location.pathname + (params.length ? ("?filter=donation&" + params.join("&")) : ""));
-        t.download.attr("href", window.location.pathname + "?filter=donation&" + (params.length ? (params.join("&") + "&") : "")) + "format=csv"
+        t.download.attr("href", window.location.pathname + "?filter=donation&" + (params.length ? (params.join("&") + "&") : "") + "format=csv")
       }
     },
     finance = {
@@ -360,6 +361,7 @@ $(document).ready(function (){
         debts: "autocomplete",
         period: "period_mix"
       },
+      download: $("#finance_csv_download"),
       states: {
         income: false,
         income_campaign: false,
@@ -439,7 +441,7 @@ $(document).ready(function (){
               Object.keys(v).forEach(function(kk){
                 var fld = p.attr("data-field"), tmp = fld, fl = false;
                 if(t.categories.indexOf(fld) !== -1) { fl = true; tmp = "category"; }
-                 console.log("set by url",kk,v,fld,fl,tmp);
+                 //console.log("set by url",kk,v,fld,fl,tmp);
                 if(gon.main_categories_ids.indexOf(v[kk]) === -1) {
                   autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[tmp+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
                 }
@@ -492,8 +494,7 @@ $(document).ready(function (){
       },
       url: function(v) {
         var t = this, url = "?", params = [], tmp;
-        console.log(v);
-        console.log("here");
+        // console.log(v);
         Object.keys(this.elem).forEach(function(el){
           if(v.hasOwnProperty(el)) {
             tmp = v[el];
@@ -509,10 +510,10 @@ $(document).ready(function (){
         });
         //console.log(window.location.pathname + (params.length ? ("?filter=finance&" + params.join("&")) : ""));
         window.history.pushState(v, null, window.location.pathname + (params.length ? ("?filter=finance&" + params.join("&")) : ""));
-        //t.download.attr("href", window.location.pathname + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "")) + "format=csv"
+        t.download.attr("href", window.location.pathname + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "") + "format=csv")
       },
       toggle: function(element, turn_on) {
-        console.log(element, turn_on);
+        //console.log(element, turn_on);
         var t = this;
         t.elem[element].parent().attr("data-on", turn_on);
         t.states[element] = turn_on;
@@ -736,7 +737,9 @@ $(document).ready(function (){
         p.find(".input-group .input-checkbox-group input[type='checkbox'][value='" + li_span.attr("data-id") + "']:checked").prop("checked", false);
       }
 
-      li_span.remove();
+      if(type !== "autocomplete") {
+        li_span.remove();
+      }
       event.stopPropagation();
     });
     $("#reset").click(function(){
@@ -748,6 +751,43 @@ $(document).ready(function (){
       }
     });
     explore_button.click(function(){ filter(); });
+
+    function export_object(source, source_type, action) {
+      console.log(source,source_type,action);
+
+      var tmp,
+      mimes = {
+        "png": "image/png",
+        "jpeg": "image/jpeg",
+        "svg": "image/svg+xml",
+        "pdf": "application/pdf",
+      };
+
+      if(source_type === "chart") {
+        tmp = $(source).highcharts();
+        if(action === "print") {
+          chart.print();
+        }
+        else {
+          tmp.exportChart({ type: mimes[action] });
+        }
+      }
+      else if(source_type === "table") {
+        // if(action == "csv") {
+        //   $(source).find(".dt-buttons [data-action='" + action + "'] a[]").trigger("click");
+        // }
+      }
+
+
+    }
+    $(".download_list a").click(function(){
+      var t = $(this), action = t.attr("data-type"), li = t.parent(),
+        ul = li.parent(), source_type = ul.attr("data-type"),
+        source = "#" + ul.attr("data-object") + "_" + source_type;
+
+      export_object(source, source_type, action);
+    });
+
     $(".chart_download a").click(function(){
       var t = $(this), type = t.attr("data-type"), p = t.parent().parent(), target = p.attr("data-target"),
       chart = $(target).highcharts(),
@@ -757,6 +797,7 @@ $(document).ready(function (){
         "svg": "image/svg+xml",
         "pdf": "application/pdf",
       };
+      //<a href="/en/explore?expenses%5B%5D=5784e800fbb6bd2f46a9e344&amp;filter=finance&amp;income%5B%5D=5784e800fbb6bd2f46a9e328&amp;income%5B%5D=5784e800fbb6bd2f46a9e319&amp;party%5B%5D=5784e800fbb6bd2f46a9e1d5&amp;party%5B%5D=5784e800fbb6bd2f46a9e1f8&amp;period%5B%5D=5784e800fbb6bd2f46a9e20b&amp;period%5B%5D=5784e800fbb6bd2f46a9e20a&amp;period%5B%5D=5784e800fbb6bd2f46a9e209&amp;format=csv" id="donation_csv_download" class="download" title="Download table"><i></i></a>
       //console.log(target, type, mimes[type]);
       if(type === "print") {
         chart.print();
@@ -794,6 +835,7 @@ $(document).ready(function (){
     // bind finance view_as buttons click event
     $(".pane[data-type='finance'] .actions .left > div[data-view-toggle]").on("click", function() {
       $(".pane[data-type='finance']").attr("data-view-current", $(this).attr("data-view-toggle"));
+      $(".pane[data-type='finance'] .actions .download_list").attr("data-type", $(this).attr("data-view-toggle"));
     });
   }
 
@@ -833,6 +875,7 @@ $(document).ready(function (){
       }
 
       tmp = finance.get();
+      console.log(tmp);
       if(tmp === null) {
         finance_category.find("li div")
           .one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() { $(this).removeClass("swing animated"); })
@@ -883,6 +926,7 @@ $(document).ready(function (){
 
 
   function render_table(type, table) {
+    // console.log("table data", table);
     if(type === "donation") {
       donation_total_amount.text(table.total_amount);
       donation_total_donations.text(table.total_donations);
@@ -926,21 +970,39 @@ $(document).ready(function (){
       table.data.forEach(function(row, row_i) {
         table_html += "<tr>";
         row.forEach(function(col, col_i) {
-          table_html += "<td>" + col + "</th>";
+          klass = table.classes[col_i];
+          klass = klass !== null ? " class='" + klass + "'" : "";
+          table_html += "<td" + klass + ">" + col + "</th>";
         });
         table_html += "</td>";
       });
       table_html += "</tbody>";
 
-      finance_table.append(table_html);
-      finance_table.DataTable({
+      if(typeof finance_datatable !== "undefined") {
+        finance_datatable.destroy();
+      }
+      finance_table.html(table_html);
+      finance_datatable = finance_table.DataTable({
         destroy: true,
         //"aaData": table.data,
         // "aoColumns": table.header.map(function(m,i) {
         //   return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
         // }),
         "info": false,
-        dom: "fltrp"
+        dom: "Bfltrp"
+        // ,
+        // buttons: [
+        //   {
+        //     extend:    'print',
+        //     text:      '<div data-action="print"></div>',
+        //     title: 'Print'
+        //   },
+        //   {
+        //     extend:    'csv',
+        //     text:      '<div data-action="csv"></div>',
+        //     title: 'Csv'
+        //   }
+        // ]
       });
     }
 
@@ -1138,7 +1200,7 @@ $(document).ready(function (){
     });
   }
   function grouped_advanced_column_chart(elem, resource, bg) {
-    console.log(resource);
+    //console.log(resource);
     $(elem).highcharts({
       chart: {
           type: 'column',

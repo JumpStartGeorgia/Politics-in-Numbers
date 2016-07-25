@@ -85,7 +85,7 @@ gem 'select2-rails', '~> 4.0', '>= 4.0.1.1'
 gem "rubyXL"
 
 # jQuery DataTables plugin - provides all the basic DataTables files, and a few of the extras.
-gem 'jquery-datatables-rails', '~> 3.3.0'
+gem 'jquery-datatables-rails', '~> 3.4.0'
 
 gem 'gon'
 

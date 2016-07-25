@@ -878,7 +878,6 @@
             background-image:url("<%= asset_path('explore/table_a.svg') %>");
           }
           [data-view='table'] {
-            margin-top: 20px;
             display:initial;
           }
         }
@@ -910,6 +909,7 @@
                 border-right:2px solid #DEE2DC;
               }
               &.center { text-align:center; }
+              &.right { text-align:right; }
             }
           }
           tbody {
@@ -925,6 +925,9 @@
                 border-bottom:0;
                 border-left:0;
                 &:first-of-type {
+                  font:16px firasans_r;
+                  color:#5D675B;
+                  text-align:left;
                   border-left:1px solid #DEE2DC;
                   border-right:2px solid #DEE2DC;
                   background-color:#F3F9F2;
@@ -1262,6 +1265,8 @@
             top: 100%;
             border:1px dashed #AEB3AD;
             right:-1px;
+            background-color:#fff;
+            z-index:999;
             .at-share-btn {
               display:block;
               max-width: 38px;
@@ -1299,6 +1304,22 @@
         .download {
           i { background-position: -50px -44px; }
           &:hover i { background-position: -50px -66px; }
+        }
+
+        .download_menu {
+          .download_list {
+            &[data-type] {
+              [data-only='chart'],
+              [data-only='table']
+              { display:none; }
+            }
+            &[data-type='chart'] [data-only='chart'] {
+              display:initial;
+            }
+            &[data-type='table'] [data-only='table'] {
+              display:initial;
+            }
+          }
         }
       }
     }

@@ -161,7 +161,7 @@ GEM
     jbuilder (2.2.13)
       activesupport (>= 3.0.0, < 5)
       multi_json (~> 1.2)
-    jquery-datatables-rails (3.3.0)
+    jquery-datatables-rails (3.4.0)
       actionpack (>= 3.1)
       jquery-rails
       railties (>= 3.1)
@@ -406,7 +406,7 @@ DEPENDENCIES
   gon
   i18n-tasks (~> 0.8.3)
   jbuilder (~> 2.0)
-  jquery-datatables-rails (~> 3.3.0)
+  jquery-datatables-rails (~> 3.4.0)
   jquery-rails (~> 4.0.3)
   jquery-ui-rails (~> 5.0.3)
   launchy (~> 2.4.3)

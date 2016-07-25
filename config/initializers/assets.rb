@@ -9,4 +9,7 @@ Rails.application.config.assets.version = '1.0'
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder
 # are already added.
-Rails.application.config.assets.precompile += %w( highcharts.js highcharts-exporting.js highcharts-offline-exporting.js highcharts-grouped-categories.js)
+Rails.application.config.assets.precompile += %w( highcharts.js highcharts-exporting.js
+                                                highcharts-offline-exporting.js highcharts-grouped-categories.js
+                                                datatables.buttons.html5.min.js datatables.buttons.min.js
+                                              )
