@@ -229,7 +229,7 @@ class RootController < ApplicationController
     pars = share_params
     @return_url = pars[:return_url]
     @return_url = root_path if !@return_url.present?
-    # Rails.logger.debug("--------------------------------------------#{return_url} #{pars[:params]}")
+    Rails.logger.info("--------------------------------------------#{request.user_agent}")
      #dev-pin.jumpstart.ge/share?return_url=http://google.com&params[]=2
      #http://localhost:3000/ka/share?return_url=/about&params[]=123&params[]=abc
      #http://localhost:3000/ka/share?return_url=http://www.dev-pin.jumpstart.ge&params[]=123&params[]=abc
