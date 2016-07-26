@@ -227,14 +227,16 @@ class RootController < ApplicationController
 
   def share
     pars = share_params
-    return_url = pars[:return_url]
-    return_url = root_path if !return_url.present?
-     Rails.logger.debug("--------------------------------------------#{return_url} #{pars[:params]}")
+    @return_url = pars[:return_url]
+    @return_url = root_path if !@return_url.present?
+    # Rails.logger.debug("--------------------------------------------#{return_url} #{pars[:params]}")
+     #dev-pin.jumpstart.ge/share?return_url=http://google.com&params[]=2
      #http://localhost:3000/ka/share?return_url=/about&params[]=123&params[]=abc
      #http://localhost:3000/ka/share?return_url=http://www.dev-pin.jumpstart.ge&params[]=123&params[]=abc
-     @inner_pars = pars[:params]
+     @inner_pars = []
+     @inner_pars = pars[:params] if pars[:params].present?
     if (request.user_agent.include?("facebook") && request.user_agent.include?("externalhit")) # if facebook robot Rails.env.development? ||
-
+#https://www.facebook.com/sharer/sharer.php?app_id=570138349825593&sdk=joey&u=http%3A%2F%2Fdev-pin.jumpstart.ge%2Fen%2Fshare%3Freturn_url%3D%252Fka%252Fshare_test%26params%255B0%255D%3D123%26params%255B1%255D%3Dabc&display=popup&ref=plugin&src=share_button
       # if p.present?
       #   encodedP = Base64.urlsafe_encode64(p.to_param)
       #   require 'game_data'
@@ -280,7 +282,7 @@ class RootController < ApplicationController
       #   redirect_to gap_path and return
       # end
     else
-      redirect_to return_url and return
+      redirect_to @return_url and return
     end
   end
 

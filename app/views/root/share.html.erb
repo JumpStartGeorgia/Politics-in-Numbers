@@ -5,9 +5,9 @@
       <meta charset="utf-8">
       <meta property="og:title"content="Share test title" />
       <meta property="og:site_name" content="Site Name" />
-      <meta property="og:image" content="" />
+      <meta property="og:image" content="<%= image_url('share.png') %>" />
       <meta property="og:description" content="<%= "#{@inner_pars.join(";")}" %>" />
-      <meta property="og:url" content="<%= request.fullpath %>" />
+      <meta property="og:url" content="<%= @return_url %>" />
       <meta property="og:type"   content="website" />
       <%= favicon_link_tag '/favicon.png', :rel => 'shortcut icon' %>
    </head>
