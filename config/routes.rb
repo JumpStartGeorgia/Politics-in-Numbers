@@ -42,6 +42,7 @@ Rails.application.routes.draw do
     get '/api' => 'root#api'
     get '/parties' => 'root#parties'
     get '/embed' => 'root#embed'
+    get '/share' => 'root#share'
     get 'select/donors' => 'root#select_donors'
     get 'select/parties' => 'root#select_parties'
     get 'explore_filter' => 'root#explore_filter'

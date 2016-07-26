@@ -1,6 +1,7 @@
 # Non-resource pages
 class RootController < ApplicationController
   layout "embed", only: [:embed]
+  layout false, only: [:share]
   def index
     redirect_to('/explore')
 
@@ -225,8 +226,14 @@ class RootController < ApplicationController
   # end
 
   def share
-   if (request.user_agent.include?("facebook") && request.user_agent.include?("externalhit")) # if facebook robot Rails.env.development? ||
-      pars = explore_params
+    pars = share_params
+    return_url = pars[:return_url]
+    return_url = root_path if !return_url.present?
+     Rails.logger.debug("--------------------------------------------#{return_url} #{pars[:params]}")
+     #http://localhost:3000/ka/share?return_url=/about&params[]=123&params[]=abc
+     #http://localhost:3000/ka/share?return_url=http://www.dev-pin.jumpstart.ge&params[]=123&params[]=abc
+     @inner_pars = pars[:params]
+    if (request.user_agent.include?("facebook") && request.user_agent.include?("externalhit")) # if facebook robot Rails.env.development? ||
 
       # if p.present?
       #   encodedP = Base64.urlsafe_encode64(p.to_param)
@@ -273,7 +280,7 @@ class RootController < ApplicationController
       #   redirect_to gap_path and return
       # end
     else
-      redirect_to explore_path and return
+      redirect_to return_url and return
     end
   end
 
@@ -285,6 +292,9 @@ class RootController < ApplicationController
     #     "type"=>"monetary",
     #      "multiple"=>"yes"},
     #       "locale"=>"en"}
+    def share_params
+      params.permit(:return_url, :locale, {params: []})
+    end
     def explore_params
       params.permit([:filter, :monetary, :multiple, :nature, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
     end
