@@ -235,6 +235,7 @@ class RootController < ApplicationController
      #http://localhost:3000/ka/share?return_url=http://www.dev-pin.jumpstart.ge&params[]=123&params[]=abc
      @inner_pars = []
      @inner_pars = pars[:params] if pars[:params].present?
+     #facebookexternalhit
     if (request.user_agent.include?("facebook") && request.user_agent.include?("externalhit")) # if facebook robot Rails.env.development? ||
 #https://www.facebook.com/sharer/sharer.php?app_id=570138349825593&sdk=joey&u=http%3A%2F%2Fdev-pin.jumpstart.ge%2Fen%2Fshare%3Freturn_url%3D%252Fka%252Fshare_test%26params%255B0%255D%3D123%26params%255B1%255D%3Dabc&display=popup&ref=plugin&src=share_button
       # if p.present?
@@ -281,7 +282,9 @@ class RootController < ApplicationController
       # else
       #   redirect_to gap_path and return
       # end
+      Rails.logger.info("--------------------------------------------inside")
     else
+      Rails.logger.info("--------------------------------------------redirecting")
       redirect_to @return_url and return
     end
   end
