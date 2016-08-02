@@ -6,6 +6,23 @@ module ApplicationHelper
   def title(page_title)
     content_for(:title) { page_title.html_safe }
   end
+
+  def current_url
+    "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
+  end
+
+  def full_url(path)
+    "#{request.protocol}#{request.host_with_port}#{path}"
+  end
+
+  # apply the strip_tags helper and also convert nbsp to a ' '
+  def strip_tags_nbsp(text)
+    if text.present?
+      strip_tags(text.gsub('&nbsp;', ' '))
+    end
+  end
+
+
     # in the forms, show the default language text in the non-default language tabs
   # type: text, url, etc - whatever is needed to make 'tabbed_translation_form.default_xxx' work
   # IMPORTANT - html_safe must be called on the return value

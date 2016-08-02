@@ -65,7 +65,7 @@ class Medium
   def cover(locale=nil)
     if locale.present? && image_translations.has_key?(locale)
       tmp = media_images.find(image_translations[locale])
-    else
+    elsif image.present?
       tmp = media_images.find(image)
     end
     tmp.present? ? tmp.image : nil
@@ -92,6 +92,17 @@ class Medium
 
   def human_cover
     "<img src='#{cover.url(:small)}'>".html_safe
+  end
+
+
+  ## SCOPES
+
+  def self.is_public
+    where(public: true)
+  end
+
+  def self.sorted_public
+    order_by([[:published_at, :desc], [:title, :asc]])
   end
 
   def self.sorted

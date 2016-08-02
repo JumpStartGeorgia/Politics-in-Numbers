@@ -45,7 +45,7 @@
         <td><%= item.human_published_at %></td>
         <td><%= item.human_read_more %></td>
         <td><%= item.human_show_image %></td>
-        <td><img src="<%= item.cover.url(:small) %>"></td>
+        <td><%= image_tag item.cover.url(:small) if item.cover.present? %></td>
         <td>
           <div class="btn-group btn-group-sm" role="group" aria-label="...">
             <%= links_for(item, :admin, [:view, :edit, :destroy]) %>

@@ -1,0 +1,54 @@
+/* pinterest column layout taken from here: https://codepen.io/dudleystorey/pen/yqrhw */;
+.media-items{
+  -webkit-column-width: 600px;
+  -moz-column-width: 600px;
+  column-width: 600px;
+  -webkit-column-gap: 15px;
+  -moz-column-gap: 15px;
+  column-gap: 15px;
+  max-width: 1900px;
+
+  .media-item{
+    border-bottom: dashed 1px #2F332F;
+    min-width: 600px;
+   // margin-bottom: 25px;
+
+  //  background: #fefefe;
+  //  border: 2px solid #fcfcfc;
+  //  box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+    margin: 0 0 25px;
+  //  padding: 15px;
+    padding-bottom: 10px;
+   // transition: opacity .4s ease-in-out;
+    display: inline-block;
+    column-break-inside: avoid;
+
+    h2{
+      display:inline-block;
+      padding:0px 60px 15px 0;
+      margin: 0 0 15px 0;
+      font:28px firasans_b;
+      color:#2F332F;
+      border-bottom: 1px solid #F78E69;
+    }
+    .media-item-text{
+      .media-item-label{
+        color:#F78E69;
+        font-weight: bold;
+      }
+    }
+
+    .media-item-image{
+      margin: 15px 0;
+    }
+    .media-item-embed{
+      margin: 15px 0;
+    }
+    .media-item-description{
+
+    }
+    .media-item-link{
+      margin: 25px 0;
+    }
+  }
+}

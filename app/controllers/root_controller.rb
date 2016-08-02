@@ -182,7 +182,8 @@ class RootController < ApplicationController
   end
 
   def media
-    # @page_content = PageContent.by_name('about')
+    @media = Medium.is_public.sorted_public
+    @show_page_title = false
   end
 
   def download

@@ -31,6 +31,8 @@ ka:
       jumpstart:
         slogan: JumpStart Georgia - We communicate data better!
       name: Politics in Numbers
+      slogan: This is the PIN slogan
+      description: This is a description of PIN
       language: Language Switch
       twitter: Share on Twitter
       facebook: Share on Facebook

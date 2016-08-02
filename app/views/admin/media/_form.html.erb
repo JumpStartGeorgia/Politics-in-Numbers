@@ -26,14 +26,6 @@
     <div class="tab-content">
       <% locales.each_with_index do |locale, index| %>
         <div role="tabpanel" class="tab-pane fade <%= 'in active' if index == 0 %>" id="<%= locale %>" data-locale="<%= locale %>">
-          <%= f.fields_for :name_translations, OpenStruct.new(f.object.name_translations) do |translation| %>
-            <%
-              label = t(label_key + 'name')
-              hint = t(hint_key + 'name')
-              hint << show_default_text(@item.name_translations[default_locale]) if index > 0
-            %>
-            <%= translation.input locale, hint: hint.html_safe, label: label %>
-          <% end %>
 
           <%= f.fields_for :title_translations, OpenStruct.new(f.object.title_translations) do |translation| %>
             <%
@@ -44,15 +36,14 @@
             <%= translation.input locale, hint: hint.html_safe, label: label, input_html: { class: "permalink-trigger", "data-permalink-receiver" => ".permalink-receiver-#{locale}"} %>
           <% end %>
 
-          <%= f.fields_for :description_translations, OpenStruct.new(f.object.description_translations) do |translation| %>
-              <%
-                label = t(label_key + 'description')
-                hint = t(hint_key + 'description')
-                hint << show_default_text(@item.description_translations[default_locale]) if index > 0
-              %>
-              <%= translation.input locale, :as => :text, rows: 10, hint: hint.html_safe, label: label,
-                  :input_html => { class: "tinymce" } %>
-            <% end %>
+          <%= f.fields_for :name_translations, OpenStruct.new(f.object.name_translations) do |translation| %>
+            <%
+              label = t(label_key + 'name')
+              hint = t(hint_key + 'name')
+              hint << show_default_text(@item.name_translations[default_locale]) if index > 0
+            %>
+            <%= translation.input locale, hint: hint.html_safe, label: label %>
+          <% end %>
 
           <%= f.fields_for :author_translations, OpenStruct.new(f.object.author_translations) do |translation| %>
             <%
@@ -62,6 +53,16 @@
             %>
             <%= translation.input locale, hint: hint.html_safe, label: label %>
           <% end %>
+
+          <%= f.fields_for :description_translations, OpenStruct.new(f.object.description_translations) do |translation| %>
+              <%
+                label = t(label_key + 'description')
+                hint = t(hint_key + 'description')
+                hint << show_default_text(@item.description_translations[default_locale]) if index > 0
+              %>
+              <%= translation.input locale, :as => :text, hint: hint.html_safe, label: label,
+                  :input_html => { class: "tinymce", rows: 5 } %>
+            <% end %>
 
           <%= f.fields_for :embed_translations, OpenStruct.new(f.object.embed_translations) do |translation| %>
             <%
@@ -84,7 +85,7 @@
               hint = t(hint_key + 'image')
               hint << show_default_text(@item.image_translations[default_locale]) if index > 0
             %>
-            <%= translation.input locale, :as => :file, hint: hint.html_safe, label: label, input_html: { class: "image_preview_trigger"} %>
+            <%= translation.input locale, :as => :file, hint: hint.html_safe, label: label, input_html: { class: "image_preview_trigger", accept: ".jpg,.jpeg,.png,.gif" } %>
             <% if @item.image_translations[locale].present? %>
               <div id="image_preview_reciever_medium_image_translations_<%= locale %>" class="preview form-group"><img src="<%= @item.cover(locale).url(:small) %>"></div>
             <% end %>

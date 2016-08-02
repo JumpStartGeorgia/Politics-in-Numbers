@@ -1,0 +1,128 @@
+.footer {
+  background:transparent url("<%= asset_path('footer/pattern.png') %>");
+  padding:26px 24px 34px;
+  .footer-left {
+    .footer-logo {
+      width:90px;
+      height:75px;
+    }
+    .footer-share {
+      margin:20px 0 0 0;
+      float:right;
+      a {
+        padding:0px 3px;
+      }
+    }
+    .footer-summary {
+      display:block;
+      clear:both;
+      font:16px/22px firasans_book;
+      color:#5D675B;
+      padding:20px 0 40px;
+      border-bottom:1px dashed #c6c9bf;
+    }
+  }
+  .footer-center {
+    .footer-share {
+      display:none;
+    }
+  }
+  .footer-right {
+    margin:20px 0 0 0;
+    > div {
+      margin:12px 0 0 0;
+      div {
+        display:table-cell;
+        vertical-align: middle;
+        img {
+          float:left;
+        }
+      }
+      a, > span {
+        display:table-cell;
+        font:18px firasans_book;
+        color:#5D675B;
+        text-decoration:none;
+        white-space:normal;
+        width:100%;
+        padding:6px 0 0 14px;
+
+      }
+
+    }
+  }
+  /* Pop */
+    @-webkit-keyframes pop {
+      50% {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+      }
+    }
+
+    @keyframes pop {
+      50% {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+      }
+    }
+
+  .pop {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .pop:hover, .pop:focus, .pop:active {
+    -webkit-animation-name: pop;
+    animation-name: pop;
+    -webkit-animation-duration: 0.3s;
+    animation-duration: 0.3s;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+    -webkit-animation-iteration-count: 1;
+    animation-iteration-count: 1;
+  }
+}
+
+@media (min-width: 992px) {
+  .footer {
+    padding:40px 24px 26px 42px;
+    .footer-left {
+      display:table-cell;
+      width:50%;
+      padding:0 80px 0 0;
+      .footer-share {
+        display:none;
+      }
+      .footer-summary {
+        padding:20px 0;
+        border-bottom:0;
+      }
+    }
+    .footer-center {
+      display:table-cell;
+      border-left:1px dashed #c6c9bf;
+      border-right:1px dashed #c6c9bf;
+      padding:0px 80px;
+      vertical-align: middle;
+      .footer-share {
+        display:block;
+        margin:0;
+        a {
+          display:block;
+          padding:6px 0;
+        }
+      }
+    }
+    .footer-right {
+      display:table-cell;
+      width:50%;
+      padding:0 0 0 80px;
+      vertical-align: middle;
+    }
+  }
+}

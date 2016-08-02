@@ -1,2 +1,49 @@
-<% page_title t('.title') %>
-<div>media</div>
+<%
+  page_title t('.title')
+  label_key = "mongoid.attributes.medium."
+%>
+
+<% if @media.present? %>
+
+  <div class="media-items">
+    <% @media.each do |medium| %>
+      <div class="media-item">
+        <h2><%= medium.title %></h2>
+        <div class="media-item-text">
+          <span class="media-item-label"><%= t(label_key + 'name') %>:</span>
+          <%= medium.name %>
+        </div>
+        <div class="media-item-text">
+          <span class="media-item-label"><%= t(label_key + 'author') %>:</span>
+          <%= medium.author %>
+        </div>
+        <div class="media-item-text">
+          <span class="media-item-label"><%= t(label_key + 'created_at') %>:</span>
+          <%= l(medium.created_at, format: :date) %>
+        </div>
+        <% if medium.show_image && medium.cover.present? %>
+          <div class="media-item-image">
+            <%= image_tag medium.cover.url(:medium) %>
+          </div>
+        <% elsif medium.embed.present? %>
+          <div class="media-item-embed">
+            <iframe src="<%= medium.embed %>" width="600" height="315" frameborder="0" allowfullscreen>Sorry your browser does not support inline frames.</iframe>
+          </div>
+        <% end %>
+        <div class="media-item-description">
+          <%= simple_format(medium.description) %>
+        </div>
+        <div class="media-item-link">
+          <%#= link_to medium.web, medium.web, target: :blank %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+<% else %>
+  <p>
+    <%= t('.no_media') %>
+  </p>
+<% end %>
+
+<% content_for :custom_css, "in-media" %>

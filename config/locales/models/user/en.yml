@@ -101,6 +101,7 @@ en:
         show_image: &show_image "Image, otherwise embed"
         human_show_image: *show_image
         human_cover: Cover image
+        created_at: Date
     models:
       user:
         one: User

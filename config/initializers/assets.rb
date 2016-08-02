@@ -12,4 +12,6 @@ Rails.application.config.assets.version = '1.0'
 Rails.application.config.assets.precompile += %w( highcharts.js highcharts-exporting.js
                                                 highcharts-offline-exporting.js highcharts-grouped-categories.js
                                                 datatables.buttons.html5.min.js datatables.buttons.min.js
+                                                admin.js admin.css explore.js explore.css crypto.min.js
+                                                in-media.css
                                               )

@@ -3,6 +3,9 @@ en:
   root:
     about:
       title: About
+    media:
+      title: In Media
+      no_media: No mentions of Politics in Number in the media have been recorded yet.
     explore:
       title: Explore
       category: Category

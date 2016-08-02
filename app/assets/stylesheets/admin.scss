@@ -6,6 +6,8 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 */
 
 /*
+  *= require reset
+  *= require fonts
   *= require formtastic
   *= require formtastic-bootstrap
 
@@ -31,13 +33,32 @@ URL: https://gist.github.com/bobbygrace/9e961e8982f42eb91b80
 
 // Components
 @import 'components/actions';
-@import 'components/app-footer';
+@import 'components/nav_bar';
+@import 'components/footer';
 @import 'components/language_switcher';
 @import 'components/loading_indicator';
 @import 'components/primary_header';
 @import 'components/categories-list';
 @import 'components/tabbed_translation_form';
 
+body, html {
+  margin:0;
+  padding:0;
+  height:100%;
+}
+
+main {
+  // flex: 1;
+  // height:100%; /* same as flex: 1 1 auto; */
+    // display: flex;
+    // flex-direction: row;
+
+    // justify-content: flex-start; /* align items in Main Axis */
+    // align-items: stretch; /* align items in Cross Axis */
+    // align-content: stretch; /* Extra space in Cross Axis */
+//  padding: 0 60px;
+  padding: 100px 42px;
+}
 
 .actions-3 {
   min-width:166px;
