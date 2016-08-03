@@ -13,5 +13,5 @@ Rails.application.config.assets.precompile += %w( highcharts.js highcharts-expor
                                                 highcharts-offline-exporting.js highcharts-grouped-categories.js
                                                 datatables.buttons.html5.min.js datatables.buttons.min.js
                                                 admin.js admin.css explore.js explore.css crypto.min.js
-                                                in-media.css
+                                                in-media.css in-media.js readmore.min.js
                                               )

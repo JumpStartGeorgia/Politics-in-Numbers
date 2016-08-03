@@ -12,21 +12,12 @@
   <table class="table table-bordered table-hover table-responsive datatable">
   <thead>
     <tr>
-      <th><%= @model.human_attribute_name(:name) %></th>
       <th><%= @model.human_attribute_name(:title) %></th>
-      <th><%= @model.human_attribute_name(:description) %></th>
+      <th><%= @model.human_attribute_name(:name) %></th>
       <th><%= @model.human_attribute_name(:author) %></th>
-      <th><%= @model.human_attribute_name(:embed) %></th>
-      <th><%= @model.human_attribute_name(:permalink) %></th>
+      <th><%= @model.human_attribute_name(:story_date) %></th>
       <th><%= @model.human_attribute_name(:web) %></th>
-
       <th><%= @model.human_attribute_name(:public) %></th>
-      <th><%= @model.human_attribute_name(:published_at) %></th>
-
-      <th><%= @model.human_attribute_name(:read_more) %></th>
-      <th><%= @model.human_attribute_name(:show_image) %></th>
-
-      <th><%= @model.human_attribute_name(:cover) %></th>
 
       <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -34,18 +25,12 @@
   <tbody>
     <% @items.each do |item| %>
       <tr>
-        <td class="available-locales-box"><%= "#{item.name} #{existence_translations(item, :name)}".html_safe %></td>
         <td class="available-locales-box"><%= "#{item.title} #{existence_translations(item, :title)}".html_safe %></td>
-        <td class="available-locales-box"><%= "#{item.description} #{existence_translations(item, :description)}".html_safe %></td>
+        <td class="available-locales-box"><%= "#{item.name} #{existence_translations(item, :name)}".html_safe %></td>
         <td class="available-locales-box"><%= "#{item.author} #{existence_translations(item, :author)}".html_safe %></td>
-        <td class="available-locales-box"><%= "#{item.embed} #{existence_translations(item, :embed)}".html_safe %></td>
-        <td class="available-locales-box"><%= "#{item.permalink} #{existence_translations(item, :permalink)}".html_safe %></td>
-        <td class="available-locales-box"><%= "#{item.web} #{existence_translations(item, :web)}".html_safe %></td>
+        <td class="available-locales-box"><%= l(item.story_date) if item.story_date.present? %></td>
+        <td class="available-locales-box"><%= link_to t('shared.actions.view'), item.web, class: 'btn btn-default btn-sm' %></td>
         <td><%= item.human_public %></td>
-        <td><%= item.human_published_at %></td>
-        <td><%= item.human_read_more %></td>
-        <td><%= item.human_show_image %></td>
-        <td><%= image_tag item.cover.url(:small) if item.cover.present? %></td>
         <td>
           <div class="btn-group btn-group-sm" role="group" aria-label="...">
             <%= links_for(item, :admin, [:view, :edit, :destroy]) %>

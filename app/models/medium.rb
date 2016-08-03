@@ -8,19 +8,19 @@ class Medium
 
   embeds_many :media_images, :cascade_callbacks => true
 
-  field :name, type: String, localize: true
+  field :name, type: String, localize: true # media name
   field :title, type: String, localize: true
-  field :description, type: String, localize: true
+  field :description, type: String, localize: true # summary
   field :author, type: String, localize: true
-  field :embed, type: String, localize: true
+  field :embed, type: String, localize: true # embed code
   field :permalink, type: String, localize: true
-  field :web, type: String, localize: true
+  field :web, type: String, localize: true # url to story
+  field :story_date, type: Date # date the story was published
 
   field :public, type: Boolean, default: false
   field :published_at, type: Date
 
-  field :read_more, type: Boolean, default: false
-  field :show_image, type: Boolean, default: true # if false embed code will be shown
+  field :read_more, type: Boolean, default: false # if story needs read_more
 
   field :image, type: BSON::ObjectId, localize: true
 
@@ -44,16 +44,15 @@ class Medium
 
   require 'uri'
   validate :validate_translations
-  validates_presence_of :public, :read_more
-  validates_format_of :web, :embed, :with => URI.regexp
+  validates_presence_of :public, :read_more, :story_date
+  validates_format_of :web, :with => URI.regexp
 
 
   #/^[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/ix
 
   def validate_translations
     default = I18n.default_locale
-    ["name_translations", "title_translations", "description_translations",
-     "author_translations", "embed_translations", "web_translations"].each{|f|
+    ["name_translations", "title_translations", "author_translations"].each{|f|
       if self.send(f)[default].blank?
         errors.add(:base, I18n.t('mongoid.errors.messages.validations.default_translation_missing',
           field: self.class.human_attribute_name(f),
@@ -80,9 +79,6 @@ class Medium
     I18n.t("mongoid.options.media.read_more.#{read_more.to_s[0]}")
   end
 
-  def human_show_image
-    I18n.t("mongoid.options.media.show_image.#{show_image.to_s[0]}")
-  end
   # def human_image
   #   image_path
   # end
@@ -94,6 +90,31 @@ class Medium
     "<img src='#{cover.url(:small)}'>".html_safe
   end
 
+  # update the embed code to use the proivided sizes
+  def human_embed(width=600, height=315)
+    embed_code = nil
+    if embed.present?
+      embed_code = embed.dup
+      w_index = embed_code.index('width="')
+      if w_index.present?
+        end_quote = embed_code.index('"', w_index+7)
+        embed_code = embed_code[0..w_index+6] + width.to_s + embed_code[end_quote..-1]
+      end
+      h_index = embed_code.index('height="')
+      if h_index.present?
+        end_quote = embed_code.index('"', h_index+8)
+        embed_code = embed_code[0..h_index+7] + height.to_s + embed_code[end_quote..-1]
+      end
+    end
+
+    # add the responsive class
+    src_index = embed_code.index('src="')
+    if src_index.present?
+      embed_code = embed_code[0..src_index-1] + ' class="embed-responsive-item" ' + embed_code[src_index..-1]
+    end
+
+    return embed_code
+  end
 
   ## SCOPES
 

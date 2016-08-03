@@ -72,8 +72,8 @@
             %>
             <%= translation.input locale, hint: hint.html_safe, label: label, input_html: { class: "embed_preview_trigger"}  %>
               <% if @item.embed_translations[locale].present? %>
-                <div id="embed_preview_reciever_medium_embed_translations_<%= locale %>" class="preview form-group">
-                  <iframe src="<%= @item.embed_translations[locale] %>" width="200" height="200" frameborder="0">Sorry your browser does not support inline frames.</iframe>
+                <div id="embed_preview_reciever_medium_embed_translations_<%= locale %>" class="preview form-group" style="width: 200; height: 200">
+                  <%= @item.embed_translations[locale].html_safe %>
                 </div>
               <% end %>
 
@@ -100,6 +100,8 @@
             <%= translation.input locale, hint: hint.html_safe, label: label %>
           <% end %>
 
+<%
+=begin %>
           <%= f.fields_for :permalink_translations, OpenStruct.new(f.object.permalink_translations) do |translation| %>
             <%
               label = t(label_key + 'permalink')
@@ -108,6 +110,8 @@
             %>
             <%= translation.input locale, hint: hint.html_safe, label: label , input_html: { value: get_slug(@item, locale), class: "permalink-receiver-#{locale}" }%>
           <% end %>
+<%
+=end %>
         </div>
       <% end %>
     </div>
@@ -116,9 +120,9 @@
 
 
   <%= f.inputs do %>
-    <%= f.input :public, :as => :boolean, label: false %>
+    <%= f.input :story_date, :as => :string, label: true, input_html: {size: 15, maxlength: 10, class: "datepicker single" } %>
     <%= f.input :read_more, :as => :boolean, label: false %>
-    <%= f.input :show_image, :as => :boolean, label: false %>
+    <%= f.input :public, :as => :boolean, label: false %>
   <% end %>
 
 

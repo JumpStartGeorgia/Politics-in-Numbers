@@ -18,24 +18,30 @@
           <%= medium.author %>
         </div>
         <div class="media-item-text">
-          <span class="media-item-label"><%= t(label_key + 'created_at') %>:</span>
-          <%= l(medium.created_at, format: :date) %>
+          <span class="media-item-label"><%= t(label_key + 'story_date') %>:</span>
+          <%= l(medium.story_date) %>
         </div>
-        <% if medium.show_image && medium.cover.present? %>
+        <% if medium.cover.present? %>
           <div class="media-item-image">
             <%= image_tag medium.cover.url(:medium) %>
           </div>
         <% elsif medium.embed.present? %>
-          <div class="media-item-embed">
-            <iframe src="<%= medium.embed %>" width="600" height="315" frameborder="0" allowfullscreen>Sorry your browser does not support inline frames.</iframe>
+          <div class="media-item-embed embed-responsive embed-responsive-16by9">
+            <%= medium.human_embed.html_safe %>
           </div>
         <% end %>
-        <div class="media-item-description">
-          <%= simple_format(medium.description) %>
-        </div>
-        <div class="media-item-link">
-          <%#= link_to medium.web, medium.web, target: :blank %>
-        </div>
+        <% if medium.description.present? %>
+          <div class="media-item-description">
+            <div class="media-item-description-container read-less">
+              <%= simple_format(medium.description) %>
+            </div>
+          </div>
+        <% end %>
+        <% if medium.web.present? %>
+          <div class="media-item-link">
+            <%= link_to truncate(medium.web,length: 70), medium.web, target: :blank %>
+          </div>
+        <% end %>
       </div>
     <% end %>
   </div>
@@ -46,4 +52,5 @@
   </p>
 <% end %>
 
+<% @custom_js = ["readmore.min", "in-media"] %>
 <% content_for :custom_css, "in-media" %>

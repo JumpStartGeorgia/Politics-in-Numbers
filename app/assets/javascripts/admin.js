@@ -109,6 +109,18 @@ $(document).ready(function(){
     $(".tree ul .box.inner").click(function(){ $(this).toggleClass("closed"); });
 
     //$(".datepicker").datepicker();
+    $( ".datepicker.single" ).datepicker({
+      //defaultDate: "+1w",
+      dateFormat: 'yy-mm-dd',
+      changeMonth: true,
+      changeYear: true,
+      numberOfMonths: 1,
+    });
+    if (gon.single_date !== undefined && gon.single_date.length > 0)
+    {
+      $(".datepicker.single").datepicker("setDate", new Date(gon.single_date));
+    }
+
     $( ".datepicker.start" ).datepicker({
       //defaultDate: "+1w",
       changeMonth: true,

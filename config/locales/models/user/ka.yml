@@ -88,20 +88,18 @@ ka:
         description_translations: Summary
         author: Author
         author_translations: Author
-        embed: Embed Content
-        embed_translations: Embed Content
+        embed: Embed Code
+        embed_translations: Embed Code
         permalink: Permalink
         public: &public Is Published?
         human_public: *public
         published_at: &published_at Publish Date
         human_published_at: *published_at
-        web: Direct Link
+        web: Link to Story
         read_more: &read_more Has 'Read more'?
         human_read_more: *read_more
-        show_image: &show_image "Image, otherwise embed"
-        human_show_image: *show_image
         human_cover: Cover image
-        created_at: Date
+        story_date: Date
     models:
       user:
         one: User
@@ -159,9 +157,6 @@ ka:
         read_more:
           t: "Yes"
           f: "No"
-        show_image:
-          t: Image
-          f: Embed
     messages:
       deffered:
         not_found: "You don't have uncompleted deffered activies."

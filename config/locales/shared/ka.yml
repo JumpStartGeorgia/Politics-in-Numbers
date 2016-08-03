@@ -46,6 +46,9 @@ ka:
       back: Back
       ns: Not Specified
       or: or
+      parties: Parties
+      show_more: Show More
+      show_less: Show Less
     locale:
       short:
         en: En

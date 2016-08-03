@@ -34,6 +34,7 @@ class Admin::MediaController < AdminController
   # GET /media/1/edit
   def edit
     @item = @model.find(params[:id])
+    gon.single_date = @item.story_date.strftime('%m/%d/%Y') if @item.story_date.present?
 
     set_tabbed_translation_form_settings
   end
@@ -47,6 +48,7 @@ class Admin::MediaController < AdminController
         format.html { redirect_to admin_media_path, flash: {success:  t('shared.msgs.success_created', :obj => t('mongoid.models.medium.one'))} }
       else
         set_tabbed_translation_form_settings
+        gon.single_date = @item.story_date.strftime('%m/%d/%Y') if @item.story_date.present?
 
         format.html { render action: "new" }
       end
@@ -70,6 +72,7 @@ class Admin::MediaController < AdminController
       redirect_to admin_media_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.medium.one'))}
     else
       set_tabbed_translation_form_settings
+      gon.single_date = @item.story_date.strftime('%m/%d/%Y') if @item.story_date.present?
 
       render action: "edit"
     end
@@ -100,7 +103,7 @@ class Admin::MediaController < AdminController
       end
       params[:medium].delete(:image_translations)
 
-      params.require(:medium).permit( :public, :read_more, :show_image,
+      params.require(:medium).permit( :public, :read_more, :story_date,
         name_translations: [:ka, :en, :ru],
         title_translations: [:ka, :en, :ru],
         description_translations: [:ka, :en, :ru],

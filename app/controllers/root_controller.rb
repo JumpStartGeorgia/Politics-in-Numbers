@@ -184,6 +184,8 @@ class RootController < ApplicationController
   def media
     @media = Medium.is_public.sorted_public
     @show_page_title = false
+    gon.show_more = t('shared.common.show_more')
+    gon.show_less = t('shared.common.show_less')
   end
 
   def download
