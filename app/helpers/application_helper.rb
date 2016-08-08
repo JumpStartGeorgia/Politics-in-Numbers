@@ -57,4 +57,10 @@ module ApplicationHelper
     }
     html.html_safe
   end
+
+
+  # create a header with a line under it that is not the full width of the container
+  def underlined_header(text, header="h2", header_class='')
+    return "<div class='underlined-header-container'><#{header} class='#{header_class}'>#{text}</#{header}><div class='underlined-header'>&nbsp;</div></div>".html_safe
+  end
 end

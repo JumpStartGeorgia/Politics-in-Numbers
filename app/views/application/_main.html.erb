@@ -3,7 +3,7 @@
     <%= bootstrap_flash %>
 
     <% if @show_page_title == true && content_for?(:page_title) %>
-      <h1 class='primary-header'><%= yield(:page_title) %></h1>
+      <%= underlined_header(yield(:page_title), 'h1', 'primary-header') %>
     <% end %>
 
     <%= yield %>

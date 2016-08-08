@@ -8,7 +8,8 @@
   <div class="media-items">
     <% @media.each do |medium| %>
       <div class="media-item">
-        <h2><%= medium.title %></h2>
+        <%= underlined_header(medium.title, 'h2') %>
+
         <div class="media-item-text">
           <span class="media-item-label"><%= t(label_key + 'name') %>:</span>
           <%= medium.name %>
