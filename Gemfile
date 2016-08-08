@@ -185,3 +185,6 @@ end
 ########################## Project Gems #############################
 
 gem 'tinymce-rails', '~> 4.4'
+
+# pagination
+gem 'kaminari', '~> 0.17.0'

@@ -248,6 +248,14 @@ namespace :deploy do
   end
 end
 
+desc "Create MongoDB indexes"
+task :mongoid_indexes do
+  queue %(echo "-----> Rebuilding Mongo Indexes")
+  queue! "cd #{current_path} && bundle exec rake db:mongoid:remove_indexes RAILS_ENV=#{rails_env}"
+  queue! "cd #{current_path} && bundle exec rake db:mongoid:create_indexes RAILS_ENV=#{rails_env}"
+end
+
+
 desc 'Setup directories and .env file; should be run before first deploy.'
 task setup: :environment do
   if capture(%(ls #{full_shared_path}/.env))
@@ -311,6 +319,7 @@ task deploy: :environment do
     invoke :'bundle:install'
 #    invoke :'rails:db_migrate'
     invoke :'deploy:assets:copy_tmp_to_current'
+    invode :'deploy:mogoid_indexes'
     invoke :'nginx:generate_conf'
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'

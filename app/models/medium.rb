@@ -129,4 +129,11 @@ class Medium
   def self.sorted
     order_by([[:public, :asc], [:published_at, :asc], [:title, :asc]])#.limit(3)
   end
+
+  #############################
+  # indexes
+  index ({ :public => 1})
+  index ({ :published_at => 1})
+  index ({ :title => 1})
+
 end

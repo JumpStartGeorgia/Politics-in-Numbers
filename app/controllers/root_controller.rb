@@ -182,7 +182,7 @@ class RootController < ApplicationController
   end
 
   def media
-    @media = Medium.is_public.sorted_public
+    @media = Medium.is_public.sorted_public.page(params[:page]).per(2)
     @show_page_title = false
     gon.show_more = t('shared.common.show_more')
     gon.show_less = t('shared.common.show_less')
