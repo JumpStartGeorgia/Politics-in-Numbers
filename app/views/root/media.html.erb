@@ -33,7 +33,7 @@
         <% if medium.description.present? %>
           <div class="media-item-description">
             <div class="media-item-description-container read-less">
-              <%= simple_format(medium.description) %>
+              <%= simple_format_no_tags(medium.description, {}, {sanitize: false}) %>
             </div>
           </div>
         <% end %>

@@ -1,0 +1,15 @@
+default:
+  statusbar: false
+  browser_spellcheck: true
+  convert_urls: false
+  width: "100%"
+  height: "200"
+  theme_modern_blockformats: "p,h2,h3,h4,h5,h6,blockquote"
+  menubar: false
+  plugins: "autolink paste fullscreen table link anchor lists hr"
+  toolbar_items_size: 'small'
+  toolbar1: "cut copy paste searchreplace | undo redo | removeformat | fullscreen"
+  toolbar2: "formatselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent blockquote | link unlink anchor | hr | table "
+  paste_auto_cleanup_on_paste: true
+  paste_remove_spans: true
+  paste_strip_class_attributes: 'mso'

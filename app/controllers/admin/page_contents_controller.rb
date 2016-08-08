@@ -33,7 +33,7 @@ class Admin::PageContentsController < AdminController
   def new
     @item = @model.new
 
-    set_tabbed_translation_form_settings('advanced')
+    set_tabbed_translation_form_settings
 
     respond_to do |format|
       format.html # new.html.erb
@@ -43,7 +43,7 @@ class Admin::PageContentsController < AdminController
   # GET /pages/1/edit
   def edit
     @item = @model.find(params[:id])
-    set_tabbed_translation_form_settings('advanced')
+    set_tabbed_translation_form_settings
   end
 
   # POST /pages
@@ -54,7 +54,7 @@ class Admin::PageContentsController < AdminController
       if @item.save
         format.html { redirect_to admin_page_content_path(@item), flash: {success:  t('app.msgs.success_created', :obj => t('mongoid.models.page_content.one'))} }
       else
-        set_tabbed_translation_form_settings('advanced')
+        set_tabbed_translation_form_settings
         format.html { render action: "new" }
       end
     end
@@ -69,7 +69,7 @@ class Admin::PageContentsController < AdminController
       if @item.update_attributes(_params)
         format.html { redirect_to admin_page_content_path(@item), flash: {success:  t('app.msgs.success_updated', :obj => t('mongoid.models.page_content.one'))} }
       else
-        set_tabbed_translation_form_settings('advanced')
+        set_tabbed_translation_form_settings
         format.html { render action: "edit" }
       end
     end

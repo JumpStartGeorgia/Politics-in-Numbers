@@ -22,6 +22,18 @@ module ApplicationHelper
     end
   end
 
+  # from http://www.kensodev.com/2012/03/06/better-simple_format-for-rails-3-x-projects/
+  # same as simple_format except it does not wrap all text in p tags
+  def simple_format_no_tags(text, html_options = {}, options = {})
+    text = '' if text.nil?
+    text = smart_truncate(text, options[:truncate]) if options[:truncate].present?
+    text = sanitize(text) unless options[:sanitize] == false
+    text = text.to_str
+    text.gsub!(/\r\n?/, "\n")                    # \r\n and \r -> \n
+#   text.gsub!(/([^\n]\n)(?=[^\n])/, '\1<br />') # 1 newline   -> br
+    text.html_safe
+  end
+
 
     # in the forms, show the default language text in the non-default language tabs
   # type: text, url, etc - whatever is needed to make 'tabbed_translation_form.default_xxx' work

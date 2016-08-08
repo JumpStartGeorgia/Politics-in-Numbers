@@ -68,7 +68,7 @@
             <%
               label = t(label_key + 'embed')
               hint = t(hint_key + 'embed')
-              hint << show_default_text(@item.embed_translations[default_locale]) if index > 0
+              #hint << show_default_text(@item.embed_translations[default_locale]) if index > 0
             %>
             <%= translation.input locale, hint: hint.html_safe, label: label, input_html: { class: "embed_preview_trigger"}  %>
               <% if @item.embed_translations[locale].present? %>
@@ -136,3 +136,4 @@
 
 
 
+<%= tinymce_assets %>

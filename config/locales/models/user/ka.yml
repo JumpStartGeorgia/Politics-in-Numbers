@@ -184,6 +184,22 @@ ka:
         source: Select spreadsheet file
       donorset:
         source: Select spreadsheet file
+      page_content:
+        title: Title of the page content
+        content: Content
+      medium:
+        name: Name of Media Organization
+        name_translations: Name of Media Organization
+        title: Story Title
+        title_translations: Story Title
+        description: Summary of the Story
+        description_translations: Summary of the Story
+        author: Story Author
+        author_translations: Story Author
+        embed: Please use embed code and not url to video
+        embed_translations: Please use embed code and not url to video
+        permalink: Permalink
+        web: Link to Story
 # en:
 #     formtastic:
 #       titles:

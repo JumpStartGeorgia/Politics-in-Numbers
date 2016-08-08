@@ -82,16 +82,11 @@ class ApplicationController < ActionController::Base
   #               notice: t('shared.msgs.does_not_exist')
   # end
 
-  def set_tabbed_translation_form_settings(tinymce_template='default')
+  def set_tabbed_translation_form_settings()
     @languages = Language.sorted
     #@css.push('tabbed_translation_form.css')
     #@js.push('tabbed_translation_form.js')
-    #gon.tinymce_options = Hash[TinyMCE::Rails.configuration[tinymce_template].options.map{|(k,v)| [k.to_s,v.class == Array ? v.join(',') : v]}]
-
-    # if tinymce_template != 'default'
-    #   @css.push('shCore.css')
-    #   @js.push('shCore.js', 'shBrushJScript.js')
-    # end
+    gon.tinymce_options = Hash[TinyMCE::Rails.configuration['default'].options.map{|(k,v)| [k.to_s,v.class == Array ? v.join(',') : v]}]
   end
 
   def d(obj)

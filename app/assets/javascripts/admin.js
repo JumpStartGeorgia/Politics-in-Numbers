@@ -86,6 +86,14 @@ $(document).ready(function(){
     });
 
 
+    // load tinymce
+    // set the width and height so even the tabs that are not showing still have the correct size
+    if (typeof tinyMCE !== "undefined"){
+      // gon.tinymce_options.height = $('form.tabbed-translation-form .tab-content .tab-pane:first textarea').height();
+      gon.tinymce_options.width = $('form.tabbed-translation-form .tab-content .tab-pane:first textarea').width();
+      tinyMCE.init(gon.tinymce_options);
+    }
+
 
      // console.log("test");
      // $("input").click(function(){

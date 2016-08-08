@@ -41,7 +41,7 @@
                 hint = t(hint_key + 'description')
                 hint << show_default_text(@item.description_translations[default_locale]) if index > 0
               %>
-              <%= translation.input locale, :as => :text, rows: 10, hint: hint.html_safe, label: label,
+              <%= translation.input locale, :as => :text, hint: hint.html_safe, label: label,
                   :input_html => { class: "tinymce" } %>
             <% end %>
             <%= f.fields_for :permalink_translations, OpenStruct.new(f.object.permalink_translations) do |translation| %>
@@ -77,3 +77,4 @@
 
 
 
+<%= tinymce_assets %>
