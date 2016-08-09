@@ -87,7 +87,7 @@ class Medium
   end
 
   def human_cover
-    "<img src='#{cover.url(:small)}'>".html_safe
+    "<img src='#{cover.url(:small)}'>".html_safe if cover.present? && cover.url.exists?
   end
 
   # update the embed code to use the proivided sizes

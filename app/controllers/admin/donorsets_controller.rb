@@ -1,4 +1,5 @@
 class Admin::DonorsetsController < AdminController
+  before_filter :authenticate_user!
   authorize_resource
   before_filter do @model = Donorset; end
 

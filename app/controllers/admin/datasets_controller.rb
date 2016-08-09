@@ -1,4 +1,5 @@
 class Admin::DatasetsController < AdminController
+  before_filter :authenticate_user!
   authorize_resource
   before_filter do @model = Dataset; end
 

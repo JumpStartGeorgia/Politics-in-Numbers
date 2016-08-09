@@ -1,4 +1,5 @@
 class Admin::PartiesController < AdminController
+  before_filter :authenticate_user!
   authorize_resource
   before_filter do @model = Party; end
 

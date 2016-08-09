@@ -1,4 +1,4 @@
-<% title t '.title', :default => @model.model_name.human(:count => 2) %>
+<% page_title t '.title', :default => @model.model_name.human(:count => 2) %>
 
 <div class="row action-pane">
   <div class="col-md-12">
@@ -8,8 +8,7 @@
 </div>
 <div class="row"><hr/></div>
 
-<div>
-  <table class="table table-bordered table-hover table-responsive datatable">
+<table class="table table-bordered table-hover table-responsive datatable">
   <thead>
     <tr>
       <th><%= @model.human_attribute_name(:title) %></th>

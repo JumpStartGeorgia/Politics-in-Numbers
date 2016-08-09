@@ -1,4 +1,5 @@
 class Admin::PageContentsController < AdminController
+  before_filter :authenticate_user!
   authorize_resource
   before_filter do @model = PageContent; end
 

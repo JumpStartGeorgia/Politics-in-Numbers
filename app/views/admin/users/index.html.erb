@@ -3,11 +3,15 @@
   page_title t('mongoid.models.user', count: 999)
 -%>
 
-<div class='actions'>
-  <%= new_button(model_class) %>
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@model, :admin, [:pre]) %>
+    <div class="pull-right"><%= links_for(@model, :admin, [:new]) %></div>
+  </div>
 </div>
+<div class="row"><hr/></div>
 
-<table class="table table-striped table-hover table-nonfluid">
+<table class="table table-bordered table-hover table-responsive datatable">
   <thead>
     <tr>
       <th></th>
