@@ -168,6 +168,13 @@ namespace :deploy do
     invoke :'git:remove_fetch_head'
   end
 
+  desc "Create MongoDB indexes"
+  task :mongoid_indexes do
+    queue %(echo "-----> Rebuilding Mongo Indexes")
+    queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:remove_indexes"
+    queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:create_indexes"
+  end
+
   namespace :assets do
     desc 'Decides whether to precompile assets'
     task :decide_whether_to_precompile do
@@ -246,13 +253,7 @@ namespace :deploy do
                  #{deploy_to}/tmp/assets)
     end
   end
-end
 
-desc "Create MongoDB indexes"
-task :mongoid_indexes do
-  queue %(echo "-----> Rebuilding Mongo Indexes")
-  queue! "cd #{current_path} && bundle exec rake db:mongoid:remove_indexes RAILS_ENV=#{rails_env}"
-  queue! "cd #{current_path} && bundle exec rake db:mongoid:create_indexes RAILS_ENV=#{rails_env}"
 end
 
 
@@ -319,7 +320,7 @@ task deploy: :environment do
     invoke :'bundle:install'
 #    invoke :'rails:db_migrate'
     invoke :'deploy:assets:copy_tmp_to_current'
-    invode :'deploy:mogoid_indexes'
+    invoke :'deploy:mongoid_indexes'
     invoke :'nginx:generate_conf'
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
