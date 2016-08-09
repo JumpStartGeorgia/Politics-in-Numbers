@@ -134,4 +134,12 @@ class Party
   def self.type_is(tp)
     TYPES.index(tp.to_sym)
   end
+
+
+  #############################
+  # indexes
+  index ({ :title => 1})
+  index ({ :name => 1})
+  index ({ :type => 1})
+
 end

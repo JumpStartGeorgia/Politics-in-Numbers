@@ -18,6 +18,17 @@ class Donor
 
   scope :by_tin, -> v { where("tin" => v) }
 
+  #############################
+  # indexes
+  index ({ :tin => 1})
+  index ({ :first_name => 1, :last_name => 1})
+  index ({ :multiple => 1})
+  index ({ :'donations.party_id' => 1})
+  index ({ :'donations.give_data' => 1})
+  index ({ :'donations.amount' => 1})
+  index ({ :'donations.monetary' => 1})
+
+
   def calculate_donated_amount(v)
     self.donated_amount = 0
     tmp_party_ids = []

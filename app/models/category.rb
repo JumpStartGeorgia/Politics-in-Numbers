@@ -27,9 +27,13 @@ class Category
   scope :non_virtual, ->{ where(virtual: false) }
   scope :only_sym, ->{ where(:sym.ne => nil) }
 
+  #############################
+  # indexes
   index code: 1
   index title: 1
   index parent_id: 1
+  index virtual: 1
+  index sym: 1
   #index simple: 1
   SYMS = [ :income, :income_campaign, :expenses, :expenses_campaign, :reform_expenses, :property_assets, :financial_assets, :debts ]
 
