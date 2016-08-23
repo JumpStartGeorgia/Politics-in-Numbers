@@ -13,7 +13,7 @@ class DetailData
   validates_presence_of :table, :detail_id
 
   def detail
-    @detail = Detail.find(category_id)
+    @detail = Detail.find(detail_id)
 
   end
 
