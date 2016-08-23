@@ -1,6 +1,6 @@
 <%- m = Donor %>
 <%= puts m.model_name.human(:count => 2) %>
-<%- title t '.title', :default => m.model_name.human(:count => 2) %>
+<%- page_title t '.title', :default => m.model_name.human(:count => 2) %>
 <div class="row action-pane">
   <div class="col-md-12">
     <%= links_for(@model, :admin, [:pre, :view_all]) %>

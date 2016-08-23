@@ -3,9 +3,6 @@ module ApplicationHelper
   def page_title(page_title)
     content_for(:page_title) { page_title.html_safe }
   end
-  def title(page_title)
-    content_for(:title) { page_title.html_safe }
-  end
 
   def current_url
     "#{request.protocol}#{request.host_with_port}#{request.fullpath}"

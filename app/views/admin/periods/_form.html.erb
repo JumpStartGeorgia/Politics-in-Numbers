@@ -1,7 +1,7 @@
 <%-
   label_key = "mongoid.attributes.period."
   hint_key = "formtastic.hints.period."
-  title t '.title', :default => @model.model_name.human(:count => 2)
+  page_title t '.title', :default => @model.model_name.human(:count => 2)
   locales = I18n.available_locales
   default_locale = locales[0].to_s
 -%>
