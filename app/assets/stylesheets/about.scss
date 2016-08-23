@@ -1,0 +1,37 @@
+body.root.about{
+  .about-summary{
+    text-align: center;
+    margin: 0 20%;
+    padding-top: 20px;
+    font:18px/22px firasans_book;
+    p{
+      margin-bottom: 10px;
+      &:last-of-type{
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  h2{
+    padding:20px 60px 10px 0;
+    font:28px firasans_b;
+    color:#2F332F;
+  }
+
+  h3{
+    color:#F78E69;
+    font:20px firasans_b;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+
+  .section{
+    font:16px/22px firasans_book;
+    p{
+      margin-bottom: 10px;
+      &:last-of-type{
+        margin-bottom: 0;
+      }
+    }
+  }
+}

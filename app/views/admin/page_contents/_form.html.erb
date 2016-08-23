@@ -1,6 +1,7 @@
 <%-
   label_key = "mongoid.attributes.page_content."
   hint_key = "formtastic.hints.page_content."
+  page_title t '.title', :default => @model.model_name.human(:count => 2)
   locales = I18n.available_locales
   default_locale = locales[0].to_s
 -%>
@@ -11,8 +12,6 @@
 	<%= f.inputs do %>
 	  <%= f.input :name, hint: t(hint_key + 'name') %>
 	<% end %>
-
-
 
   <div role="tabpanel" class="tabbed-translation-fields">
     <ul class="nav nav-tabs" role="tablist">
@@ -31,6 +30,7 @@
     <div class="tab-content">
       <% locales.each_with_index do |locale, index| %>
         <div role="tabpanel" class="tab-pane fade <%= 'in active' if index == 0 %>" id="<%= locale %>" data-locale="<%= locale %>">
+
           <%= f.fields_for :title_translations, OpenStruct.new(f.object.title_translations) do |translation| %>
             <%
               label = t(label_key + 'title')
@@ -54,10 +54,10 @@
     </div>
   </div>
 
-  <div class="form-group">
+  <div class="form-group" style="margin-top: 20px;">
     <%= f.submit nil, :class => 'btn btn-primary' %>
-	  <%= f.submit t('helpers.links.reset'), :class => 'btn btn-warning', :type => :reset, :name => :reset %>
-	  <%= link_to t('helpers.links.cancel'), admin_page_contents_path, :class => 'btn btn-warning' %>
+    <%= f.submit t('shared.actions.reset'), :class => 'btn btn-warning', :type => :reset, :name => :reset %>
+    <%= link_to t('shared.actions.cancel'), admin_page_contents_path, :class => 'btn btn-warning' %>
   </div>
 <% end %>
 

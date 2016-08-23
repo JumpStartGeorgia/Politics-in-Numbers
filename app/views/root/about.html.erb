@@ -1,2 +1,33 @@
 <% page_title t('.title') %>
-<%= @page_content.content.html_safe %>
+
+<div class="about-summary">
+  <%= simple_format t('shared.common.summary') %>
+</div>
+
+<div class="section">
+  <%= underlined_header(t('.methodology'), 'h2') %>
+  <div class="content">
+    <% if @donations_page_content.present? %>
+      <h3><%= t('.donations') %></h3>
+      <%= simple_format_no_tags @donations_page_content.content.html_safe %>
+    <% end %>
+
+    <% if @party_finances_page_content.present? %>
+      <h3><%= t('.party_finances') %></h3>
+      <%= simple_format_no_tags @party_finances_page_content.content.html_safe %>
+    <% end %>
+  </div>
+</div>
+
+
+<div class="section">
+  <%= underlined_header(t('.sponsors'), 'h2') %>
+  <div class="content">
+    ( insert images here )
+  </div>
+</div>
+
+
+
+
+<% content_for :custom_css, "about" %>

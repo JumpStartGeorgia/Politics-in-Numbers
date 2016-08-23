@@ -87,6 +87,9 @@ class Admin::PageContentsController < AdminController
   end
   private
     def _params
-      params.require(:page_content).permit(:id, :name, :title, :content)
+      params.require(:page_content).permit(:id, :name, :title, :content,
+        title_translations: [:ka, :en, :ru],
+        content_translations: [:ka, :en, :ru]
+      )
     end
 end

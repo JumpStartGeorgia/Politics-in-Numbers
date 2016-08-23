@@ -161,3 +161,12 @@ abbr[title], abbr[data-original-title] {
 }
 
 
+a.btn, button.btn {
+  text-decoration:none;
+  font:16px firasans_r;
+  color:#fff;
+  &:hover, &:focus, &:active, &:visited {
+    color:#fff;
+    cursor:pointer;
+  }
+}

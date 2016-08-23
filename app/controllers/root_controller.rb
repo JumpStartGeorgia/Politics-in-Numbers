@@ -178,7 +178,9 @@ class RootController < ApplicationController
 
 
   def about
-    @page_content = PageContent.by_name('about')
+    @donations_page_content = PageContent.by_name('about_donations')
+    @party_finances_page_content = PageContent.by_name('about_party_finances')
+    @show_page_title = false
   end
 
   def media

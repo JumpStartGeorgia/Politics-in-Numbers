@@ -1,36 +1,31 @@
 <%- model_class = PageContent -%>
 <% page_title t '.title', :default => model_class.model_name.human(:count => 2) %>
 
-<div class="form-group form-group-admin-buttons">
-  <%= link_to t('.new', :default => t("helpers.links.new")),
-              new_admin_page_content_path,
-              :class => 'btn btn-primary' %>
-  <%= link_to t('helpers.links.admin'), admin_path,
-  :class => 'btn btn-default' %>
+<div class="row action-pane">
+  <div class="col-md-12">
+    <%= links_for(@model, :admin, [:pre]) %>
+    <div class="pull-right"><%= links_for(@model, :admin, [:new]) %></div>
+  </div>
 </div>
+<div class="row"><hr/></div>
 
-<table class="table table-striped display">
+<table class="table table-bordered table-hover table-responsive datatable">
   <thead>
     <tr>
-      <th><%= model_class.human_attribute_name(:name) %></th>
-      <th><%= model_class.human_attribute_name(:title) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th><%= @model.human_attribute_name(:name) %></th>
+      <th><%= @model.human_attribute_name(:title) %></th>
+      <th class="actions-3"><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody>
-    <% @items.each do |page| %>
+    <% @items.each do |item| %>
       <tr>
-        <td><%= link_to page.name, admin_page_content_path(page) %></td>
-        <td><%= page.title %></td>
+        <td><%= item.name %></td>
+        <td class="available-locales-box"><%= "#{item.title} #{existence_translations(item, :title)}".html_safe %></td>
         <td>
-          <%= link_to t('shared.actions.edit'),
-                      edit_admin_page_content_path(page),
-                      :class => 'btn btn-xs btn-edit' %>
-          <%= link_to t('shared.actions.destroy'),
-                      admin_page_content_path(page),
-                      :method => :delete,
-                      :data => { :confirm => I18n.t("helpers.links.confirm") },
-                      :class => 'btn btn-xs btn-delete' %>
+          <div class="btn-group btn-group-sm" role="group" aria-label="...">
+            <%= links_for(item, :admin, [:view, :edit, :destroy]) %>
+          </div>
         </td>
       </tr>
     <% end %>
