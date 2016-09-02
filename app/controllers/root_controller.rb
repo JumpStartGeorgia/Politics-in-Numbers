@@ -3,7 +3,10 @@ class RootController < ApplicationController
   layout "embed", only: [:embed]
   layout false, only: [:share]
   def index
-    redirect_to('/explore')
+    # redirect_to('/explore')
+
+    @show_page_title = false
+    @home_page_content = PageContent.by_name('home')
 
 
     # dd = nil

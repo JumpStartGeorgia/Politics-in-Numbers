@@ -87,6 +87,22 @@ ka:
         total_donations_for_each_donor: Total Donations for Each Donor
         donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb}
         parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj}
+    filters:
+      donations: DONATIONS
+      party_finances: PARTY <br/>FINANCES
+      income: Income
+      income_campaign: Income Campaign
+      expenses: Expenses
+      expenses_campaign: Expenses Campaign
+      reform_expenses_button: REFORMS FUND <br/>EXPENSES
+      reform_expenses: Reforms Fund Expenses
+      property_assets_button: PROPERTY <br/>ASSETS
+      property_assets: Property Assets
+      financial_assets_button: FINANCIAL <br/>ASSETS
+      financial_assets: Financial Assets
+      debts: Debts
+      campaign: Campaign
+      all: All
   notifier:
     job:
       donorset_file_process:

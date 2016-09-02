@@ -1,0 +1,198 @@
+body.root.index{
+  main{
+    background-color: #367652;
+  }
+  .home-summary{
+    background:image-url('home.png') no-repeat bottom center;
+    background-size: cover;
+    height: 600px;
+    margin: -100px -42px 25px -42px;
+    position: relative;
+
+    .home-summary-text{
+      text-align: center;
+      margin: 0 20%;
+      padding-top: 160px;
+      font:18px/22px firasans_book;
+      color: #fff;
+      font-weight: bold;
+      p{
+        margin-bottom: 10px;
+        &:last-of-type{
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .home-filters{
+      text-align:center;
+    }
+    .filter-type{
+      background-color: transparent;
+      padding-left: 0;
+      display: inline-block;
+      width: auto;
+
+      .filter-summary{
+        display:table-cell;
+        font:26px firasans_book;
+        color: #fff;
+        text-align: right;
+        padding-right:10px;
+        vertical-align: middle;
+        font-weight: bold;
+      }
+      .donation{
+        text-align: right;
+        width: 150px;
+      }
+      .finance{
+        width:auto;
+        .finance-toggle {
+          background-color: #F78E69;
+          color:#fff;
+        }
+      }
+
+      #finance_category {
+        li {
+          .finance-category-toggle {
+            background-color: #fff;
+            opacity: 1;
+            a.label {
+              color:#000;
+            }
+          }
+        }
+      }
+    }
+  }
+
+}
+
+
+@media screen and (max-width: 1500px) {
+  body.root.index{
+    .home-summary{
+      height: 350px;
+
+      .home-summary-text{
+        padding-top: 125px;
+        margin: 0 15%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  body.root.index{
+    .home-summary{
+      height: 300px;
+
+      .home-summary-text{
+        padding-top: 125px;
+        font-size: 16px;
+        margin: 0 10%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1081px) {
+  body.root.index{
+    .home-summary{
+      height: 275px;
+
+      .home-summary-text{
+        padding-top: 90px;
+        font-size: 16px;
+        margin: 0 10%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 992px) {
+  body.root.index{
+    .home-summary{
+      height: 275px;
+
+      .home-summary-text{
+        padding-top: 80px;
+        font-size: 16px;
+        margin: 0;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 850px) {
+  body.root.index{
+    .home-summary{
+      height: 300px;
+
+      .home-summary-text{
+        padding-top: 75px;
+        font-size: 14px;
+        margin: 0 20px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 650px) {
+  body.root.index{
+    .home-summary{
+      height: 300px;
+
+      .home-summary-text{
+        padding-top: 60px;
+        font-size: 14px;
+        margin: 0 20px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 575px) {
+  body.root.index{
+    .home-summary{
+      height: 350px;
+
+      .home-summary-text{
+        padding-top: 60px;
+        font-size: 12px;
+        margin: 0 20px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 400px) {
+  body.root.index{
+    .home-summary{
+      height: 425px;
+
+      .home-summary-text{
+        padding-top: 60px;
+        font-size: 12px;
+        margin: 0 20px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 350px) {
+  body.root.index{
+    .home-summary{
+      height: 500px;
+
+      .home-summary-text{
+        padding-top: 60px;
+        font-size: 12px;
+        margin: 0 20px;
+      }
+    }
+  }
+}
+

@@ -76,31 +76,49 @@ if User.where(email: email).count == 0
 end
 
 
-puts "Populate page content data"
-PageContent.create(name: 'about', title_translations: {'en' => 'About', 'ka' => 'about'}, content_translations: {
-  'en' =>  %q(
-    <div class="section">
-      <h1>Methodology</h1>
-      <div class="content">
-        <div class="column">
-          <label>Donations</label>
-          <p>lorem ipsum</p>
-        </div>
-        <div class="column">
-          <label>Party Finances</label>
-          <p>lorem ipsum</p>
-        </div>
-      </div>
-    </div>
-    <div class="section">
-      <h1>Sponsors</h1>
-      <div class="content">
-        <a href="#"><img src="js.jpg"></a>
-        <a href="#js"><img src="js.jpg"></a>
-      </div>
-    </div>
-  ),
-  'ka' => ''}) if PageContent.by_name('about').nil?
+# puts "Populate page content data"
+# PageContent.create(name: 'about', title_translations: {'en' => 'About', 'ka' => 'about'}, content_translations: {
+#   'en' =>  %q(
+#     <div class="section">
+#       <h1>Methodology</h1>
+#       <div class="content">
+#         <div class="column">
+#           <label>Donations</label>
+#           <p>lorem ipsum</p>
+#         </div>
+#         <div class="column">
+#           <label>Party Finances</label>
+#           <p>lorem ipsum</p>
+#         </div>
+#       </div>
+#     </div>
+#     <div class="section">
+#       <h1>Sponsors</h1>
+#       <div class="content">
+#         <a href="#"><img src="js.jpg"></a>
+#         <a href="#js"><img src="js.jpg"></a>
+#       </div>
+#     </div>
+#   ),
+#   'ka' => ''}) if PageContent.by_name('about').nil?
+
+PageContent.create(name: 'about_donations', title_translations: {'en' => 'Donations', 'ka' => 'Donations'}, content_translations: {
+  'en' => '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In diam arcu, ornare in tortor sed, tincidunt accumsan eros. Quisque tempor, diam bibendum tempor aliquet, elit tortor vestibulum metus, non molestie orci purus id ipsum. Donec in maximus turpis. Sed dapibus odio nec ligula mattis, id efficitur mauris auctor. Cras suscipit, enim rutrum placerat fermentum, elit sapien elementum nisl, at scelerisque nunc orci sed risus. Integer quis condimentum leo, sit amet posuere neque. Vestibulum porta sollicitudin quam at ornare. Nunc sit amet pharetra magna, vitae congue leo. Integer eu ultrices lectus, pellentesque porttitor nisl. Duis elementum aliquet tempor. Integer nec ante sit amet erat porta condimentum. Nullam ac enim sagittis, pharetra urna vel, sagittis tellus.</p><p>Mauris tempus, enim in lobortis venenatis, nisi lacus convallis nibh, eget sollicitudin leo eros ac eros. Vestibulum ac nisl nisl. Duis a lorem justo. Nulla facilisi. Pellentesque blandit lorem in posuere lacinia. Aliquam erat volutpat. Proin pharetra vehicula ex sit amet pretium. Sed at justo at augue imperdiet eleifend eu nec arcu. Sed porttitor urna ac sem feugiat consequat. Duis eu nunc arcu. </p>',
+  'ka' => '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. In diam arcu, ornare in tortor sed, tincidunt accumsan eros. Quisque tempor, diam bibendum tempor aliquet, elit tortor vestibulum metus, non molestie orci purus id ipsum. Donec in maximus turpis. Sed dapibus odio nec ligula mattis, id efficitur mauris auctor. Cras suscipit, enim rutrum placerat fermentum, elit sapien elementum nisl, at scelerisque nunc orci sed risus. Integer quis condimentum leo, sit amet posuere neque. Vestibulum porta sollicitudin quam at ornare. Nunc sit amet pharetra magna, vitae congue leo. Integer eu ultrices lectus, pellentesque porttitor nisl. Duis elementum aliquet tempor. Integer nec ante sit amet erat porta condimentum. Nullam ac enim sagittis, pharetra urna vel, sagittis tellus.</p><p>Mauris tempus, enim in lobortis venenatis, nisi lacus convallis nibh, eget sollicitudin leo eros ac eros. Vestibulum ac nisl nisl. Duis a lorem justo. Nulla facilisi. Pellentesque blandit lorem in posuere lacinia. Aliquam erat volutpat. Proin pharetra vehicula ex sit amet pretium. Sed at justo at augue imperdiet eleifend eu nec arcu. Sed porttitor urna ac sem feugiat consequat. Duis eu nunc arcu. </p>'}
+) if PageContent.by_name('about_donations').nil?
+
+PageContent.create(name: 'about_party_finances', title_translations: {'en' => 'Party Finances', 'ka' => 'Party Finances'}, content_translations: {
+  'en' => '<p>Mauris tempus, enim in lobortis venenatis, nisi lacus convallis nibh, eget sollicitudin leo eros ac eros. Vestibulum ac nisl nisl. Duis a lorem justo. Nulla facilisi. Pellentesque blandit lorem in posuere lacinia. Aliquam erat volutpat. Proin pharetra vehicula ex sit amet pretium. Sed at justo at augue imperdiet eleifend eu nec arcu. Sed porttitor urna ac sem feugiat consequat. Duis eu nunc arcu. </p>',
+  'ka' => '<p>Mauris tempus, enim in lobortis venenatis, nisi lacus convallis nibh, eget sollicitudin leo eros ac eros. Vestibulum ac nisl nisl. Duis a lorem justo. Nulla facilisi. Pellentesque blandit lorem in posuere lacinia. Aliquam erat volutpat. Proin pharetra vehicula ex sit amet pretium. Sed at justo at augue imperdiet eleifend eu nec arcu. Sed porttitor urna ac sem feugiat consequat. Duis eu nunc arcu. </p>'}
+) if PageContent.by_name('about_party_finances').nil?
+
+
+PageContent.create(name: 'home', title_translations: {'en' => 'Home page', 'ka' => 'Home page'}, content_translations: {
+  'en' => '<p>Praesent et consectetur diam. Aliquam hendrerit turpis ex, vel euismod lectus gravida id. Proin ultricies diam nec lorem tristique, eu aliquet diam gravida. Praesent et consectetur diam. Aliquam hendrerit turpis ex, vel euismod lectus gravida id. Proin ultricies diam nec lorem tristique, eu aliquet diam gravida.</p>',
+  'ka' => '<p>Praesent et consectetur diam. Aliquam hendrerit turpis ex, vel euismod lectus gravida id. Proin ultricies diam nec lorem tristique, eu aliquet diam gravida. Praesent et consectetur diam. Aliquam hendrerit turpis ex, vel euismod lectus gravida id. Proin ultricies diam nec lorem tristique, eu aliquet diam gravida.</p>'}
+) if PageContent.by_name('home').nil?
+
+
 
 
 puts "Gather category data"

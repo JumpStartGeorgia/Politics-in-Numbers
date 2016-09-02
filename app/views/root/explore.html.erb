@@ -4,44 +4,44 @@
     <div class="back"><%= image_tag("explore/back.svg", alt: t('shared.common.back'), title: t('shared.common.back')) %>
     </div>
     <div class="donation active" data-type="donation">
-      <button type="button" id="donation_toggle" class="donation-toggle" tabindex="4"><%= t('.donations') %></button>
+      <button type="button" id="donation_toggle" class="donation-toggle" tabindex="4"><%= t('shared.filters.donations') %></button>
     </div>
     <div class="sep"></div>
     <div class="finance" data-type="finance">
       <div class="finance-container">
-        <button type="button" id="finance_toggle" class="finance-toggle" tabindex="4"><%= t('.party_finances').html_safe %><span>:</span></button><ul id="finance_category" >
+        <button type="button" id="finance_toggle" class="finance-toggle" tabindex="4"><%= t('shared.filters.party_finances').html_safe %><span>:</span></button><ul id="finance_category" >
           <li>
             <div class="finance-category-toggle" data-state="" data-cat="income">
-              <a href="#income" class="label" tabindex="4"><span class="f"><%= t('.all') %></span><span class="s"><%= t('.campaign') %></span><%= t('.income').upcase %></a>
-              <a href="#income-all" class="sub" tabindex="4" data-sub="all" data-cat="income"><%= t('.all') %></a>
-              <a href="#income-campaign" class="sub" tabindex="4" data-sub="campaign" data-cat="income_campaign"><%= t('.campaign') %></a>
+              <a href="#income" class="label" tabindex="4"><span class="f"><%= t('shared.filters.all') %></span><span class="s"><%= t('shared.filters.campaign') %></span><%= t('shared.filters.income').upcase %></a>
+              <a href="#income-all" class="sub" tabindex="4" data-sub="all" data-cat="income"><%= t('shared.filters.all') %></a>
+              <a href="#income-campaign" class="sub" tabindex="4" data-sub="campaign" data-cat="income_campaign"><%= t('shared.filters.campaign') %></a>
             </div>
           </li>
           <li>
             <div class="finance-category-toggle" data-state="" data-cat="expenses">
-              <a href="#expense" class="label" tabindex="4"><span class="f"><%= t('.all') %></span><span class="s"><%= t('.campaign') %></span><%= t('.expenses').upcase %></a>
-              <a href="#expense-all" class="sub" tabindex="4" data-sub="all" data-cat="expenses"><%= t('.all') %></a>
-              <a href="#expense-campaign" class="sub" tabindex="4" data-sub="campaign" data-cat="expenses_campaign"><%= t('.campaign') %></a>
+              <a href="#expense" class="label" tabindex="4"><span class="f"><%= t('shared.filters.all') %></span><span class="s"><%= t('shared.filters.campaign') %></span><%= t('shared.filters.expenses').upcase %></a>
+              <a href="#expense-all" class="sub" tabindex="4" data-sub="all" data-cat="expenses"><%= t('shared.filters.all') %></a>
+              <a href="#expense-campaign" class="sub" tabindex="4" data-sub="campaign" data-cat="expenses_campaign"><%= t('shared.filters.campaign') %></a>
             </div>
           </li>
           <li>
             <div class="finance-category-toggle" data-state="simple" data-cat="reform_expenses">
-              <a href="#reform_expenses" class="label long" tabindex="4"><%= t('.reform_expenses_button').html_safe %></a>
+              <a href="#reform_expenses" class="label long" tabindex="4"><%= t('shared.filters.reform_expenses_button').html_safe %></a>
             </div>
           </li>
           <li>
             <div class="finance-category-toggle" data-state="simple" data-cat="property_assets">
-              <a href="#property_assets" class="label long" tabindex="4"><%= t('.property_assets_button').html_safe %></a>
+              <a href="#property_assets" class="label long" tabindex="4"><%= t('shared.filters.property_assets_button').html_safe %></a>
             </div>
           </li>
           <li>
             <div class="finance-category-toggle" data-state="simple" data-cat="financial_assets">
-              <a href="#financial_assets" class="label long" tabindex="4"><%= t('.financial_assets_button').html_safe %></a>
+              <a href="#financial_assets" class="label long" tabindex="4"><%= t('shared.filters.financial_assets_button').html_safe %></a>
             </div>
           </li>
           <li>
             <div class="finance-category-toggle" data-state="simple" data-cat="debts">
-              <a href="#debts" class="label" tabindex="4"><%= t('.debts').html_safe %></a>
+              <a href="#debts" class="label" tabindex="4"><%= t('shared.filters.debts').html_safe %></a>
             </div>
           </li>
         </ul>
