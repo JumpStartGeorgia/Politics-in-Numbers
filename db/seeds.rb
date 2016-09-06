@@ -113,10 +113,11 @@ PageContent.create(name: 'about_party_finances', title_translations: {'en' => 'P
 ) if PageContent.by_name('about_party_finances').nil?
 
 
-PageContent.create(name: 'home', title_translations: {'en' => 'Home page', 'ka' => 'Home page'}, content_translations: {
-  'en' => '<p>Praesent et consectetur diam. Aliquam hendrerit turpis ex, vel euismod lectus gravida id. Proin ultricies diam nec lorem tristique, eu aliquet diam gravida. Praesent et consectetur diam. Aliquam hendrerit turpis ex, vel euismod lectus gravida id. Proin ultricies diam nec lorem tristique, eu aliquet diam gravida.</p>',
-  'ka' => '<p>Praesent et consectetur diam. Aliquam hendrerit turpis ex, vel euismod lectus gravida id. Proin ultricies diam nec lorem tristique, eu aliquet diam gravida. Praesent et consectetur diam. Aliquam hendrerit turpis ex, vel euismod lectus gravida id. Proin ultricies diam nec lorem tristique, eu aliquet diam gravida.</p>'}
-) if PageContent.by_name('home').nil?
+# PageContent.create(name: 'home', title_translations: {'en' => 'Home page', 'ka' => 'Home page'}, content_translations: {
+#   'en' => '<p>Do you want to know where the political parties get money from? Politics in Numbers has all the official data about the party finances. You can see and compare political party income and expenses, campaign funds, donations, assets, financial obligations and other interesting details.</p>',
+#   'ka' => '<p>გაინტერესებს, საიდან იღებენ და რაში ხარჯავენ პოლიტიკური პარტიები ფულს? “პოლიტიკა რიცხვებში” აერთიანებს ყველა ოფიციალურ მონაცემს პოლიტიკური პარტიების დაფინანსების შესახებ. შეგიძლია, ნახო და შეადარო პარტიების შემოსავლები და ხარჯები, კამპანიის ფონდები, შემოწირულებები, ქონება, ვალები და სხვა საინტერესო დეტალები.</p>',
+#   'ru' => '<p>Откуда получают и на что тратят деньги политические партии? Узнайте и сравните доходы и расходы, во сколько обходится предвыборная кампания, какие пожертвования получают, каким имуществом обладают и какие заработали долги.Ответы на интересующие вас вопросы в проекте «Политика в цифрах». Мы составили для вас единую базу данных. Здесь всё о финансировании политических объединений в Грузии. Статистика составлялась согласно официальным источникам.</p>'}
+# ) if PageContent.by_name('home').nil?
 
 
 

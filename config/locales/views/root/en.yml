@@ -2,7 +2,9 @@
 en:
   root:
     index:
+      summary: Do you want to know where the political parties get money from? Politics in Numbers has all the official data about the party finances. You can see and compare political party income and expenses, campaign funds, donations, assets, financial obligations and other interesting details.
       filter_summary: You can explore data by<br />categories and compare them
+      go_explore: Go Explore!
     about:
       title: About
     media:

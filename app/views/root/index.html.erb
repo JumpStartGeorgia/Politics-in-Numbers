@@ -2,60 +2,75 @@
 
   <div class="home-summary">
     <div class="home-summary-text">
-      <%= simple_format_no_tags @home_page_content.content.html_safe %>
+      <%= simple_format t('.summary') %>
     </div>
 
     <div class="home-filters">
-      <div id="filter_type" class="filter-type" data-type="donation">
-        <div class="filter-summary">
+      <div id="filter_type" class="filter-type clear" data-type="donation">
+        <div class="filter-summary-small-screen">
           <%= t('.filter_summary').html_safe %>
         </div>
-        <div class="donation active" data-type="donation">
-          <button type="button" id="donation_toggle" class="donation-toggle" tabindex="4"><%= t('shared.filters.donations') %></button>
+        <div class="filters-left">
+          <div class="filter-summary">
+            <%= t('.filter_summary').html_safe %>
+          </div>
+          <div class="donation active" data-type="donation">
+            <button type="button" id="donation_toggle" class="donation-toggle" tabindex="4" data-link="<%= explore_path(filter: 'donation') %>"><%= t('shared.filters.donations') %></button>
+          </div>
         </div>
-        <div class="sep"></div>
-        <div class="finance" data-type="finance">
-          <div class="finance-container">
-            <button type="button" id="finance_toggle" class="finance-toggle" tabindex="4"><%= t('shared.filters.party_finances').html_safe %><span>:</span></button><ul id="finance_category" >
-              <li>
-                <div class="finance-category-toggle" data-state="" data-cat="income">
-                  <%= link_to t('shared.filters.income').upcase, explore_path(anchor: 'income', filter: 'finance'), class: 'label', tabindex: '4' %>
-                </div>
-              </li>
-              <li>
-                <div class="finance-category-toggle" data-state="" data-cat="expenses">
-                  <%= link_to t('shared.filters.expenses').upcase, explore_path(anchor: 'expense', filter: 'finance'), class: 'label', tabindex: '4' %>
-                </div>
-              </li>
-              <li>
-                <div class="finance-category-toggle" data-state="simple" data-cat="reform_expenses">
-                  <%= link_to t('shared.filters.reform_expenses_button').html_safe, explore_path(anchor: 'reform_expenses', filter: 'finance'), class: 'label long', tabindex: '4' %>
-                </div>
-              </li>
-              <li>
-                <div class="finance-category-toggle" data-state="simple" data-cat="property_assets">
-                  <%= link_to t('shared.filters.property_assets_button').html_safe, explore_path(anchor: 'property_assets', filter: 'finance'), class: 'label long', tabindex: '4' %>
-                </div>
-              </li>
-              <li>
-                <div class="finance-category-toggle" data-state="simple" data-cat="financial_assets">
-                  <%= link_to t('shared.filters.financial_assets_button').html_safe, explore_path(anchor: 'financial_assets', filter: 'finance'), class: 'label long', tabindex: '4' %>
-                </div>
-              </li>
-              <li>
-                <div class="finance-category-toggle" data-state="simple" data-cat="debts">
-                  <%= link_to t('shared.filters.debts').html_safe, explore_path(anchor: 'debts', filter: 'finance'), class: 'label', tabindex: '4' %>
-                </div>
-              </li>
-            </ul>
+        <div class="filters-right">
+          <div class="finance" data-type="finance">
+            <div class="finance-container">
+              <button type="button" id="finance_toggle" class="finance-toggle" tabindex="4"  data-link="<%= explore_path(filter: 'finance', :'income[]' => @main_categories[:income]) %>"><%= t('shared.filters.party_finances').html_safe %></button><ul id="finance_category" >
+                <li>
+                  <div class="finance-category-toggle" data-state="" data-cat="income">
+                    <%= link_to t('shared.filters.income').upcase, explore_path(filter: 'finance', :'income[]' => @main_categories[:income]), class: 'label', tabindex: '4' %>
+                  </div>
+                </li>
+                <li>
+                  <div class="finance-category-toggle" data-state="" data-cat="expenses">
+                    <%= link_to t('shared.filters.expenses').upcase, explore_path(filter: 'finance', :'expenses[]' => @main_categories[:expenses]), class: 'label', tabindex: '4' %>
+                  </div>
+                </li>
+                <li>
+                  <div class="finance-category-toggle" data-state="simple" data-cat="reform_expenses">
+                    <%= link_to t('shared.filters.reform_expenses_button').html_safe, explore_path(filter: 'finance', :'reform_expenses[]' => @main_categories[:reform_expenses]), class: 'label long', tabindex: '4' %>
+                  </div>
+                </li>
+                <li>
+                  <div class="finance-category-toggle" data-state="simple" data-cat="property_assets">
+                    <%= link_to t('shared.filters.property_assets_button').html_safe, explore_path(filter: 'finance', :'property_assets[]' => @main_categories[:property_assets]), class: 'label long', tabindex: '4' %>
+                  </div>
+                </li>
+                <li>
+                  <div class="finance-category-toggle" data-state="simple" data-cat="financial_assets">
+                    <%= link_to t('shared.filters.financial_assets_button').html_safe, explore_path(filter: 'finance', :'financial_assets[]' => @main_categories[:financial_assets]), class: 'label long', tabindex: '4' %>
+                  </div>
+                </li>
+                <li>
+                  <div class="finance-category-toggle" data-state="simple" data-cat="debts">
+                    <%= link_to t('shared.filters.debts').html_safe, explore_path(filter: 'finance', :'debts[]' => @main_categories[:debts]), class: 'label', tabindex: '4' %>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
+
+      <div class="home-explore">
+        <%= link_to t('.go_explore'), explore_path(filter: 'finance', :'income[]' => @main_categories[:income]) %>
+      </div>
+
     </div>
   </div>
-
+<%
+=begin %>
   <div class="home-highlights">
     &nbsp;
   </div>
+<%
+=end %>
 
+<% content_for :custom_js,  "home"  %>
 <% content_for :custom_css, "home" %>

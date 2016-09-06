@@ -8,6 +8,10 @@ class RootController < ApplicationController
     @show_page_title = false
     @home_page_content = PageContent.by_name('home')
 
+    # get categories so can generate links to explore page
+    categories = Category.non_virtual.only_sym
+    @main_categories = {}
+    categories.each{|m| @main_categories[m[:sym]] = m[:id].to_s }
 
     # dd = nil
     #  Donor.each{|e| e.donations.each{|ee|

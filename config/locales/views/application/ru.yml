@@ -1,0 +1,16 @@
+---
+ru:
+  application:
+    navbar_header:
+      explore: Explore
+      about: "О нас"
+      media: In Media
+      download: Download
+      api: Api
+      parties: Parties
+      settings: Settings
+      account:
+        edit_profile: პროფილის შეცვლა
+        logout: გასვლა
+      link1: "ლინკი 1"
+      link2: "ლინკი 2"

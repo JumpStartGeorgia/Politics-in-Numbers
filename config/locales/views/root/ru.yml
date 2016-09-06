@@ -1,12 +1,12 @@
 ---
-ka:
+ru:
   root:
     index:
-      summary: გაინტერესებს, საიდან იღებენ და რაში ხარჯავენ პოლიტიკური პარტიები ფულს? “პოლიტიკა რიცხვებში” აერთიანებს ყველა ოფიციალურ მონაცემს პოლიტიკური პარტიების დაფინანსების შესახებ. შეგიძლია, ნახო და შეადარო პარტიების შემოსავლები და ხარჯები, კამპანიის ფონდები, შემოწირულებები, ქონება, ვალები და სხვა საინტერესო დეტალები.
-      filter_summary: გამოიკვლიე პარტიების ფინანსები <br />კატეგორიების მიხედვით <br />და შეადარე ერთმანეთს
-      go_explore: გაეცანი!
+      summary: Откуда получают и на что тратят деньги политические партии? Узнайте и сравните доходы и расходы, во сколько обходится предвыборная кампания, какие пожертвования получают, каким имуществом обладают и какие заработали долги.Ответы на интересующие вас вопросы в проекте «Политика в цифрах». Мы составили для вас единую базу данных. Здесь всё о финансировании политических объединений в Грузии. Статистика составлялась согласно официальным источникам.
+      filter_summary: Сравните финансирование<br />партий по категорям
+      go_explore: Исследуй!
     about:
-      title: ჩვენზე
+      title: О нас
     media:
       title: In Media
       no_media: No mentions of Politics in Number in the media have been recorded yet.
@@ -25,6 +25,7 @@ ka:
       party: Party
       donation_type: Donation Type
       donated_multiple_parties: Donated to multipled parties?
+      donor_nature: Donor Type
       reset: RESET
       from: From
       to: To
@@ -32,6 +33,8 @@ ka:
       non_monetary: Non-Monetary
       _yes: "Yes"
       _no: "No"
+      individual: Individual
+      organization: Organization
       total_amount: Total Amount
       total_donations: Total Donations
       categories: Categories
@@ -53,6 +56,13 @@ ka:
       view_as_table: Table view
       search: Search
       table_length: Show _MENU_ entries
+      export_type:
+        print: Print
+        pdf: Pdf document
+        svg: Svg image
+        jpeg: Jpeg image
+        png: Png image
+        csv: Csv document
       placeholder:
         donor: Select donor
         party: Select party
