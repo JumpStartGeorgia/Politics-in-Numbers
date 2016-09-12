@@ -52,10 +52,11 @@ class RootController < ApplicationController
     gon.period_list = Period.each.map{|m| [m.id.to_s, m.title] }
 
     @categories = Category.non_virtual # required for object explore calls
+    gon.category_lists = Category.simple_tree_local(@categories, false)
     gon.main_categories = {}
     @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m[:id].to_s }
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
-    gon.category_list = @categories.map{|m| [m.id.to_s, m.title] }
+
     gon.all = t('.all')
     gon.campaign = t('.campaign')
     gon.search = t('.search')

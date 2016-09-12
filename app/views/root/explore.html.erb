@@ -123,6 +123,7 @@
       <div class="finance filter-inputs" data-type="finance">
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true, list: generate_li_list(party_list), category_label: 0 } %>
         <% lists = Category.by_sym(@categories) %>
+
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income", on: false, list: lists[:income].html_safe } %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income_campaign", on: false, list: lists[:income_campaign].html_safe } %>
         <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "expenses", on: false, list: lists[:expenses].html_safe } %>
@@ -257,11 +258,13 @@
         <div data-view="table"><div id="finance_table"><table></table></div></div>
 
       </div>
+      <div class="pane" data-type="not_found"><p class="not-found-text"><%= t('.not_found') %></p></div>
     </div>
   </div>
 </div>
 <% content_for :custom_js,  "explore"  %>
-<% @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "highcharts-grouped-categories.js", "crypto.min.js", "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5554a5643f1d9065"#,
+<% @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "highcharts-grouped-categories.js", "crypto.min.js"
+  # Warning uncomment this , "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5554a5643f1d9065"#,
   #"datatables.buttons.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/dataTables.buttons.min.js",
   #"datatables.buttons.html5.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/buttons.html5.min.js",
   #"https://cdn.datatables.net/buttons/1.2.1/js/buttons.print.min.js"

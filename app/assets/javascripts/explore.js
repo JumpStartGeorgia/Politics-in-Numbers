@@ -71,24 +71,39 @@ $(document).ready(function (){
           if(v.length >= 3 && t.data("previous") !== v) {
             t.data("previous", v);
             if(p.is("[data-local]")) {
-              ul.find("li .item").hide();
-              var regex = new RegExp(".*" + v + ".*", "i");
-              gon[p.attr("data-local") + "_list"].forEach(function(d) {
-                if(d[1].match(regex) !== null) {
-                  ul.find("li .item[data-id='" + d[0] + "']").show();
-                }
+              ul.find("li").hide();
+              var regex = new RegExp(".*" + v + ".*", "i"),
+                local = p.attr("data-local"),
+                multilevel = finance.categories.indexOf(local) !== -1,
+                list = multilevel ? gon.category_lists[local] : gon[local + "_list"], to_show = [];
 
-              });
-              //console.log("local");
+              if(multilevel) {
+                list.forEach(function(d) {
+                  if(d[1].match(regex) !== null) {
+                    to_show.push(d[0]);
+                    if(d[2] !== -1) {
+                      var d2 = d[2];
+                      while(d2 !== -1) {
+                        to_show.push(d2);
+                        d2 = list.filter(function (ll) { return ll[0] === d2; })[0][2];
+                      }
+                    }
+                    to_show.forEach(function(ts) {
+                      ul.find("li .item[data-id='" + ts + "']").parent().show();
+                    });
+                  }
+                });
+              }
             }
             else {
-              //console.log("ajax");
+              console.log("ajax");
               $.ajax({
                 url: p.attr("data-url"),
                 dataType: 'json',
                 data: { q: v },
                 success: function(data) {
                   var html = "";
+                  console.log("back", data);
                   data.forEach(function(d) {
                     html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
                   });
@@ -104,6 +119,7 @@ $(document).ready(function (){
         }
         event.stopPropagation();
       }, 250),
+      // search_tree: function () {}
       bind: function() {
         $(".autocomplete input").on("change paste keyup", this.onchange);
         $(".autocomplete input").on("click", function() {
@@ -262,7 +278,11 @@ $(document).ready(function (){
             if(tp === "autocomplete") {
               p = el.parent();
               Object.keys(v).forEach(function(kk){
-                autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[p.attr("data-field")+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
+                var local = p.attr("data-field"),
+                  is_category = finance.categories.indexOf(local) !== -1,
+                  list = is_category ? gon.category_lists[local] : gon[local + "_list"];
+
+                autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], list.filter(function(d) { return d[0] == v[kk]; })[0][1]);
               });
             }
             else if(tp === "period") {
@@ -443,7 +463,8 @@ $(document).ready(function (){
                 if(t.categories.indexOf(fld) !== -1) { fl = true; tmp = "category"; }
                  //console.log("set by url",kk,v,fld,fl,tmp);
                 if(gon.main_categories_ids.indexOf(v[kk]) === -1) {
-                  autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], gon[tmp+"_list"].filter(function(d) { return d[0] == v[kk]; })[0][1]);
+                  list = fl ? gon.category_lists[fld] : gon[tmp + "_list"];
+                  autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], list.filter(function(d) { return d[0] == v[kk]; })[0][1]);
                 }
                 if(fl) { emulate_category_click(fld); }
               });
@@ -1009,15 +1030,20 @@ $(document).ready(function (){
   }
   function filter_callback(data, partial) {
      // console.log("filter_callback", partial);
-    if(partial === "donation") {
-      bar_chart("#donation_chart_1", data.chart1, data.chart1_title, "#EBE187");
-      bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
+     // data =  undefined; // test for not found data
+    var is_data_ok = typeof data !== "undefined";
+    content.find(".panes").toggleClass("not-found", !is_data_ok);
+    if(is_data_ok) {
+      if(partial === "donation") {
+        bar_chart("#donation_chart_1", data.chart1, data.chart1_title, "#EBE187");
+        bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
+      }
+      else {
+        //grouped_column_chart("#finance_chart", data.chart1, "#fff");
+        grouped_advanced_column_chart("#finance_chart", data.chart1, "#fff");
+      }
+      render_table(partial, data.table);
     }
-    else {
-      //grouped_column_chart("#finance_chart", data.chart1, "#fff");
-      grouped_advanced_column_chart("#finance_chart", data.chart1, "#fff");
-    }
-    render_table(partial, data.table);
   }
   (function init() {
     Highcharts.setOptions({

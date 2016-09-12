@@ -56,6 +56,7 @@ ru:
       view_as_table: Table view
       search: Search
       table_length: Show _MENU_ entries
+      not_found: Your requested data could not be found
       export_type:
         print: Print
         pdf: Pdf document

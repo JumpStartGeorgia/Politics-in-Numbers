@@ -80,6 +80,27 @@ class Category
   #   }
   #   out
   # end
+  def self.simple_tree_local(cats, vir = false, sym = nil)
+    list = {}
+    cats.select{|s| s.level == 0 }.sort { |x,y| x.order <=> x.order }.each{|cat|
+      list[cat.sym] = [[cat.id.to_s, cat.title, -1]] + sub_simple_tree_local(cats, cat.id, 1, vir)
+    }
+    list
+  end
+  def self.sub_simple_tree_local(cats, par_id, lvl, vir = false)
+    # puts par_id
+    # puts lvl
+    list = nil
+    if lvl != 6
+      list = []
+      cats.select{|s| s.level == lvl && s.parent_id == par_id && s.virtual == vir }.sort { |x,y| x.order <=> x.order }.each{ |cat|
+        tmp = sub_simple_tree_local(cats, cat.id, lvl+1, vir)
+        list << [cat.id.to_s, cat.title, par_id.to_s ]
+        list = list + tmp if tmp.present?
+      }
+    end
+    list
+  end
   def self.tree_local(cats, vir = false, sym = nil)
     list = []
     cats.select{|s| s.level == 0 }.sort { |x,y| x.order <=> x.order }.each{|cat|

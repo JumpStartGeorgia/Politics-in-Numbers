@@ -53,6 +53,7 @@ ka:
       view_as_table: Table view
       search: Search
       table_length: Show _MENU_ entries
+      not_found: Your requested data could not be found
       placeholder:
         donor: Select donor
         party: Select party
