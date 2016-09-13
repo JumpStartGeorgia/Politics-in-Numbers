@@ -16,17 +16,14 @@ class Party
   field :color, type: String, default: "##{SecureRandom.hex(3)}"
   field :tmp_id, type: Integer
   field :type, type: Integer, default: 0 # 0 - party, 1 - initiative
-  field :permalink, type: String, localize: true
-  slug :permalink, :title, history: true, localize: true do |d|
-    if d.permalink_changed?
-      d.permalink.to_url
-    elsif d.title_changed?
+  slug :title, history: true, localize: true do |d|
+    if d.title_changed?
       d.title_translations[I18n.locale].to_url
     else
       d.id.to_s
     end
   end
-  # rake mongoid_slug:set this is not working
+
 
   validate :validate_translations
   validates_presence_of :color, :name
@@ -35,6 +32,15 @@ class Party
   #   puts "***************************"
   #   puts "***************************#{changes.inspect}" if _slugs?
   # end
+
+  def self.get_ids_by_slugs(id_or_slugs)
+    if id_or_slugs.present? && id_or_slugs.class == Array
+      x = only(:_id, :_slugs).find(id_or_slugs)
+      x.present? ? x.map{ |m| m[:_id].to_s } : []
+    else
+      []
+    end
+  end
 
   def validate_translations
     default = I18n.default_locale
@@ -82,7 +88,15 @@ class Party
   end
 
   def self.list
-    where({type: 0}).sorted.map{|t| [t.title, t.id]}
+    only_parties.sorted.map{|t| [t.title, t.id]}
+  end
+
+  def self.party_list
+    only_parties.sorted.map{|t| [t.slug, t.title]} # used while creating list in view
+  end
+
+  def self.only_parties
+    where({type: 0})
   end
 
   def self.full_list

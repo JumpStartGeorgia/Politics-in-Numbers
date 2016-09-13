@@ -706,6 +706,9 @@ $(document).ready(function (){
       }
       t.toggleClass("expanded", !state);
     });
+    filter_extended.find(".filter-input button.clear").click(function () {
+      autocomplete.clear($(this).parent().attr("data-autocomplete-id"));
+    });
     $(window).on("resize", function(){
       filter_extended.find(".filter-inputs").css("max-height", $(window).height() - filter_extended.find(".filter-toggle").offset().top);
     });

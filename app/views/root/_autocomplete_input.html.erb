@@ -5,6 +5,7 @@
   <div class="input-group">
     <div class="autocomplete" data-autocomplete-id="<%= "#{input_for}-#{input_field}" %>" data-local="<%= input_field %>"<%= "data-url='#{remote_url}'" if defined?(remote_url) %>>
       <input type="text" placeholder='<%= t("root.explore.placeholder.#{input_field}") %>' tabindex="5">
+      <button class="clear" title="<%= t('root.explore.filter_clear') %>"></button>
       <ul class="dropdown" id="filter_<%= input_for %>_by_<%= input_field %>" tabindex="5"><%= list %></ul>
     </div>
   </div>

@@ -47,14 +47,14 @@ class RootController < ApplicationController
 
   def explore
     gon.filter_item_close = t('.filter_item_close');
-    gon.party_list = Party.each.map{|m| [m.id.to_s, m.title] }
-    gon.donor_list = Donor.each.map{|m| [m.id.to_s, "#{m.first_name} #{m.last_name}"] }
-    gon.period_list = Period.each.map{|m| [m.id.to_s, m.title] }
+    gon.party_list = Party.all.map{|m| [m.slug, m.title] }
+    gon.donor_list = Donor.all.map{|m| [m.slug, m.full_name] }
+    gon.period_list = Period.all.map{|m| [m.slug, m.title] }
 
     @categories = Category.non_virtual # required for object explore calls
     gon.category_lists = Category.simple_tree_local(@categories, false)
     gon.main_categories = {}
-    @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m[:id].to_s }
+    @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.slug }
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
 
     gon.all = t('.all')
@@ -75,9 +75,8 @@ class RootController < ApplicationController
       @filter_type = "finance"
       which_filter = "finance"
       pars[:income] = [gon.main_categories[:income]]
-      pars[:party] = Party.only(:_id).where(:tmp_id.in => [1,2]).map{|m| m[:_id].to_s }
-      pars[:period] = Period.annual.only(:_id).limit(3).map{|m| m[:_id].to_s }
-      Rails.logger.debug("---------default filter------------")
+      pars[:party] = Party.where(:tmp_id.in => [1,2]).map{|m| m.slug }
+      pars[:period] = Period.annual.limit(3).map{|m| m.slug }
     end
 
     if has_filters

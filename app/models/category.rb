@@ -2,6 +2,7 @@
 class Category
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Slug
 
   # has_many :category_data
 
@@ -23,6 +24,14 @@ class Category
   field :order, type: Integer
   field :sym, type: Symbol
 
+  slug :title, history: true, localize: true do |d|
+    if d.title_changed?
+      d.title_translations[I18n.locale].to_url
+    else
+      d.id.to_s
+    end
+  end
+
   scope :virtual, ->{ where(virtual: true) }
   scope :non_virtual, ->{ where(virtual: false) }
   scope :only_sym, ->{ where(:sym.ne => nil) }
@@ -36,6 +45,21 @@ class Category
   index sym: 1
   #index simple: 1
   SYMS = [ :income, :income_campaign, :expenses, :expenses_campaign, :reform_expenses, :property_assets, :financial_assets, :debts ]
+
+
+  def self.get_ids_by_slugs(id_or_slugs)
+    if id_or_slugs.present? && id_or_slugs.class == Array
+      if id_or_slugs[0] == "all"
+        []
+      else
+         Rails.logger.debug("---------here-----------------------------------#{id_or_slugs}")
+        x = only(:_id, :_slugs).find(id_or_slugs)
+        x.present? ? x.map{ |m| m[:_id] } : []
+      end
+    else
+      []
+    end
+  end
 
   def self.full_names(cats, ids)
     # names = []
@@ -83,19 +107,17 @@ class Category
   def self.simple_tree_local(cats, vir = false, sym = nil)
     list = {}
     cats.select{|s| s.level == 0 }.sort { |x,y| x.order <=> x.order }.each{|cat|
-      list[cat.sym] = [[cat.id.to_s, cat.title, -1]] + sub_simple_tree_local(cats, cat.id, 1, vir)
+      list[cat.sym] = [[cat.slug, cat.title, -1]] + sub_simple_tree_local(cats, cat.id, cat.slug, 1, vir)
     }
     list
   end
-  def self.sub_simple_tree_local(cats, par_id, lvl, vir = false)
-    # puts par_id
-    # puts lvl
+  def self.sub_simple_tree_local(cats, par_id, par_slug, lvl, vir = false)
     list = nil
     if lvl != 6
       list = []
       cats.select{|s| s.level == lvl && s.parent_id == par_id && s.virtual == vir }.sort { |x,y| x.order <=> x.order }.each{ |cat|
-        tmp = sub_simple_tree_local(cats, cat.id, lvl+1, vir)
-        list << [cat.id.to_s, cat.title, par_id.to_s ]
+        tmp = sub_simple_tree_local(cats, cat.id, cat.slug, lvl+1, vir)
+        list << [cat.slug, cat.title, par_slug]
         list = list + tmp if tmp.present?
       }
     end

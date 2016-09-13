@@ -139,24 +139,15 @@ class Dataset
     limiter = 5
     #Rails.logger.debug("--------------------------------------------#{params}")
 
-    f = {
-      parties: nil,
-      period: nil
-    }
+    f = { parties: nil, period: nil }
 
-    tmp = params[:party]
-    f[:parties] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
+    f[:parties] = Party.get_ids_by_slugs(params[:party])
 
-    tmp = params[:period]
-    f[:period] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
+    f[:period] =  Period.get_ids_by_slugs(params[:period])
 
-    #{ category: Category.tree(false) }
     ln = 0
     main_categories_count = 0
-    SYMS.each { |e|
-      tmp = params[e]
-      f[e] = tmp.present? && tmp.class == Array  && (tmp[0] == "all" || tmp.all?{|t| t.size === 24 }) ? tmp.map{|m| BSON::ObjectId(m) } : nil
-    }
+    SYMS.each { |e| f[e] = Category.get_ids_by_slugs(params[e]) }
 
     data = filter(f).to_a
 
@@ -268,27 +259,44 @@ class Dataset
     }
 
     categories_list = []
-    # title generator
-    chart_title = ""
-    chart_title += "#{I18n.t('shared.chart.finance.title.party_donations_for')}: #{f[:parties].map{|m| parties[BSON::ObjectId(m)][:name] }.join(', ')}<br/>" if f[:parties].present?
 
-    if ln >= 1
-      chart_title += I18n.t("shared.chart.finance.title.#{ln == 1 ? 'category' : 'category_grouped_by'}")+": "
+    # Party Finance chart titles: Chart titles be like this: Category name (if 2, connect with 'and', if more than 2, connect with comma and put 'and' between the last one items), Party Name ( (if more than one, the same principle), Time period
+
+
+    # title generator
+    chart_titles = [[],[],[]]
+
+    if ln >= 1 # grab selected category names
+      #chart_title += I18n.t("shared.chart.finance.title.#{ln == 1 ? 'category' : 'category_grouped_by'}")+": "
+          # chart_title += tmp.join(', ') + (chart_type == 2 ? "; " : ", ")
       SYMS.each { |e|
         if f[e].present?
           tmp = Category.full_names(categories, f[e])
-          chart_title += tmp.join(', ') + (chart_type == 2 ? "; " : ", ")
+          chart_titles[0].concat(tmp);
           tmp.each{|ee| categories_list << ee }
         end
       }
-      chart_title = chart_title[0...-2] + "<br/>"
     end
 
-    if f[:period].present?
+    chart_titles[1].concat(f[:parties].map{|m| parties[BSON::ObjectId(m)][:name] }) # grab selected party names
+
+    if f[:period].present? # grab selected period names
       period_first = periods[BSON::ObjectId(f[:period][0])]
-      chart_title += I18n.t("shared.chart.finance.title.time_period_#{Period::TYPES[period_first[:type]] == :annual ? 'annual' : 'campaign'}")+": "
-      chart_title += f[:period].map{|m| periods[BSON::ObjectId(m)][:name] }.join(", ")
+      period_title = I18n.t("shared.chart.finance.title.time_period_#{Period::TYPES[period_first[:type]] == :annual ? 'annual' : 'campaign'}")
+
+      chart_titles[2].concat(f[:period].map{|m| "#{period_title} #{periods[BSON::ObjectId(m)][:name]}" })
     end
+
+    chart_title = ""
+    last_and = I18n.t("shared.common.and")
+    chart_titles.each{ |r|
+      sz = r.size
+      r.each_with_index { |rr, ii|
+         Rails.logger.debug("--------------------------------------------#{rr} #{ii} #{sz}")
+        chart_title += (ii == sz - 1 && sz > 1 ? " " + last_and + " " : ", ") + rr
+      }
+    }
+    chart_title = chart_title[2..chart_title.size-1] if chart_title.size > 1
 
     headers = [[""],[I18n.t("shared.common.parties")]]
     header_classes = [["empty"], ["outer"]]

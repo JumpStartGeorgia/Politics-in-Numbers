@@ -19,6 +19,7 @@ en:
       filter_toggle: Toggle to add new filtering option
       filter_close: Close Filter Window
       filter_item_close: Remove item from filter
+      filter_clear: Remove all items from filter
       donor: ID/Name
       time_period: Time Period
       amount: Amount

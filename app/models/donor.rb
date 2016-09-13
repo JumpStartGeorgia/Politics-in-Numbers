@@ -2,6 +2,7 @@
 class Donor
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Slug
 
   embeds_many :donations, after_add: :calculate_donated_amount, after_remove: :calculate_donated_amount
 
@@ -13,6 +14,18 @@ class Donor
   field :donated_amount, type: Float
   field :nature, type: Integer, default: 0
   field :multiple, type: Boolean, default: false # if donated to multiple parties
+
+
+  slug :first_name, :last_name, history: true, localize: true do |d|
+    if d.first_name_changed? || d.last_name_changed?
+      "#{d.first_name_translations[I18n.locale]} #{d.last_name_translations[I18n.locale]}".to_url
+    else
+      d.id.to_s
+    end
+  end
+
+
+
 
   validates_presence_of :first_name, :last_name, :tin
 
@@ -273,6 +286,9 @@ class Donor
         total_donations: total_donations
       }
     }
+  end
+  def full_name
+    "#{first_name} #{last_name}"
   end
 end
 

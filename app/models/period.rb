@@ -2,6 +2,7 @@
 class Period
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Slug
 
   #has_many :datasets
   TYPES = [:annual, :election]
@@ -13,12 +14,28 @@ class Period
   # not working date is nill, default: ->{"#{self.start_date.strftime('%d/%m/%Y')}" << self.end_date.present? ? " - #{self.end_date.strftime('%d/%m/%Y')}" : "" }
   field :description, type: String, localize: true
 
+  slug :title, history: true, localize: true do |d|
+    if d.title_changed?
+      d.title_translations[I18n.locale].to_url
+    else
+      d.id.to_s
+    end
+  end
+
+
   validate :validate_dates
   validates_presence_of :type, :start_date, :end_date, :title
   validates_inclusion_of :type, in: [0, 1]
 
-  #default_scope ->{ order_by([[:type, :desc], [:title, :asc]]) }
-  #
+  def self.get_ids_by_slugs(id_or_slugs)
+    if id_or_slugs.present? && id_or_slugs.class == Array
+      x = only(:_id, :_slugs).find(id_or_slugs)
+      x.present? ? x.map{ |m| m[:_id].to_s } : []
+    else
+      []
+    end
+  end
+
   scope :annual, ->{ where(type: type_is(:annual)).order_by([[:start_date, :desc]]) }
   scope :campaigns, ->{ where(type: type_is(:election)).order_by([[:start_date, :desc]]) }
 
