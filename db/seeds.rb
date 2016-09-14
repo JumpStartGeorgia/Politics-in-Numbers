@@ -249,6 +249,7 @@ workbook[0].each_with_index { |row, row_i|
     tmp[:title_translations][:ru] = cells[4] if cells[4].present?
     tmp[:description] = "პარტია #{cells[1].present? ? cells[1] : cells[2]}"
     tmp[:name] = cells[2]
+    tmp[:member] = cells[0].present?
 
     parties_data << tmp
   end

@@ -545,6 +545,7 @@
         max-height:700%;
         overflow-y:auto;
         width:100%;
+
         > li {
           .item { padding:8px 10px; }
           li {
@@ -556,11 +557,12 @@
           color:#F78E69;
           cursor:pointer;
           .item {
+            position:relative;
             text-align:left;
             width:100%;
-            &:hover {
-              background-color: #F5F7F5;
-            }
+            // &:hover {
+            //   background-color: #F5F7F5;
+            // }
 
           }
           &.l1 .item { padding-left:23px; }
@@ -568,6 +570,7 @@
           &.l3 .item { padding-left:29px; }
           &.l4 .item { padding-left:32px; }
           &.l5 .item { padding-left:35px; }
+          & .tree-toggle { z-index: 1;}
           &.l1 .tree-toggle { padding-left:3px; }
           &.l2 .tree-toggle { padding-left:9px; }
           &.l3 .tree-toggle { padding-left:15px; }
@@ -594,6 +597,7 @@
             > ul { display: inline-block; }
           }
 
+
           // &.expanded {
           //   .toggle i{
           //     background:transparent url("<%= asset_path('explore/collapse.svg') %>") no-repeat center;
@@ -602,6 +606,22 @@
           //     display: inline-block;
           //   }
           // }
+        }
+        li > .item:before {
+          display:block;
+          content:"";
+          position:absolute;
+          height:100%;
+          width:2px;
+          top:0;
+          left:1px;
+          background-color: #AEB3AD;
+        }
+        li > .item:hover:before {
+          background-color: #F78E69;
+        }
+        li > .item.selected:before, li > .item.focus:before {
+          background-color: #F78E69;
         }
         &::-webkit-scrollbar-track {
           background-color: #F5F7F5;
@@ -625,9 +645,7 @@
         }
         .dropdown {
           display:initial;
-          .selected, .focus {
-            background-color: #F5F7F5;
-          }
+
         }
       }
     }

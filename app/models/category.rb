@@ -106,6 +106,7 @@ class Category
   # end
   def self.simple_tree_local(cats, vir = false, sym = nil)
     list = {}
+     Rails.logger.debug("-------------------------------------------cats-#{cats.class}")
     cats.select{|s| s.level == 0 }.sort { |x,y| x.order <=> x.order }.each{|cat|
       list[cat.sym] = [[cat.slug, cat.title, -1]] + sub_simple_tree_local(cats, cat.id, cat.slug, 1, vir)
     }

@@ -46,18 +46,18 @@ class RootController < ApplicationController
   end
 
   def explore
+    gon.date_format = t('date.formats.jsdate')
     gon.filter_item_close = t('.filter_item_close');
-    gon.party_list = Party.all.map{|m| [m.slug, m.title] }
+    gon.party_list = Party.party_list
     gon.donor_list = Donor.all.map{|m| [m.slug, m.full_name] }
     gon.period_list = Period.all.map{|m| [m.slug, m.title] }
 
     @categories = Category.non_virtual # required for object explore calls
-    gon.category_lists = Category.simple_tree_local(@categories, false)
+    gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
     gon.main_categories = {}
     @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.slug }
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
-
-    gon.all = t('.all')
+    gon.all = t('shared.common.all')
     gon.campaign = t('.campaign')
     gon.search = t('.search')
     gon.table_length = t('.table_length')
@@ -69,7 +69,6 @@ class RootController < ApplicationController
     @filter_type = which_filter == "finance" ? "finance" : "donation"
     has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
 
-
     if !has_filters
       has_filters = true
       @filter_type = "finance"
@@ -78,7 +77,6 @@ class RootController < ApplicationController
       pars[:party] = Party.where(:tmp_id.in => [1,2]).map{|m| m.slug }
       pars[:period] = Period.annual.limit(3).map{|m| m.slug }
     end
-
     if has_filters
       gon.gonned = true
       # pars.each{|k,v|
@@ -97,7 +95,6 @@ class RootController < ApplicationController
       @download_link = request.path + "?" +  pars.to_param  + "#{pars.empty? ? '' : '&'}#{'format=csv'}"
       gon.params = pars
     end
-
     if pars[:format] == 'csv'
       if which_filter == "donation"
         csv_file = CSV.generate do |csv|

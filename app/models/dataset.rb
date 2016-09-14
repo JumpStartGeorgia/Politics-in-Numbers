@@ -281,10 +281,8 @@ class Dataset
     chart_titles[1].concat(f[:parties].map{|m| parties[BSON::ObjectId(m)][:name] }) # grab selected party names
 
     if f[:period].present? # grab selected period names
-      period_first = periods[BSON::ObjectId(f[:period][0])]
-      period_title = I18n.t("shared.chart.finance.title.time_period_#{Period::TYPES[period_first[:type]] == :annual ? 'annual' : 'campaign'}")
 
-      chart_titles[2].concat(f[:period].map{|m| "#{period_title} #{periods[BSON::ObjectId(m)][:name]}" })
+      chart_titles[2].concat(f[:period].map{|m| "#{periods[BSON::ObjectId(m)][:name]}" })
     end
 
     chart_title = ""
@@ -292,7 +290,6 @@ class Dataset
     chart_titles.each{ |r|
       sz = r.size
       r.each_with_index { |rr, ii|
-         Rails.logger.debug("--------------------------------------------#{rr} #{ii} #{sz}")
         chart_title += (ii == sz - 1 && sz > 1 ? " " + last_and + " " : ", ") + rr
       }
     }

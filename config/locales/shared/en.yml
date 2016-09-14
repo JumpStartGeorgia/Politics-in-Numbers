@@ -53,6 +53,7 @@ en:
       show_more: Show More
       show_less: Show Less
       and: and
+      all: All
     locale:
       short:
         en: En
@@ -110,7 +111,6 @@ en:
       financial_assets: Financial Assets
       debts: Debts
       campaign: Campaign
-      all: All
   notifier:
     job:
       donorset_file_process:

@@ -37,12 +37,14 @@ $(document).ready(function (){
       pop: function(autocomplete_id, key) {
         if(this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key)) {
           $("[data-autocomplete-view='" + autocomplete_id + "'] li[data-id='" + key + "']").remove();
+          $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li .item[data-id='" + key + "']").removeClass("selected");
           delete this[autocomplete_id][key];
         }
       },
       clear: function(autocomplete_id) {
         if(this.hasOwnProperty(autocomplete_id)) {
           $("[data-autocomplete-view='" + autocomplete_id + "'] li").remove();
+          $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li .item").removeClass("selected");
           delete this[autocomplete_id];
         }
       },
@@ -288,7 +290,7 @@ $(document).ready(function (){
             else if(tp === "period") {
               el.from.datepicker('setDate', new Date(+v[0]));
               el.to.datepicker('setDate', new Date(+v[1]));
-              tmp = formatRange([el.from.datepicker("getDate").format("mm/dd/yyyy"), el.to.datepicker("getDate").format("mm/dd/yyyy")]);
+              tmp = formatRange([el.from.datepicker("getDate").format(gon.date_format), el.to.datepicker("getDate").format(gon.date_format)]);
               create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
             }
             else if(tp === "range") {
@@ -667,7 +669,7 @@ $(document).ready(function (){
           tmp = [];
           t.find(".input-group input[type='text'].datepicker").each(function(i, d){
             tmp2 = $(d).datepicker("getDate");
-            tmp.push(tmp2 ? tmp2.format("mm/dd/yyyy") : null);
+            tmp.push(tmp2 ? tmp2.format(gon.date_format) : null);
           });
           tmp = formatRange(tmp);
           create_list_item(list, tmp, tmp);
@@ -718,6 +720,7 @@ $(document).ready(function (){
       firstDay: 1,
       changeMonth: true,
       changeYear: true,
+      dateFormat: gon.date_format,
       onClose: function( selectedDate ) {
         donation.elem.period.to.datepicker( "option", "minDate", selectedDate );
       }
@@ -726,6 +729,7 @@ $(document).ready(function (){
       firstDay: 1,
       changeMonth: true,
       changeYear: true,
+      dateFormat: gon.date_format,
       onClose: function( selectedDate ) {
         donation.elem.period.from.datepicker( "option", "maxDate", selectedDate );
       }

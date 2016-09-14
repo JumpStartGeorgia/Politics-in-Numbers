@@ -36,6 +36,8 @@ en:
       default: "%m-%d-%Y"
       long: "%B %d, %Y"
       short: "%b %d"
+      date: "%m/%d/%Y"
+      jsdate: "mm/dd/yy"
     month_names:
     -
     - January

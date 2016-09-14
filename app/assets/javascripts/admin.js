@@ -30,22 +30,22 @@
 //= require_self
 ////////////////////////////////////////
 
-function permalink (str, locale, receiver) {
- $.ajax({
-    dataType: "json",
-    url: "/permalink",
-    data: {"value": str, "locale" : locale},
-    success:  function (data) {
-       console.log(data);
-      $(receiver).val(data.permalink ? data.permalink : "");
-    }
-  });
-}
+// function permalink (str, locale, receiver) {
+//  $.ajax({
+//     dataType: "json",
+//     url: "/permalink",
+//     data: {"value": str, "locale" : locale},
+//     success:  function (data) {
+//        console.log(data);
+//       $(receiver).val(data.permalink ? data.permalink : "");
+//     }
+//   });
+// }
 
-$(".permalink-trigger").on("change keyup paste click", debounce(function() {
-  var t = $(this), receiver = t.attr("data-permalink-receiver");
-  permalink(t.val(), receiver.substr(receiver.length - 2), receiver);
-}));
+// $(".permalink-trigger").on("change keyup paste click", debounce(function() {
+//   var t = $(this), receiver = t.attr("data-permalink-receiver");
+//   permalink(t.val(), receiver.substr(receiver.length - 2), receiver);
+// }));
 
 
 $( "#categories-list" ).select2({

@@ -16,6 +16,7 @@ class Party
   field :color, type: String, default: "##{SecureRandom.hex(3)}"
   field :tmp_id, type: Integer
   field :type, type: Integer, default: 0 # 0 - party, 1 - initiative
+  field :member, type: Boolean, default: false
   slug :title, history: true, localize: true do |d|
     if d.title_changed?
       d.title_translations[I18n.locale].to_url
@@ -86,12 +87,24 @@ class Party
   def self.sorted
     order_by([[:title, :asc]])#.limit(3)
   end
+  def self.members
+    where({member: true})
+  end
+
 
   def self.list
     only_parties.sorted.map{|t| [t.title, t.id]}
   end
 
+  def self.member_party_list
+    only_parties.members.sorted.map{|t| [t.slug, t.title]} # used while creating list in view
+  end
+
   def self.party_list
+    sorted.map{|t| [t.slug, t.title]} # used while creating list in view
+  end
+
+  def self.only_party_list
     only_parties.sorted.map{|t| [t.slug, t.title]} # used while creating list in view
   end
 

@@ -57,6 +57,7 @@ class Donor
     order_by([[:first_name, :asc], [:last_name, :asc]])
   end
 
+
   def self.filter(params)
     #Rails.logger.debug("****************************************#{params}")
     lang = I18n.locale
@@ -228,7 +229,7 @@ class Donor
         e[:partial_donated_amount] += am
         total_amount += am
         total_donations += 1
-        table.push(["#{ee[:_id]}", e[:name], nature_values[e[:nature]], I18n.l(ee[:give_date], format: :date), am, parties[ee[:party_id]][:name], monetary_values[ee[:monetary] ? 0 : 1] ])
+        table.push(["#{ee[:_id]}", e[:name], e[:tin], nature_values[e[:nature]], I18n.l(ee[:give_date], format: :date), am, parties[ee[:party_id]][:name], monetary_values[ee[:monetary] ? 0 : 1] ])
       }
       e[:partial_donated_amount] = e[:partial_donated_amount].round(2)
     }
@@ -277,7 +278,7 @@ class Donor
       chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart_meta_obj),
       table: {
         data: table,
-        header: [human_attribute_name(:id), human_attribute_name(:name),
+        header: [human_attribute_name(:id), human_attribute_name(:name), human_attribute_name(:tin),
           human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
           Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
           Donation.human_attribute_name(:monetary)],

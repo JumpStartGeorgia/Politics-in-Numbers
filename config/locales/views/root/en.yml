@@ -58,6 +58,15 @@ en:
       search: Search
       table_length: Show _MENU_ entries
       not_found: Your requested data could not be found
+      income: Income
+      income_campaign: Income Campaign
+      expenses: Expenses
+      expenses_campaign: Expenses Campaign
+      reform_expenses: Reforms Fund Expenses
+      property_assets: Property Assets
+      financial_assets: Financial Assets
+      debts: Debts
+      campaign: Campaign
       export_type:
         print: Print
         pdf: Pdf document
