@@ -8,4 +8,11 @@ namespace :prepare do # WARNING ondeploy
       end
     }
   end
+  desc "For each donor save, for full_name to be filled"
+  task :set_donor_full_name => :environment do |t, args|
+    Donor.each{|p|
+      p.save
+    }
+  end
+  # WARNING call slug generator function for Category, Donor, Party, Period
 end

@@ -144,7 +144,6 @@ class Dataset
     f[:parties] = Party.get_ids_by_slugs(params[:party])
 
     f[:period] =  Period.get_ids_by_slugs(params[:period])
-
     ln = 0
     main_categories_count = 0
     SYMS.each { |e| f[e] = Category.get_ids_by_slugs(params[e]) }
@@ -184,7 +183,6 @@ class Dataset
     cs = ln
     ps = f[:parties].nil? ? 0 : f[:parties].length
 
-          # Rails.logger.debug("-------------------------------------------test4-#{category_grouped_period_party}")
     chart_type = cs == 1 ? 0 : ( main_categories_count == 1 ? 1 : 2 )
 
     chart1 = []
@@ -318,7 +316,6 @@ class Dataset
 
     elsif chart_type == 1 # multiple categories for same main category
 
-      # Rails.logger.debug("--------------------------------------------sdfsdf1")
       selected_categories.each_with_index{|cat, cat_i|
 
         chart1.push({

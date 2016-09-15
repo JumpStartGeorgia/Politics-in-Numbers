@@ -72,6 +72,10 @@ class Period
   end
 
   def self.list
+    sorted.map{|t| [t.slug, t.title]}
+  end
+
+  def self.for_collection
     sorted.map{|t| [t.title, t.id]}
   end
 

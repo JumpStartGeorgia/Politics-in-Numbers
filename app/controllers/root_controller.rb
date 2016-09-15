@@ -48,9 +48,9 @@ class RootController < ApplicationController
   def explore
     gon.date_format = t('date.formats.jsdate')
     gon.filter_item_close = t('.filter_item_close');
-    gon.party_list = Party.party_list
-    gon.donor_list = Donor.all.map{|m| [m.slug, m.full_name] }
-    gon.period_list = Period.all.map{|m| [m.slug, m.title] }
+    gon.party_list = Party.list
+    gon.donor_list = Donor.list
+    gon.period_list = Period.list
 
     @categories = Category.non_virtual # required for object explore calls
     gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
@@ -69,32 +69,38 @@ class RootController < ApplicationController
     @filter_type = which_filter == "finance" ? "finance" : "donation"
     has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
 
+    donation_pars = {}
+    finance_pars = {
+      income: [gon.main_categories[:income]],
+      party: Party.where(:tmp_id.in => [1,2]).map{|m| m.slug },
+      period: Period.annual.limit(3).map{|m| m.slug }
+    }
     if !has_filters
       has_filters = true
       @filter_type = "finance"
       which_filter = "finance"
-      pars[:income] = [gon.main_categories[:income]]
-      pars[:party] = Party.where(:tmp_id.in => [1,2]).map{|m| m.slug }
-      pars[:period] = Period.annual.limit(3).map{|m| m.slug }
+      pars.merge!(finance_pars)
     end
+
+    is_finance = which_filter == "finance"
+
     if has_filters
       gon.gonned = true
-      # pars.each{|k,v|
-      #   pars[k] = v.split(";") if v.index(";")
-      # }
-      if which_filter == "donation"
-        dt = Donor.explore(pars)
-        gon.donation_data = dt
-        #pars[:donor] = dt[:donor_info] if dt[:donor_info].present?
-      else
-        dt = Dataset.explore(pars)
-        gon.finance_data = dt
-         # Rails.logger.debug("------------finance--------------------------------#{dt}")
-      end
+
+      donation_pars = pars if !is_finance
+      finance_pars = pars if is_finance
+      gon.gonned_type = which_filter
+      gon.donation_params = donation_pars
+      gon.finance_params = finance_pars
+      gon.donation_data = Donor.explore(donation_pars)
+      gon.finance_data  = Dataset.explore(finance_pars)
+      dt = is_finance ? gon.finance_data : gon.donation_data
+
       pars.delete(:locale)
       @download_link = request.path + "?" +  pars.to_param  + "#{pars.empty? ? '' : '&'}#{'format=csv'}"
       gon.params = pars
     end
+
     if pars[:format] == 'csv'
       if which_filter == "donation"
         csv_file = CSV.generate do |csv|

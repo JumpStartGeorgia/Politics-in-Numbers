@@ -4,17 +4,18 @@ class Donor
   include Mongoid::Timestamps
   include Mongoid::Slug
 
+  before_save :regenerate_fullname
   embeds_many :donations, after_add: :calculate_donated_amount, after_remove: :calculate_donated_amount
 
   NATURE_TYPES = ["individual", "organization"]
 
   field :first_name, type: String, localize: true
   field :last_name, type: String, localize: true
+  field :full_name, type: String, localize: true
   field :tin, type: String
   field :donated_amount, type: Float
   field :nature, type: Integer, default: 0
   field :multiple, type: Boolean, default: false # if donated to multiple parties
-
 
   slug :first_name, :last_name, history: true, localize: true do |d|
     if d.first_name_changed? || d.last_name_changed?
@@ -23,9 +24,6 @@ class Donor
       d.id.to_s
     end
   end
-
-
-
 
   validates_presence_of :first_name, :last_name, :tin
 
@@ -40,7 +38,6 @@ class Donor
   index ({ :'donations.give_data' => 1})
   index ({ :'donations.amount' => 1})
   index ({ :'donations.monetary' => 1})
-
 
   def calculate_donated_amount(v)
     self.donated_amount = 0
@@ -57,6 +54,9 @@ class Donor
     order_by([[:first_name, :asc], [:last_name, :asc]])
   end
 
+  def self.list
+    sorted.map{|t| [t.slug, t.full_name]}
+  end
 
   def self.filter(params)
     #Rails.logger.debug("****************************************#{params}")
@@ -282,15 +282,20 @@ class Donor
           human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
           Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
           Donation.human_attribute_name(:monetary)],
-        classes: ["center", "", "", "center", "right", "", ""],
+        classes: ["center", "", "center", "center", "center", "right", "", "center"],
         total_amount: total_amount,
         total_donations: total_donations
       }
     }
   end
-  def full_name
-    "#{first_name} #{last_name}"
-  end
+  private
+    def regenerate_fullname
+      tmp = {}
+      self.first_name_translations.each{|k,v|
+        tmp[k] = "#{v} #{self.last_name_translations[k]}"
+      }
+      self.full_name_translations = tmp
+    end
 end
 
   # scope :by_donors, -> v { where(:id.in => v) if v.present? }

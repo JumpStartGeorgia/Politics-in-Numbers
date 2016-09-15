@@ -4,12 +4,10 @@ class Party
   include Mongoid::Timestamps
   include Mongoid::Slug
 
-  #before_update :check_changed_attributes
-
-
-  #has_many :datasets
+#constants
   TYPES = [:party, :initiative]
 
+#fields
   field :name, type: String
   field :title, type: String, localize: true
   field :description, type: String, localize: true
@@ -17,6 +15,8 @@ class Party
   field :tmp_id, type: Integer
   field :type, type: Integer, default: 0 # 0 - party, 1 - initiative
   field :member, type: Boolean, default: false
+
+#slug
   slug :title, history: true, localize: true do |d|
     if d.title_changed?
       d.title_translations[I18n.locale].to_url
@@ -25,15 +25,54 @@ class Party
     end
   end
 
+#indexes
+  index ({ :title => 1})
+  index ({ :name => 1})
+  index ({ :type => 1})
 
+#validation
   validate :validate_translations
   validates_presence_of :color, :name
   validates_inclusion_of :type, in: [0, 1]
-  # def check_changed_attributes
-  #   puts "***************************"
-  #   puts "***************************#{changes.inspect}" if _slugs?
-  # end
 
+  def validate_translations
+    default = I18n.default_locale
+    locales = [:ka, :en, :ru]
+    ["title_translations", "description_translations"].each{|f|
+      if self.send(f)[default].blank?
+        errors.add(:base, I18n.t('mongoid.errors.messages.validations.default_translation_missing',
+          field: self.class.human_attribute_name(f),
+          lang: Language.name_by_locale(default)))
+      end
+    }
+  end
+
+#scopes
+  def self.sorted
+    order_by([[:title, :asc]])#.limit(3)
+  end
+  def self.members # only parties that was set to be visible on explore/party finance page
+    where({member: true})
+  end
+
+  def self.only_parties # not initiatives
+    where({type: 0})
+  end
+
+#scoped data
+  def self.list
+    sorted.map{|t| [t.slug, t.title]} # used while creating list in view
+  end
+
+  def self.for_collection
+    sorted.map{|t| [t.title, t.id]} # used while creating list in view
+  end
+
+  def self.member_party_list
+    only_parties.members.sorted.map{|t| [t.slug, t.title]} # used while creating list in view
+  end
+
+#getters
   def self.get_ids_by_slugs(id_or_slugs)
     if id_or_slugs.present? && id_or_slugs.class == Array
       x = only(:_id, :_slugs).find(id_or_slugs)
@@ -41,20 +80,6 @@ class Party
     else
       []
     end
-  end
-
-  def validate_translations
-    default = I18n.default_locale
-    locales = [:ka, :en, :ru]
-#    puts "validating --------------------------------#{_slugs_translations.inspect}"
-    ["title_translations", "description_translations"].each{|f|
-      #f.delete_if{|k,v| !v.present? }
-      if self.send(f)[default].blank?
-        errors.add(:base, I18n.t('mongoid.errors.messages.validations.default_translation_missing',
-          field: self.class.human_attribute_name(f),
-          lang: Language.name_by_locale(default)))
-      end
-    }
   end
 
   def self.clean_name(name)
@@ -84,46 +109,12 @@ class Party
     return name.strip
   end
 
-  def self.sorted
-    order_by([[:title, :asc]])#.limit(3)
-  end
-  def self.members
-    where({member: true})
-  end
-
-
-  def self.list
-    only_parties.sorted.map{|t| [t.title, t.id]}
-  end
-
-  def self.member_party_list
-    only_parties.members.sorted.map{|t| [t.slug, t.title]} # used while creating list in view
-  end
-
-  def self.party_list
-    sorted.map{|t| [t.slug, t.title]} # used while creating list in view
-  end
-
-  def self.only_party_list
-    only_parties.sorted.map{|t| [t.slug, t.title]} # used while creating list in view
-  end
-
-  def self.only_parties
-    where({type: 0})
-  end
-
-  def self.full_list
-    sorted.map{|t| [t.title, t.id]}
-  end
-  # def self.by_permalink(permalink)
-  #   find_by(permalink: permalink)
-  # end
-
   def self.by_name(party_name)
     party_name = Party.clean_name(party_name)
     Party.or({ name: party_name }, { title: party_name }).first
   end
 
+#field helpers
   def self.is_initiative(party_name)
     patterns = [
       "სინიციატივო ჯგუფი",
@@ -161,12 +152,5 @@ class Party
   def self.type_is(tp)
     TYPES.index(tp.to_sym)
   end
-
-
-  #############################
-  # indexes
-  index ({ :title => 1})
-  index ({ :name => 1})
-  index ({ :type => 1})
 
 end
