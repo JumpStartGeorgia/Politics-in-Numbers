@@ -137,7 +137,7 @@ class Dataset
   end
   def self.explore(params)
     limiter = 5
-    #Rails.logger.debug("--------------------------------------------#{params}")
+    # Rails.logger.debug("--------------------------------------------#{params}")
 
     f = { parties: nil, period: nil }
 
@@ -146,7 +146,9 @@ class Dataset
     f[:period] =  Period.get_ids_by_slugs(params[:period])
     ln = 0
     main_categories_count = 0
-    SYMS.each { |e| f[e] = Category.get_ids_by_slugs(params[e]) }
+    SYMS.each { |e| f[e] = Category.get_ids_by_slugs(params[e]) if params[e].present? }
+
+    # Rails.logger.debug("--------------------------------------------#{f}")
 
     data = filter(f).to_a
 
