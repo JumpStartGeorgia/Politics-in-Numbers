@@ -82,6 +82,13 @@ set :shared_env_path, -> { "#{full_shared_path}/.env" }
 # Fetch Head location: this file contains the currently deployed git commit hash
 set :fetch_head, -> { "#{deploy_to}/scm/FETCH_HEAD" }
 
+# Delayed job settings
+set :delayed_job, -> { 'bin/delayed_job' }
+set :delayed_job_pid_dir, 'pids'
+set :delayed_job_processes, 1
+set :delayed_job_additional_params, ''
+set :shared_dirs, -> { fetch(:shared_dirs, []).push(fetch(:delayed_job_pid_dir)) }
+
 namespace :rails do
   desc "Opens the deployed application's .env file in vim for editing"
   task :edit_env do
@@ -256,6 +263,47 @@ namespace :deploy do
 
 end
 
+namespace :delayed_job do
+  desc 'Stop delayed_job'
+  task stop: :environment do
+    comment 'Stop delayed_job'
+    in_path(fetch(:current_path)) do
+      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} stop --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
+    end
+  end
+
+  desc 'Start delayed_job'
+  task start: :environment do
+    comment 'Start delayed_job'
+    in_path(fetch(:current_path)) do
+      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} start -n #{delayed_job_processes} --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
+    end
+  end
+
+  desc 'Restart delayed_job'
+  task restart: :environment do
+    comment 'Restart delayed_job'
+    in_path(fetch(:current_path)) do
+      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} restart -n #{delayed_job_processes} --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
+    end
+  end
+
+  desc 'delayed_job status'
+  task status: :environment do
+    comment 'Delayed job Status'
+    in_path(fetch(:current_path)) do
+      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} status --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
+    end
+  end
+
+  desc 'delayed_job setup'
+  task setup: :environment do
+    comment 'Delayed job Setup (generate bin/delayed_job script)'
+    in_path(fetch(:current_path)) do
+      command "RAILS_ENV='#{fetch(:rails_env)}' bundle exec rails generate delayed_job"
+    end
+  end
+end
 
 desc 'Setup directories and .env file; should be run before first deploy.'
 task setup: :environment do
@@ -312,19 +360,21 @@ task deploy: :environment do
       set :bundle_options, "#{bundle_options} --quiet"
     end
 
+    invoke :'delayed_job:stop'
     invoke :'deploy:check_revision'
     invoke :'deploy:assets:decide_whether_to_precompile'
     invoke :'deploy:assets:local_precompile' if precompile_assets
     invoke :'git:clone'
     invoke :'deploy:link_shared_paths'
     invoke :'bundle:install'
-#    invoke :'rails:db_migrate'
+    #invoke :'rails:db_migrate'
     invoke :'deploy:assets:copy_tmp_to_current'
     invoke :'deploy:mongoid_indexes'
     invoke :'nginx:generate_conf'
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
+    invoke :'delayed_job:start'
 
     to :launch do
       queue! "mkdir -p #{full_current_path}/tmp/"
@@ -376,6 +426,7 @@ task :post_setup do
   invoke :'puma:jungle:add'
   invoke :'nginx:stop'
   invoke :'nginx:start'
+  invoke :'delayed_job:setup'
   invoke :finished_deploy_message
 end
 
