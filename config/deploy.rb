@@ -292,8 +292,7 @@ namespace :delayed_job do
   task status: :environment do
     comment 'Delayed job Status'
     in_path(fetch(:current_path)) do
-      puts "Helloo --------------"
-      #command echo_cmd "ls -al" #"RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} status --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
+      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} status --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
     end
   end
 
