@@ -50,6 +50,7 @@ class Category
 
 
   def self.get_ids_by_slugs(id_or_slugs)
+    id_or_slugs = id_or_slugs.delete_if(&:blank?)
     if id_or_slugs.present? && id_or_slugs.class == Array
       if id_or_slugs[0] == "all"
         []
@@ -61,6 +62,10 @@ class Category
     else
       []
     end
+  end
+
+  def permalink
+    slug.present? ? slug : id.to_s
   end
 
   def self.full_names(cats, ids)
@@ -77,6 +82,7 @@ class Category
     # return names
     return ids.map{ |m| cats[m][:title] }
   end
+
 
   def self.main_category_id(cats, id)
      # Rails.logger.debug("--------------------------------------------#{cats[id].inspect} #{id}")
@@ -110,7 +116,7 @@ class Category
   def self.simple_tree_local(cats, vir = false, sym = nil)
     list = {}
     cats.select{|s| s.level == 0 }.sort { |x,y| x.order <=> x.order }.each{|cat|
-      list[cat.sym] = [[cat.slug, cat.title, -1]] + sub_simple_tree_local(cats, cat.id, cat.slug, 1, vir)
+      list[cat.sym] = [[cat.permalink, cat.title, -1]] + sub_simple_tree_local(cats, cat.id, cat.permalink, 1, vir)
     }
     list
   end
@@ -119,8 +125,8 @@ class Category
     if lvl != 6
       list = []
       cats.select{|s| s.level == lvl && s.parent_id == par_id && s.virtual == vir }.sort { |x,y| x.order <=> x.order }.each{ |cat|
-        tmp = sub_simple_tree_local(cats, cat.id, cat.slug, lvl+1, vir)
-        list << [cat.slug, cat.title, par_slug]
+        tmp = sub_simple_tree_local(cats, cat.id, cat.permalink, lvl+1, vir)
+        list << [cat.permalink, cat.title, par_slug]
         list = list + tmp if tmp.present?
       }
     end

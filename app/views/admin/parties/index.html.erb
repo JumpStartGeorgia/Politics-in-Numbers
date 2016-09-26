@@ -27,7 +27,7 @@
         <td class="available-locales-box"><%= "#{item.title} #{existence_translations(item, :title)}".html_safe %></td>
         <td class="available-locales-box"><%= "#{item.description} #{existence_translations(item, :description)}".html_safe %></td>
         <td><%= t("mongoid.shared.options.party.type.#{@model::TYPES[item.type]}") %></td>
-        <td><%= item.slug %></td>
+        <td><%= item.permalink %></td>
         <td><%= item.color %></td>
         <td><%= item.name %></td>
         <td>

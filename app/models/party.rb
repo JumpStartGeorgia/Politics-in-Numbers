@@ -41,6 +41,9 @@ class Party
     }
   end
 
+  def permalink
+    slug.present? ? slug : id.to_s
+  end
 #scopes
   def self.sorted
     order_by([[:title, :asc]])#.limit(3)
@@ -55,7 +58,7 @@ class Party
 
 #scoped data
   def self.list
-    sorted.map{|t| [t.slug, t.title]} # used while creating list in view
+    sorted.map{|t| [t.permalink, t.title]} # used while creating list in view
   end
 
   def self.for_collection
@@ -63,11 +66,12 @@ class Party
   end
 
   def self.member_party_list
-    only_parties.members.sorted.map{|t| [t.slug, t.title]} # used while creating list in view
+    only_parties.members.sorted.map{|t| [t.permalink, t.title]} # used while creating list in view
   end
 
 #getters
   def self.get_ids_by_slugs(id_or_slugs)
+    id_or_slugs = id_or_slugs.delete_if(&:blank?)
     if id_or_slugs.present? && id_or_slugs.class == Array
       x = only(:_id, :_slugs).find(id_or_slugs)
       x.present? ? x.map{ |m| m[:_id].to_s } : []

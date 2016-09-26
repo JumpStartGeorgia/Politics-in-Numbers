@@ -34,6 +34,10 @@ class Donor
   index ({ :'donations.monetary' => 1})
   index({_slugs: 1}, { unique: true, sparse: false })
 
+  def permalink
+    slug.present? ? slug : id.to_s
+  end
+
   def calculate_donated_amount(v)
     self.donated_amount = 0
     tmp_party_ids = []
@@ -50,7 +54,7 @@ class Donor
   end
 
   def self.list
-    sorted.map{|t| [t.slug, t.full_name]}
+    sorted.map{|t| [t.permalink, t.full_name]}
   end
 
   def self.filter(params)

@@ -55,8 +55,8 @@ class RootController < ApplicationController
     @categories = Category.non_virtual # required for object explore calls
     gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
     gon.main_categories = {}
-    @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.slug }
-     Rails.logger.debug("--------------------------------------------#{gon.main_categories}")
+    @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.permalink }
+     Rails.logger.debug("---------------------------bas-----------------#{gon.main_categories}")
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
     gon.all = t('shared.common.all')
     gon.campaign = t('.campaign')
@@ -73,8 +73,8 @@ class RootController < ApplicationController
     donation_pars = {}
     finance_pars = {
       income: [gon.main_categories[:income]],
-      party: Party.where(:tmp_id.in => [1,2]).map{|m| m.slug },
-      period: Period.annual.limit(3).map{|m| m.slug }
+      party: Party.where(:tmp_id.in => [1,2]).map{|m| m.permalink },
+      period: Period.annual.limit(3).map{|m| m.permalink }
     }
     if !has_filters
       has_filters = true

@@ -56,7 +56,7 @@
       </div>
 
       <div class="donation filter-inputs" data-type="donation">
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "donor", on: true, list: generate_li_list(Donor.all.map{|m| [m.slug,m.full_name]}), category_label: 0, remote_url: "select/donors" } %>
+        <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "donor", on: true, list: generate_li_list(Donor.all.map{|m| [m.permalink,m.full_name]}), category_label: 0, remote_url: "select/donors" } %>
         <div class="row filter-input" data-field="period" data-type="period">
           <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
           <div class="list"></div>
@@ -146,14 +146,14 @@
             <div class="input-checkbox-group">
               <ul data-type="annual">
                 <% Period.annual.each{|e| %>
-                  <li><input type="checkbox" id='finance_period_annual_<%= "#{e.slug}" %>' name='finance_period_annual' value="<%= "#{e.slug}" %>">
-                  <label for='finance_period_annual_<%= "#{e.slug}" %>'><span></span><%= "#{e.title}" %></label></li>
+                  <li><input type="checkbox" id='finance_period_annual_<%= "#{e.permalink}" %>' name='finance_period_annual' value="<%= "#{e.permalink}" %>">
+                  <label for='finance_period_annual_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
                 <% } %>
               </ul>
               <ul class="hidden" data-type="campaign">
                 <% Period.campaigns.each{|e| %>
-                  <li><input type="checkbox" id='finance_period_campaign_<%= "#{e.slug}" %>' name='finance_period_campaign' value="<%= "#{e.slug}" %>">
-                  <label for='finance_period_campaign_<%= "#{e.slug}" %>'><span></span><%= "#{e.title}" %></label></li>
+                  <li><input type="checkbox" id='finance_period_campaign_<%= "#{e.permalink}" %>' name='finance_period_campaign' value="<%= "#{e.permalink}" %>">
+                  <label for='finance_period_campaign_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
                 <% } %>
               </ul>
             </div>
