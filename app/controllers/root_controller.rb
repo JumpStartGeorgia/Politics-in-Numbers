@@ -56,6 +56,7 @@ class RootController < ApplicationController
     gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
     gon.main_categories = {}
     @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.slug }
+     Rails.logger.debug("--------------------------------------------#{gon.main_categories}")
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
     gon.all = t('shared.common.all')
     gon.campaign = t('.campaign')
