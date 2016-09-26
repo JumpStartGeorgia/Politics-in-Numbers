@@ -38,6 +38,7 @@ class Donor
   index ({ :'donations.give_data' => 1})
   index ({ :'donations.amount' => 1})
   index ({ :'donations.monetary' => 1})
+  index({_slugs: 1}, { sparse: false })
 
   def calculate_donated_amount(v)
     self.donated_amount = 0

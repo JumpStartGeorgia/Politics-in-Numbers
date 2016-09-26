@@ -29,7 +29,7 @@ class Party
   index ({ :title => 1})
   index ({ :name => 1})
   index ({ :type => 1})
-
+  index({_slugs: 1}, { sparse: false })
 #validation
   validate :validate_translations
   validates_presence_of :color, :name
