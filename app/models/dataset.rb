@@ -137,7 +137,7 @@ class Dataset
   end
   def self.explore(params)
     limiter = 5
-    # Rails.logger.debug("--------------------------------------------#{params}")
+    Rails.logger.info("--------------------------------------------#{params}")
 
     f = { parties: nil, period: nil }
 
