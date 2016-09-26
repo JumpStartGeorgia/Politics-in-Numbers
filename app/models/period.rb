@@ -37,7 +37,7 @@ class Period
   # indexes
   index({ type: 1, start_date: 1, end_date: 1 }, unique: true)
   index ({ type: 1, title: 1})
-  index({_slugs: 1}, { sparse: false })
+  index({_slugs: 1}, { unique: true, sparse: false })
 
   # rake db:mongoid:create_indexes
 
