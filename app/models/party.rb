@@ -17,13 +17,7 @@ class Party
   field :member, type: Boolean, default: false
 
 #slug
-  slug :title, history: true, localize: true do |d|
-    if d.title_changed?
-      d.title_translations[I18n.locale].to_url
-    else
-      d.id.to_s
-    end
-  end
+  slug :title, history: true, localize: true
 
 #indexes
   index ({ :title => 1})

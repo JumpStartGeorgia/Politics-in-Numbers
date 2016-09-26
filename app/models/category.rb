@@ -24,13 +24,14 @@ class Category
   field :order, type: Integer
   field :sym, type: Symbol
 
-  slug :title, history: true, localize: true do |d|
-    if d.title_changed?
-      d.title_translations[I18n.locale].to_url
-    else
-      d.id.to_s
-    end
-  end
+  slug :title, history: true, localize: true
+  #  do |d|
+  #   if d.title_changed? && d.title.present?
+  #     d.title_translations[I18n.locale].to_url
+  #   else
+  #     d.id.to_s
+  #   end
+  # end
 
   scope :virtual, ->{ where(virtual: true) }
   scope :non_virtual, ->{ where(virtual: false) }

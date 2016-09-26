@@ -14,13 +14,7 @@ class Period
   # not working date is nill, default: ->{"#{self.start_date.strftime('%d/%m/%Y')}" << self.end_date.present? ? " - #{self.end_date.strftime('%d/%m/%Y')}" : "" }
   field :description, type: String, localize: true
 
-  slug :title, history: true, localize: true do |d|
-    if d.title_changed?
-      d.title_translations[I18n.locale].to_url
-    else
-      d.id.to_s
-    end
-  end
+  slug :title, history: true, localize: true
 
 
   validate :validate_dates

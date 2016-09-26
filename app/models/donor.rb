@@ -18,10 +18,8 @@ class Donor
   field :multiple, type: Boolean, default: false # if donated to multiple parties
 
   slug :first_name, :last_name, history: true, localize: true do |d|
-    if d.first_name_changed? || d.last_name_changed?
+    if d.first_name_changed? || d.last_name_changed? && (d.first_name.present? || d.last_name.present?)
       "#{d.first_name_translations[I18n.locale]} #{d.last_name_translations[I18n.locale]}".to_url
-    else
-      d.id.to_s
     end
   end
 

@@ -11,23 +11,19 @@ namespace :prepare do # WARNING ondeploy
   desc "For each donor save, for full_name to be filled"
   task :reset_slugs => :environment do |t, args|
     Donor.each { |p|
-      p.clear_slug!
-      p.build_slug
+      p.unset_slug!
       p.save
     }
     Party.each { |p|
-      p.clear_slug!
-      p.build_slug
+      p.unset_slug!
       p.save
     }
     Period.each { |p|
-      p.clear_slug!
-      p.build_slug
+      p.unset_slug!
       p.save
     }
     Category.each { |p|
-      p.clear_slug!
-      p.build_slug
+      p.unset_slug!
       p.save
     }
   end
