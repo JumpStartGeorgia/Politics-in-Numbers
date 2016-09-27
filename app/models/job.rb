@@ -190,7 +190,11 @@ class Job
     def _donorset_file_process(item_id, user_id, links)
       begin
         # notifiers = [:user]
-        lg = Delayed::Worker.logger
+        # lg = Delayed::Worker.logger
+        lg = Logger.new File.new('log/donorset.log', 'a')
+        lg.formatter = proc do |severity, datetime, progname, msg|
+          "#{msg}\n"
+        end
         lg.info "----------------------------------start"
         @donorset = Donorset.find(item_id)
         donors = []
