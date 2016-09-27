@@ -193,7 +193,6 @@ class Job
         @donorset = Donorset.find(item_id)
         donors = []
         @user = User.find(user_id)
-        Rails.logger.debug("--------------------------------------------here")
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.donorset_not_found"))) if @donorset.nil?
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.operator_not_found"));) if @user.nil?
 
@@ -204,6 +203,7 @@ class Job
 
         lg = Delayed::Worker.logger
 
+        lg.info "----------------------------------1"
         workbook = RubyXL::Parser.parse(@donorset.source.path)
         worksheet = workbook[0]
         is_header = true
@@ -247,7 +247,7 @@ class Job
             end
           end
         }
-
+        lg.info "----------------------------------2 #{is_header}"
         if is_header
           raise Exception.new(I18n.t("notifier.job.donorset_file_process.unmatched_header", header: headers_map))
         else
