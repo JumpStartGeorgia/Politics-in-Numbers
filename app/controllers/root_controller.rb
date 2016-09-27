@@ -46,17 +46,19 @@ class RootController < ApplicationController
   end
 
   def explore
+    gon.url = root_url
+    gon.app_name = "pins.ge"
     gon.date_format = t('date.formats.jsdate')
     gon.filter_item_close = t('.filter_item_close');
     gon.party_list = Party.list
-    gon.donor_list = Donor.list
+    gon.donor_list = Donor.list_with_tin
     gon.period_list = Period.list
 
     @categories = Category.non_virtual # required for object explore calls
     gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
     gon.main_categories = {}
     @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.permalink }
-     Rails.logger.debug("---------------------------bas-----------------#{gon.main_categories}")
+    # Rails.logger.debug("---------------------------bas-----------------#{gon.main_categories}")
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
     gon.all = t('shared.common.all')
     gon.campaign = t('.campaign')

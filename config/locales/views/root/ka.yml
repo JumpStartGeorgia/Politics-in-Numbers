@@ -48,7 +48,6 @@ ka:
       donors: DONORS
       party_donations: PARTY <br/>DONATIONS
       view: View
-      donation_caption: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Officia expedita enim fugiat"
       view_as: View as
       view_as_chart: Chart view
       view_as_table: Table view

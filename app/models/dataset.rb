@@ -88,7 +88,6 @@ class Dataset
     options = []
     matches = []
     conditions = []
-
     matches.push({ "party_id": { "$in": params[:parties].map{|m| BSON::ObjectId(m)} } }) if params[:parties].present?
     matches.push({ "period_id": { "$in": params[:period].map{|m| BSON::ObjectId(m)} } }) if params[:period].present?
 
@@ -137,7 +136,7 @@ class Dataset
   end
   def self.explore(params)
     limiter = 5
-    Rails.logger.info("--------------------------------------------#{params}")
+    #Rails.logger.info("--------------------------------------------#{params}")
 
     f = { parties: nil, period: nil }
 
@@ -148,7 +147,6 @@ class Dataset
     main_categories_count = 0
     SYMS.each { |e| f[e] = Category.get_ids_by_slugs(params[e]) if params[e].present? }
 
-    # Rails.logger.debug("--------------------------------------------#{f}")
 
     data = filter(f).to_a
 
@@ -158,6 +156,7 @@ class Dataset
     Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
     Period.each{|e| periods[e.id] = { name: e.title, date: e.start_date, type: e.type } }
     Category.each{|e| categories[e.id] = { title: e.title, parent_id: e.parent_id } }
+    Rails.logger.debug("--------------------------------------------#{parties}")
 
     selected_categories = []
     main_categories = {}
@@ -211,6 +210,19 @@ class Dataset
         parties_list[e[:party_id]] = { name: parties[e[:party_id]][:name], data: [] }
       end
     }
+
+    f[:period].each { |p_id|
+      if !period_list.key?(BSON::ObjectId(p_id))
+        period_list[p_id] = { id: p_id, name: periods[BSON::ObjectId(p_id)][:name], date: periods[BSON::ObjectId(p_id)][:date], type: periods[BSON::ObjectId(p_id)][:type]  }
+      end
+    }
+
+    f[:parties].each { |p_id|
+      if !parties_list.key?(BSON::ObjectId(p_id))
+        parties_list[p_id] = { name: parties[BSON::ObjectId(p_id)][:name], data: [] }
+      end
+    }
+
     tmp = []
     period_list.each{|k,v| tmp.push({ id: v[:id], name: v[:name], date: v[:date], type: v[:type] }) }
     period_list = tmp.sort!{ |x,y| x[:date] <=> y[:date] }
@@ -298,6 +310,7 @@ class Dataset
     headers = [[""],[I18n.t("shared.common.parties")]]
     header_classes = [["empty"], ["outer"]]
     classes = [nil]
+     Rails.logger.debug("--------------------------------------------#{chart_type} #{parties_list}")
     # prepaire data for charts
     if chart_type == 0 # one category
       chart1 = parties_list.map{|k,v|
@@ -364,10 +377,9 @@ class Dataset
       }
 
     elsif chart_type == 2 # multiple categories for different main categories
-      Rails.logger.debug("--------------------------------------------sdfsdf2")
       cat_i = 0
       main_categories.each{|cat_k, cat_v|
-         Rails.logger.debug("-------------------------------#{main_categories}---------#{cat_k}----#{cat_v}")
+         # Rails.logger.debug("-------------------------------#{main_categories}---------#{cat_k}----#{cat_v}")
         tmp = cat_v.map{ |m| categories[m][:title] }.join(", ")
 
         chart1.push({

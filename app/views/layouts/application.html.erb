@@ -10,7 +10,7 @@
     <% if Rails.env.production? %>
       <%= render partial: 'application/google_analytics' %>
     <% end %>
-    <%= include_gon(watch: true) %>
+    <%#= include_gon(watch: true) %>
     <script type="text/javascript">
       I18n = {
         defaultLocale: "<%= I18n.default_locale %>",

@@ -78,7 +78,6 @@ $(document).ready(function (){
                 local = p.attr("data-local"),
                 multilevel = finance.categories.indexOf(local) !== -1,
                 list = multilevel ? gon.category_lists[local] : gon[local + "_list"], to_show = [];
-
               if(multilevel) {
                 list.forEach(function(d) {
                   if(d[1].match(regex) !== null) {
@@ -94,6 +93,16 @@ $(document).ready(function (){
                       ul.find("li .item[data-id='" + ts + "']").parent().show();
                     });
                   }
+                });
+              }
+              else {
+                list.forEach(function(d) {
+                  if((d[1] + (d.length === 3 ? d[2] : "")).match(regex) !== null) {
+                    to_show.push(d[0]);
+                  }
+                });
+                to_show.forEach(function(ts) {
+                  ul.find("li .item[data-id='" + ts + "']").parent().show();
                 });
               }
             }
@@ -123,6 +132,15 @@ $(document).ready(function (){
       }, 250),
       // search_tree: function () {}
       bind: function() {
+        $(".autocomplete[data-source]").each(function() {
+          var t = $(this), source = t.attr("data-source"), html = "";
+          if(gon.hasOwnProperty(source) && Array.isArray(gon[source])) {
+            gon[source].forEach(function(d) {
+              html += "<li><div class=\"item\" data-id=" + d[0] + ">" + d[1] + "</div></li>";
+            });
+            t.find(".dropdown").html(html);
+          }
+        });
         $(".autocomplete input").on("change paste keyup", this.onchange);
         $(".autocomplete input").on("click", function() {
           //console.log("here");
@@ -320,6 +338,7 @@ $(document).ready(function (){
 
             if(type === "autocomplete") {
               autocomplete.clear(t.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"));
+              if(typeof global_click_callback === "function") { global_click_callback(); }
             }
             else if(type === "period") {
               t.find(".input-group input[type='text'].datepicker").datepicker('setDate', null);
@@ -495,6 +514,7 @@ $(document).ready(function (){
 
             if(type === "autocomplete") {
               autocomplete.clear(t.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"));
+              if(typeof global_click_callback === "function") { global_click_callback(); }
             }
             else if(type === "period_mix") {
               t.find(".input-group .input-radio-group input:first-of-type").prop("checked", true);
@@ -1036,8 +1056,8 @@ $(document).ready(function (){
     content.find(".panes").toggleClass("not-found", !is_data_ok);
     if(is_data_ok) {
       if(partial === "donation") {
-        bar_chart("#donation_chart_1", data.chart1, data.chart1_title, "#EBE187");
-        bar_chart("#donation_chart_2", data.chart2, data.chart2_title, "#B8E8AD");
+        bar_chart("#donation_chart_1", data.chart1, data.chart1_title, data.chart_subtitle, "#EBE187");
+        bar_chart("#donation_chart_2", data.chart2, data.chart2_title, data.chart_subtitle, "#B8E8AD");
       }
       else {
         //grouped_column_chart("#finance_chart", data.chart1, "#fff");
@@ -1051,8 +1071,29 @@ $(document).ready(function (){
       lang: {
         numericSymbols: [ "k" , "M" , "G" , "T" , "P" , "E"]
       },
-      colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"]
+      colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
+      credits: {
+        enabled: true,
+        href: gon.url,
+        // position: undefined
+        // style: undefined
+        text: gon.app_name
+      }
     });
+    (function(H) { // for highchart to recognize maxPointWidth property
+        var each = H.each;
+        H.wrap(H.seriesTypes.column.prototype, 'drawPoints', function(proceed) {
+            var series = this;
+            if(series.data.length > 0 ){
+                var width = series.barW > series.options.maxPointWidth ? series.options.maxPointWidth : series.barW;
+                each(this.data, function(point) {
+                    point.shapeArgs.x += (point.shapeArgs.width - width) / 2;
+                    point.shapeArgs.width = width;
+                });
+            }
+            proceed.call(this);
+        })
+    })(Highcharts)
 
     bind();
     is_type_donation = gon.gonned_type === "donation";
@@ -1060,7 +1101,7 @@ $(document).ready(function (){
     filter();
   })();
 
-  function bar_chart(elem, series_data, title, bg) {
+  function bar_chart(elem, series_data, title, subtitle, bg) {
     //console.log("chart", elem, series_data);
     $(elem).highcharts({
       chart: {
@@ -1076,6 +1117,7 @@ $(document).ready(function (){
         }
       },
       title: { text: title },
+      subtitle: { text: subtitle },
       xAxis: {
         type: "category",
         lineWidth: 0,
@@ -1112,12 +1154,11 @@ $(document).ready(function (){
               shadow: false
           }
       },
-      credits: { enabled: false },
       series: [{ data: series_data }]
     });
   }
   function grouped_column_chart(elem, resource, bg) {
-    //console.log("chart", elem, resource);
+    console.log("chart", elem, resource);
     $(elem).highcharts({
       chart: {
           type: 'column',
@@ -1204,10 +1245,9 @@ $(document).ready(function (){
 
       plotOptions: {
         column:{
-          pointWidth: 10
+          maxPointWidth: 20
         }
       },
-      credits: { enabled: false },
       series: resource.series,
       tooltip: {
         backgroundColor: "#DCE0DC",
@@ -1225,7 +1265,7 @@ $(document).ready(function (){
     });
   }
   function grouped_advanced_column_chart(elem, resource, bg) {
-    //console.log(resource);
+    console.log(resource);
     $(elem).highcharts({
       chart: {
           type: 'column',
@@ -1312,10 +1352,9 @@ $(document).ready(function (){
 
       plotOptions: {
         column:{
-          pointWidth: 10
+          maxPointWidth: 20
         }
       },
-      credits: { enabled: false },
       series: resource.series,
       tooltip: {
         backgroundColor: "#DCE0DC",

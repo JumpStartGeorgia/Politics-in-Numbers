@@ -197,7 +197,10 @@ class Job
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.donorset_not_found"))) if @donorset.nil?
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.operator_not_found"));) if @user.nil?
 
-        headers_map = ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
+        headers_map = [
+          ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ],
+          ["N", "თარიღი", "სახელი/ სამართლებრივი ფორმა", "გვარი / იურიდიული პირის დასახელება", "პირადი ნომერი / საიდ. კოდი", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
+        ]
 
         lg = Delayed::Worker.logger
 
@@ -208,14 +211,14 @@ class Job
         # raise Exception.new("some")
         worksheet.each_with_index { |row, row_i|
           if row && row.cells
-            cells = Array.new(headers_map.length, nil)
+            cells = Array.new(headers_map[0].length, nil)
             row.cells.each_with_index do |c, c_i|
               if c && c.value.present?
                 cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
               end
             end
             if is_header
-              is_header = false if cells == headers_map
+              is_header = false if headers_map.any?{|hm| hm == cells }
             else
               break if cells[1].nil?
               party = cells[6]

@@ -228,7 +228,7 @@ class Category
         out = "<ul>" if !first
         list.each { |item|
           has_sub = item[:sub].present?
-          out += "<li class='l#{item[:c].level}#{has_sub ? ' collapse' : ''}' tabindex='5'>#{has_sub ? '<div class=\'tree-toggle\'></div>' : ''}<div class='item' data-id='#{item[:c].id}'>#{item[:c].title}</div>"
+          out += "<li class='l#{item[:c].level}#{has_sub ? ' collapse' : ''}'>#{has_sub ? '<div class=\'tree-toggle\'></div>' : ''}<div class='item' data-id='#{item[:c].permalink}'>#{item[:c].title}</div>"
           out += by_sym_helper(item[:sub], false) if has_sub
           out += "</li>"
         }

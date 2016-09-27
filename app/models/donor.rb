@@ -34,6 +34,8 @@ class Donor
   index ({ :'donations.monetary' => 1})
   index({_slugs: 1}, { unique: true, sparse: false })
 
+
+
   def permalink
     slug.present? ? slug : id.to_s
   end
@@ -55,6 +57,10 @@ class Donor
 
   def self.list
     sorted.map{|t| [t.permalink, t.full_name]}
+  end
+
+  def self.list_with_tin
+    sorted.map{|t| [t.permalink, t.full_name, t.tin]}
   end
 
   def self.filter(params)
@@ -136,6 +142,17 @@ class Donor
     #end
     result
   end
+
+  def self.max_give_date
+    collection.aggregate(
+       [{
+          "$group": {
+            maxDate: { "$max": "$donations.give_date" }
+          }
+         }
+       ]
+    )
+  end
   def self.explore(params)
     limiter = 5
      # Rails.logger.debug("--------------------------------------------#{}")
@@ -154,7 +171,9 @@ class Donor
 
     tmp = params[:period]
     f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
-
+     Rails.logger.debug("--------------------------------------------#{f[:period]}")
+    chart_subtitle = f[:period][0] != -1 && f[:period][1] != -1 ? "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}" : " not specified "
+     # Rails.logger.debug("--------------------------------------------#{f[:period]}")
     tmp = params[:amount]
     f[:amount] = tmp.map{|t| t.to_i } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
 
@@ -270,11 +289,12 @@ class Donor
     end
 
     {
-      data: data,
+      #data: data,
       chart1: chart1,
       chart1_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", chart_meta_obj),
       chart2: chart2,
       chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart_meta_obj),
+      chart_subtitle: chart_subtitle,
       table: {
         data: table,
         header: [human_attribute_name(:id), human_attribute_name(:name), human_attribute_name(:tin),
