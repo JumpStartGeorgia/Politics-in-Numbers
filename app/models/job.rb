@@ -190,18 +190,19 @@ class Job
     def _donorset_file_process(item_id, user_id, links)
       begin
         # notifiers = [:user]
+        lg = Delayed::Worker.logger
+        lg.info "----------------------------------start"
         @donorset = Donorset.find(item_id)
         donors = []
         @user = User.find(user_id)
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.donorset_not_found"))) if @donorset.nil?
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.operator_not_found"));) if @user.nil?
-
+        lg.info "----------------------------------1"
         headers_map = [
           ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ],
           ["N", "თარიღი", "სახელი/ სამართლებრივი ფორმა", "გვარი / იურიდიული პირის დასახელება", "პირადი ნომერი / საიდ. კოდი", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
         ]
 
-        lg = Delayed::Worker.logger
 
         lg.info "----------------------------------1"
         workbook = RubyXL::Parser.parse(@donorset.source.path)
