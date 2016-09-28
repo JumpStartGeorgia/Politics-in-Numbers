@@ -15,6 +15,7 @@
       <th><%= @model.human_attribute_name(:title) %></th>
       <th><%= @model.human_attribute_name(:description) %></th>
       <th><%= @model.human_attribute_name(:type) %></th>
+      <th><%= @model.human_attribute_name(:member) %></th>
       <th><%= @model.human_attribute_name(:slug) %></th>
       <th><%= @model.human_attribute_name(:color) %></th>
       <th><%= @model.human_attribute_name(:name) %></th>
@@ -26,7 +27,8 @@
       <tr>
         <td class="available-locales-box"><%= "#{item.title} #{existence_translations(item, :title)}".html_safe %></td>
         <td class="available-locales-box"><%= "#{item.description} #{existence_translations(item, :description)}".html_safe %></td>
-        <td><%= t("mongoid.shared.options.party.type.#{@model::TYPES[item.type]}") %></td>
+        <td><%= t("mongoid.options.party.type.#{@model::TYPES[item.type]}") %></td>
+        <td><%= t("mongoid.options.party.member.#{item.member ? '_true' : '_false'}") %></td>
         <td><%= item.permalink %></td>
         <td><%= item.color %></td>
         <td><%= item.name %></td>

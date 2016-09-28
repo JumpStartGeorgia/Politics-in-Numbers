@@ -133,6 +133,9 @@ en:
         type:
           party: Party
           initiative: Initiative
+        member:
+          _true: Member
+          _false: Not a member
       period:
         type:
           annual: Annual
