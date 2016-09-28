@@ -85,7 +85,7 @@ class Admin::PartiesController < AdminController
     if @deffered.nil?
       redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.not_found") }
     else
-      @items = @model.where(:id.in => @deffered.related_ids)
+      @items = @model.where(:id.in => @deffered.related_ids).to_a
       if @items.nil?
         @deffered.destroy
         redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.no_related_objects") }
