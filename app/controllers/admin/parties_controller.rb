@@ -82,11 +82,11 @@ class Admin::PartiesController < AdminController
 
   def bulk
     @deffered = current_user.deffereds.find(params[:id])
-    if @deffered.nil?
+    if !@deffered.present?
       redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.not_found") }
     else
       @items = @model.where(:id.in => @deffered.related_ids)
-      if @items.present?
+      if !@items.present?
         @deffered.destroy
         redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.no_related_objects") }
       end
