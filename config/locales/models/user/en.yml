@@ -164,7 +164,7 @@ en:
     messages:
       deffered:
         not_found: "You don't have uncompleted deffered activies."
-        no_related_objects: "Current deffered activity has no related objects to communicate with."
+        no_related_objects: "Current deffered activity has no related objects to communicate with. It was removed."
         missing_parameter: "Your deffered activity is broken, or you are trying to brake this peace of code"
   formtastic:
     hints:
