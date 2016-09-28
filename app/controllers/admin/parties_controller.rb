@@ -85,9 +85,7 @@ class Admin::PartiesController < AdminController
     if @deffered.nil?
       redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.not_found") }
     else
-      ids = @deffered.related_ids
-      @items = @model.where(:id.in => ids)
-
+      @items = @model.where(:id.in => @deffered.related_ids)
       redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.no_related_objects") } if @items.nil?
     end
   end
@@ -141,15 +139,15 @@ class Admin::PartiesController < AdminController
   private
     def _params
       pars = params.clone
-      #puts "=================================#{pars}"
+      puts "=================================#{pars}"
       default = I18n.default_locale
       locales = [:ka, :en, :ru]
-      [:title_translations, :description_translations, :permalink_translations].each{|f|
+      [:title_translations, :description_translations].each{|f|
         pars[:party][f].delete_if{|k,v| !v.present? }
       }
       # sls = pars[:party][:_slugs_translations];
       # sls.each{|k,v| sls[k] = [v] }
-      pars.require(:party).permit(:_id, :id, :title, :type, :color, :name, :tmp_id, title_translations: [:ka, :en, :ru], description_translations: [:ka, :en, :ru], permalink_translations: [:ka, :en, :ru])
+      pars.require(:party).permit(:_id, :id, :title, :type, :color, :name, :tmp_id, title_translations: [:ka, :en, :ru], description_translations: [:ka, :en, :ru])
     end
     def _bulk_params
       #params.permit(:id).permit(:parties).permit!

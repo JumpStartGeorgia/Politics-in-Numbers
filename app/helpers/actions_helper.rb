@@ -5,7 +5,7 @@ module ActionsHelper
               obj: t("mongoid.models.#{object.model_name.singular}",
                      count: 1)),
             link_path,
-            class: 'btn btn-default'
+            class: 'btn btn-info'
   end
 
   def view_all_button(object)
@@ -13,7 +13,7 @@ module ActionsHelper
               obj: t("mongoid.models.#{object.model_name.singular}",
                      count: 999)),
             url_for(action: :index, controller: object.model_name.plural),
-            class: 'btn btn-default'
+            class: 'btn btn-info'
   end
 
   def new_button(model_class)
@@ -29,7 +29,7 @@ module ActionsHelper
               obj: t("mongoid.models.#{object.model_name.singular}",
                      count: 1)),
             link_path,
-            class: 'btn btn-default'
+            class: 'btn btn-warning'
   end
 
   def destroy_button(object, link_path = object)

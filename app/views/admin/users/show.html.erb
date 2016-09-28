@@ -4,9 +4,11 @@
                 user_email: @user.email) %>
 
 <div class='actions'>
-  <%= view_all_button(@user) %>
-  <%= edit_button(@user, edit_admin_user_path) if can? :edit, @user %>
-  <%= destroy_button(@user, admin_user_path) if can? :destroy, @user %>
+  <div class="btn-group btn-group-sm" role="group" aria-label="...">
+    <%= view_all_button(@user) %>
+    <%= edit_button(@user, edit_admin_user_path) if can? :edit, @user %>
+    <%= destroy_button(@user, admin_user_path) if can? :destroy, @user %>
+  </div>
 </div>
 
 <dl class='dl-horizontal'>

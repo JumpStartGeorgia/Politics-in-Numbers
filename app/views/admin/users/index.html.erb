@@ -14,7 +14,6 @@
 <table class="table table-bordered table-hover table-responsive datatable">
   <thead>
     <tr>
-      <th></th>
       <th><%= model_class.human_attribute_name(:email) %></th>
       <th><%= model_class.human_attribute_name(:role_id) %></th>
       <th><%= model_class.human_attribute_name(:last_sign_in_at) %></th>
@@ -26,28 +25,28 @@
   <tbody>
     <% @users.each do |user| %>
       <tr>
-        <td>
-          <%= link_to t('shared.actions.view'),
-                      admin_user_path(user),
-                      class: 'btn btn-default' %>
-        </td>
         <td><%= user.email %></td>
         <td><%= user.role.name if user.role.present? %></td>
         <td><%= user.last_sign_in_at %></td>
         <% if (can? :edit, user) || (can? :destroy, user) %>
           <td>
-            <%= if can? :edit, User
-                  link_to t('shared.actions.edit'),
-                          edit_admin_user_path(user),
-                          class: 'btn btn-default'
-            end %>
-            <%= if can? :destroy, User
-                  link_to t('shared.actions.destroy'),
-                          admin_user_path(user),
-                          method: :delete,
-                          data: { confirm: t('shared.prompts.confirm') },
-                          class: 'btn btn-danger'
-            end %>
+            <div class="btn-group btn-group-sm" role="group" aria-label="...">
+              <%= link_to t('shared.actions.view'),
+                        admin_user_path(user),
+                        class: 'btn btn-info' %>
+              <%= if can? :edit, User
+                    link_to t('shared.actions.edit'),
+                            edit_admin_user_path(user),
+                            class: 'btn btn-warning'
+              end %>
+              <%= if can? :destroy, User
+                    link_to t('shared.actions.destroy'),
+                            admin_user_path(user),
+                            method: :delete,
+                            data: { confirm: t('shared.prompts.confirm') },
+                            class: 'btn btn-danger'
+              end %>
+            </div>
           </td>
         <% end %>
       </tr>
