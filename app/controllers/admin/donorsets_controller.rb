@@ -23,8 +23,7 @@ class Admin::DonorsetsController < AdminController
 
   # GET /donors/1
   def show
-    @items = @model.find(params[:id]).donors
-
+    @items = @model.find(params[:id]).donations
     respond_to do |format|
       format.html
     end
@@ -56,6 +55,7 @@ class Admin::DonorsetsController < AdminController
   # DELETE /donorsets/1
   def destroy
     @item = @model.find(params[:id])
+
     @item.destroy
 
     respond_to do |format|

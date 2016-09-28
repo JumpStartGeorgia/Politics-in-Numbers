@@ -156,7 +156,6 @@ class Dataset
     Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
     Period.each{|e| periods[e.id] = { name: e.title, date: e.start_date, type: e.type } }
     Category.each{|e| categories[e.id] = { title: e.title, parent_id: e.parent_id } }
-    Rails.logger.debug("--------------------------------------------#{parties}")
 
     selected_categories = []
     main_categories = {}
@@ -310,7 +309,6 @@ class Dataset
     headers = [[""],[I18n.t("shared.common.parties")]]
     header_classes = [["empty"], ["outer"]]
     classes = [nil]
-     Rails.logger.debug("--------------------------------------------#{chart_type} #{parties_list}")
     # prepaire data for charts
     if chart_type == 0 # one category
       chart1 = parties_list.map{|k,v|

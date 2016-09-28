@@ -55,7 +55,6 @@ class Category
       if id_or_slugs[0] == "all"
         []
       else
-         Rails.logger.info("--------------------------------------------#{id_or_slugs}")
         x = only(:_id, :_slugs).find(id_or_slugs)
         x.present? ? x.map{ |m| m[:_id] } : []
       end

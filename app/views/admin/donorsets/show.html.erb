@@ -24,43 +24,18 @@
     </thead>
     <tbody>
       <% @items.each do |item| %>
-        <tr>
-          <td><%= item.first_name %></td>
-          <td><%= item.last_name %></td>
-          <td class="text-right"><%= item.tin %></td>
-          <td class="text-right"><%= item.amount %></td>
-          <td><%= item.party %></td>
-          <td class="text-center"><%= I18n.l(item.give_date, format: :default) %></td>
-          <td><%= item.comment %></td>
-        </tr>
+        <% item[:donations].each { |donation| %>
+          <tr>
+            <td><%= item[:first_name] %></td>
+            <td><%= item[:last_name] %></td>
+            <td class="text-center"><%= item[:tin] %></td>
+            <td class="text-right"><%= donation[:amount] %></td>
+            <td><%= Party.find(donation[:party_id]).title %></td>
+            <td class="text-center"><%= I18n.l(donation[:give_date], format: :date) %></td>
+            <td><%= donation[:comment] %></td>
+          </tr>
+        <% } %>
       <% end %>
     </tbody>
   </table>
 </div>
-
-
-<%-
-  # top_donors = {}
-  # top_parties = {}
-  # d = Donorset.last.donors
-  # d.each{|t|
-  #   k = t.first_name + " " + t.last_name
-  #   if top_donors.key?(k)
-  #     top_donors[k] += t.amount
-  #   else
-  #     top_donors[k] = t.amount
-  #   end
-  #   k = t.party
-  #   if top_parties.key?(k)
-  #     top_parties[k] += t.amount
-  #   else
-  #     top_parties[k] = t.amount
-  #   end
-  # }
-%>
-<%#- top_donors.sort_by { |k,v| -v }[0..5].each{|k,v| %>
-  <%#= "#{k} #{v}\n" %></br>
-<%#- } %>
-<%#- top_parties.sort_by { |k,v| -v }[0..5].each{|k,v| %>
-  <%#= "#{k} #{v}\n" %></br>
-<%#- } %>

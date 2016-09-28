@@ -303,7 +303,7 @@ class Job
     Job._dataset_file_process(item_id, user_id, links)
   end
 
-  def self.donorset_file_process(item_id, user_id, links)
+  def self.donorset_file_process(item_id, user_id, links=["", ""])
     Job._donorset_file_process(item_id, user_id, links)
   end
 

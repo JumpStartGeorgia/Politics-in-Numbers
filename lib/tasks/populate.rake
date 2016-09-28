@@ -1,11 +1,11 @@
 require 'fileutils'
 namespace :populate do
   desc "Read and upload all annual files"
-  task :annual => :environment do |t, args|
+  task :annuals => :environment do |t, args|
 
     log_path = "#{Rails.root}/log/tasks"
     FileUtils.mkpath(log_path)
-    lg = Logger.new File.new("#{log_path}/populate.log", 'w')
+    lg = Logger.new File.new("#{log_path}/populate_annual.log", 'w')
     lg.formatter = proc do |severity, datetime, progname, msg|
       "#{msg}\n"
     end
@@ -41,7 +41,7 @@ namespace :populate do
         period_id = per._id
         dataset = Dataset.new({party_id: party_id, period_id: period_id, source: File.open(f) })
         dataset.save
-        Job.dataset_file_process(dataset._id, User.all[1]._id, []) # [admin_dataset_url(id: "_id")])
+        Job.dataset_file_process(dataset._id, User.all[0]._id, []) # [admin_dataset_url(id: "_id")])
       else
         lg.info "File #{filenames[f_i]}, Party for id #{tmp_id} is missing" if prt.nil?
         lg.info "File #{filenames[f_i]}, Period for id #{year} is missing" if per.nil?
@@ -53,7 +53,7 @@ namespace :populate do
   end
 
   desc "Read and upload all election files"
-  task :election => :environment do |t, args|
+  task :elections => :environment do |t, args|
 
     log_path = "#{Rails.root}/log/tasks"
     FileUtils.mkpath(log_path)
@@ -111,7 +111,7 @@ namespace :populate do
       if prt.present? && per.present?
         dataset = Dataset.new({party_id: prt._id, period_id: period_id = per._id, source: File.open(f) })
         dataset.save
-        Job.dataset_file_process(dataset._id, User.all[1]._id, [])
+        Job.dataset_file_process(dataset._id, User.all[0]._id, [])
       else
         lg.info "File #{filenames[f_i]}, Party for id #{tmp_id} is missing" if prt.nil?
         lg.info "File #{filenames[f_i]}, Period for id #{tmp_id} is missing" if per.nil?
@@ -120,6 +120,42 @@ namespace :populate do
 
     }
     # puts ps.inspect
+    lg.close
+  end
+
+  desc "Read and upload all donation files"
+  task :donations => :environment do |t, args|
+
+    log_path = "#{Rails.root}/log/tasks"
+    FileUtils.mkpath(log_path)
+    lg = Logger.new File.new("#{log_path}/populate_donation.log", 'w')
+    lg.formatter = proc do |severity, datetime, progname, msg|
+      "#{msg}\n"
+    end
+
+    Donorset.destroy_all # only for dev
+
+    I18n.locale = :en
+
+    files = []
+    filenames = []
+    upload_path = Rails.public_path.join("upload/donors")
+    Dir.entries(upload_path).each {|f|
+      if File.file?("#{upload_path}/#{f}") && f != ".gitkeep"
+        files << "#{upload_path}/#{f}"
+        filenames << f.to_s.gsub(".xlsx","")
+      end
+    }
+
+    puts files.length
+    files.each_with_index {|f,f_i|
+      lg.info filenames[f_i]
+
+      donorset = Donorset.new({ source: File.open(f) })
+      donorset.save
+      lg.info donorset.errors.inspect
+      Job.donorset_file_process(donorset._id, User.all[0]._id)
+    }
     lg.close
   end
 end

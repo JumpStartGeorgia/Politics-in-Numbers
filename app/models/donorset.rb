@@ -6,7 +6,7 @@ class Donorset
 
 
   STATES = [:pending, :processed, :discontinued]  # 0 pending 1 processed 2 discontinued
-
+  before_destroy :destroy_donations
   # has_many :donations
 
   field :state, type: Integer, default: 0
@@ -59,6 +59,39 @@ class Donorset
     self.state == STATES.index(st)
   end
 
+  def donations
+    lang = I18n.locale
+    options = []
+    matches = []
+    conditions = []
+
+    tmp = self.id
+    matches.push({ "donations.donorset_id": { "$eq": tmp } })
+    conditions.push({"$eq": [ "$$donation.donorset_id", tmp ]})
+
+    options.push({ "$match": { "$and": matches } }) if !matches.blank?
+    options.push({
+      "$project": {
+        first_name: "$first_name.#{lang}",
+        last_name: "$last_name.#{lang}",
+        tin: 1,
+        donations: {
+          "$filter": {
+            input: "$donations",
+            as: "donation",
+            cond: { "$and": conditions }
+          }
+        }
+      }
+    })
+    Donor.collection.aggregate(options).to_a
+  end
+  def destroy_donations
+    Donor.each{|dnr|
+      dnr.donations.delete_all({donorset_id: self.id})
+      dnr.save
+    }
+  end
   # def self.dates_range
   #   min = nil
   #   max = nil

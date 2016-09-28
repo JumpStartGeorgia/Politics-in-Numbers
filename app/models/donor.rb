@@ -230,7 +230,7 @@ class Donor
       e[:partial_donated_amount] = 0
       e[:donations].each { |ee|
         am = ee[:amount]
-        puts "--------------------------#{ee[:party_id]}"
+        puts "------------------------#{e[:donations]}--#{ee[:party_id]} #{ee[:donorset_id]}"
         parties[ee[:party_id]][:value] += am if chart_type == 0
 
 

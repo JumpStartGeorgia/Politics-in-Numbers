@@ -83,3 +83,7 @@ If your primary puma jungle script is stored at the default location `/etc/init.
  - `/etc/init.d/puma restart`
 
 This starter template provides access to the puma jungle through mina commands, such as `mina puma:jungle:start`. Run `mina -T puma:jungle` to see all these commands.
+
+
+### Notes
+  * While uploading excel file make sure they have mime type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as file was resaved in ubuntu its mime type is 'application/zip'

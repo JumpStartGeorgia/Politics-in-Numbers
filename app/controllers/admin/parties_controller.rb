@@ -95,7 +95,7 @@ class Admin::PartiesController < AdminController
 
   def bulk_update
     @deffered = current_user.deffereds.find(params[:id])
-    if @deffered.nil?
+    if !@deffered.present?
       redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.not_found") }
     else
       related_ids = @deffered.related_ids
