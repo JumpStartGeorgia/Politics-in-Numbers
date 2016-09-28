@@ -19,9 +19,13 @@
                 <span class="caret"></span>
               </a>
               <ul class="dropdown-menu" role="menu">
+                <li>
+                  <%= link_to t('mongoid.models.admin', count: 1).upcase,
+                              admin_path, tabindex: 2  %>
+                </li>
                 <% if current_user.deffereds.present? %>
                   <li>
-                    <%= link_to admin_path, tabindex: 2  do %>
+                    <%= link_to deffered_admin_users_path, tabindex: 2  do %>
                       <%= t('mongoid.models.deffered', count: current_user.deffereds.length).upcase %>
                       <span class="badge"><%= current_user.deffereds.length %></span>
                     <% end %>
@@ -31,10 +35,7 @@
                   <%= link_to t('mongoid.models.user', count: 999).upcase,
                               admin_users_path, tabindex: 2  %>
                 </li>
-                <li>
-                  <%= link_to t('mongoid.models.admin', count: 1).upcase,
-                              admin_path, tabindex: 2  %>
-                </li>
+
 
                 <li class='divider'>
 

@@ -171,7 +171,7 @@ class Donor
 
     tmp = params[:period]
     f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
-     Rails.logger.debug("--------------------------------------------#{f[:period]}")
+     # Rails.logger.debug("--------------------------------------------#{f[:period]}")
     chart_subtitle = f[:period][0] != -1 && f[:period][1] != -1 ? "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}" : " not specified "
      # Rails.logger.debug("--------------------------------------------#{f[:period]}")
     tmp = params[:amount]
@@ -230,7 +230,7 @@ class Donor
       e[:partial_donated_amount] = 0
       e[:donations].each { |ee|
         am = ee[:amount]
-
+        puts "--------------------------#{ee[:party_id]}"
         parties[ee[:party_id]][:value] += am if chart_type == 0
 
 

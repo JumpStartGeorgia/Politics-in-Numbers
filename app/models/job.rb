@@ -195,20 +195,17 @@ class Job
         lg.formatter = proc do |severity, datetime, progname, msg|
           "#{msg}\n"
         end
-        lg.info "----------------------------------start"
         @donorset = Donorset.find(item_id)
         donors = []
         @user = User.find(user_id)
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.donorset_not_found"))) if @donorset.nil?
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.operator_not_found"));) if @user.nil?
-        lg.info "----------------------------------1"
         headers_map = [
           ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ],
           ["N", "თარიღი", "სახელი/ სამართლებრივი ფორმა", "გვარი / იურიდიული პირის დასახელება", "პირადი ნომერი / საიდ. კოდი", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
         ]
 
 
-        lg.info "----------------------------------1"
         workbook = RubyXL::Parser.parse(@donorset.source.path)
         worksheet = workbook[0]
         is_header = true
@@ -242,7 +239,7 @@ class Job
               end
               donor = Donor.by_tin(cells[4]).first
               if !donor.present?
-                donor = Donor.new({ first_name_translations: { ka: cells[2], en: cells[2].latinize.capitalize }, last_name_translations: { ka: cells[3], en: cells[3].latinize.capitalize }, tin: cells[4], nature: cells[3].present? ? 0 : 1 }) # individual or organization
+                donor = Donor.new({ first_name_translations: { ka: cells[2], en: cells[2].latinize.capitalize }, last_name_translations: { ka: cells[3] }.merge(cells[3].present? ? { en: cells[3].latinize.capitalize } : {}), tin: cells[4], nature: cells[3].present? ? 0 : 1 }) # individual or organization
               end
               donation = Donation.new({ give_date: cells[1], amount: cells[5].round(2), party_id: p._id, comment: cells[7], monetary: cells[7] != "არაფულადი",
               donorset_id: @donorset.id })
@@ -252,7 +249,6 @@ class Job
             end
           end
         }
-        lg.info "----------------------------------2 #{is_header}"
         if is_header
           raise Exception.new(I18n.t("notifier.job.donorset_file_process.unmatched_header", header: headers_map))
         else
