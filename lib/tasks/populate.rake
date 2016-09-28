@@ -158,4 +158,24 @@ namespace :populate do
     }
     lg.close
   end
+
+  desc "Test if there is no dead donations (donations without donorsets)"
+  task :test_dead_donations => :environment do |t, args|
+
+    sets = {}
+    Donorset.each{|d|
+      sets[d._id] = 1
+    }
+    Donor.each{|dnr|
+      dnr.donations.each {|don|
+        if !sets.key?(don.donorset_id)
+          puts "---------------donation without donorset found #{don.donorset_id}"
+          dnr.donations.delete(don)
+          dnr.save
+        end
+      }
+    }
+  end
+
+
 end

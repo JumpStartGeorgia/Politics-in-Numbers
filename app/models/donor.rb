@@ -146,12 +146,29 @@ class Donor
   def self.max_give_date
     collection.aggregate(
        [{
+          "$project": {
+            # _id: "$donations._id",
+            maxDate: { "$max": "$maxDate" },
+            minDate: { "$min": "$minDate" }
+          },
           "$group": {
-            maxDate: { "$max": "$donations.give_date" }
+            _id: "$donations._id",
+            maxDate: { "$max": "$donations.give_date" },
+            minDate: { "$min": "$donations.give_date" }
           }
          }
        ]
     )
+    # .aggregate(
+    #    [{
+    #       "$project": {
+    #         # _id: "$donations._id",
+    #         maxDate: { "$max": "$maxDate" },
+    #         minDate: { "$min": "$minDate" }
+    #       }
+    #      }
+    #    ]
+    # )
   end
   def self.explore(params)
     limiter = 5

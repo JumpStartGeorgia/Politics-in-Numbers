@@ -46,18 +46,6 @@ class RootController < ApplicationController
   end
 
   def explore
-    # sets = {}
-    # Donorset.each{|d|
-    #   sets[d] = 1
-    # }
-    # Donor.each{|dnr|
-    #   dnr.donations.each {|don|
-    #     if !sets.key?(don.donorset_id)
-    #       dnr.donations.delete(don)
-    #     end
-    #   }
-    #   dnr.save
-    # }
     gon.url = root_url
     gon.app_name = "pins.ge"
     gon.date_format = t('date.formats.jsdate')
