@@ -1107,7 +1107,7 @@ $(document).ready(function (){
       chart: {
           type: 'bar',
           backgroundColor: bg,
-          height: 200
+          height: 60*(Math.round(title.length/40)+1) + 40 * series_data.length
       },
       exporting: {
         buttons: {
@@ -1116,8 +1116,24 @@ $(document).ready(function (){
           }
         }
       },
-      title: { text: title },
-      subtitle: { text: subtitle },
+      title: {
+        text: title,
+        style: {
+          color: "#5d675b",
+          fontSize:"18px",
+          fontFamily: "firasans_r",
+          textShadow: 'none'
+        }
+      },
+      subtitle: {
+        text: subtitle,
+        style: {
+          color: "#5d675b",
+          fontSize:"12px",
+          fontFamily: "firasans_book",
+          textShadow: 'none'
+        }
+      },
       xAxis: {
         type: "category",
         lineWidth: 0,
@@ -1154,7 +1170,23 @@ $(document).ready(function (){
               shadow: false
           }
       },
-      series: [{ data: series_data }]
+      series: [{ data: series_data }],
+      tooltip: {
+        backgroundColor: "#DCE0DC",
+        followPointer: true,
+        shadow: false,
+        borderWidth:0,
+        style: {
+          color: "#5D675B",
+          fontSize:"14px",
+          fontFamily: "firasans_r",
+          textShadow: 'none',
+          fontWeight:'normal'
+        },
+        formatter: function() {
+          return "<b>" + this.key + "</b>: " + Highcharts.numberFormat(this.y);
+        }
+      }
     });
   }
   function grouped_column_chart(elem, resource, bg) {

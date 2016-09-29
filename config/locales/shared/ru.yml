@@ -77,8 +77,8 @@ ru:
       forgot_password: Forgot your password?
     chart:
       title:
-        top_5_donors: Top 5 Donors
-        top_5_parties: Top 5 Parties
+        top_5_donors: Top %{n} Donors
+        top_5_parties: Top %{n} Parties
         top_5_donors_for_party: Top %{n} Donors for %{obj}
         last_5_donations_for_party: Last %{n} Donations for %{obj}
         top_5_donors_for_parties: Top %{n} Donors for All Parties
@@ -95,6 +95,10 @@ ru:
           category_grouped_by: "Category - Grouped by"
           time_period_annual: "Annual"
           time_period_campaign: "Campaign"
+      label:
+        donors: Donors
+        parties: Parties
+        donations: Donations
     filters:
       donations: Пожертвования
       party_finances: Финансирование <br />партии

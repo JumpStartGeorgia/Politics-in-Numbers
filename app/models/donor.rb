@@ -40,6 +40,17 @@ class Donor
     slug.present? ? slug : id.to_s
   end
 
+  def self.get_ids_by_slugs(id_or_slugs)
+    id_or_slugs = [] if !id_or_slugs.present?
+    id_or_slugs = id_or_slugs.delete_if(&:blank?)
+    if id_or_slugs.class == Array
+      x = only(:_id, :_slugs).find(id_or_slugs)
+      x.present? ? x.map{ |m| m[:_id].to_s } : []
+    else
+      []
+    end
+  end
+
   def calculate_donated_amount(v)
     self.donated_amount = 0
     tmp_party_ids = []
@@ -143,32 +154,19 @@ class Donor
     result
   end
 
-  def self.max_give_date
+  def self.date_span
     collection.aggregate(
-       [{
-          "$project": {
-            # _id: "$donations._id",
-            maxDate: { "$max": "$maxDate" },
-            minDate: { "$min": "$minDate" }
-          },
+       [
+        { "$unwind": "$donations" },
+        {
           "$group": {
-            _id: "$donations._id",
-            maxDate: { "$max": "$donations.give_date" },
-            minDate: { "$min": "$donations.give_date" }
+          "_id": nil, #"$_id",
+          "first_date": { "$min": "$donations.give_date" },
+          "last_date": { "$max": "$donations.give_date" }
           }
-         }
-       ]
-    )
-    # .aggregate(
-    #    [{
-    #       "$project": {
-    #         # _id: "$donations._id",
-    #         maxDate: { "$max": "$maxDate" },
-    #         minDate: { "$min": "$minDate" }
-    #       }
-    #      }
-    #    ]
-    # )
+        }
+      ]
+    ).first
   end
   def self.explore(params)
     limiter = 5
@@ -183,19 +181,25 @@ class Donor
       nature: nil
     }
 
-    tmp = params[:donor]
-    f[:donor_ids] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
+    f[:donor_ids] = Donor.get_ids_by_slugs(params[:donor])
+
+    # f[:period] = Period.get_ids_by_slugs(params[:period])
 
     tmp = params[:period]
     f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
      # Rails.logger.debug("--------------------------------------------#{f[:period]}")
-    chart_subtitle = f[:period][0] != -1 && f[:period][1] != -1 ? "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}" : " not specified "
-     # Rails.logger.debug("--------------------------------------------#{f[:period]}")
+
+    if f[:period][0] != -1 && f[:period][1] != -1
+      chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
+    else
+      dte = Donor.date_span
+      chart_subtitle = "#{I18n.l(dte[:first_date], format: :date)} - #{I18n.l(dte[:last_date], format: :date)}"
+    end
+
     tmp = params[:amount]
     f[:amount] = tmp.map{|t| t.to_i } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
 
-    tmp = params[:party]
-    f[:parties] = tmp if tmp.present? && tmp.class == Array && tmp.all?{|t| t.size === 24 }
+    f[:parties] = Party.get_ids_by_slugs(params[:party])
 
     tmp = params[:monetary]
     f[:monetary] = tmp == "yes" if tmp == "yes" || tmp == "no"
@@ -204,12 +208,13 @@ class Donor
 
     tmp = params[:nature]
     f[:nature] = tmp == "individual" ? 0 : 1 if tmp == "individual" || tmp == "organization"
-
     data = filter(f).to_a
-    # Rails.logger.debug("-----------------------------------------return size---#{data.size}")
+    # Rails.logger.debug("---------------------------------------#{params}--#{f}")
     # TODO refactor code to remove ambitious code
     chart1 = []
     chart2 = []
+    chart1_n = 0
+    chart2_n = 0
     table = []
     total_amount = 0
     total_donations = 0
@@ -226,7 +231,8 @@ class Donor
       ["total_donations_for_each_donor", "top_5_parties_donated_to"],
       ["donors_donations_sorted_by_amount", "parties_donations_sorted_by_amount"]
     ]
-    chart_meta_obj = { n: limiter, obj: nil, objb: nil }
+    chart1_meta_obj = { n: 0, obj: nil, objb: nil }
+    chart2_meta_obj = { n: 0, obj: nil, objb: nil }
 
     ds = f[:donor_ids].nil? ? 0 : f[:donor_ids].length
     ps = f[:parties].nil? ? 0 : f[:parties].length
@@ -247,7 +253,6 @@ class Donor
       e[:partial_donated_amount] = 0
       e[:donations].each { |ee|
         am = ee[:amount]
-        puts "------------------------#{e[:donations]}--#{ee[:party_id]} #{ee[:donorset_id]}"
         parties[ee[:party_id]][:value] += am if chart_type == 0
 
 
@@ -258,8 +263,8 @@ class Donor
           parties_list[ee[:party_id]][:value] += am
         end
 
-        recent_donations.push({ date: ee[:give_date], out: [e[:name], am] }) if chart_type == 1
-        recent_donations.push({ date: ee[:give_date], out: [parties[ee[:party_id]][:name], am] }) if chart_type == 3
+        recent_donations.push({ date: ee[:give_date], out: { name: e[:name], value: am } }) if chart_type == 1
+        recent_donations.push({ date: ee[:give_date], out: { name: parties[ee[:party_id]][:name], value: am } }) if chart_type == 3
 
         e[:partial_donated_amount] += am
         total_amount += am
@@ -274,43 +279,52 @@ class Donor
 
     if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
 
-      chart1 = data.take(limiter).map{|m| [m[:name], m[:donated_amount]] }
-      chart2 = parties.sort_by { |k, v| -1*v[:value] }.take(limiter).map{|k,v| [v[:name], v[:value]] }
+      chart1 = pull_n(data, limiter, :donated_amount, "shared.chart.label.donors")
+      chart2 = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, "shared.chart.label.parties")
 
     elsif chart_type == 1 # If select 1 party -> top 5 donors for party, last 5 donations for party
-      chart_meta_obj[:obj] = parties[BSON::ObjectId(f[:parties][0])][:name]
-      chart1 = data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }.take(limiter).map{|m| [m[:name], m[:partial_donated_amount]] }
-      chart2 = recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.take(limiter).map{|m| m[:out] }
+
+      chart1_meta_obj[:obj], chart2_meta_obj[:obj] = parties[BSON::ObjectId(f[:parties][0])][:name]
+      chart1 = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donors")
+      chart2 = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
 
     elsif chart_type == 2 || chart_type == 4 # If select > 1 party -> top 5 donors for parties, total donations for selected parties
       # If select > 1 donor-> total donations for each donor, top 5 parties donated to
 
-      chart1 = data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }.take(limiter).map{|m| [m[:name], m[:partial_donated_amount]] }
-      chart2 = parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }.take(limiter).map{|m| [m[:name], m[:value]] }
+      chart1 = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.#{chart_type == 2 ? 'donors' : 'donations'}")
+      chart2 = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.#{chart_type == 2 ? 'donations' : 'parties'}")
 
-      chart_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ") if chart_type == 4
+      chart1_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ") if chart_type == 4
+      chart2_meta_obj[:obj] = chart2.map{|m| m[0] }.join(", ") if chart_type == 4
 
     elsif chart_type == 3 # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
-      chart1 = recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.take(limiter).map{|m| m[:out] }
-      chart2 = parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }.take(limiter).map{|m| [m[:name], m[:value]] }
 
-      chart_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ")
+      chart1 = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
+      chart2 = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.parties")
+
+      chart1_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ")
+      chart2_meta_obj[:obj] = chart2.map{|m| m[0] }.join(", ")
 
     elsif chart_type == 5 # show selected donors sorted by who donated most and show selected parties sorted by who received most
 
-      chart1 = data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }.map{|m| [m[:name], m[:partial_donated_amount]] }
-      chart2 = parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }.map{|m| [m[:name], m[:value]] }
-      chart_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ")
-      chart_meta_obj[:objb] = chart2.map{|m| m[0] }.join(", ")
+      chart1 = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donations")
+      chart2 = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, "shared.chart.label.donations")
+
+      chart1_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ")
+      chart1_meta_obj[:objb] = chart2.map{|m| m[0] }.join(", ")
+
+      chart2_meta_obj[:obj] = chart2.map{|m| m[0] }.join(", ")
+      chart2_meta_obj[:objb] = chart1.map{|m| m[0] }.join(", ")
 
     end
-
+    chart1_meta_obj[:n] = chart1.size
+    chart2_meta_obj[:n] = chart2.size
     {
       #data: data,
       chart1: chart1,
-      chart1_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", chart_meta_obj),
+      chart1_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", chart1_meta_obj),
       chart2: chart2,
-      chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart_meta_obj),
+      chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart2_meta_obj),
       chart_subtitle: chart_subtitle,
       table: {
         data: table,
@@ -331,6 +345,28 @@ class Donor
         tmp[k] = "#{v} #{self.last_name_translations[k]}"
       }
       self.full_name_translations = tmp
+    end
+
+    def self.pull_n (data, n, key, str) # get n rows grouped by key from data, with counting distinct item count and if > 1 than output with str else just name
+       # Rails.logger.debug("--------------------------------------------#{data}")
+      grp_h = { }
+      grp_a = []
+      d_i = 0
+      data.each{ |e|
+        break if d_i >= n
+        if !grp_h.key?(e[key])
+          grp_h[e[key]] = 0
+          grp_a << [e[:name], e[key]]
+          d_i += 1
+        end
+        grp_h[e[key]] += 1
+      }
+      str = I18n.t(str)
+      grp_a.each_with_index {|e,i|
+        if grp_h[e[1]] > 1
+          grp_a[i][0] = "#{grp_h[e[1]]} #{str}"
+        end
+      }
     end
 end
 

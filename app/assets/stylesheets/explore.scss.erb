@@ -726,7 +726,6 @@
           > div {
             display:table-cell;
             &:not(.separator) {
-
               width:50%;
               text-align:center;
             }
@@ -1121,6 +1120,7 @@
               width:50%;
               padding:12px 14px 44px;
               position:relative;
+              vertical-align:top;
               z-index:32;
               .actions {
                 text-align:right;
@@ -1131,12 +1131,18 @@
               right:-15px;
             }
             .separator {
-              display:table-cell;
               position:relative;
+              display:table-cell;
               min-width:330px;
               height:286px;
-              background:transparent url("<%= asset_path('explore/image.png') %>") no-repeat center;
-              z-index:33;
+              max-height:286px;
+              vertical-align:middle;
+              .separator-box {
+                height:286px;
+                position:relative;
+                background:transparent url("<%= asset_path('explore/image.png') %>") no-repeat center;
+                z-index:33;
+              }
               .donors {
                 font:20px firasans_b;
                 color:#2e302d;

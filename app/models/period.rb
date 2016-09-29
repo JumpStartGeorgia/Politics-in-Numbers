@@ -22,8 +22,9 @@ class Period
   validates_inclusion_of :type, in: [0, 1]
 
   def self.get_ids_by_slugs(id_or_slugs)
+    id_or_slugs = [] if !id_or_slugs.present?
     id_or_slugs = id_or_slugs.delete_if(&:blank?)
-    if id_or_slugs.present? && id_or_slugs.class == Array
+    if id_or_slugs.class == Array
       x = only(:_id, :_slugs).find(id_or_slugs)
       x.present? ? x.map{ |m| m[:_id].to_s } : []
     else
