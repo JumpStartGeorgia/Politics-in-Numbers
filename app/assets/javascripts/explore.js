@@ -642,7 +642,7 @@ $(document).ready(function (){
   function emulate_category_click(cat) {
     var t, tmp, subcat = "all";
 
-    finance_toggle.trigger("click");
+    // finance_toggle.trigger("click");
     if(["income_campaign", "expenses_campaign"].indexOf(cat) !== -1) {
       var tmp = cat.split("_");
       cat = tmp[0];
@@ -907,7 +907,6 @@ $(document).ready(function (){
 
 
       finance.set_by_url();
-
       tmp = finance.get();
       if(tmp === null) { return; }
       finance_id = finance.id(tmp);
@@ -1050,7 +1049,7 @@ $(document).ready(function (){
 
   }
   function filter_callback(data, partial) {
-     // console.log("filter_callback", partial);
+     console.log("filter_callback", data);
      // data =  undefined; // test for not found data
     var is_data_ok = typeof data !== "undefined";
     content.find(".panes").toggleClass("not-found", !is_data_ok);

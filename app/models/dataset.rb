@@ -136,18 +136,29 @@ class Dataset
   end
   def self.explore(params)
     limiter = 5
-    #Rails.logger.info("--------------------------------------------#{params}")
 
-    f = { parties: nil, period: nil }
+    f = { }
 
     f[:parties] = Party.get_ids_by_slugs(params[:party])
+    f[:period] = Period.get_ids_by_slugs(params[:period])
 
-    f[:period] =  Period.get_ids_by_slugs(params[:period])
     ln = 0
     main_categories_count = 0
-    SYMS.each { |e| f[e] = Category.get_ids_by_slugs(params[e]) if params[e].present? }
-
-
+    missing_category = true
+    SYMS.each { |e|
+      if params[e].present?
+        f[e] = Category.get_ids_by_slugs(params[e])
+        if f[e].present?
+          missing_category = false
+        else
+          params.delete(e)
+        end
+      end
+    }
+    if missing_category
+      f[:income] = [Category.only_sym.where(sym: :income).first._id]
+      params[:income] = [:income]
+    end
     data = filter(f).to_a
 
     parties = {}
@@ -438,7 +449,8 @@ class Dataset
         header: headers,
         header_classes: header_classes,
         classes: classes
-      }
+      },
+      pars: params
     }
   end
 end

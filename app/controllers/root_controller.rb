@@ -58,7 +58,6 @@ class RootController < ApplicationController
     gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
     gon.main_categories = {}
     @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.permalink }
-    # Rails.logger.debug("---------------------------bas-----------------#{gon.main_categories}")
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
     gon.all = t('shared.common.all')
     gon.campaign = t('.campaign')
@@ -78,13 +77,13 @@ class RootController < ApplicationController
       party: Party.where(:tmp_id.in => [1,2]).map{|m| m.permalink },
       period: Period.annual.limit(3).map{|m| m.permalink }
     }
+
     if !has_filters
       has_filters = true
       @filter_type = "finance"
       which_filter = "finance"
       pars.merge!(finance_pars)
     end
-
     is_finance = which_filter == "finance"
 
     if has_filters
@@ -94,9 +93,10 @@ class RootController < ApplicationController
       finance_pars = pars if is_finance
       gon.gonned_type = which_filter
       gon.donation_params = donation_pars
-      gon.finance_params = finance_pars
       gon.donation_data = Donor.explore(donation_pars)
-      gon.finance_data  = Dataset.explore(finance_pars)
+      tmp = Dataset.explore(finance_pars)
+      gon.finance_params = tmp.delete(:pars)
+      gon.finance_data = tmp
       dt = is_finance ? gon.finance_data : gon.donation_data
 
       pars.delete(:locale)

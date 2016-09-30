@@ -2,57 +2,61 @@
 ka:
   shared:
     actions:
-      change_my_password: Change my password
-      destroy: Delete
-      edit: Edit
-      log_in: Log in
-      view: View
-      view_all: View All
-      new: New
-      reset: Reset
-      cancel: Cancel
-      save: Save
+      change_my_password: პაროლის შეცვლა
+      destroy: წაშლა
+      edit: რედაქტირება
+      log_in: შესვლა
+      view: ნახვა
+      view_all: ყველას ნახვა
+      new: ახალი
+      reset: განახლება
+      cancel: შეწყვეტა
+      save: შენახვა
       with_obj:
-        cancel: Cancel %{obj}
-        create: Create %{obj}
-        destroy: Delete %{obj}
-        edit: Edit %{obj}
-        new: New %{obj}
-        update: Update %{obj}
-        view: View %{obj}
-        view_all: View All %{obj}
-      remember_me: Remember Me
+        cancel: "%{obj}-ის შეწყვეტა"
+        create: "%{obj}-ის შექმნა"
+        destroy: "%{obj}-ის წაშლა"
+        edit: "%{obj}-ის რედაქტირება"
+        new: "ახალი %{obj}"
+        update: "%{obj}-ის განახლება"
+        view: "%{obj}-ის ნახვა"
+        view_all: "ყველას ნახვა %{obj}"
+      remember_me: დამახსოვრება
     common:
-      account: Account
-      actions: Actions
-      default_text: "ძირითადი ტექსტი"
-      default_url: "ძირითადი URL"
-      unknown: Unknown
+      account: ანგარიში
+      actions: ქმედებები
+      default_text: ძირითადი ტექსტი
+      default_url: ძირითადი URL
+      unknown: უცნობი
       jumpstart:
-        slogan: JumpStart Georgia - We communicate data better!
-      name: Politics in Numbers
-      slogan: This is the PIN slogan
-      description: This is a description of PIN
-      language: Language Switch
-      twitter: Share on Twitter
-      facebook: Share on Facebook
-      phone: Phone
-      actual_phone: +995 012 3456789
-      email: Email
-      actual_email: email@jumpstart.ge
-      address: Address
-      actual_address: "6 Melikishvili Street, Third Floor, 0179 Tbilisi, Georgia"
+        slogan: JumpStart Georgia - ჩვენ გაწვდით ინფორმაციას მონაცემებით და დიზაინით
+      name: პოლიტიკა რიცხვებში
+      slogan: დაათვალიერე პარტიების ფინანსები
+      description:  |
+        “პოლიტიკა რიცხვებში” აშშ სახელმწიფო დეპარტამენტის მიერ დაფინანსებული პროექტია, რომელიც მიზნად ისახავს საქართველოში პოლიტიკური პარტიების ფინანსების გამჭვირვალეობის გაზრდას და პოლიტიკური ამბების გაშუქებაში მონაცემებისა და ვიზუალიზაციების გამოყენების ხელშეწყობას.
+
+        პროექტის ავტორები არიან  Digital Communication Network პროგრამის კურსდამთავრებულები ქეთევან ბოჯგუა და ნინო მაჭარაშვილი. პროექტი ხორციელდება “ჯამპსტარტ ჯორჯიასთან” და საქართველოს სახელმწიფო აუდიტის სამსახურთან თანამშრომლობით.
+      language: ენის გადამრთველი
+      twitter: Twitter-ზე გაზიარება
+      facebook: Facebook-ზე გაზიარება
+      phone: ტელეფონი
+      actual_phone: +995 598 476682
+      email: ელ. ფოსტა
+      actual_email: info@pins.ge
+      address: მისამართი
+      actual_address: "მელიქიშვილის 6, მე-3 სართული, 0179 თბილისი, საქართველო"
       summary: |
         “პოლიტიკა რიცხვებში” აშშ სახელმწიფო დეპარტამენტის მიერ დაფინანსებული პროექტია, რომელიც მიზნად ისახავს საქართველოში პოლიტიკური პარტიების ფინანსების გამჭვირვალეობის გაზრდას და პოლიტიკური ამბების გაშუქებაში მონაცემებისა და ვიზუალიზაციების გამოყენების ხელშეწყობას.
 
         პროექტის ავტორები არიან  Digital Communication Network პროგრამის კურსდამთავრებულები ქეთევან ბოჯგუა და ნინო მაჭარაშვილი. პროექტი ხორციელდება “ჯამპსტარტ ჯორჯიასთან” და საქართველოს სახელმწიფო აუდიტის სამსახურთან თანამშრომლობით.
-      back: Back
-      ns: Not Specified
-      or: or
-      parties: Parties
-      show_more: Show More
-      show_less: Show Less
-      and: and
+      back: უკან
+      ns: უცნობია
+      or: ან
+      parties: პარტიები
+      show_more: ნაკლების ჩვენება
+      show_less: მეტის ჩვენება
+      and: და
+      all: ყველა
     locale:
       short:
         en: En
@@ -63,51 +67,57 @@ ka:
         ka: "ქართული"
         ru: "Русский"
     msgs:
-      does_not_exist: You tried to access a page that does not exist.
-      not_authorized: You are not authorized to view that page.
-      missing_parameter: Data for some fields is missing. Fill in all required fields
-      success_created: "%{obj} was successfully created."
-      success_created_with_pending_job: "Request for creating %{obj} accepted, you will receive notification as soon as server will process request (Based on server load it can take some time)"
-      success_destroyed: "%{obj} was successfully destroyed."
-      success_updated: "%{obj} was successfully updated."
-      unexpected_error: "Error occur while processing request, please log your action and send request to app support team."
-      fail_destroyed_existed_relation: "%{obj} was not destroyed, remove all relation before continue."
+      does_not_exist: თქვენ მიერ მოთხოვნილი გვერდი არ მოიძებნა.
+      not_authorized: თქვენ არ გაქვთ ამ გვერდის ნახვის უფლება.
+      missing_parameter: ზოგიერთი ველის მონაცემები აკლია. შეავსეთ ყველა სავალდებულო ველი.
+      success_created: "%{obj} წარმატებით შეიქმნა"
+      success_created_with_pending_job: "%{obj}-ის შექმნის მოთხოვნა მიღებულია. თქვენ მიიღებთ შეტყობინებას როგორც კი სერვერი მოთხოვნას დაამუშავებს."
+      success_destroyed: "%{obj} წარმატებით განადგურდა."
+      success_updated: "%{obj} წარმატებით განახლდა."
+      unexpected_error: "მოთხოვნის შესრულებისას დაფიქსირდა ხარვეზი, გთხოვთ შეინახოთ მონაცემები და დაუკავშირდით ტექნიკურ გუნდს."
+      fail_destroyed_existed_relation: "%{obj} ვერ განადგურდა, გაგრძელებამდე წაშალეთ ყველა დაკავშირებული ფაილი."
     prompts:
-      confirm: Are you sure?
-      forgot_password: Forgot your password?
+      confirm: დარწმუნებული ხართ?
+      forgot_password: დაგავიწყდათ პაროლი?
     chart:
       title:
-        top_5_donors: Top %{n} Donors
-        top_5_parties: Top %{n} Parties
-        top_5_donors_for_party: Top %{n} Donors for %{obj}
-        last_5_donations_for_party: Last %{n} Donations for %{obj}
-        top_5_donors_for_parties: Top %{n} Donors for All Parties
-        total_donations_for_parties: Total Donations for Parties
-        last_5_donations_for_donor: Last %{n} Donations
-        top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj}
-        total_donations_for_each_donor: Total Donations for Each Donor
-        donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb}
-        parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj}
+        top_5_donors: "Top %{n} შემომწირველი"
+        top_5_parties: "Top %{n} პარტია"
+        top_5_donors_for_party: "%{obj}-ის Top %{n} შემომწირველი"
+        last_5_donations_for_party: "%{obj}-ის ბოლო %{n} შემოწირულობა"
+        top_5_donors_for_parties: "Top %{n} შემომწირველი ყველა პარტიისთვის"
+        total_donations_for_parties: მთლიანი შემოწირულობები პარტიებისთვის
+        last_5_donations_for_donor: "ბოლო %{n} შემოწირულობა"
+        top_5_parties_donated_to: "პარტია, რომელსაც შემოწირულობა გაუკეთა %{obj}-მ"
+        total_donations_for_each_donor: შემომწირველების ჯამური შემოწირულობა"
+        donors_donations_sorted_by_amount: "%{obj} -ის Top შემოწირულობები %{objb}-ს"
+        parties_donations_sorted_by_amount: "%{obj} -ის Top შემოწირულობები %{objb}-ს"
+      finance:
+        title:
+          party_donations_for: "პარტია - შემოწირულობები"
+          category: კატეგორია
+          category_grouped_by: "კატეგორია - დაჯგუფებული"
+          time_period_annual: "პერიოდი - წლიური"
+          time_period_campaign: "პერიოდი - წინასაარჩევნო"
       label:
-        donors: Donors
-        parties: Parties
-        donations: Donations
+        donors: შემომწირველი
+        parties: პარტია
+        donations: შემოწირულობა
     filters:
       donations: შემოწირულებები
       party_finances: პარტიის <br />ფინანსები
-      income: Income
-      income_campaign: Income Campaign
-      expenses: Expenses
-      expenses_campaign: Expenses Campaign
-      reform_expenses_button: REFORMS FUND <br/>EXPENSES
-      reform_expenses: Reforms Fund Expenses
-      property_assets_button: PROPERTY <br/>ASSETS
-      property_assets: Property Assets
-      financial_assets_button: FINANCIAL <br/>ASSETS
-      financial_assets: Financial Assets
-      debts: Debts
-      campaign: Campaign
-      all: All
+      income: შემოსავალი
+      income_campaign: კამპანიის შემოსავალი
+      expenses: ხარჯები
+      expenses_campaign: კამპანიის ხარჯები
+      reform_expenses_button: რეფორმების ფონდი <br/>ხარჯები
+      reform_expenses: რეფორმების ფონდი ხარჯები
+      property_assets_button: უძრავი ქონება
+      property_assets:  უძრავი ქონება
+      financial_assets_button: ფინანსური <br/>სახსრები
+      financial_assets: ფინანსური სახსრები
+      debts: ვალები
+      campaign: კამპანია
   notifier:
     job:
       donorset_file_process:
