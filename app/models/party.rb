@@ -8,7 +8,7 @@ class Party
   TYPES = [:party, :initiative]
 
 #fields
-  field :name, type: String
+  field :name, type: Array
   field :title, type: String, localize: true
   field :description, type: String, localize: true
   field :color, type: String, default: "##{SecureRandom.hex(3)}"

@@ -24,6 +24,7 @@ en:
       time_period: Time Period
       amount: Amount
       party: Party
+      party_candidate: Party/Candidate
       donation_type: Donation Type
       donated_multiple_parties: Donated to multipled parties?
       donor_nature: Donor Type

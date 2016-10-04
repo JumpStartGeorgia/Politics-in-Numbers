@@ -61,8 +61,8 @@
       </button>
       <div class="navbar-collapse collapse navbar-lang-collapse">
         <ul class='nav navbar-nav'>
-          <% ln = I18n.available_locales.length %>
-          <% I18n.available_locales.each_with_index do |locale, locale_ind| %>
+          <% ln = I18n.available_locales.reject{|r| r == :ru }.length %>
+          <% I18n.available_locales.reject{|r| r == :ru }.each_with_index do |locale, locale_ind| %>
             <li class='<%= "active" if I18n.locale == locale %>'>
               <%= link_to url_for(locale: locale), tabindex: 3  do %>
                 <span class="short"><%= I18n.locale != locale ? t("shared.locale.short.#{locale}") : t("shared.locale.long.#{locale}") %></span>

@@ -16,6 +16,7 @@ class Donor
   field :donated_amount, type: Float
   field :nature, type: Integer, default: 0
   field :multiple, type: Boolean, default: false # if donated to multiple parties
+  field :color, type: String, default: "##{SecureRandom.hex(3)}"
 
   slug :full_name, history: true, localize: true
 
@@ -71,7 +72,7 @@ class Donor
   end
 
   def self.list_with_tin
-    sorted.map{|t| [t.permalink, t.full_name, t.tin]}
+    sorted.map{|t| [t.permalink, t.full_name, t.tin, t.color]}
   end
 
   def self.filter(params)
@@ -168,7 +169,7 @@ class Donor
       ]
     ).first
   end
-  def self.explore(params)
+  def self.explore(params, only_table = false)
     limiter = 5
      # Rails.logger.debug("--------------------------------------------#{}")
     f = {
@@ -319,15 +320,10 @@ class Donor
     end
     chart1_meta_obj[:n] = chart1.size
     chart2_meta_obj[:n] = chart2.size
+
     {
-      #data: data,
-      chart1: chart1,
-      chart1_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", chart1_meta_obj),
-      chart2: chart2,
-      chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart2_meta_obj),
-      chart_subtitle: chart_subtitle,
       table: {
-        data: table,
+        data: table.sort { |x,y| [x[1], x[2]] <=> [y[1], y[2]] },
         header: [human_attribute_name(:id), human_attribute_name(:name), human_attribute_name(:tin),
           human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
           Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
@@ -336,7 +332,15 @@ class Donor
         total_amount: total_amount,
         total_donations: total_donations
       }
-    }
+    }.merge(only_table ? {} :
+      {
+        chart1: chart1,
+        chart1_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", chart1_meta_obj),
+        chart2: chart2,
+        chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart2_meta_obj),
+        chart_subtitle: chart_subtitle
+      }
+    )
   end
   private
     def regenerate_fullname
@@ -348,18 +352,18 @@ class Donor
     end
 
     def self.pull_n (data, n, key, str) # get n rows grouped by key from data, with counting distinct item count and if > 1 than output with str else just name
-       # Rails.logger.debug("--------------------------------------------#{data}")
       grp_h = { }
       grp_a = []
       d_i = 0
       data.each{ |e|
         break if d_i >= n
-        if !grp_h.key?(e[key])
-          grp_h[e[key]] = 0
-          grp_a << [e[:name], e[key]]
+        ek = e[key].round
+        if !grp_h.key?(ek)
+          grp_h[ek] = 0
+          grp_a << [e[:name], ek]
           d_i += 1
         end
-        grp_h[e[key]] += 1
+        grp_h[ek] += 1
       }
       str = I18n.t(str)
       grp_a.each_with_index {|e,i|

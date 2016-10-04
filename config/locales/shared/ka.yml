@@ -57,6 +57,7 @@ ka:
       show_less: მეტის ჩვენება
       and: და
       all: ყველა
+      numericSymbols: [ null , "მლნ" , "მლრდ" , "ტრილ" , "კვადრ" , "E"]
     locale:
       short:
         en: En
@@ -116,7 +117,7 @@ ka:
       property_assets:  უძრავი ქონება
       financial_assets_button: ფინანსური <br/>სახსრები
       financial_assets: ფინანსური სახსრები
-      debts: ვალები
+      debts: ვალდებულებები
       campaign: კამპანია
   notifier:
     job:

@@ -46,30 +46,20 @@ class RootController < ApplicationController
   end
 
   def explore
-    gon.url = root_url
-    gon.app_name = "pins.ge"
-    gon.date_format = t('date.formats.jsdate')
-    gon.filter_item_close = t('.filter_item_close');
-    gon.party_list = Party.list
-    gon.donor_list = Donor.list_with_tin
-    gon.period_list = Period.list
+    pars = explore_params
+    is_csv = pars[:format] == 'csv'
+
+
+
+    which_filter = pars[:filter]
+    @filter_type = which_filter == "finance" ? "finance" : "donation"
+    has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
 
     @categories = Category.non_virtual # required for object explore calls
     gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
     gon.main_categories = {}
     @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.permalink }
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
-    gon.all = t('shared.common.all')
-    gon.campaign = t('.campaign')
-    gon.search = t('.search')
-    gon.table_length = t('.table_length')
-    dt = []
-    pars = explore_params
-    #pars = pars
-    gon.gonned = false
-    which_filter = pars[:filter]
-    @filter_type = which_filter == "finance" ? "finance" : "donation"
-    has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
 
     donation_pars = {}
     finance_pars = {
@@ -84,34 +74,61 @@ class RootController < ApplicationController
       which_filter = "finance"
       pars.merge!(finance_pars)
     end
-    is_finance = which_filter == "finance"
 
-    if has_filters
+    is_finance = which_filter == "finance"
+    is_donation = !is_finance
+
+    dt = []
+
+    donation_pars = pars if !is_finance
+    finance_pars = pars if is_finance
+
+
+    if !is_csv
+
+      gon.url = root_url
+      gon.app_name = "pins.ge"
+      gon.date_format = t('date.formats.jsdate')
+      gon.filter_item_close = t('.filter_item_close')
+      gon.all = t('shared.common.all')
+      gon.campaign = t('.campaign')
+      gon.search = t('.search')
+      gon.table_length = t('.table_length')
+      gon.numericSymbols = t('shared.common.numericSymbols')
+
       gon.gonned = true
 
-      donation_pars = pars if !is_finance
-      finance_pars = pars if is_finance
+      gon.party_list = Party.list
+      gon.donor_list = Donor.list_with_tin
+      gon.period_list = Period.list
+
+
+
       gon.gonned_type = which_filter
+
       gon.donation_params = donation_pars
       gon.donation_data = Donor.explore(donation_pars)
+
       tmp = Dataset.explore(finance_pars)
       gon.finance_params = tmp.delete(:pars)
       gon.finance_data = tmp
+
       dt = is_finance ? gon.finance_data : gon.donation_data
 
       pars.delete(:locale)
-      @download_link = request.path + "?" +  pars.to_param  + "#{pars.empty? ? '' : '&'}#{'format=csv'}"
-      gon.params = pars
-    end
+      @donation_download_link = request.path + "?filter=donation&" +  donation_pars.reject{|k,v| k == "filter" }.to_param  + "#{donation_pars.empty? ? '' : '&'}#{'format=csv'}"
+      @finance_download_link = request.path + "?filter=finance&" +  finance_pars.reject{|k,v| k == "filter" }.to_param  + "#{finance_pars.empty? ? '' : '&'}#{'format=csv'}"
 
-    if pars[:format] == 'csv'
-      if which_filter == "donation"
-        csv_file = CSV.generate do |csv|
+      gon.params = pars
+
+    else
+
+      dt = is_finance ? Dataset.explore(finance_pars, true) : Donor.explore(donation_pars, true)
+
+      csv_file = CSV.generate do |csv|
+        if is_donation
           csv << dt[:table][:header]
-          dt[:table][:data].each { |r| csv << r }
-        end
-      elsif which_filter == "finance"
-         csv_file = CSV.generate do |csv|
+        else
           dt[:table][:header].each{|e|
             tmp = []
             tmp_prev = ""
@@ -121,8 +138,8 @@ class RootController < ApplicationController
             }
             csv << tmp
           }
-          dt[:table][:data].each { |r| csv << r }
         end
+        dt[:table][:data].each { |r| csv << r }
       end
     end
 

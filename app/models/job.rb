@@ -229,7 +229,7 @@ class Job
                 clean_name = Party.clean_name(party)
                 missing_parties.each{|mp| (p = mp; break;) if mp.name == clean_name }
                 if p.class != Party
-                  p = Party.new({ name: clean_name, title: clean_name, description: "საინიციატივო ჯგუფი #{clean_name}", tmp_id: -99, type: Party.type_is(:initiative) })
+                  p = Party.new({ name: [clean_name], title: clean_name, description: "საინიციატივო ჯგუფი #{clean_name}", tmp_id: -99, type: Party.type_is(:initiative) })
                   if p.valid?
                     missing_parties << p
                   else

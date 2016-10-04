@@ -8,6 +8,8 @@ $(document).ready(function (){
   var js = {
       cache: {}
     },
+    w = 0,
+    h = 0,
     explore = $("#explore"),
     explore_button = $("#explore_button"),
     finance_toggle = $("#finance_toggle"),
@@ -599,8 +601,8 @@ $(document).ready(function (){
     filter_type.toggleClass("in-depth");
   });
   finance_category.find(".finance-category-toggle").click(function(event) {
-    //console.log("toggle");
-    if(!is_type_donation) { finance_toggle.trigger("click"); }
+    // console.log("toggle", is_type_donation);
+    if(is_type_donation) { finance_toggle.trigger("click"); }
     var t = $(this), state = t.attr("data-state"), sub, sub_state, cat = t.attr("data-cat");
     global_click_callback = undefined;
     if(typeof state === "undefined" || state === "") {
@@ -664,6 +666,10 @@ $(document).ready(function (){
   }
   function li(id, text) {
     return "<li data-id='"+id+"'>"+text+"<i class='close' title='" + gon.filter_item_close + "'></i></li>";
+  }
+  function resize() {
+    w = $(window).width();
+    h = $(window).height();
   }
   function bind() {
     window.onpopstate = function(event) {
@@ -735,9 +741,10 @@ $(document).ready(function (){
       autocomplete.clear($(this).parent().attr("data-autocomplete-id"));
     });
     $(window).on("resize", function(){
+      resize();
       filter_extended.find(".filter-inputs").css("max-height", $(window).height() - filter_extended.find(".filter-toggle").offset().top);
     });
-
+    resize();
 
     donation.elem.period.from.datepicker({
       firstDay: 1,
@@ -971,15 +978,29 @@ $(document).ready(function (){
     if(type === "donation") {
       donation_total_amount.text(table.total_amount);
       donation_total_donations.text(table.total_donations);
-
-      donation_table.DataTable({
-        destroy: true,
-        "aaData": table.data,
-        "aoColumns": table.header.map(function(m,i) {
-          return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
-        }),
-        "info": false,
-        dom: "fltrp"
+      var prev = undefined, alt_color = true,
+        dt = donation_table.DataTable({
+          responsive: true,
+          destroy: true,
+          order: [],
+          "aaData": table.data,
+          "aoColumns": table.header.map(function(m,i) {
+            return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
+          }),
+          "info": false,
+          dom: "fltrp",
+          createdRow: function ( row, data, index ) {
+            if(data[2] !== prev) {
+              alt_color = !alt_color;
+            }
+            if(alt_color) {
+              $(row).addClass('alt');
+            }
+            prev = data[2];
+          }
+        });
+      dt.on("draw", function (e, settings) {
+        $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
       });
     }
     else if(type === "finance") {
@@ -1025,25 +1046,13 @@ $(document).ready(function (){
       finance_table.html(table_html);
       finance_datatable = finance_table.DataTable({
         destroy: true,
+        responsive: true,
         //"aaData": table.data,
         // "aoColumns": table.header.map(function(m,i) {
         //   return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
         // }),
         "info": false,
         dom: "Bfltrp"
-        // ,
-        // buttons: [
-        //   {
-        //     extend:    'print',
-        //     text:      '<div data-action="print"></div>',
-        //     title: 'Print'
-        //   },
-        //   {
-        //     extend:    'csv',
-        //     text:      '<div data-action="csv"></div>',
-        //     title: 'Csv'
-        //   }
-        // ]
       });
     }
 
@@ -1068,7 +1077,7 @@ $(document).ready(function (){
   (function init() {
     Highcharts.setOptions({
       lang: {
-        numericSymbols: [ "k" , "M" , "G" , "T" , "P" , "E"]
+        numericSymbols: gon.numericSymbols
       },
       colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
       credits: {
@@ -1102,11 +1111,13 @@ $(document).ready(function (){
 
   function bar_chart(elem, series_data, title, subtitle, bg) {
     //console.log("chart", elem, series_data);
+    console.log($("#content").width());
     $(elem).highcharts({
       chart: {
           type: 'bar',
           backgroundColor: bg,
-          height: 60*(Math.round(title.length/40)+1) + 40 * series_data.length
+          height: 60*(Math.round(title.length/40)+1) + 40 * series_data.length,
+          width: w > 992 ? ($("#content").width()-386)/2 : w - 12
       },
       exporting: {
         buttons: {
@@ -1195,7 +1206,7 @@ $(document).ready(function (){
           type: 'column',
           backgroundColor: bg,
           height: 400,
-          width:800
+          width: w > 992 ? ($("#content").width()-28)/2 : w - 12
       },
       exporting: {
         buttons: {
@@ -1276,7 +1287,7 @@ $(document).ready(function (){
 
       plotOptions: {
         column:{
-          maxPointWidth: 20
+          maxPointWidth: 60
         }
       },
       series: resource.series,
@@ -1302,7 +1313,7 @@ $(document).ready(function (){
           type: 'column',
           backgroundColor: bg,
           height: 400,
-          width:800
+          width: w > 992 ? ($("#content").width()-28)/2 : w - 12
       },
       exporting: {
         buttons: {
@@ -1383,7 +1394,7 @@ $(document).ready(function (){
 
       plotOptions: {
         column:{
-          maxPointWidth: 20
+          maxPointWidth: 40
         }
       },
       series: resource.series,

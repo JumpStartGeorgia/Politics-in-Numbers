@@ -26,6 +26,10 @@ if destroy_mode
   Detail.destroy_all
   puts "  category data"
   Category.destroy_all
+  puts "  dataset data"
+  Dataset.destroy_all
+  puts "  donorset data"
+  Donorset.destroy_all
   # puts "  role data"
   # Role.destroy_all
   # puts "  user data"
@@ -42,8 +46,9 @@ puts 'loading languages'
 if (Language.count == 0)
   langs = [
     ["ka", "ქართული"],
-    ["en", "English"],
-    ["ru", "Русский"]
+    ["en", "English"]
+    # ,
+    # ["ru", "Русский"]
   ]
 
   langs = langs.map{|x| {locale: x[0], name: x[1]}}
@@ -244,11 +249,12 @@ workbook[0].each_with_index { |row, row_i|
     end
     tmp = { }
     tmp[:tmp_id] = cells[0] if cells[0].present?
-    tmp[:title_translations] = { ka: (cells[1].present? ? cells[1] : cells[2]) }
+    names = cells[2].split(";")
+    tmp[:title_translations] = { ka: (cells[1].present? ? cells[1] : names[0]) }
     tmp[:title_translations][:en] = cells[3] if cells[3].present?
     tmp[:title_translations][:ru] = cells[4] if cells[4].present?
-    tmp[:description] = "პარტია #{cells[1].present? ? cells[1] : cells[2]}"
-    tmp[:name] = cells[2]
+    tmp[:description] = "პარტია #{cells[1].present? ? cells[1] : names[0]}"
+    tmp[:name] = names
     tmp[:member] = cells[0].present?
 
     parties_data << tmp
@@ -717,7 +723,7 @@ puts "Creating phase ----------------------"
 
     d[:detail_id] = Detail.by_code(d[:detail_id])._id if (d[:detail_id].present? && !["FF9", "FF8"].include?(d[:detail_id]))
 
-    cat = Category.create!(d)
+    cat = Category.create(d)
     categories_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
     virtuals_data.each {|r|
       ind = r[:virtual_ids].index(tmp_id)
@@ -732,7 +738,7 @@ puts "Creating phase ----------------------"
   puts "  Virtual Category data"
   virtuals_data.each_with_index do |d,d_i|
     tmp_id = d.delete(:tmp_id)
-    cat = Category.create!(d)
+    cat = Category.create(d)
     virtuals_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
     puts "    Virtual Category '#{d[:title_translations][:en]}' was added" #{d[:virtual_ids].inspect}
  end

@@ -134,7 +134,7 @@ class Dataset
     #end
     result
   end
-  def self.explore(params)
+  def self.explore(params, only_table = false)
     limiter = 5
 
     f = { }
@@ -165,6 +165,7 @@ class Dataset
     periods = {}
     categories = {}
     Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
+    # Rails.logger.fatal("----------------------------------------#{parties.inspect}----#{I18n.locale}")
     Period.each{|e| periods[e.id] = { name: e.title, date: e.start_date, type: e.type } }
     Category.each{|e| categories[e.id] = { title: e.title, parent_id: e.parent_id } }
 
@@ -439,18 +440,21 @@ class Dataset
 
     # returned data
     {
-      chart1: {
-        categories: chart1_categories,
-        series: chart1,
-        title: chart_title
-      },
       table: {
         data: table,
         header: headers,
         header_classes: header_classes,
         classes: classes
-      },
-      pars: params
-    }
+      }
+    }.merge(only_table ? {} :
+      {
+        chart1: {
+          categories: chart1_categories,
+          series: chart1,
+          title: chart_title
+        },
+        pars: params
+      }
+    )
   end
 end

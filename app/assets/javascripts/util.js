@@ -69,7 +69,20 @@ function debounce(func, wait, immediate) {
     if (callNow) func.apply(context, args);
   };
 };
-
+// function web_safe_colors () {
+//   var ray = [], steps = [ "00", "33", "66", "99", "cc", "ff" ], i = 1, str = "";
+//   steps.forEach(function (r) {
+//     steps.forEach(function (g) {
+//       steps.forEach(function (b) {
+//         ray.push("#" + r + "" + g + "" + b);
+//         str += ".c" + i + "{background-color:" + "#" + r + "" + g + "" + b + ";}";
+//         ++i;
+//       });
+//     });
+//   });
+//   console.log(str);
+//   return ray;
+// }
 
 // /*
 //  * Date Format 1.2.3

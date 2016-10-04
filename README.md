@@ -87,3 +87,4 @@ This starter template provides access to the puma jungle through mina commands, 
 
 ### Notes
   * While uploading excel file make sure they have mime type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', as file was resaved in ubuntu its mime type is 'application/zip'
+  * After seed call rake mongoid_slug:set

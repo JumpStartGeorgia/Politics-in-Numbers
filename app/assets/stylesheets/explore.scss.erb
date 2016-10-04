@@ -1,6 +1,6 @@
 #explore {
-  margin: -100px -42px 0 -42px;
-  margin-top: -100px;
+  // margin: -100px -42px 0 -42px;
+  // margin-top: -100px;
   position:relative;
   .filter-type {
     background-color:#F5F7F5;
@@ -261,6 +261,11 @@
       margin:0 auto;
     }
   }
+  .filter-section {
+    display:flex;
+    flex-direction:column;
+  }
+
   .filter-extended {
     position:relative;
     display:inline-block;
@@ -326,9 +331,9 @@
       background-color:#F5F7F5;
       position:absolute;
       top: 0px;
-      z-index:55;
-      width:60%;
+      width:200px;
       min-width:200px;
+      z-index:55;
       padding:0px 14px 12px;
       overflow-y:auto;
       &::-webkit-scrollbar-track {
@@ -1052,12 +1057,16 @@
       .sep { display:table-cell; }
       .back { display:none !important; }
     }
+    .filter-section {
+      flex-direction:row;
+    }
     .filter-extended {
-      display:table-cell;
-      top:-22px;
-      left:26px;
-      width:190px;
-      min-width:190px;
+      // display:table-cell;
+      // top:-22px;
+      // left:26px;
+      width:252px;
+      min-width:252px;
+      text-align:center;
       .filter-toggle {
         display:inline-block;
         padding:12px 20px;
@@ -1067,7 +1076,8 @@
         font:14px firasans_r;
         color:#fff;
         background-color:#88D877;
-        position: relative;
+        position: absolute;
+        top:-22px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 77;
@@ -1077,9 +1087,10 @@
         i.close { display:none; }
       }
       .pane {
+        position: relative;
         display:inline-block;
-        position:relative;
-        top:-22px;
+        // position:relative;
+        // top:-22px;
         padding:24px 14px 12px;
         .filter-header {
           display:none;
@@ -1102,8 +1113,8 @@
     }
     .content {
       // margin-left:222px;
-      display:table-cell;
-      padding: 10px 10px 10px 42px;
+      // display:table-cell;
+      padding: 10px 10px 10px 10px;
       .panes {
         .pane {
           width:100%;
@@ -1128,7 +1139,7 @@
               }
             }
             .chart-container-1 {
-              right:-15px;
+              right:-16px;
             }
             .separator {
               position:relative;
@@ -1316,7 +1327,7 @@
             border:1px dashed #AEB3AD;
             right:-1px;
             background-color:#fff;
-            z-index:999;
+            z-index:14;
             .at-share-btn {
               display:block;
               max-width: 38px;
@@ -1381,7 +1392,7 @@
 // 40 36
 .actions .download_menu {
   position:relative;
-  z-index:888;
+  z-index:14;
   ul {
     display:none;
   }
@@ -1511,3 +1522,8 @@
   -webkit-animation-name: swing;
   animation-name: swing;
 }
+
+table.highlighted .alt {
+  background-color: rgba(136, 216, 119,0.3);
+}
+

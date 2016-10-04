@@ -8,60 +8,80 @@ ka:
     about:
       title: ჩვენზე
     media:
-      title: In Media
-      no_media: No mentions of Politics in Number in the media have been recorded yet.
+      title: მედიაში
+      no_media: ჯერჯერობით არ მოიპოვება ჩანაწერი.
     explore:
-      title: Explore
-      category: Category
-      add_hint: Add category to filter
-      remove_hint: Remove category from filter
-      filters: Filters
-      filter_toggle: Toggle to add new filtering option
-      filter_close: Close Filter Window
-      filter_item_close: Remove item from filter
-      filter_clear: Remove all items from filter
-      donor: ID/Name
-      time_period: Time Period
-      amount: Amount
-      party: Party
-      donation_type: Donation Type
-      donated_multiple_parties: Donated to multipled parties?
-      reset: RESET
-      from: From
-      to: To
-      monetary: Monetary
-      non_monetary: Non-Monetary
-      _yes: "Yes"
-      _no: "No"
-      total_amount: Total Amount
-      total_donations: Total Donations
-      categories: Categories
-      time: Time
-      annual: Annual
-      explore: EXPLORE
-      share_chart: Share chart
-      embed_chart: Embed chart
-      download_chart: Download chart
-      share_table: Share table
-      embed_table: Embed table
-      download_table: Download table
-      donors: DONORS
-      party_donations: PARTY <br/>DONATIONS
-      view: View
-      view_as: View as
-      view_as_chart: Chart view
-      view_as_table: Table view
-      search: Search
-      table_length: Show _MENU_ entries
-      not_found: Your requested data could not be found
+      title: დათვალიერება
+      category: კატეგორია
+      add_hint: ფილტრისთვის კატეგორიის დამატება
+      remove_hint: ფილტრიდან კატეგორიის წაშლა
+      filters: ფილტრი
+      filter_toggle: ახალი ფილტრის დამატება
+      filter_close: ფილტრის დახურვა
+      filter_item_close: ფილტრიდან ამოშლა
+      filter_clear: ფილტრის გასუფთავება
+      donor: პ.ნ./სახელი
+      time_period: პერიოდი
+      amount: რაოდენობა
+      party: პარტია
+      party_candidate: პარტია/კანდიდატი
+      donation_type: შემოწირულობის ტიპი
+      donated_multiple_parties: ერთზე მეტ პარტიას შეწირა?
+      donor_nature: შემომწირველის ტიპი
+      reset: განახლება
+      from: -დან
+      to: -მდე
+      monetary: ფულადი
+      non_monetary: არაფულადი
+      _yes: "კი"
+      _no: "არა"
+      individual: ფიზიკური პირი
+      organization: ორგანიზაცია
+      total_amount: მთლიანი თანხა
+      total_donations: მთლიანი შემოწირულობა
+      categories: კატეგორიები
+      time: პერიოდი
+      annual: წლიური
+      explore: დათვალიერება
+      share_chart: დიაგრამის გაზიარება
+      embed_chart: დიაგრამის ჩასმა
+      download_chart: დიაგრამის ჩამოტვირთვა
+      share_table: ცხრილის გაზიარება
+      embed_table: ცხრილის ჩასმა
+      download_table: ცხრილის ჩამოტვირთვა
+      donors: შემომწირველები
+      party_donations: პარტიის <br/>შემოწირულობები
+      view: ნახვა
+      view_as: ნახვა
+      view_as_chart: დიაგრამის სახით
+      view_as_table: ცხრილის სახით
+      search: ძიება
+      table_length: აჩვენე _MENU_ ჩანაწერი
+      not_found: თქვენ მიერ მოთხოვნილი მონაცემები არ მოიძებნა
+      income: შემოსავალი
+      income_campaign: კამპანიის შემოსავალი
+      expenses: ხარჯები
+      expenses_campaign: კამპანიის ხარჯები
+      reform_expenses: რეფორმების ფონდი ხარჯები
+      property_assets: უძრავი ქონება
+      financial_assets: ფინანსური სახსრები
+      debts: ვალდებულებები
+      campaign: კამპანია
+      export_type:
+        print: ბეჭდვა
+        pdf: Pdf
+        svg: Svg
+        jpeg: Jpeg
+        png: Png
+        csv: Csv
       placeholder:
-        donor: Select donor
-        party: Select party
-        income: Select category
-        income_campaign: Select category
-        expenses: Select category
-        expenses_campaign: Select category
-        reform_expenses: Select category
-        property_assets: Select category
-        financial_assets: Select category
-        debts: Select category
+        donor: დონორის არჩევა
+        party: პარტიის არჩევა
+        income: კატეგორიის არჩევა
+        income_campaign: კატეგორიის არჩევა
+        expenses: კატეგორიის არჩევა
+        expenses_campaign: კატეგორიის არჩევა
+        reform_expenses: კატეგორიის არჩევა
+        property_assets: კატეგორიის არჩევა
+        financial_assets: კატეგორიის არჩევა
+        debts: კატეგორიის არჩევა

@@ -1,4 +1,11 @@
 require 'fileutils'
+# I18n.locale = :ka
+def is_numeric?(obj)
+   obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
+end
+
+
+
 namespace :populate do
   desc "Read and upload all annual files"
   task :annuals => :environment do |t, args|
@@ -176,6 +183,5 @@ namespace :populate do
       }
     }
   end
-
 
 end

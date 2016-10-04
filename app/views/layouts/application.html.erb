@@ -15,7 +15,7 @@
       I18n = {
         defaultLocale: "<%= I18n.default_locale %>",
         locale: "<%= I18n.locale %>",
-        available_locales: "<%= I18n.available_locales.map{|x| x.to_s}.join(',') %>".split(',')
+        available_locales: "<%= I18n.available_locales.reject{|r| r == :ru }.map{|x| x.to_s}.join(',') %>".split(',')
       }
     </script>
 

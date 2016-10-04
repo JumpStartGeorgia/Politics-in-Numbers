@@ -47,218 +47,221 @@
       </div>
     </div>
   </div>
-  <div id="filter_extended" class="filter-extended" data-type="<%= @filter_type %>">
-    <div class="filter-toggle"><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></div>
-    <div class="pane">
-      <div class="filter-header">
-        <label><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></label>
-        <i class="close" title="<%= t('.filter_close') %>"></i>
-      </div>
+  <div class="filter-section">
+    <div id="filter_extended" class="filter-extended" data-type="<%= @filter_type %>">
+      <div class="filter-toggle"><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></div>
+      <div class="pane">
+        <div class="filter-header">
+          <label><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></label>
+          <i class="close" title="<%= t('.filter_close') %>"></i>
+        </div>
 
-      <div class="donation filter-inputs" data-type="donation">
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "donor", on: true, source: "donor_list", category_label: 0 } %>
-        <div class="row filter-input" data-field="period" data-type="period">
-          <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <div class="list"></div>
-          <div class="input-group">
-            <input id="donation_period_from" type="text" placeholder="<%= t('.from') %>" class="datepicker" data-type="period">
-            <input id="donation_period_to" type="text" placeholder="<%= t('.to') %>" class="datepicker" data-type="period">
-            <div class="sublabel"><%= t('.campaign') %>:</div>
-            <ul id="donation_period_campaigns">
-              <% Period.campaigns.each {|r| %>
-                <li><a href="#" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date, format: :date} - #{l r.end_date, format: :date}"%></a></li>
-              <% } %>
-            </ul>
-          </div>
-        </div>
-        <div class="row filter-input" data-field="amount" data-type="range">
-          <a href="#" class="toggle" tabindex="5"><%= t('.amount') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <div class="list hidden"></div>
-          <div class="input-group">
-            <input id="donation_amount_from" type="number" placeholder="<%= t('.from') %>" class="datepicker" data-type="range">
-            <input id="donation_amount_to" type="number" placeholder="<%= t('.to') %>" class="datepicker" data-type="range">
-          </div>
-        </div>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "party", on: true, list: generate_li_list(Party.list), category_label: 0 } %>
-        <div class="row filter-input" data-field="type" data-type="radio">
-          <a href="#" class="toggle" tabindex="5"><%= t('.donation_type') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <div class="list hidden"></div>
-          <div class="input-group">
-            <div class="block b1">
-              <input type="radio" id="donation_monetary_yes" name="donation_monetary" value="yes" data-type="radio">
-              <label for="donation_monetary_yes"><span></span><%= t('.monetary') %></label>
-            </div>
-            <div class="block">
-              <input type="radio"  id="donation_monetary_no" name="donation_monetary" value="no" data-type="radio">
-              <label for="donation_monetary_no"><span></span><%= t('.non_monetary') %></label>
-            </div>
-          </div>
-        </div>
-        <div class="row filter-input" data-field="multiple" data-type="checkbox">
-          <a href="#" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <div class="list hidden"></div>
-          <div class="input-group">
-            <div class="block">
-              <input type="checkbox" id="donation_multiple_yes" name="donation_multiple" value="yes" data-type="checkbox">
-              <label for="donation_multiple_yes"><span></span><%= t('._yes') %></label>
-            </div>
-          </div>
-        </div>
-        <div class="row filter-input" data-field="nature" data-type="radio">
-          <a href="#" class="toggle" tabindex="5"><%= t('.donor_nature') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <div class="list hidden"></div>
-          <div class="input-group">
-            <div class="block b1">
-              <input type="radio" id="donor_nature_individual" name="donor_nature" value="individual" data-type="radio">
-              <label for="donor_nature_individual"><span></span><%= t('.individual') %></label>
-            </div>
-            <div class="block">
-              <input type="radio"  id="donor_nature_organization" name="donor_nature" value="organization" data-type="radio">
-              <label for="donor_nature_organization"><span></span><%= t('.organization') %></label>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="finance filter-inputs" data-type="finance">
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true, list: generate_li_list(Party.member_party_list), category_label: 0 } %>
-        <% lists = Category.by_sym(@categories) %>
-
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income", on: false, list: lists[:income].html_safe } %>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income_campaign", on: false, list: lists[:income_campaign].html_safe } %>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "expenses", on: false, list: lists[:expenses].html_safe } %>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "expenses_campaign", on: false, list: lists[:expenses_campaign].html_safe } %>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "reform_expenses", on: false, list: lists[:reform_expenses].html_safe } %>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "property_assets", on: false, list: lists[:property_assets].html_safe } %>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "financial_assets", on: false, list: lists[:financial_assets].html_safe } %>
-        <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "debts", on: false, list: lists[:debts].html_safe } %>
-
-        <div class="row filter-input" data-field="period" data-type="period_mix">
-          <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
-          <ul id="finance_period" class="list" data-type="period_mix"></ul>
-          <div class="input-group">
-            <div class="input-radio-group">
-              <input type="radio" id="finance_period_annual" name="finance_period" value="annual" data-type="period_mix" checked>
-              <label for="finance_period_annual" data-type="annual"><%= t('.annual') %></label>
-              <span class="or"><%= t('shared.common.or') %></span>
-              <input type="radio" id="finance_period_campaign" name="finance_period" value="campaign" data-type="period_mix">
-              <label for="finance_period_campaign" data-type="campaign"><%= t('.campaign') %></label>
-            </div>
-            <div class="input-checkbox-group">
-              <ul data-type="annual">
-                <% Period.annual.each{|e| %>
-                  <li><input type="checkbox" id='finance_period_annual_<%= "#{e.permalink}" %>' name='finance_period_annual' value="<%= "#{e.permalink}" %>">
-                  <label for='finance_period_annual_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
-                <% } %>
-              </ul>
-              <ul class="hidden" data-type="campaign">
-                <% Period.campaigns.each{|e| %>
-                  <li><input type="checkbox" id='finance_period_campaign_<%= "#{e.permalink}" %>' name='finance_period_campaign' value="<%= "#{e.permalink}" %>">
-                  <label for='finance_period_campaign_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
+        <div class="donation filter-inputs" data-type="donation">
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "donor", on: true, source: "donor_list", category_label: 0 } %>
+          <div class="row filter-input" data-field="period" data-type="period">
+            <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <div class="list"></div>
+            <div class="input-group">
+              <input id="donation_period_from" type="text" placeholder="<%= t('.from') %>" class="datepicker" data-type="period">
+              <input id="donation_period_to" type="text" placeholder="<%= t('.to') %>" class="datepicker" data-type="period">
+              <div class="sublabel"><%= t('.campaign') %>:</div>
+              <ul id="donation_period_campaigns">
+                <% Period.campaigns.each {|r| %>
+                  <li><a href="#" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date, format: :date} - #{l r.end_date, format: :date}"%></a></li>
                 <% } %>
               </ul>
             </div>
+          </div>
+          <div class="row filter-input" data-field="amount" data-type="range">
+            <a href="#" class="toggle" tabindex="5"><%= t('.amount') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <div class="list hidden"></div>
+            <div class="input-group">
+              <input id="donation_amount_from" type="number" min="1" placeholder="<%= t('.from') %>" class="datepicker" data-type="range">
+              <input id="donation_amount_to" type="number" min="1" placeholder="<%= t('.to') %>" class="datepicker" data-type="range">
+            </div>
+          </div>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "party", on: true, list: generate_li_list(Party.list), category_label: 0, label: "party_candidate" } %>
+          <div class="row filter-input" data-field="multiple" data-type="checkbox">
+            <a href="#" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <div class="list hidden"></div>
+            <div class="input-group">
+              <div class="block">
+                <input type="checkbox" id="donation_multiple_yes" name="donation_multiple" value="yes" data-type="checkbox">
+                <label for="donation_multiple_yes"><span></span><%= t('._yes') %></label>
+              </div>
+            </div>
+          </div>
+          <div class="row filter-input" data-field="type" data-type="radio">
+            <a href="#" class="toggle" tabindex="5"><%= t('.donation_type') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <div class="list hidden"></div>
+            <div class="input-group">
+              <div class="block b1">
+                <input type="radio" id="donation_monetary_yes" name="donation_monetary" value="yes" data-type="radio">
+                <label for="donation_monetary_yes"><span></span><%= t('.monetary') %></label>
+              </div>
+              <div class="block">
+                <input type="radio"  id="donation_monetary_no" name="donation_monetary" value="no" data-type="radio">
+                <label for="donation_monetary_no"><span></span><%= t('.non_monetary') %></label>
+              </div>
+            </div>
+          </div>
 
+          <div class="row filter-input" data-field="nature" data-type="radio">
+            <a href="#" class="toggle" tabindex="5"><%= t('.donor_nature') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <div class="list hidden"></div>
+            <div class="input-group">
+              <div class="block b1">
+                <input type="radio" id="donor_nature_individual" name="donor_nature" value="individual" data-type="radio">
+                <label for="donor_nature_individual"><span></span><%= t('.individual') %></label>
+              </div>
+              <div class="block">
+                <input type="radio"  id="donor_nature_organization" name="donor_nature" value="organization" data-type="radio">
+                <label for="donor_nature_organization"><span></span><%= t('.organization') %></label>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="filter-footer">
-        <button id="reset" class="reset"><%= t('.reset') %></button>
-        <button id="explore_button" class="explore-button"><i class='explore'></i><%= t('.explore') %></button>
+        <div class="finance filter-inputs" data-type="finance">
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true, list: generate_li_list(Party.member_party_list), category_label: 0 } %>
+          <% lists = Category.by_sym(@categories) %>
+
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income", on: false, list: lists[:income].html_safe } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income_campaign", on: false, list: lists[:income_campaign].html_safe } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "expenses", on: false, list: lists[:expenses].html_safe } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "expenses_campaign", on: false, list: lists[:expenses_campaign].html_safe } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "reform_expenses", on: false, list: lists[:reform_expenses].html_safe } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "property_assets", on: false, list: lists[:property_assets].html_safe } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "financial_assets", on: false, list: lists[:financial_assets].html_safe } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "debts", on: false, list: lists[:debts].html_safe } %>
+
+          <div class="row filter-input" data-field="period" data-type="period_mix">
+            <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <ul id="finance_period" class="list" data-type="period_mix"></ul>
+            <div class="input-group">
+              <div class="input-radio-group">
+                <input type="radio" id="finance_period_annual" name="finance_period" value="annual" data-type="period_mix" checked>
+                <label for="finance_period_annual" data-type="annual"><%= t('.annual') %></label>
+                <span class="or"><%= t('shared.common.or') %></span>
+                <input type="radio" id="finance_period_campaign" name="finance_period" value="campaign" data-type="period_mix">
+                <label for="finance_period_campaign" data-type="campaign"><%= t('.campaign') %></label>
+              </div>
+              <div class="input-checkbox-group">
+                <ul data-type="annual">
+                  <% Period.annual.each{|e| %>
+                    <li><input type="checkbox" id='finance_period_annual_<%= "#{e.permalink}" %>' name='finance_period_annual' value="<%= "#{e.permalink}" %>">
+                    <label for='finance_period_annual_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
+                  <% } %>
+                </ul>
+                <ul class="hidden" data-type="campaign">
+                  <% Period.campaigns.each{|e| %>
+                    <li><input type="checkbox" id='finance_period_campaign_<%= "#{e.permalink}" %>' name='finance_period_campaign' value="<%= "#{e.permalink}" %>">
+                    <label for='finance_period_campaign_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
+                  <% } %>
+                </ul>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="filter-footer">
+          <button id="reset" class="reset"><%= t('.reset') %></button>
+          <button id="explore_button" class="explore-button"><i class='explore'></i><%= t('.explore') %></button>
+        </div>
       </div>
     </div>
-  </div>
-  <div id="content" class="content">
-    <div class="overlay hidden"></div>
-    <div class="panes" >
-      <div class="pane" data-type="donation">
-        <div class="charts">
-          <div class="chart-container chart-container-1">
-            <div class="actions">
-              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+    <div id="content" class="content">
+      <div class="overlay hidden"></div>
+      <div class="panes" >
+        <div class="pane" data-type="donation">
+          <div class="charts">
+            <div class="chart-container chart-container-1">
+              <div class="actions">
+                <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+                <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+                <div class="download download_menu" title="<%= t('.download_chart') %>">
+                  <i></i>
+                  <ul class="chart_download" data-target="#donation_chart_1">
+                    <li><a href="#" data-type="print">print</a></li>
+                    <li><a href="#" data-type="pdf">pdf</a></li>
+                    <li><a href="#" data-type="svg">svg</a></li>
+                    <li><a href="#" data-type="jpeg">jpeg</a></li>
+                    <li><a href="#" data-type="png">png</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div id="donation_chart_1"></div>
+            </div>
+            <div class="separator">
+              <div class="separator-box">
+                <span class="donors"><%= t('.donors') %></span>
+                <span class="party-donations"><%= t('.party_donations').html_safe %></span>
+              </div>
+            </div>
+            <div class="chart-container chart-container-2">
+              <div class="actions">
+                <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+                <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+                <div class="download download_menu" title="<%= t('.download_chart') %>">
+                  <i></i>
+                  <ul class="chart_download" data-target="#donation_chart_2">
+                    <li><a href="#" data-type="print">print</a></li>
+                    <li><a href="#" data-type="pdf">pdf</a></li>
+                    <li><a href="#" data-type="svg">svg</a></li>
+                    <li><a href="#" data-type="png">png</a></li>
+                    <li><a href="#" data-type="jpeg">jpeg</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div id="donation_chart_2"></div>
+            </div>
+          </div>
+          <div class="total">
+            <div id="donation_total_amount"><div class="box"><label><%= t('.total_amount') %>:</label><span></span></div></div>
+            <div class="separator"></div>
+            <div id="donation_total_donations"><div class="box"><label><%= t('.total_donations') %>:</label><span></span></div></div>
+          </div>
+          <div class="table">
+              <div class="actions">
+                <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
+                <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
+                <a href='<%= "#{@donation_download_link}" %>' id="donation_csv_download" class="download" title="<%= t('.download_table') %>"><i></i></a>
+              </div>
+            <div id="donation_table">
+              <table class="highlighted"></table>
+            </div>
+          </div>
+        </div>
+        <div class="pane" data-type="finance" data-view-current="chart">
+          <div class="actions">
+            <div class="left">
+              <label><%= t('.view_as') %>:</label>
+              <div data-view-toggle="chart" title="<%= t('.view_as_chart') %>"></div>
+              <div data-view-toggle="table" title="<%= t('.view_as_table') %>"></div>
+            </div>
+            <div class="right">
+              <div class="share" title="<%= t('.share_chart') %>"><i></i>
+                  <div class="addthis_sharing_toolbox"></div>
+              </div>
               <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
               <div class="download download_menu" title="<%= t('.download_chart') %>">
                 <i></i>
-                <ul class="chart_download" data-target="#donation_chart_1">
-                  <li><a href="#" data-type="print">print</a></li>
-                  <li><a href="#" data-type="pdf">pdf</a></li>
-                  <li><a href="#" data-type="svg">svg</a></li>
-                  <li><a href="#" data-type="jpeg">jpeg</a></li>
-                  <li><a href="#" data-type="png">png</a></li>
+                <ul class="download_list" data-type="chart" data-object="finance">
+                  <li data-only="table"><a href="<%= "#{@finance_download_link}" %>" id="finance_csv_download" data-type="csv"><%= t('.export_type.csv') %></a></li>
+                  <li data-only="chart"><a href="#" data-type="print"><%= t('.export_type.print') %></a></li>
+                  <li data-only="chart"><a href="#" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
+                  <li data-only="chart"><a href="#" data-type="svg"><%= t('.export_type.svg') %></a></li>
+                  <li data-only="chart"><a href="#" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
+                  <li data-only="chart"><a href="#" data-type="png"><%= t('.export_type.png') %></a></li>
                 </ul>
               </div>
             </div>
-            <div id="donation_chart_1"></div>
           </div>
-          <div class="separator">
-            <div class="separator-box">
-              <span class="donors"><%= t('.donors') %></span>
-              <span class="party-donations"><%= t('.party_donations').html_safe %></span>
-            </div>
-          </div>
-          <div class="chart-container chart-container-2">
-            <div class="actions">
-              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
-              <div class="download download_menu" title="<%= t('.download_chart') %>">
-                <i></i>
-                <ul class="chart_download" data-target="#donation_chart_2">
-                  <li><a href="#" data-type="print">print</a></li>
-                  <li><a href="#" data-type="pdf">pdf</a></li>
-                  <li><a href="#" data-type="svg">svg</a></li>
-                  <li><a href="#" data-type="png">png</a></li>
-                  <li><a href="#" data-type="jpeg">jpeg</a></li>
-                </ul>
-              </div>
-            </div>
-            <div id="donation_chart_2"></div>
-          </div>
-        </div>
-        <div class="total">
-          <div id="donation_total_amount"><div class="box"><label><%= t('.total_amount') %>:</label><span></span></div></div>
-          <div class="separator"></div>
-          <div id="donation_total_donations"><div class="box"><label><%= t('.total_donations') %>:</label><span></span></div></div>
-        </div>
-        <div class="table">
-            <div class="actions">
-              <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-              <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
-              <a href='<%= "#{@download_link}" %>' id="donation_csv_download" class="download" title="<%= t('.download_table') %>"><i></i></a>
-            </div>
-          <div id="donation_table">
-            <table></table>
-          </div>
-        </div>
-      </div>
-      <div class="pane" data-type="finance" data-view-current="chart">
-        <div class="actions">
-          <div class="left">
-            <label><%= t('.view_as') %>:</label>
-            <div data-view-toggle="chart" title="<%= t('.view_as_chart') %>"></div>
-            <div data-view-toggle="table" title="<%= t('.view_as_table') %>"></div>
-          </div>
-          <div class="right">
-            <div class="share" title="<%= t('.share_chart') %>"><i></i>
-                <div class="addthis_sharing_toolbox"></div>
-            </div>
-            <div class="embed" title="<%= t('.embed_chart') %>"><i></i></div>
-            <div class="download download_menu" title="<%= t('.download_chart') %>">
-              <i></i>
-              <ul class="download_list" data-type="chart" data-object="finance">
-                <li data-only="table"><a href="#" id="finance_csv_download" data-type="csv"><%= t('.export_type.csv') %></a></li>
-                <li data-only="chart"><a href="#" data-type="print"><%= t('.export_type.print') %></a></li>
-                <li data-only="chart"><a href="#" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
-                <li data-only="chart"><a href="#" data-type="svg"><%= t('.export_type.svg') %></a></li>
-                <li data-only="chart"><a href="#" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
-                <li data-only="chart"><a href="#" data-type="png"><%= t('.export_type.png') %></a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div data-view="chart"><div id="finance_chart"></div></div>
-        <div data-view="table"><div id="finance_table"><table></table></div></div>
+          <div data-view="chart"><div id="finance_chart"></div></div>
+          <div data-view="table"><div id="finance_table"><table></table></div></div>
 
+        </div>
+        <div class="pane" data-type="not_found"><p class="not-found-text"><%= t('.not_found') %></p></div>
       </div>
-      <div class="pane" data-type="not_found"><p class="not-found-text"><%= t('.not_found') %></p></div>
     </div>
   </div>
 </div>

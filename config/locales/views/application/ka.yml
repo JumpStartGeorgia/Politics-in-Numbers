@@ -2,15 +2,13 @@
 ka:
   application:
     navbar_header:
-      explore: Explore
+      explore: ნახვა
       about: "პროექტის შესახებ"
-      media: In Media
-      download: Download
+      media: მედიაში
+      download: ჩამოტვირთვა
       api: Api
-      parties: Parties
-      settings: Settings
+      parties: პარტიები
+      settings: პარამეტრები
       account:
         edit_profile: პროფილის შეცვლა
         logout: გასვლა
-      link1: "ლინკი 1"
-      link2: "ლინკი 2"
