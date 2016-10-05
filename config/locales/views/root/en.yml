@@ -7,9 +7,19 @@ en:
       go_explore: Go Explore!
     about:
       title: About
+      methodology: Methodology
+      donations: Donations
+      party_finances: Party Finances
+      sponsors: Sponsors and Partners
+      alt:
+        js: "Informing Communities with Data and Design"
+        dcn: "Alt"
+        us: "Alt"
     media:
       title: In Media
       no_media: No mentions of Politics in Number in the media have been recorded yet.
+    download:
+      title: Download
     explore:
       title: Explore
       category: Category

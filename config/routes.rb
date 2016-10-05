@@ -46,6 +46,9 @@ Rails.application.routes.draw do
     get 'select/donors' => 'root#select_donors'
     get 'select/parties' => 'root#select_parties'
     get 'explore_filter' => 'root#explore_filter'
+    get 'download' => 'root#download'
+    get 'download_file' => 'root#download_file', defaults: { format: 'zip' }, constraints: { format: 'zip' }
+
     # get '/read' => 'root#read'
     # get '/read_details' => 'root#read_details'
     # get '/read_donors' => 'root#read_donors'

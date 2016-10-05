@@ -1,2 +1,81 @@
 <% page_title t('.title') %>
-<div>download</div>
+
+<div class="filter" data-type="<%= @filter_type %>">
+  <div class="filter-toggle"><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></div>
+  <div class="filter-type-toggles">
+    <button type="button" id="donation_toggle" class="donation-toggle<%= @filter_type == 'donation' ? ' active' : '' %>" data-type="donation"><%= t('shared.filters.donations') %></button>
+    <button type="button" id="finance_toggle" class="finance-toggle<%= @filter_type != 'donation' ? ' active' : '' %>" tabindex="4" data-type="finance"><%= t('shared.filters.party_finances').html_safe %></button>
+  </div>
+  <div class="pane">
+    <div class="filter-header">
+      <label><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></label>
+      <i class="close" title="<%= t('.filter_close') %>"></i>
+    </div>
+
+    <div class="donation filter-inputs" data-type="donation">
+      <div class="row filter-input" data-field="period" data-type="period">
+        <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
+        <div class="list"></div>
+        <div class="input-group">
+          <input id="donation_period_from" type="text" placeholder="<%= t('.from') %>" class="datepicker" data-type="period">
+          <input id="donation_period_to" type="text" placeholder="<%= t('.to') %>" class="datepicker" data-type="period">
+          <div class="sublabel"><%= t('.campaign') %>:</div>
+          <ul id="donation_period_campaigns">
+            <% Period.campaigns.each {|r| %>
+              <li><a href="#" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date, format: :date} - #{l r.end_date, format: :date}"%></a></li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="finance filter-inputs" data-type="finance">
+      <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true, list: generate_li_list(Party.member_party_list), category_label: 0 } %>
+      <% lists = Category.by_sym(@categories) %>
+
+      <div class="row filter-input" data-field="period" data-type="period_mix">
+        <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
+        <ul id="finance_period" class="list" data-type="period_mix"></ul>
+        <div class="input-group">
+          <div class="input-radio-group">
+            <input type="radio" id="finance_period_annual" name="finance_period" value="annual" data-type="period_mix" checked>
+            <label for="finance_period_annual" data-type="annual"><%= t('.annual') %></label>
+            <span class="or"><%= t('shared.common.or') %></span>
+            <input type="radio" id="finance_period_campaign" name="finance_period" value="campaign" data-type="period_mix">
+            <label for="finance_period_campaign" data-type="campaign"><%= t('.campaign') %></label>
+          </div>
+          <div class="input-checkbox-group">
+            <ul data-type="annual">
+              <% Period.annual.each{|e| %>
+                <li><input type="checkbox" id='finance_period_annual_<%= "#{e.permalink}" %>' name='finance_period_annual' value="<%= "#{e.permalink}" %>">
+                <label for='finance_period_annual_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
+              <% } %>
+            </ul>
+            <ul class="hidden" data-type="campaign">
+              <% Period.campaigns.each{|e| %>
+                <li><input type="checkbox" id='finance_period_campaign_<%= "#{e.permalink}" %>' name='finance_period_campaign' value="<%= "#{e.permalink}" %>">
+                <label for='finance_period_campaign_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
+              <% } %>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <div class="filter-footer">
+      <button id="reset" class="reset"><%= t('.reset') %></button>
+      <button id="explore_button" class="explore-button"><i class='explore'></i><%= t('.explore') %></button>
+    </div>
+  </div>
+</div>
+<div class="view" data-type="<%= @filter_type %>">
+  <div class="view-loader hidden"></div>
+</div>
+<%# content_for :custom_js,  "explore"  %>
+<%# @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "highcharts-grouped-categories.js", "crypto.min.js"
+  # Warning uncomment this , "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5554a5643f1d9065"#,
+  #"datatables.buttons.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/dataTables.buttons.min.js",
+  #"datatables.buttons.html5.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/buttons.html5.min.js",
+  #"https://cdn.datatables.net/buttons/1.2.1/js/buttons.print.min.js"
+ ] %>
+<%# @custom_css = [ "https://cdn.datatables.net/buttons/1.2.1/css/buttons.dataTables.min.css" ] %>
+<% content_for :custom_css, "download" %>

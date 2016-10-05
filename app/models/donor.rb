@@ -355,10 +355,12 @@ class Donor
       grp_h = { }
       grp_a = []
       d_i = 0
-      data.each{ |e|
+
+      data.each_with_index{ |e, e_i|
         break if d_i >= n
         ek = e[key].round
         if !grp_h.key?(ek)
+          break if e_i >= n
           grp_h[ek] = 0
           grp_a << [e[:name], ek]
           d_i += 1

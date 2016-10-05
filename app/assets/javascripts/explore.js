@@ -2,6 +2,7 @@
 /*eslint no-console: "error"*/
 //= require jquery-ui/datepicker
 //= require dataTables.pagination.js
+//= require jquery-ui/tooltip
 var dn;
 $(document).ready(function (){
   // console.log("explore ready");
@@ -895,6 +896,12 @@ $(document).ready(function (){
       $(".pane[data-type='finance']").attr("data-view-current", $(this).attr("data-view-toggle"));
       $(".pane[data-type='finance'] .actions .download_list").attr("data-type", $(this).attr("data-view-toggle"));
     });
+
+    $(document).tooltip({
+      content: function() { return $(this).attr("data-retitle"); },
+      items: "text[data-retitle]",
+      track: true
+    });
   }
 
   function filter() {
@@ -1000,7 +1007,9 @@ $(document).ready(function (){
           }
         });
       dt.on("draw", function (e, settings) {
-        $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
+        if(settings.aaSorting.length) {
+          $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
+        }
       });
     }
     else if(type === "finance") {
@@ -1111,13 +1120,20 @@ $(document).ready(function (){
 
   function bar_chart(elem, series_data, title, subtitle, bg) {
     //console.log("chart", elem, series_data);
-    console.log($("#content").width());
     $(elem).highcharts({
       chart: {
           type: 'bar',
           backgroundColor: bg,
           height: 60*(Math.round(title.length/40)+1) + 40 * series_data.length,
-          width: w > 992 ? ($("#content").width()-386)/2 : w - 12
+          width: w > 992 ? ($("#content").width()-386)/2 : w - 12,
+          events: {
+            load: function () {
+              var tls = $(this.container).find(".highcharts-xaxis-labels text title"),
+                p = tls.parent();
+              p.attr("data-retitle", tls.text());
+              tls.remove();
+            }
+          }
       },
       exporting: {
         buttons: {
@@ -1155,6 +1171,10 @@ $(document).ready(function (){
             fontFamily: "firasans_book",
             textShadow: 'none'
           }
+          // ,
+          // formatter: function(a,b,c) {
+          //   return this.value + "<title>hello</title>";
+          // }
         }
       },
       yAxis: { visible: false },
@@ -1206,7 +1226,8 @@ $(document).ready(function (){
           type: 'column',
           backgroundColor: bg,
           height: 400,
-          width: w > 992 ? ($("#content").width()-28)/2 : w - 12
+          width: w > 992 ? ($("#content").width()-28)/2 : w - 12,
+          spacingLeft: 20
       },
       exporting: {
         buttons: {
@@ -1228,15 +1249,9 @@ $(document).ready(function (){
       xAxis: {
         type: "category",
         categories: resource.categories,
-        // gridLineColor: "#5D675B",
-        // gridLineWidth:1,
-        // gridLineDashStyle: "Dash",
         lineWidth: 1,
         lineColor: "#5D675B",
         tickWidth: 0,
-        // tickColor: "#5D675B",
-        // tickLength: 50,
-        // tickPosition: "outside",
         min: 0,
         labels: {
           style: {

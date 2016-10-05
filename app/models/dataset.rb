@@ -18,7 +18,7 @@ class Dataset
   field :del, type: Boolean, default: false
 
   default_scope ->{ where(del: false) }
-
+#  before_source_post_process :source_post_process
   has_mongoid_attached_file :source,
     :path => ':rails_root/public/system/:class/:attachment/:id/:style.:extension',
     :url => '/system/:class/:attachment/:id/:style.:extension'
@@ -27,6 +27,9 @@ class Dataset
   validates_presence_of :party_id, :period_id
   validates_attachment :source, presence: true, content_type: { content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }, size: { in: 0..25.megabytes }
   validates_inclusion_of :state, in: [0, 1, 2]
+
+  def source_post_process
+  end
 
   def self.sorted
     order_by([[:created_at, :desc]])

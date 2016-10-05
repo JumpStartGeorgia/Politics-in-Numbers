@@ -3,16 +3,18 @@ body.root.about{
     background:image-url('about.png') no-repeat bottom center;
     background-size: cover;
     height: 400px;
-    margin: -100px -42px 25px -42px;
-    position: relative;
+    // margin: -100px -42px 25px -42px;
+    // position: relative;
+    display:flex;
+    flex-direction:row;
 
     .about-summary-text{
-      text-align: center;
-      margin: 0 20%;
-      padding-top: 160px;
+      align-self: center;
+      max-width:1024px;
+      margin: 0 auto;
       font:18px/22px firasans_book;
+      text-align: center;
       color: #fff;
-      font-weight: bold;
       p{
         margin-bottom: 10px;
         &:last-of-type{
@@ -20,6 +22,7 @@ body.root.about{
         }
       }
     }
+
   }
 
   h2{
@@ -36,6 +39,7 @@ body.root.about{
   }
 
   .section{
+    padding:25px 42px;
     font:16px/22px firasans_book;
     p{
       margin-bottom: 10px;
@@ -43,132 +47,147 @@ body.root.about{
         margin-bottom: 0;
       }
     }
-  }
-}
+    .content-sponsors {
+      a {
+        display:inline-block;
+        padding:10px;
+        img {
+          height:84px;
 
-
-@media screen and (max-width: 1500px) {
-  body.root.about{
-    .about-summary{
-      height: 350px;
-
-      .about-summary-text{
-        padding-top: 125px;
-        margin: 0 15%;
+        }
       }
     }
   }
 }
+@media (min-width: 768px) {
 
-@media screen and (max-width: 1200px) {
-  body.root.about{
-    .about-summary{
-      height: 300px;
+}
+@media (min-width: 992px) {
 
-      .about-summary-text{
-        padding-top: 125px;
-        font-size: 16px;
-        margin: 0 10%;
-      }
-    }
-  }
 }
 
-@media screen and (max-width: 1081px) {
-  body.root.about{
-    .about-summary{
-      height: 275px;
+// @media screen and (max-width: 1500px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 350px;
 
-      .about-summary-text{
-        padding-top: 90px;
-        font-size: 16px;
-        margin: 0 10%;
-      }
-    }
-  }
-}
+//       .about-summary-text{
+//         padding-top: 125px;
+//         margin: 0 15%;
+//       }
+//     }
+//   }
+// }
 
-@media screen and (max-width: 992px) {
-  body.root.about{
-    .about-summary{
-      height: 275px;
+// @media screen and (max-width: 1200px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 300px;
 
-      .about-summary-text{
-        padding-top: 80px;
-        font-size: 16px;
-        margin: 0;
-      }
-    }
-  }
-}
+//       .about-summary-text{
+//         padding-top: 125px;
+//         font-size: 16px;
+//         margin: 0 10%;
+//       }
+//     }
+//   }
+// }
 
-@media screen and (max-width: 850px) {
-  body.root.about{
-    .about-summary{
-      height: 300px;
+// @media screen and (max-width: 1081px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 275px;
 
-      .about-summary-text{
-        padding-top: 75px;
-        font-size: 14px;
-        margin: 0 20px;
-      }
-    }
-  }
-}
+//       .about-summary-text{
+//         padding-top: 90px;
+//         font-size: 16px;
+//         margin: 0 10%;
+//       }
+//     }
+//   }
+// }
 
-@media screen and (max-width: 650px) {
-  body.root.about{
-    .about-summary{
-      height: 300px;
+// @media screen and (max-width: 992px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 275px;
 
-      .about-summary-text{
-        padding-top: 60px;
-        font-size: 14px;
-        margin: 0 20px;
-      }
-    }
-  }
-}
+//       .about-summary-text{
+//         padding-top: 80px;
+//         font-size: 16px;
+//         margin: 0;
+//       }
+//     }
+//   }
+// }
 
-@media screen and (max-width: 575px) {
-  body.root.about{
-    .about-summary{
-      height: 350px;
+// @media screen and (max-width: 850px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 300px;
 
-      .about-summary-text{
-        padding-top: 60px;
-        font-size: 12px;
-        margin: 0 20px;
-      }
-    }
-  }
-}
+//       .about-summary-text{
+//         padding-top: 75px;
+//         font-size: 14px;
+//         margin: 0 20px;
+//       }
+//     }
+//   }
+// }
 
-@media screen and (max-width: 400px) {
-  body.root.about{
-    .about-summary{
-      height: 425px;
+// @media screen and (max-width: 650px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 300px;
 
-      .about-summary-text{
-        padding-top: 60px;
-        font-size: 12px;
-        margin: 0 20px;
-      }
-    }
-  }
-}
+//       .about-summary-text{
+//         padding-top: 60px;
+//         font-size: 14px;
+//         margin: 0 20px;
+//       }
+//     }
+//   }
+// }
 
-@media screen and (max-width: 350px) {
-  body.root.about{
-    .about-summary{
-      height: 500px;
+// @media screen and (max-width: 575px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 350px;
 
-      .about-summary-text{
-        padding-top: 60px;
-        font-size: 12px;
-        margin: 0 20px;
-      }
-    }
-  }
-}
+//       .about-summary-text{
+//         padding-top: 60px;
+//         font-size: 12px;
+//         margin: 0 20px;
+//       }
+//     }
+//   }
+// }
+
+// @media screen and (max-width: 400px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 425px;
+
+//       .about-summary-text{
+//         padding-top: 60px;
+//         font-size: 12px;
+//         margin: 0 20px;
+//       }
+//     }
+//   }
+// }
+
+// @media screen and (max-width: 350px) {
+//   body.root.about{
+//     .about-summary{
+//       height: 500px;
+
+//       .about-summary-text{
+//         padding-top: 60px;
+//         font-size: 12px;
+//         margin: 0 20px;
+//       }
+//     }
+//   }
+// }
 

@@ -7,6 +7,14 @@ ka:
       go_explore: გაეცანი!
     about:
       title: ჩვენზე
+      methodology: მეთოდოლოგია
+      donations: შემოწირულებები
+      party_finances: პარტიის ფინანსები
+      sponsors: სპონსორები და პარტნიორები
+      alt:
+        js: "Informing Communities with Data and Design"
+        dcn: "Alt"
+        us: "Alt"
     media:
       title: მედიაში
       no_media: ჯერჯერობით არ მოიპოვება ჩანაწერი.
