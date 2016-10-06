@@ -47,6 +47,7 @@ Rails.application.routes.draw do
     get 'select/parties' => 'root#select_parties'
     get 'explore_filter' => 'root#explore_filter'
     get 'download' => 'root#download'
+    get 'download_filter' => 'root#download_filter'
     get 'download_file' => 'root#download_file', defaults: { format: 'zip' }, constraints: { format: 'zip' }
 
     # get '/read' => 'root#read'

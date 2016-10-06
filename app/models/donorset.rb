@@ -92,6 +92,7 @@ class Donorset
       dnr.save
     }
   end
+
   # def self.dates_range
   #   min = nil
   #   max = nil

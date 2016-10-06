@@ -162,8 +162,113 @@ class RootController < ApplicationController
     render :json => res
   end
 
+  def download
+    @show_page_title = false
 
+    pars = download_params
+    is_zip = pars[:format] == 'zip'
 
+    which_filter = pars[:filter]
+    @filter_type = which_filter == "finance" ? "finance" : "donation"
+    has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
+
+    donation_pars = {}
+    finance_pars = {}
+
+    if !has_filters
+      has_filters = true
+      @filter_type = "finance"
+      which_filter = "finance"
+      pars.merge!(finance_pars)
+    end
+
+    is_finance = which_filter == "finance"
+    is_donation = !is_finance
+
+    @button_state = ['','']
+    @button_state[is_finance ? 1 : 0] = ' active'
+
+    dt = []
+
+    donation_pars = pars if !is_finance
+    finance_pars = pars if is_finance
+
+    if !is_zip
+      gon.download = t('.download')
+      gon.search = t('.search')
+      # gon.url = root_url
+      # gon.app_name = "pins.ge"
+      # gon.date_format = t('date.formats.jsdate')
+      # gon.filter_item_close = t('.filter_item_close')
+      # gon.all = t('shared.common.all')
+      # gon.campaign = t('.campaign')
+      # gon.search = t('.search')
+      # gon.table_length = t('.table_length')
+      # gon.numericSymbols = t('shared.common.numericSymbols')
+
+      gon.gonned = false
+
+      gon.party_list = Party.list
+      gon.period_list = Period.list
+
+      gon.gonned_type = which_filter
+       Rails.logger.fatal("--------------------------------------------#{pars}")
+
+      gon.donation_params = donation_pars
+      gon.donation_data = Donor.download(donation_pars)
+      tmp = [] #Dataset.explore(finance_pars)
+      gon.finance_params = tmp.delete(:pars)
+      gon.finance_data = tmp
+
+      dt = is_finance ? gon.finance_data : gon.donation_data
+      gon.donation_data = {donation: { table: { data: [["Donations", "16.05.2016-20.11.2016", "25.645KB"]] }}}
+      pars.delete(:locale)
+
+      # @donation_download_link = request.path + "?filter=donation&" +  donation_pars.reject{|k,v| k == "filter" }.to_param  + "#{donation_pars.empty? ? '' : '&'}#{'format=csv'}"
+      # @finance_download_link = request.path + "?filter=finance&" +  finance_pars.reject{|k,v| k == "filter" }.to_param  + "#{finance_pars.empty? ? '' : '&'}#{'format=csv'}"
+
+      gon.params = pars
+
+    else
+
+      dt = is_finance ? Dataset.explore(finance_pars, true) : Donor.download(donation_pars, true)
+
+      # csv_file = CSV.generate do |csv|
+      #   if is_donation
+      #     csv << dt[:table][:header]
+      #   else
+      #     dt[:table][:header].each{|e|
+      #       tmp = []
+      #       tmp_prev = ""
+      #       e.reverse_each{|ee|
+      #         tmp.unshift(ee.present? ? ee : tmp_prev)
+      #         tmp_prev = ee
+      #       }
+      #       csv << tmp
+      #     }
+      #   end
+      #   dt[:table][:data].each { |r| csv << r }
+      # end
+    end
+
+    respond_to do |format|
+      format.html
+      format.zip { send_data dt[:file], filename: "explore_#{which_filter}_#{Date.today}.zip" }
+    end
+    # @page_content = PageContent.by_name('about')
+  end
+
+  def download_filter
+    res = {}
+    pars = download_filter_params
+    if pars[:donation].present?
+      res[:donation] = Donor.download(pars[:donation])
+    elsif pars[:finance].present?
+      res[:finance] = { finance: "test" } # Dataset.explore(pars[:finance])
+    end
+
+    render :json => res
+  end
 
 
   # show the embed chart if the id was provided and can be decoded and parsed into hash
@@ -220,10 +325,7 @@ class RootController < ApplicationController
     gon.show_less = t('shared.common.show_less')
   end
 
-  def download
-    @show_page_title = false
-    # @page_content = PageContent.by_name('about')
-  end
+
 
   # def api
   #   # @page_content = PageContent.by_name('about')
@@ -372,6 +474,10 @@ class RootController < ApplicationController
     end
     def download_params
       params.permit([:filter, :locale, :format, period: [], party: [] ])
+    end
+    def download_filter_params
+      params.permit(:donation => [:all, :locale, { period: [] }],
+        :finance => [:all, :locale, { party: [], period:[] }])
     end
 end
 

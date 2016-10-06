@@ -342,6 +342,142 @@ class Donor
       }
     )
   end
+  def self.download_filter(params)
+    #Rails.logger.debug("****************************************#{params}")
+    lang = I18n.locale
+    result = []
+    options = []
+    matches = []
+    conditions = []
+
+    tmp = params[:period][0]
+    if tmp.present? && tmp != -1
+      matches.push({ "donations.give_date": { "$gte": tmp } })
+      conditions.push({"$gte": [ "$$donation.give_date", tmp ]})
+    end
+
+    tmp = params[:period][1]
+    if tmp.present? && tmp != -1
+      matches.push({ "donations.give_date": { "$lte": tmp } })
+      conditions.push({"$lte": [ "$$donation.give_date", tmp ]})
+    end
+
+    options.push({ "$match": { "$and": matches } }) if !matches.blank?
+
+    #if !conditions.blank?
+      options.push({
+        "$project": {
+          first_name: "$first_name.#{lang}",
+          last_name: "$last_name.#{lang}",
+          tin: 1,
+          nature: 1,
+          donations: {
+            "$filter": {
+              input: "$donations",
+              as: "donation",
+              cond: { "$and": conditions }
+            }
+
+          }
+        }
+       })
+    #end
+    options.push({ "$sort": { give_date: -1, name: 1 } })
+    #if !matches.blank? || !conditions.blank?
+      # Rails.logger.debug("-------------------------------------aggregate options-------#{options}")
+      result = collection.aggregate(options)
+    #end
+    result
+  end
+  def self.download(params, with_zip = false)
+
+    f = { period: [-1,-1] }
+
+    tmp = params[:period]
+    f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
+     # Rails.logger.debug("--------------------------------------------#{f[:period]}")
+
+    if f[:period][0] != -1 && f[:period][1] != -1
+      chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
+    else
+      dte = Donor.date_span
+      chart_subtitle = "#{I18n.l(dte[:first_date], format: :date)} - #{I18n.l(dte[:last_date], format: :date)}"
+    end
+
+    data = download_filter(f).to_a
+    # Rails.logger.debug("---------------------------------------#{params}--#{f}")
+    table = []
+    parties = {}
+    Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
+
+    recent_donations = []
+    parties_list = {}
+    monetary_values = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
+    nature_values = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
+
+    workbook = RubyXL::Workbook.new
+    worksheet = workbook[0] #.add_worksheet('Sheet2')
+
+    [
+      "#",
+      Donation.human_attribute_name(:give_date),
+      human_attribute_name(:first_name),
+      human_attribute_name(:last_name),
+      human_attribute_name(:tin),
+      Donation.human_attribute_name(:amount),
+      Donation.human_attribute_name(:party),
+      Donation.human_attribute_name(:comment),
+      human_attribute_name(:nature),
+      Donation.human_attribute_name(:monetary)
+    ].each_with_index { |e,i|
+      worksheet.add_cell(0, i, e)
+    }
+    i = 1
+    min_date = Date.new(2050,1,1)
+    max_date = Date.new(1970,1,1)
+    data.each{|e|
+      e[:donations].each { |ee|
+        max_date = ee[:give_date] if ee[:give_date] > max_date
+        min_date = ee[:give_date] if ee[:give_date] < min_date
+        worksheet.add_cell(i, 0, i)
+        worksheet.add_cell(i, 1, I18n.l(ee[:give_date], format: :date))
+        worksheet.add_cell(i, 2, e[:first_name])
+        worksheet.add_cell(i, 3, e[:last_name])
+        worksheet.add_cell(i, 4, e[:tin])
+        worksheet.add_cell(i, 5, ee[:amount])
+        worksheet.add_cell(i, 6, parties[ee[:party_id]][:name])
+        worksheet.add_cell(i, 7, ee[:comment])
+        worksheet.add_cell(i, 8, nature_values[e[:nature]])
+        worksheet.add_cell(i, 9, monetary_values[ee[:monetary] ? 0 : 1])
+        i+=1
+      }
+    }
+    filename = "#{I18n.t("root.download.filename_donation")}-#{I18n.l(min_date, format: :filename)}-#{I18n.l(max_date, format: :filename)}.xlsx"
+      #send_data workbook.stream.string, filename: "myworkbook.xlsx",disposition: 'attachment'
+
+
+
+
+
+   compressed_filestream = Zip::OutputStream.write_buffer do |zp|
+      zp.put_next_entry filename
+      zp.print workbook.stream.string
+    end
+    compressed_filestream.rewind
+     Rails.logger.fatal("--------------------------------------------#{compressed_filestream.size}")
+    #send_data compressed_filestream.read, filename: "animals.zip"
+    sz = compressed_filestream.size
+    # compressed_filestream.close
+
+    {
+      table: {
+        header: ["", I18n.t("root.download.filename"), I18n.t("root.download.filename_period")],
+        data: [[1, filename, "#{I18n.l(min_date, format: :date)}-#{I18n.l(max_date, format: :date)}"]],
+        classes: ["", "", "center"]
+      },
+      size: ActionController::Base.helpers.number_to_human_size(sz)
+    }.merge(with_zip ? { file: compressed_filestream.read } : {})
+  end
   private
     def regenerate_fullname
       tmp = {}

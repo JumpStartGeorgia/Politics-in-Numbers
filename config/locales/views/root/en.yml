@@ -12,14 +12,36 @@ en:
       party_finances: Party Finances
       sponsors: Sponsors and Partners
       alt:
-        js: "Informing Communities with Data and Design"
-        dcn: "Alt"
-        us: "Alt"
+        js: "JumpStart Georgia"
+        us: "U.S. Department of State"
+        us_embassy: "Embassy of the Unites States Georgia"
+        dcn: "Digital Communication Network"
+        sao: "State Audit Office of Georgia"
     media:
       title: In Media
       no_media: No mentions of Politics in Number in the media have been recorded yet.
     download:
       title: Download
+      filters: Filters
+      filter_donations: Donations
+      filter_finance: Party Finances
+      filter_toggle: Toggle to add new filtering option
+      filter_close: Close Filter Window
+      filter_item_close: Remove item from filter
+      filter_clear: Remove all items from filter
+      time_period: Time Period
+      time: Time
+      annual: Annual
+      campaign: Campaign
+      from: From
+      to: To
+      reset: RESET
+      filter_submit: GENERATE
+      download: Download
+      filename_donation: Donations
+      search: Search
+      filename: File Name
+      filename_period: Time Period
     explore:
       title: Explore
       category: Category

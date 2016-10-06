@@ -1,18 +1,18 @@
 <% page_title t('.title') %>
 
 <div class="filter" data-type="<%= @filter_type %>">
-  <div class="filter-toggle"><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></div>
-  <div class="filter-type-toggles">
-    <button type="button" id="donation_toggle" class="donation-toggle<%= @filter_type == 'donation' ? ' active' : '' %>" data-type="donation"><%= t('shared.filters.donations') %></button>
-    <button type="button" id="finance_toggle" class="finance-toggle<%= @filter_type != 'donation' ? ' active' : '' %>" tabindex="4" data-type="finance"><%= t('shared.filters.party_finances').html_safe %></button>
-  </div>
+  <div class="filter-toggle"><i title="<%= t('.filters') %>"></i><%= t('.filters') %></div>
+
   <div class="pane">
     <div class="filter-header">
       <label><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></label>
       <i class="close" title="<%= t('.filter_close') %>"></i>
     </div>
-
-    <div class="donation filter-inputs" data-type="donation">
+    <div class="filter-type-toggles">
+      <button type="button" class="filter-type-toggle<%= @button_state[0] %>" data-type="donation" title="<%= t('.filter_donations') %>"><%= t('.filter_donations') %></button>
+      <button type="button" class="filter-type-toggle<%= @button_state[1] %>" data-type="finance" title="<%= t('.filter_finance') %>"><%= t('.filter_finance').html_safe %></button>
+    </div>
+    <div class="filter-inputs" data-type="donation">
       <div class="row filter-input" data-field="period" data-type="period">
         <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
         <div class="list"></div>
@@ -28,7 +28,7 @@
         </div>
       </div>
     </div>
-    <div class="finance filter-inputs" data-type="finance">
+    <div class="filter-inputs" data-type="finance">
       <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true, list: generate_li_list(Party.member_party_list), category_label: 0 } %>
       <% lists = Category.by_sym(@categories) %>
 
@@ -62,16 +62,17 @@
       </div>
     </div>
     <div class="filter-footer">
-      <button id="reset" class="reset"><%= t('.reset') %></button>
-      <button id="explore_button" class="explore-button"><i class='explore'></i><%= t('.explore') %></button>
+      <button id="filter_reset" class="filter-reset"><%= t('.reset') %></button>
+      <button id="filter_submit" class="filter-submit"><i></i><%= t('.filter_submit') %></button>
     </div>
   </div>
 </div>
 <div class="view" data-type="<%= @filter_type %>">
   <div class="view-loader hidden"></div>
+  <div class="view-content"><table></table></div>
 </div>
-<%# content_for :custom_js,  "explore"  %>
-<%# @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "highcharts-grouped-categories.js", "crypto.min.js"
+<% content_for :custom_js,  "download"  %>
+<% @custom_js = ["crypto.min.js"
   # Warning uncomment this , "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5554a5643f1d9065"#,
   #"datatables.buttons.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/dataTables.buttons.min.js",
   #"datatables.buttons.html5.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/buttons.html5.min.js",

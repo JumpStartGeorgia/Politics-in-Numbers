@@ -180,12 +180,12 @@ ka:
         format: "%n %u"
         units:
           byte:
-            one: Byte
-            other: Bytes
-          gb: GB
-          kb: KB
-          mb: MB
-          tb: TB
+            one: ბაიტი
+            other: ბაიტი
+          gb: გბ
+          kb: კბ
+          mb: მბ
+          tb: ტბ
     percentage:
       format:
         delimiter: ''
@@ -205,4 +205,5 @@ ka:
       long: "%B %d, %Y %I:%M %p"
       short: "%d %b %I:%M %p"
       date: "%d/%m/%Y"
+      filename: "%d_%m_%Y"
     pm: pm

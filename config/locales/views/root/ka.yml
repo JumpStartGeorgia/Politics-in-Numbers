@@ -12,12 +12,36 @@ ka:
       party_finances: პარტიის ფინანსები
       sponsors: სპონსორები და პარტნიორები
       alt:
-        js: "Informing Communities with Data and Design"
-        dcn: "Alt"
-        us: "Alt"
+        js: "ჯამპსტარტ ჯორჯია"
+        us: "აშშ სახელმწიფო დეპარტამენტი"
+        us_embassy: "ამერიკის შეერთებული შტატების საელჩო საქართველოში"
+        dcn: "Digital Communication Network"
+        sao: "სახელმწიფო აუდიტის სამსახური"
     media:
       title: მედიაში
       no_media: ჯერჯერობით არ მოიპოვება ჩანაწერი.
+    download:
+      title: ჩამოტვირთვა
+      filters: ფილტრი
+      filter_donations: შემოწირულებები
+      filter_finance: პარტიის ფინანსები
+      filter_toggle: ახალი ფილტრის დამატება
+      filter_close: ფილტრის დახურვა
+      filter_item_close: ფილტრიდან ამოშლა
+      filter_clear: ფილტრის გასუფთავება
+      time_period: პერიოდი
+      time: პერიოდი
+      annual: წლიური
+      campaign: კამპანია
+      from: -დან
+      to: -მდე
+      reset: განახლება
+      filter_submit: გენერაცია
+      download: ჩამოტვირთვა
+      filename_donation: შემოწირულებები
+      search: ძებნა
+      filename: File Name
+      filename_period: Time Period
     explore:
       title: დათვალიერება
       category: კატეგორია

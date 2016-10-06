@@ -206,4 +206,5 @@ en:
       long: "%B %d, %Y %I:%M %p"
       short: "%d %b %I:%M %p"
       date: "%m/%d/%Y"
+      filename: "%m_%d_%Y"
     pm: pm
