@@ -1,6 +1,6 @@
 <% page_title t('.title') %>
 
-<div class="filter" data-type="<%= @filter_type %>">
+<div class="filter" data-type="<%= @fltr %>">
   <div class="filter-toggle"><i title="<%= t('.filters') %>"></i><%= t('.filters') %></div>
 
   <div class="pane">
@@ -67,7 +67,7 @@
     </div>
   </div>
 </div>
-<div class="view" data-type="<%= @filter_type %>">
+<div class="view" data-type="<%= @fltr %>">
   <div class="view-loader hidden"></div>
   <div class="view-content"><table></table></div>
 </div>

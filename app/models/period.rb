@@ -90,4 +90,7 @@ class Period
   def self.type_is(tp)
     TYPES.index(tp.to_sym)
   end
+  def self.to_str
+    return "Dates"
+  end
 end

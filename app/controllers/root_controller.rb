@@ -13,36 +13,6 @@ class RootController < ApplicationController
     @main_categories = {}
     categories.each{|m| @main_categories[m[:sym]] = m[:id].to_s }
 
-    # dd = nil
-    #  Donor.each{|e| e.donations.each{|ee|
-    #     if ee.amount == 800
-    #       dd = e
-    #     end
-    #   }
-    # }
-    #Rails.logger.debug("--------------------------------------------#{dd.collection.inspect}")
-    # sd = dd.collection.aggregate([
-    #     { "$match": { "donations.amount": 800 } },
-    #    {
-    #       "$project": {
-    #         first_name: 1,
-    #          donations: {
-    #             "$filter": {
-    #                 input: "$donations",
-    #                 as: "donation",
-    #                 cond: { "$eq": [ "$$donation.amount", 800 ] }
-    #                #cond: { "$$donation": { "$amount": 800 } }
-    #             }
-    #          }
-    #       }
-    #    }
-    # ])
-    # # .each do | doc |
-    # #     pp doc
-    # # end
-    #  Rails.logger.debug("--------------------------------#{sd.inspect}")
-    # @categories = Category.tree_out
-    #@parties = Dataset.first
   end
 
   def explore
@@ -163,113 +133,57 @@ class RootController < ApplicationController
   end
 
   def download
+    Rails.logger.fatal("--------------------------------------------#{params}")
+
     @show_page_title = false
 
     pars = download_params
-    is_zip = pars[:format] == 'zip'
+    @fltr = pars[:filter]
 
-    which_filter = pars[:filter]
-    @filter_type = which_filter == "finance" ? "finance" : "donation"
-    has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
+    @fltr = "finance" if !(@fltr.present? && ["finance", "donation"].index(@fltr).present?)
 
-    donation_pars = {}
-    finance_pars = {}
-
-    if !has_filters
-      has_filters = true
-      @filter_type = "finance"
-      which_filter = "finance"
-      pars.merge!(finance_pars)
-    end
-
-    is_finance = which_filter == "finance"
+    is_finance = @fltr == "finance"
     is_donation = !is_finance
 
-    @button_state = ['','']
+    @button_state = ['', '']
     @button_state[is_finance ? 1 : 0] = ' active'
 
     dt = []
 
-    donation_pars = pars if !is_finance
-    finance_pars = pars if is_finance
+    if request.format.json?
+      if pars[:type] == "info"
+        dt = is_finance ? Dataset.download(pars, "info") : { donation: Donor.download(pars) }
+      else
+        dt = is_finance ? Dataset.download(pars) : { donation: Donor.download(pars) }
+      end
 
-    if !is_zip
+    elsif request.format.zip?
+      dt = is_finance ? Dataset.download(pars, "file") : Donor.download(pars, true)
+    else
+      gon.gonned = true
+
       gon.download = t('.download')
       gon.search = t('.search')
-      # gon.url = root_url
-      # gon.app_name = "pins.ge"
-      # gon.date_format = t('date.formats.jsdate')
-      # gon.filter_item_close = t('.filter_item_close')
-      # gon.all = t('shared.common.all')
-      # gon.campaign = t('.campaign')
-      # gon.search = t('.search')
-      # gon.table_length = t('.table_length')
-      # gon.numericSymbols = t('shared.common.numericSymbols')
-
-      gon.gonned = false
+      gon.file_size = t('.file_size')
 
       gon.party_list = Party.list
       gon.period_list = Period.list
 
-      gon.gonned_type = which_filter
-       Rails.logger.fatal("--------------------------------------------#{pars}")
+      gon.is_donation = is_donation
+      #gon.gonned_type = @fltr
 
-      gon.donation_params = donation_pars
-      gon.donation_data = Donor.download(donation_pars)
-      tmp = [] #Dataset.explore(finance_pars)
-      gon.finance_params = tmp.delete(:pars)
-      gon.finance_data = tmp
-
-      dt = is_finance ? gon.finance_data : gon.donation_data
-      gon.donation_data = {donation: { table: { data: [["Donations", "16.05.2016-20.11.2016", "25.645KB"]] }}}
+      gon.gonned_data = is_finance ? Dataset.download(pars) : Donor.download(pars)
       pars.delete(:locale)
-
-      # @donation_download_link = request.path + "?filter=donation&" +  donation_pars.reject{|k,v| k == "filter" }.to_param  + "#{donation_pars.empty? ? '' : '&'}#{'format=csv'}"
-      # @finance_download_link = request.path + "?filter=finance&" +  finance_pars.reject{|k,v| k == "filter" }.to_param  + "#{finance_pars.empty? ? '' : '&'}#{'format=csv'}"
-
       gon.params = pars
 
-    else
-
-      dt = is_finance ? Dataset.explore(finance_pars, true) : Donor.download(donation_pars, true)
-
-      # csv_file = CSV.generate do |csv|
-      #   if is_donation
-      #     csv << dt[:table][:header]
-      #   else
-      #     dt[:table][:header].each{|e|
-      #       tmp = []
-      #       tmp_prev = ""
-      #       e.reverse_each{|ee|
-      #         tmp.unshift(ee.present? ? ee : tmp_prev)
-      #         tmp_prev = ee
-      #       }
-      #       csv << tmp
-      #     }
-      #   end
-      #   dt[:table][:data].each { |r| csv << r }
-      # end
     end
 
     respond_to do |format|
       format.html
-      format.zip { send_data dt[:file], filename: "explore_#{which_filter}_#{Date.today}.zip" }
+      format.json { render :json => dt }
+      format.zip { send_data dt[:file], filename: "#{dt[:filename]}" }
     end
-    # @page_content = PageContent.by_name('about')
   end
-
-  def download_filter
-    res = {}
-    pars = download_filter_params
-    if pars[:donation].present?
-      res[:donation] = Donor.download(pars[:donation])
-    elsif pars[:finance].present?
-      res[:finance] = { finance: "test" } # Dataset.explore(pars[:finance])
-    end
-
-    render :json => res
-  end
-
 
   # show the embed chart if the id was provided and can be decoded and parsed into hash
   # id - base64 encoded string of a hash of parameters
@@ -311,7 +225,6 @@ class RootController < ApplicationController
   # end
   end
 
-
   def about
     @donations_page_content = PageContent.by_name('about_donations')
     @party_finances_page_content = PageContent.by_name('about_party_finances')
@@ -325,15 +238,6 @@ class RootController < ApplicationController
     gon.show_less = t('shared.common.show_less')
   end
 
-
-
-  # def api
-  #   # @page_content = PageContent.by_name('about')
-  # end
-
-  # def parties
-  #   # @page_content = PageContent.by_name('about')
-  # end
   def select_donors
     q = params[:q].split
     donors = []
@@ -351,33 +255,33 @@ class RootController < ApplicationController
   end
 
 
-  def download_file
-    # Zip::File.open('path/archive.zip', Zip::File::CREATE) do |z|
-    #   files.each do |f|
-    #     z.add('file_name', f.path)
-    #   end
-    # end
-    respond_to do |format|
-      format.html
-      format.zip do
-        compressed_filestream = Zip::OutputStream.write_buffer do |zp|
-          zp.put_next_entry "parties.xlsx"
-          zp.print IO.read(Rails.public_path.join("upload/test/parties.xlsx"))
+  # def download_file
+  #   # Zip::File.open('path/archive.zip', Zip::File::CREATE) do |z|
+  #   #   files.each do |f|
+  #   #     z.add('file_name', f.path)
+  #   #   end
+  #   # end
+  #   respond_to do |format|
+  #     format.html
+  #     format.zip do
+  #       compressed_filestream = Zip::OutputStream.write_buffer do |zp|
+  #         zp.put_next_entry "parties.xlsx"
+  #         zp.print IO.read(Rails.public_path.join("upload/test/parties.xlsx"))
 
-          zp.put_next_entry "categories.xlsx"
-          zp.print IO.read(Rails.public_path.join("upload/test/categories.xlsx"))
+  #         zp.put_next_entry "categories.xlsx"
+  #         zp.print IO.read(Rails.public_path.join("upload/test/categories.xlsx"))
 
-          #zp.print animal.to_json(only: [:name, :age, :species])
-        end
-        compressed_filestream.rewind
-        send_data compressed_filestream.read, filename: "animals.zip"
-        # send_file 'path/archive.zip', type: 'application/zip',
-        #   disposition: 'attachment',
-        #   filename: "my_archive.zip"
-      end
-    end
-  end
-#options = Rack::Utils.parse_query(Base64.urlsafe_decode64(embed_id))
+  #         #zp.print animal.to_json(only: [:name, :age, :species])
+  #       end
+  #       compressed_filestream.rewind
+  #       send_data compressed_filestream.read, filename: "animals.zip"
+  #       # send_file 'path/archive.zip', type: 'application/zip',
+  #       #   disposition: 'attachment',
+  #       #   filename: "my_archive.zip"
+  #     end
+  #   end
+  # end
+  # options = Rack::Utils.parse_query(Base64.urlsafe_decode64(embed_id))
   # def select_parties
   #   q = params[:q]
   #   parties = []
@@ -394,7 +298,7 @@ class RootController < ApplicationController
     pars = share_params
     @return_url = pars[:return_url]
     @return_url = root_path if !@return_url.present?
-    Rails.logger.info("--------------------------------------------#{request.user_agent}")
+    #Rails.logger.info("--------------------------------------------#{request.user_agent}")
      #dev-pin.jumpstart.ge/share?return_url=http://google.com&params[]=2
      #http://localhost:3000/ka/share?return_url=/about&params[]=123&params[]=abc
      #http://localhost:3000/ka/share?return_url=http://www.dev-pin.jumpstart.ge&params[]=123&params[]=abc
@@ -402,7 +306,7 @@ class RootController < ApplicationController
      @inner_pars = pars[:params] if pars[:params].present?
      #facebookexternalhit
     if (request.user_agent.include?("facebook") && request.user_agent.include?("externalhit")) # if facebook robot Rails.env.development? ||
-#https://www.facebook.com/sharer/sharer.php?app_id=570138349825593&sdk=joey&u=http%3A%2F%2Fdev-pin.jumpstart.ge%2Fen%2Fshare%3Freturn_url%3D%252Fka%252Fshare_test%26params%255B0%255D%3D123%26params%255B1%255D%3Dabc&display=popup&ref=plugin&src=share_button
+      #https://www.facebook.com/sharer/sharer.php?app_id=570138349825593&sdk=joey&u=http%3A%2F%2Fdev-pin.jumpstart.ge%2Fen%2Fshare%3Freturn_url%3D%252Fka%252Fshare_test%26params%255B0%255D%3D123%26params%255B1%255D%3Dabc&display=popup&ref=plugin&src=share_button
       # if p.present?
       #   encodedP = Base64.urlsafe_encode64(p.to_param)
       #   require 'game_data'
@@ -455,13 +359,6 @@ class RootController < ApplicationController
   end
 
   private
-      # "donation"=>{"donor"=>["574d9379fbb6bd0313000007", "574d9379fbb6bd0313000014"],
-    #  "period"=>["1464724800000", "1464897600000"],
-    #   "amount"=>["100", "500"],
-    #    "party"=>["5748093cfbb6bd3781000016", "5748093cfbb6bd3781000027"],
-    #     "type"=>"monetary",
-    #      "multiple"=>"yes"},
-    #       "locale"=>"en"}
     def share_params
       params.permit(:return_url, :locale, {params: []})
     end
@@ -473,11 +370,7 @@ class RootController < ApplicationController
         :finance => [:all, :locale, { party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
     end
     def download_params
-      params.permit([:filter, :locale, :format, period: [], party: [] ])
-    end
-    def download_filter_params
-      params.permit(:donation => [:all, :locale, { period: [] }],
-        :finance => [:all, :locale, { party: [], period:[] }])
+      params.permit([:filter, :locale, :format, :type, period: [], party: [], :donation => [:all, :locale, { period: [] }] ], :finance => [:all, :locale, { party: [], period:[] }])
     end
 end
 

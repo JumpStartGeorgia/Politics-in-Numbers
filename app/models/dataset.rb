@@ -85,9 +85,7 @@ class Dataset
     where({period_id: per_id})
   end
   def self.filter(params)
-    #Rails.logger.debug("***filter*************************************#{params}")
 
-    result = []
     options = []
     matches = []
     conditions = []
@@ -108,34 +106,21 @@ class Dataset
 
     options.push({ "$match": { "$and": matches } }) if !matches.blank?
 
-    #if !conditions.blank?
-      options.push({
-        "$project": {
-          party_id: 1,
-          period_id: 1,
-          # name: { "$concat": ["$first_name", " ", "$last_name"] },
-          # tin: 1,
-          # nature: 1,
-          # donated_amount: 1,
-          category_datas: {
-            "$filter": {
-              input: "$category_datas",
-              as: "category_datas",
-              cond: { "$and": conditions }
-            }
-
+    options.push({
+      "$project": {
+        party_id: 1,
+        period_id: 1,
+        category_datas: {
+          "$filter": {
+            input: "$category_datas",
+            as: "category_datas",
+            cond: { "$and": conditions }
           }
+
         }
-       })
-      # If one category > page 1 of design
-    # If multiple categories selected > page 3 of design
-    #end
-    #options.push({ "$sort": { donated_amount: -1, name: 1 } })
-    # #if !matches.blank? || !conditions.blank?
-    #   Rails.logger.debug("-------------------------------------aggregate options-------#{options}")
-      result = collection.aggregate(options)
-    #end
-    result
+      }
+     })
+    collection.aggregate(options)
   end
   def self.explore(params, only_table = false)
     limiter = 5
@@ -459,5 +444,74 @@ class Dataset
         pars: params
       }
     )
+  end
+  def self.download_filter(params)
+    options = []
+    matches = []
+    conditions = []
+
+    matches.push({ "party_id": { "$in": params[:parties].map{|m| BSON::ObjectId(m)} } }) if params[:parties].present?
+    matches.push({ "period_id": { "$in": params[:period].map{|m| BSON::ObjectId(m)} } }) if params[:period].present?
+
+    matches.push({ "state": { "$eq": 1 } }) # only processed datasets
+
+    options.push({ "$match": { "$and": matches } }) if !matches.blank?
+
+    options.push({
+      "$project": {
+        party_id: 1,
+        period_id: 1
+      }
+     })
+
+    #options.push({ "$sort": { give_date: -1, name: 1 } })
+    collection.aggregate(options)
+  end
+  def self.download(params, type="table")
+     Rails.logger.fatal("-------------------here-------------------------#{type}")
+    f = {}
+    f[:parties] = Party.get_ids_by_slugs(params[:party]) if params[:party].present?
+    f[:period] = Period.get_ids_by_slugs(params[:period]) if params[:period].present?
+
+    data = download_filter(f).to_a
+    parties = {}
+    periods = {}
+    Party.members.each{|e| parties[e.id] = e.title }
+    Period.each{|e| periods[e.id] = "#{e.title}_#{e.start_date}_#{e.type}" }
+
+    if type == "table"
+      require "#{Rails.root}/lib/js/helper.rb"
+      table = []
+      data.each_with_index{ |e, e_i|
+        table << [e[:_id].to_s, parties[e[:party_id]], periods[e[:period_id]]]
+      }
+      table.sort!{ |x,y| [x[1],y[2]] <=> [y[1],x[2]] } # sort by name asc and date desc
+      {
+        table: {
+          header: ["", I18n.t("root.download.party_name"), I18n.t("root.download.time_period")],
+          data: table,
+          classes: ["", "", "center"]
+        },
+      }
+    elsif type == "file" || type == "info"
+      require "#{Rails.root}/lib/js/helper.rb"
+      compressed_filestream = Zip::OutputStream.write_buffer do |zp|
+        data.each_with_index{ |e, e_i|
+          tmp_party = parties[e[:party_id]]
+          tmp_period = periods[e[:period_id]]
+
+          zp.put_next_entry "%s.xlsx" % [Helper.sanitize("#{tmp_party}_#{tmp_period}")]
+          zp.print IO.read(Rails.public_path.join("system/datasets/sources/#{e[:_id]}/original.xlsx"))
+        }
+      end
+      compressed_filestream.rewind
+      sz = compressed_filestream.size
+      # compressed_filestream.close
+      { size: ActionController::Base.helpers.number_to_human_size(sz) }
+        .merge(type == "file" ? {
+          file: compressed_filestream.read,
+          filename: "Archive file.zip"
+        } : {})
+    end
   end
 end

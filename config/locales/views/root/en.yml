@@ -42,6 +42,8 @@ en:
       search: Search
       filename: File Name
       filename_period: Time Period
+      party_name: Party Name
+      file_size: File Size
     explore:
       title: Explore
       category: Category

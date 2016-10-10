@@ -501,6 +501,9 @@
     font: 14px firasans_r;
     color: rgb(93, 103, 91);
     margin-left:10px;
+    span {
+      display:inline-block;
+    }
   }
   .DataTables_Table_0_right {
     display:inline-block;
@@ -688,3 +691,35 @@
 
 }
 
+@-webkit-keyframes loop {
+  from {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loop {
+  from {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+.animated {
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+.loop {
+  -webkit-animation-name: loop;
+  animation-name: loop;
+  animation-iteration-count: infinite;
+}

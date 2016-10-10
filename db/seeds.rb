@@ -749,3 +749,11 @@ puts "Creating phase ----------------------"
   # rescue Exception=>e
   #   puts e.inspect
   # end
+# mp = []
+# Period.each {|p| mp << p.id }
+# ln = mp.length
+# r = Random.new
+# Dataset.each{|d|
+#   d.period_id = mp[r.rand(0...ln)]
+#   d.save
+# }

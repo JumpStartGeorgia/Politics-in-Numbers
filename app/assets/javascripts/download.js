@@ -204,6 +204,7 @@ $(document).ready(function (){
         }
       },
       data: {},
+      name: "donation",
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, tmp_o, lnk;
         t.data = {};
@@ -295,6 +296,7 @@ $(document).ready(function (){
         period: $("#finance_period")
       },
       data: {},
+      name: "finance",
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, lnk;
         t.data = {};
@@ -611,7 +613,13 @@ $(document).ready(function (){
       t.next("label").trigger("click");
     });
     $(document).on("click", "#download_button", function () {
-      console.log("clicked to download");
+      var ids = [];
+      $(view_table_object.$("tr", {"filter": "applied"})).find("td:first-of-type input:checked")
+        .each(function(){ ids.push($(this).attr("data-id")); });
+        //" + (params.length ? (params.join("&") + "&") : "") + "
+      window.location = window.location.pathname + "?filter=donation&format=zip";
+      // t.download.attr("href", )
+      // console.log("clicked to download", ids);
       // var t = $(this), state = t.is(":checked");
       // console.log(state, view_table_object.$("tr", {"filter": "applied"}).find("td input[type='checkbox']"));
       // $(view_table_object.$("tr", {"filter": "applied"}))
@@ -624,94 +632,59 @@ $(document).ready(function (){
 
   function filter() {
     loader.fadeIn();
-    //console.log("start filter", is_type_donation);
+    console.log("start filter", is_type_donation);
+
     var filters = {},
-      remote_required = false, tmp, cacher_id, donation_id, finance_id;
-      console.log(gon.gonned);
+      remote_required = false,
+      tmp, cacher_id,
+      obj = is_type_donation ? donation : finance;
+
     if(gon.gonned) {
-      donation.set_by_url();
-
-      tmp = donation.get();
-      donation_id = donation.id(tmp);
-
-      js.cache[donation_id] = gon.donation_data;
-
-      filter_callback(js.cache[donation_id], "donation");
-
-
-      finance.set_by_url();
-      tmp = finance.get();
-      if(tmp === null) { return; }
-      finance_id = finance.id(tmp);
-
-      js.cache[finance_id] = gon.finance_data;
-
-      filter_callback(js.cache[finance_id], "finance");
+      obj.set_by_url();
+      tmp = obj.get();
+      _id = obj.id(tmp);
+      js.cache[_id] = gon.gonned_data;
 
       gon.gonned = false;
+      filter_callback(js.cache[_id], filters);
     } else {
-      if(is_type_donation) {
+      tmp = obj.get();
+      _id = obj.id(tmp);
+      obj.url(tmp);
 
-        tmp = donation.get();
-        donation_id = donation.id(tmp);
-
-        donation.url(tmp);
-
-        console.log(tmp,donation_id, "-----------");
-        if(!js.cache.hasOwnProperty(donation_id)) {
-          filters["donation"] = tmp;
-          remote_required = true;
-        }
-        else {
-          filter_callback(js.cache[donation_id], "donation");
-        }
+      if(!js.cache.hasOwnProperty(_id)) {
+        filters[obj.name] = tmp;
+        remote_required = true;
       }
       else {
-
-        tmp = finance.get();
-        if(tmp === null) { return; }
-        finance_id = finance.id(tmp);
-
-        finance.url(tmp);
-
-        if(!js.cache.hasOwnProperty(finance_id)) {
-          filters["finance"] = tmp;
-          remote_required = true;
-        }
-        else {
-          filter_callback(js.cache[finance_id], "finance");
-        }
+        filter_callback(js.cache[_id], filters);
       }
 
-
-      console.log(filters);
       if(remote_required) {
         $.ajax({
-          url: "download_filter",
           dataType: 'json',
           data: filters,
           success: function(data) {
-            console.log("remote", data);
-            if(data.hasOwnProperty("donation")) { filter_callback(js.cache[donation_id] = data.donation, "donation"); }
-            if(data.hasOwnProperty("finance")) { filter_callback(js.cache[finance_id] = data.finance, "finance"); }
+            if(data.hasOwnProperty("table")) { filter_callback(js.cache[_id] = data, filters); }
           }
         });
       }
     }
   }
-  function filter_callback(data, partial) {
-    console.log("filter_callback", data);
-    var is_data_ok = typeof data !== "undefined";
-    $(".view").toggleClass("not-found", !is_data_ok);
-    if(is_data_ok) {
-      render_table(partial, data.table, data.size);
+  function filter_callback(data, filters) {
+    if(typeof data !== "undefined") {
+      render_table(data.table);
+      $.getJSON("", Object.assign({ type: "info" }, filters )).done(function( json ) { render_table_refresh(json.size); });
+    }
+    else {
+      $(".view").addClass("not-found");
     }
     loader.fadeOut();
   }
-
-  function render_table(type, table, size) {
-    // console.log("table data", table);
-    if(type === "donation") {
+  TODO set by url is not working
+  function render_table(table) {
+    console.log("table data", table, table.header);
+    // if(type === "donation") {
       //view_content.html("new tab");
       //var prev = undefined, alt_color = true,
         view_table_object = view_content.find("table").DataTable({
@@ -731,86 +704,35 @@ $(document).ready(function (){
           "info": false,
           dom: "<\"download-button\"><\"download-size\"><\"DataTables_Table_0_right\"fl>trp",
           createdRow: function ( row, data, index ) {
-            console.log(data);
-            if(index === 0) {
-              $('td', row).eq(0).html("<input id='file' type='checkbox'" + (data[0] === 1 ? " checked" : "") + "><label for='file'><span></span></label>");
-            }
-            // if(data[2] !== prev) {
-            //   alt_color = !alt_color;
-            // }
-            // if(alt_color) {
-            //   $(row).addClass('alt');
-            // }
-            // prev = data[2];
+            $('td', row).eq(0).html("<input id='fl" + (index+1) + "' type='checkbox' checked data-id='" + data[0] + "'><label for='fl" + (index+1) + "'><span></span></label>");
+            // " + (data[0] === 1 ? " checked" : "") + "
           }
         });
-        $("div.download-button").html("<button type='button'>" + gon.download + "</button>").attr("id", "download_button");
-        $("div.download-size").text(size).attr("id", "download_size");
+        $("div.download-button").html("<button type='button'>" + gon.download + "</button>").attr("id", "download_button");  //href=" + gon.download_link + "
+        $("div.download-size").html("<label>" + gon.file_size + ":&nbsp;&nbsp;</label><span class='animated loop'>/</span>").attr("id", "download_size");
 
       // dt.on("draw", function (e, settings) {
       //   if(settings.aaSorting.length) {
       //     $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
       //   }
       // });
+    // }
+    // else if(type === "finance") {
+
+    // }
+
+  }
+  function render_table_refresh(size) {
+    var t = $("#download_size");
+    if(t.length) {
+     t.find("span").removeClass("loop").text(size);
     }
-    else if(type === "finance") {
-      // var table_html = "<thead>", colspan = 0, tmp, klass;
-      // table.header.forEach(function(row, row_i) {
-
-      //   table_html += "<tr>";
-      //   row.forEach(function(col, col_i) {
-      //     if(col === null) {
-      //       ++colspan;
-      //     }
-      //     else {
-      //       tmp = "";
-      //       klass = table.header_classes[row_i][col_i];
-      //       klass = klass !== null ? " class='" + klass + "'" : "";
-
-      //       if(colspan) {
-      //         tmp = " colspan='" + (colspan+1) + "'";
-      //         colspan = 0;
-      //       }
-      //       table_html += "<th" + klass + tmp +">" + col + "</th>";
-      //     }
-      //   });
-      //   table_html += "</tr>";
-      // });
-      // table_html += "</thead><tbody>";
-
-
-      // table.data.forEach(function(row, row_i) {
-      //   table_html += "<tr>";
-      //   row.forEach(function(col, col_i) {
-      //     klass = table.classes[col_i];
-      //     klass = klass !== null ? " class='" + klass + "'" : "";
-      //     table_html += "<td" + klass + ">" + col + "</th>";
-      //   });
-      //   table_html += "</td>";
-      // });
-      // table_html += "</tbody>";
-
-      // if(typeof finance_datatable !== "undefined") {
-      //   finance_datatable.destroy();
-      // }
-      // finance_table.html(table_html);
-      // finance_datatable = finance_table.DataTable({
-      //   destroy: true,
-      //   responsive: true,
-      //   //"aaData": table.data,
-      //   // "aoColumns": table.header.map(function(m,i) {
-      //   //   return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
-      //   // }),
-      //   "info": false,
-      //   dom: "Bfltrp"
-      // });
-    }
-
+    else { setTiemout(function() { render_table_refresh(size) }, 100);}
   }
 
   (function init() {
     bind();
-    is_type_donation = gon.gonned_type === "donation";
+    is_type_donation = gon.is_donation;
 
     filter();
   })();

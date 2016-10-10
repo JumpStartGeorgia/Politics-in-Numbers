@@ -464,7 +464,7 @@ class Donor
       zp.print workbook.stream.string
     end
     compressed_filestream.rewind
-     Rails.logger.fatal("--------------------------------------------#{compressed_filestream.size}")
+    # Rails.logger.fatal("--------------------------------------------#{compressed_filestream.size}")
     #send_data compressed_filestream.read, filename: "animals.zip"
     sz = compressed_filestream.size
     # compressed_filestream.close
