@@ -16,8 +16,8 @@ if destroy_mode
   puts "Destroy phase ----------------------"
   puts "  languages"
   Language.destroy_all
-  puts "  page_content"
-  PageContent.destroy_all
+  # puts "  page_content"
+  # PageContent.destroy_all
   puts "  party data"
   Party.destroy_all
   puts "  period data"
@@ -30,6 +30,8 @@ if destroy_mode
   Dataset.destroy_all
   puts "  donorset data"
   Donorset.destroy_all
+  puts "  donor data"
+  Donor.destroy_all
   # puts "  role data"
   # Role.destroy_all
   # puts "  user data"
@@ -46,9 +48,8 @@ puts 'loading languages'
 if (Language.count == 0)
   langs = [
     ["ka", "ქართული"],
-    ["en", "English"]
-    # ,
-    # ["ru", "Русский"]
+    ["en", "English"],
+    ["ru", "Русский"]
   ]
 
   langs = langs.map{|x| {locale: x[0], name: x[1]}}
