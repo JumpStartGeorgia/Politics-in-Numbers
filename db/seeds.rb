@@ -7,7 +7,7 @@
 def is_numeric?(obj)
    obj.to_s.match(/\A[+-]?\d+?(\.\d+)?\Z/) == nil ? false : true
 end
-
+# if ENV['load_test_data'].present?
 I18n.locale = :ka
 destroy_mode = true
 up_path = Rails.public_path.join("upload")
@@ -16,8 +16,8 @@ if destroy_mode
   puts "Destroy phase ----------------------"
   puts "  languages"
   Language.destroy_all
-  # puts "  page_content"
-  # PageContent.destroy_all
+  puts "  page_content"
+  PageContent.destroy_all
   puts "  party data"
   Party.destroy_all
   puts "  period data"
