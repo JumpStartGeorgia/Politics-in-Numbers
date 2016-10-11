@@ -35,8 +35,6 @@ class Donor
   index ({ :'donations.monetary' => 1})
   index({_slugs: 1}, { unique: true, sparse: false })
 
-
-
   def permalink
     slug.present? ? slug : id.to_s
   end
@@ -169,6 +167,7 @@ class Donor
       ]
     ).first
   end
+
   def self.explore(params, only_table = false)
     limiter = 5
      # Rails.logger.debug("--------------------------------------------#{}")
@@ -342,8 +341,9 @@ class Donor
       }
     )
   end
+
   def self.download_filter(params)
-    #Rails.logger.debug("****************************************#{params}")
+
     lang = I18n.locale
     result = []
     options = []
@@ -364,120 +364,112 @@ class Donor
 
     options.push({ "$match": { "$and": matches } }) if !matches.blank?
 
-    #if !conditions.blank?
-      options.push({
-        "$project": {
-          first_name: "$first_name.#{lang}",
-          last_name: "$last_name.#{lang}",
-          tin: 1,
-          nature: 1,
-          donations: {
-            "$filter": {
-              input: "$donations",
-              as: "donation",
-              cond: { "$and": conditions }
-            }
-
+    options.push({
+      "$project": {
+        first_name: "$first_name.#{lang}",
+        last_name: "$last_name.#{lang}",
+        tin: 1,
+        nature: 1,
+        donations: {
+          "$filter": {
+            input: "$donations",
+            as: "donation",
+            cond: { "$and": conditions }
           }
+
         }
-       })
-    #end
+      }
+    })
     options.push({ "$sort": { give_date: -1, name: 1 } })
-    #if !matches.blank? || !conditions.blank?
-      # Rails.logger.debug("-------------------------------------aggregate options-------#{options}")
-      result = collection.aggregate(options)
-    #end
-    result
+    collection.aggregate(options)
   end
-  def self.download(params, with_zip = false)
+
+  def self.download(params, type="table")
 
     f = { period: [-1,-1] }
 
     tmp = params[:period]
     f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
-     # Rails.logger.debug("--------------------------------------------#{f[:period]}")
-
-    if f[:period][0] != -1 && f[:period][1] != -1
-      chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
-    else
-      dte = Donor.date_span
-      chart_subtitle = "#{I18n.l(dte[:first_date], format: :date)} - #{I18n.l(dte[:last_date], format: :date)}"
-    end
 
     data = download_filter(f).to_a
-    # Rails.logger.debug("---------------------------------------#{params}--#{f}")
-    table = []
+
     parties = {}
     Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
-
-    recent_donations = []
-    parties_list = {}
-    monetary_values = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
-    nature_values = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
-
-    workbook = RubyXL::Workbook.new
-    worksheet = workbook[0] #.add_worksheet('Sheet2')
-
-    [
-      "#",
-      Donation.human_attribute_name(:give_date),
-      human_attribute_name(:first_name),
-      human_attribute_name(:last_name),
-      human_attribute_name(:tin),
-      Donation.human_attribute_name(:amount),
-      Donation.human_attribute_name(:party),
-      Donation.human_attribute_name(:comment),
-      human_attribute_name(:nature),
-      Donation.human_attribute_name(:monetary)
-    ].each_with_index { |e,i|
-      worksheet.add_cell(0, i, e)
-    }
-    i = 1
     min_date = Date.new(2050,1,1)
     max_date = Date.new(1970,1,1)
-    data.each{|e|
-      e[:donations].each { |ee|
-        max_date = ee[:give_date] if ee[:give_date] > max_date
-        min_date = ee[:give_date] if ee[:give_date] < min_date
-        worksheet.add_cell(i, 0, i)
-        worksheet.add_cell(i, 1, I18n.l(ee[:give_date], format: :date))
-        worksheet.add_cell(i, 2, e[:first_name])
-        worksheet.add_cell(i, 3, e[:last_name])
-        worksheet.add_cell(i, 4, e[:tin])
-        worksheet.add_cell(i, 5, ee[:amount])
-        worksheet.add_cell(i, 6, parties[ee[:party_id]][:name])
-        worksheet.add_cell(i, 7, ee[:comment])
-        worksheet.add_cell(i, 8, nature_values[e[:nature]])
-        worksheet.add_cell(i, 9, monetary_values[ee[:monetary] ? 0 : 1])
-        i+=1
+    filename_donation = I18n.t("root.download.filename_donation")
+    if type == "table"
+      data.each{|e|
+        e[:donations].each { |ee|
+          max_date = ee[:give_date] if ee[:give_date] > max_date
+          min_date = ee[:give_date] if ee[:give_date] < min_date
+        }
       }
-    }
-    filename = "#{I18n.t("root.download.filename_donation")}-#{I18n.l(min_date, format: :filename)}-#{I18n.l(max_date, format: :filename)}.xlsx"
-      #send_data workbook.stream.string, filename: "myworkbook.xlsx",disposition: 'attachment'
 
+      {
+        table: {
+          header: ["", I18n.t("root.download.filename"), I18n.t("root.download.filename_period")],
+          data: [[1, filename_donation, "#{I18n.l(min_date, format: :date)} - #{I18n.l(max_date, format: :date)}"]],
+          classes: ["", "", "center"]
+        }
+      }
+    elsif type == "file" || type == "info"
+      monetary_values = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
+      nature_values = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
 
+      workbook = RubyXL::Workbook.new
+      worksheet = workbook[0]
 
+      [
+        "#",
+        Donation.human_attribute_name(:give_date),
+        human_attribute_name(:first_name),
+        human_attribute_name(:last_name),
+        human_attribute_name(:tin),
+        Donation.human_attribute_name(:amount),
+        Donation.human_attribute_name(:party),
+        Donation.human_attribute_name(:comment),
+        human_attribute_name(:nature),
+        Donation.human_attribute_name(:monetary)
+      ].each_with_index { |e,e_i|
+        worksheet.add_cell(0, e_i, e)
+      }
 
+      i = 1
+      min_date = Date.new(2050,1,1)
+      max_date = Date.new(1970,1,1)
 
-   compressed_filestream = Zip::OutputStream.write_buffer do |zp|
-      zp.put_next_entry filename
+      data.each{|e|
+        e[:donations].each { |ee|
+          max_date = ee[:give_date] if ee[:give_date] > max_date
+          min_date = ee[:give_date] if ee[:give_date] < min_date
+          worksheet.add_cell(i, 0, i)
+          worksheet.add_cell(i, 1, I18n.l(ee[:give_date], format: :date))
+          worksheet.add_cell(i, 2, e[:first_name])
+          worksheet.add_cell(i, 3, e[:last_name])
+          worksheet.add_cell(i, 4, e[:tin])
+          worksheet.add_cell(i, 5, ee[:amount])
+          worksheet.add_cell(i, 6, parties[ee[:party_id]][:name])
+          worksheet.add_cell(i, 7, ee[:comment])
+          worksheet.add_cell(i, 8, nature_values[e[:nature]])
+          worksheet.add_cell(i, 9, monetary_values[ee[:monetary] ? 0 : 1])
+          i+=1
+        }
+      }
+
+    compressed_filestream = Zip::OutputStream.write_buffer do |zp|
+      zp.put_next_entry "%s%s.xlsx" % [Helper.sanitize("#{filename_donation} ("), "#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)})"]
       zp.print workbook.stream.string
     end
-    compressed_filestream.rewind
-    # Rails.logger.fatal("--------------------------------------------#{compressed_filestream.size}")
-    #send_data compressed_filestream.read, filename: "animals.zip"
-    sz = compressed_filestream.size
-    # compressed_filestream.close
+    compressed_filestream.rewind # not sure if close is needed compressed_filestream.close
 
-    {
-      table: {
-        header: ["", I18n.t("root.download.filename"), I18n.t("root.download.filename_period")],
-        data: [[1, filename, "#{I18n.l(min_date, format: :date)}-#{I18n.l(max_date, format: :date)}"]],
-        classes: ["", "", "center"]
-      },
-      size: ActionController::Base.helpers.number_to_human_size(sz)
-    }.merge(with_zip ? { file: compressed_filestream.read } : {})
+    { size: ActionController::Base.helpers.number_to_human_size(compressed_filestream.size) }
+    .merge(type == "file" ? {
+      file: compressed_filestream.read,
+      filename: "#{filename_donation}_#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)}_(pins.ge).zip" } : {})
+    end
   end
+
   private
     def regenerate_fullname
       tmp = {}
@@ -511,76 +503,3 @@ class Donor
       }
     end
 end
-
-  # scope :by_donors, -> v { where(:id.in => v) if v.present? }
-  #scope :by_party, -> v { where("party_id" => { "$in": v.map{|m| BSON::ObjectId(m) } }) if v.present?}
-  # scope :from_date, -> v { where("donations.give_date" => { "$gte":  v}) if v.present? && v != -1 }
-  # scope :to_date, -> v { where("donations.give_date" => { "$lte":  v}) if v.present? && v != -1 }
-  # scope :from_amount, -> v { where("donations.amount" => { "$gte":  v}) if v.present? && v != -1 }
-  # scope :to_amount, -> v { where("donations.amount" => { "$lte":  v}) if v.present? && v != -1 }
-  # scope :where_monetary, -> v { where("donations.monetary" => v) if v == true || v == false }
-  # scope :only_multiple_donations, -> v { where("donations.1" => { "$exists" => true }) if v == true }
-  # d.collection.aggregate([{ "$project": { "name": {"$concat": ["$first_name","-","$last_name"] } }}]).first
-  #scope :pair_by_donors, -> v { where(:id.in => v).aggregate([{ "$project": { "name": {"$concat": ["$first_name","-","$last_name"] } }}]) if v.present? }
-   # d.collection.aggregate([ { "$match": { tin: "17001006279"}}, { "$project": { "name": {"$concat": ["$first_name","-","$last_name"] } }}])
-   #
-
-
-# "donation"=>{"donor"=>["574d9379fbb6bd0313000007", "574d9379fbb6bd0313000014"],
-#  "period"=>["1464724800000", "1464897600000"],
-#   "amount"=>["100", "500"],
-#    "party"=>["5748093cfbb6bd3781000016", "5748093cfbb6bd3781000027"],
-#     "type"=>"monetary",
-#      "multiple"=>"yes"},
-#       "locale"=>"en"}
-#res = Donor.sorted_by_amount.limit(5).map{|m| { value: m.amount, name: "#{m.first_name} #{m.last_name}" } }
-# require 'digest'
-# { data: donors, id: Digest::MD5.hexdigest(["d",donor_ids,period,amount,parties,monetary,multiple].join(";"))}
-
-
-
-  # def self.by_party(v)
-  #   if v.present?
-  #     v.map!{|m| BSON::ObjectId(m) }
-  #     collection.aggregate([
-  #       { "$match": { "donations.party_id": { "$in": v } } },
-  #       { "$project": {
-  #           first_name: 1,
-  #           last_name: 1,
-  #           tin: 1,
-  #           nature: 1,
-  #           donations: {
-  #             "$filter": {
-  #                 input: "$donations",
-  #                 as: "donation",
-  #                 cond: { "$$donation.party_id": { "$in": v } }
-  #             }
-  #           }
-  #         }
-  #       }
-  #     ]).collection.criteria
-  #   else
-  #     self
-  #   end
-  # end
-
-  # def self.pair_by_donors(ids) #id name
-  #   res = {}
-  #   collection.aggregate([ { "$match": { "_id": { "$in": ids.map{|m| BSON::ObjectId(m) } } } }, { "$project": { "name": {"$concat": ["$first_name"," ","$last_name"] } }}]).each{|d|
-  #     res[d[:_id].to_s] = d[:name]
-  #   }
-  #   res
-  # end
-
-
-       #Rails.logger.debug("-------------------------------------#{data.to_a}-------#{data.map{|m| m}.length}")
-    # donors = Donor
-    #         .by_donors(f.donor_ids)
-    #         .by_party(f.parties)
-    #         .from_date(f.period[0])
-    #         .to_date(f.period[1])
-    #         .from_amount(f.amount[0])
-    #         .to_amount(f.amount[1])
-    #         .where_monetary(f.monetary)
-    #         .only_multiple_donations(f.multiple)
-    #         #.order_by(donated_amount: :desc)

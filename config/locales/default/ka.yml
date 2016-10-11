@@ -37,6 +37,7 @@ ka:
       short: "%b %d"
       date: "%d/%m/%Y"
       jsdate: "dd/mm/yy"
+      filename: "%d-%m-%Y"
     month_names:
     -
     - January
@@ -205,5 +206,5 @@ ka:
       long: "%B %d, %Y %I:%M %p"
       short: "%d %b %I:%M %p"
       date: "%d/%m/%Y"
-      filename: "%d_%m_%Y"
+      filename: "%d-%m-%Y"
     pm: pm

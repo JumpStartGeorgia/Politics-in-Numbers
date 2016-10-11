@@ -29,21 +29,20 @@ ka:
       filter_close: ფილტრის დახურვა
       filter_item_close: ფილტრიდან ამოშლა
       filter_clear: ფილტრის გასუფთავება
-      time_period: პერიოდი
       time: პერიოდი
       annual: წლიური
       campaign: კამპანია
       from: -დან
       to: -მდე
       reset: განახლება
-      filter_submit: გენერაცია
+      filter_submit: გენერირება
       download: ჩამოტვირთვა
       filename_donation: შემოწირულებები
       search: ძებნა
-      filename: File Name
-      filename_period: Time Period
-      party_name: Party Name
-      file_size: File Size
+      filename: სახელი
+      filename_period: პერიოდი
+      file_size: ფაილის ზომა
+      filename_finance: პარტიის_ფინანსები
     explore:
       title: დათვალიერება
       category: კატეგორია

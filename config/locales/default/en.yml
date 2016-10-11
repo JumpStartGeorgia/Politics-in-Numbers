@@ -38,6 +38,7 @@ en:
       short: "%b %d"
       date: "%m/%d/%Y"
       jsdate: "mm/dd/yy"
+      filename: "%m-%d-%Y"
     month_names:
     -
     - January
@@ -206,5 +207,5 @@ en:
       long: "%B %d, %Y %I:%M %p"
       short: "%d %b %I:%M %p"
       date: "%m/%d/%Y"
-      filename: "%m_%d_%Y"
+      filename: "%m-%d-%Y"
     pm: pm

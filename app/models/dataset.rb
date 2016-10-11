@@ -84,11 +84,19 @@ class Dataset
   def self.by_period(per_id)
     where({period_id: per_id})
   end
+
+  def self.clean_ids(ids)
+    ids = [] if !ids.present?
+    ids = ids.delete_if(&:blank?)
+    ids.class == Array ? ids : []
+  end
+
   def self.filter(params)
 
     options = []
     matches = []
     conditions = []
+
     matches.push({ "party_id": { "$in": params[:parties].map{|m| BSON::ObjectId(m)} } }) if params[:parties].present?
     matches.push({ "period_id": { "$in": params[:period].map{|m| BSON::ObjectId(m)} } }) if params[:period].present?
 
@@ -446,10 +454,12 @@ class Dataset
     )
   end
   def self.download_filter(params)
+
     options = []
     matches = []
     conditions = []
 
+    matches.push({ "_id": { "$in": params[:ids].map{|m| BSON::ObjectId(m)} } }) if params[:ids].present?
     matches.push({ "party_id": { "$in": params[:parties].map{|m| BSON::ObjectId(m)} } }) if params[:parties].present?
     matches.push({ "period_id": { "$in": params[:period].map{|m| BSON::ObjectId(m)} } }) if params[:period].present?
 
@@ -468,8 +478,9 @@ class Dataset
     collection.aggregate(options)
   end
   def self.download(params, type="table")
-     Rails.logger.fatal("-------------------here-------------------------#{type}")
+
     f = {}
+    f[:ids] = Dataset.clean_ids(params[:ids]) if params[:ids].present?
     f[:parties] = Party.get_ids_by_slugs(params[:party]) if params[:party].present?
     f[:period] = Period.get_ids_by_slugs(params[:period]) if params[:period].present?
 
@@ -477,18 +488,24 @@ class Dataset
     parties = {}
     periods = {}
     Party.members.each{|e| parties[e.id] = e.title }
-    Period.each{|e| periods[e.id] = "#{e.title}_#{e.start_date}_#{e.type}" }
+    Period.each{|e| periods[e.id] = { tp: e.current_type, sd: e.start_date, ed: e.end_date } }
+    min_date = Date.new(2050,1,1)
+    max_date = Date.new(1970,1,1)
 
     if type == "table"
       require "#{Rails.root}/lib/js/helper.rb"
       table = []
       data.each_with_index{ |e, e_i|
-        table << [e[:_id].to_s, parties[e[:party_id]], periods[e[:period_id]]]
+        p = periods[e[:period_id]]
+        table << [e[:_id].to_s, "#{parties[e[:party_id]]} - #{p[:tp]}", "#{I18n.l(p[:sd], format: :date)} - #{I18n.l(p[:ed], format: :date)}"]
+        max_date = p[:ed] if p[:ed] > max_date
+        min_date = p[:sd] if p[:sd] < min_date
       }
       table.sort!{ |x,y| [x[1],y[2]] <=> [y[1],x[2]] } # sort by name asc and date desc
+
       {
         table: {
-          header: ["", I18n.t("root.download.party_name"), I18n.t("root.download.time_period")],
+          header: ["", I18n.t("root.download.filename"), I18n.t("root.download.filename_period")],
           data: table,
           classes: ["", "", "center"]
         },
@@ -498,20 +515,20 @@ class Dataset
       compressed_filestream = Zip::OutputStream.write_buffer do |zp|
         data.each_with_index{ |e, e_i|
           tmp_party = parties[e[:party_id]]
-          tmp_period = periods[e[:period_id]]
-
-          zp.put_next_entry "%s.xlsx" % [Helper.sanitize("#{tmp_party}_#{tmp_period}")]
+          p = periods[e[:period_id]]
+          max_date = p[:ed] if p[:ed] > max_date
+          min_date = p[:sd] if p[:sd] < min_date
+          zp.put_next_entry "%s%s.xlsx" % [Helper.sanitize("#{tmp_party} (#{p[:tp]} "), "#{I18n.l(p[:sd], format: :filename)}_#{I18n.l(p[:ed], format: :filename)})"]
           zp.print IO.read(Rails.public_path.join("system/datasets/sources/#{e[:_id]}/original.xlsx"))
         }
       end
       compressed_filestream.rewind
-      sz = compressed_filestream.size
-      # compressed_filestream.close
+      sz = compressed_filestream.size # not sure if close is needed compressed_filestream.close
+
       { size: ActionController::Base.helpers.number_to_human_size(sz) }
-        .merge(type == "file" ? {
-          file: compressed_filestream.read,
-          filename: "Archive file.zip"
-        } : {})
+      .merge(type == "file" ? {
+        file: compressed_filestream.read,
+        filename: "#{I18n.t("root.download.filename_finance")}_#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)}_(pins.ge).zip" } : {})
     end
   end
 end

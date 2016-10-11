@@ -29,7 +29,6 @@ en:
       filter_close: Close Filter Window
       filter_item_close: Remove item from filter
       filter_clear: Remove all items from filter
-      time_period: Time Period
       time: Time
       annual: Annual
       campaign: Campaign
@@ -40,10 +39,10 @@ en:
       download: Download
       filename_donation: Donations
       search: Search
-      filename: File Name
-      filename_period: Time Period
-      party_name: Party Name
+      filename: Name
+      filename_period: Period
       file_size: File Size
+      filename_finance: PartyFinances
     explore:
       title: Explore
       category: Category

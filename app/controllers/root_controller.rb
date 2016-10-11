@@ -133,14 +133,15 @@ class RootController < ApplicationController
   end
 
   def download
-    Rails.logger.fatal("--------------------------------------------#{params}")
-
     @show_page_title = false
 
     pars = download_params
     @fltr = pars[:filter]
 
-    @fltr = "finance" if !(@fltr.present? && ["finance", "donation"].index(@fltr).present?)
+    if !(@fltr.present? && ["finance", "donation"].index(@fltr).present?)
+      @fltr = "finance"
+      pars.merge!({filter: "finance"})
+    end
 
     is_finance = @fltr == "finance"
     is_donation = !is_finance
@@ -152,13 +153,13 @@ class RootController < ApplicationController
 
     if request.format.json?
       if pars[:type] == "info"
-        dt = is_finance ? Dataset.download(pars, "info") : { donation: Donor.download(pars) }
+        dt = is_finance ? Dataset.download(pars, "info") : Donor.download(pars, "info")
       else
-        dt = is_finance ? Dataset.download(pars) : { donation: Donor.download(pars) }
+        dt = is_finance ? Dataset.download(pars) : Donor.download(pars)
       end
 
     elsif request.format.zip?
-      dt = is_finance ? Dataset.download(pars, "file") : Donor.download(pars, true)
+      dt = is_finance ? Dataset.download(pars, "file") : Donor.download(pars, "file")
     else
       gon.gonned = true
 
@@ -170,12 +171,10 @@ class RootController < ApplicationController
       gon.period_list = Period.list
 
       gon.is_donation = is_donation
-      #gon.gonned_type = @fltr
 
       gon.gonned_data = is_finance ? Dataset.download(pars) : Donor.download(pars)
       pars.delete(:locale)
       gon.params = pars
-
     end
 
     respond_to do |format|
@@ -184,6 +183,20 @@ class RootController < ApplicationController
       format.zip { send_data dt[:file], filename: "#{dt[:filename]}" }
     end
   end
+
+  def about
+    @donations_page_content = PageContent.by_name('about_donations')
+    @party_finances_page_content = PageContent.by_name('about_party_finances')
+    @show_page_title = false
+  end
+
+  def media
+    @media = Medium.is_public.sorted_public.page(params[:page]).per(2)
+    @show_page_title = false
+    gon.show_more = t('shared.common.show_more')
+    gon.show_less = t('shared.common.show_less')
+  end
+
 
   # show the embed chart if the id was provided and can be decoded and parsed into hash
   # id - base64 encoded string of a hash of parameters
@@ -218,81 +231,11 @@ class RootController < ApplicationController
     #   end
     #   @js.push('highcharts-exporting.js')
     # end
-    puts "here1"
     respond_to do |format|
       format.html # index.html.erb
     end
   # end
   end
-
-  def about
-    @donations_page_content = PageContent.by_name('about_donations')
-    @party_finances_page_content = PageContent.by_name('about_party_finances')
-    @show_page_title = false
-  end
-
-  def media
-    @media = Medium.is_public.sorted_public.page(params[:page]).per(2)
-    @show_page_title = false
-    gon.show_more = t('shared.common.show_more')
-    gon.show_less = t('shared.common.show_less')
-  end
-
-  def select_donors
-    q = params[:q].split
-    donors = []
-    if q.length == 1
-      regex1 =  /^#{Regexp.escape(q[0])}/i
-      regex2 = /.*/i
-    else
-      regex1 =  /^#{Regexp.escape(q[0])}/i
-      regex2 = /^#{Regexp.escape(q[1])}/i
-    end
-    Donor.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
-      donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
-    }
-    render :json => donors
-  end
-
-
-  # def download_file
-  #   # Zip::File.open('path/archive.zip', Zip::File::CREATE) do |z|
-  #   #   files.each do |f|
-  #   #     z.add('file_name', f.path)
-  #   #   end
-  #   # end
-  #   respond_to do |format|
-  #     format.html
-  #     format.zip do
-  #       compressed_filestream = Zip::OutputStream.write_buffer do |zp|
-  #         zp.put_next_entry "parties.xlsx"
-  #         zp.print IO.read(Rails.public_path.join("upload/test/parties.xlsx"))
-
-  #         zp.put_next_entry "categories.xlsx"
-  #         zp.print IO.read(Rails.public_path.join("upload/test/categories.xlsx"))
-
-  #         #zp.print animal.to_json(only: [:name, :age, :species])
-  #       end
-  #       compressed_filestream.rewind
-  #       send_data compressed_filestream.read, filename: "animals.zip"
-  #       # send_file 'path/archive.zip', type: 'application/zip',
-  #       #   disposition: 'attachment',
-  #       #   filename: "my_archive.zip"
-  #     end
-  #   end
-  # end
-  # options = Rack::Utils.parse_query(Base64.urlsafe_decode64(embed_id))
-  # def select_parties
-  #   q = params[:q]
-  #   parties = []
-  #   regex1 =  /^#{Regexp.escape(q[0])}/i
-  #   # Party.all.each{ |set|
-  #   #   set.donors.any_of({ title: regex1 , last_name: regex2 }, 1{ first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
-  #   #     parties << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
-  #   #   }
-  #   # }
-  #   render :json => parties
-  # end
 
   def share
     pars = share_params
@@ -351,12 +294,27 @@ class RootController < ApplicationController
       # else
       #   redirect_to gap_path and return
       # end
-      Rails.logger.info("--------------------------------------------inside")
+      #Rails.logger.info("--------------------------------------------inside")
     else
-      Rails.logger.info("--------------------------------------------redirecting")
+      #Rails.logger.info("--------------------------------------------redirecting")
       redirect_to @return_url and return
     end
   end
+  # def select_donors
+  #   q = params[:q].split
+  #   donors = []
+  #   if q.length == 1
+  #     regex1 =  /^#{Regexp.escape(q[0])}/i
+  #     regex2 = /.*/i
+  #   else
+  #     regex1 =  /^#{Regexp.escape(q[0])}/i
+  #     regex2 = /^#{Regexp.escape(q[1])}/i
+  #   end
+  #   Donor.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
+  #     donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
+  #   }
+  #   render :json => donors
+  # end
 
   private
     def share_params
@@ -370,7 +328,7 @@ class RootController < ApplicationController
         :finance => [:all, :locale, { party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
     end
     def download_params
-      params.permit([:filter, :locale, :format, :type, period: [], party: [], :donation => [:all, :locale, { period: [] }] ], :finance => [:all, :locale, { party: [], period:[] }])
+      params.permit([:filter, :locale, :format, :type, period: [], party: [], ids: []])
     end
 end
 

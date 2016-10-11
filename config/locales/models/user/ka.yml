@@ -134,8 +134,8 @@ ka:
           initiative: Initiative
       period:
         type:
-          annual: Annual
-          election: Election
+          annual: წლიური
+          election: წინასაარჩევნო
       dataset:
         state:
           pending: &pending Pending

@@ -31,7 +31,6 @@ $(document).ready(function (){
           $("[data-autocomplete-view='" + autocomplete_id + "']").append(li(key, value));
           this[autocomplete_id][key] = value;
         }
-        //console.log(autocomplete);
       },
       pop: function(autocomplete_id, key) {
         if(this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key)) {
@@ -106,14 +105,12 @@ $(document).ready(function (){
               }
             }
             else {
-              console.log("ajax");
               $.ajax({
                 url: p.attr("data-url"),
                 dataType: 'json',
                 data: { q: v },
                 success: function(data) {
                   var html = "";
-                  console.log("back", data);
                   data.forEach(function(d) {
                     html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
                   });
@@ -142,14 +139,11 @@ $(document).ready(function (){
         });
         $(".autocomplete input").on("change paste keyup", this.onchange);
         $(".autocomplete input").on("click", function() {
-          //console.log("here");
           var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul");
           p.addClass("active");
           global_click_callback = function(target) {
             target = $(target);
-             //console.log("here", target.hasClass(".autocomplete"), target.closest(".autocomplete").length);
             if(!target.hasClass(".autocomplete") && !target.closest(".autocomplete").length) {
-               //console.log("inner");
               p.removeClass("active");
               global_click_callback = undefined;
               global_keyup_up_callback = undefined;
@@ -160,21 +154,17 @@ $(document).ready(function (){
         });
 
         $(document).on("click keypress", ".autocomplete .dropdown li .item", function(event) {
-          // console.log("click keypress autocomplete name");
           if(event.type === "keypress" && event.keyCode !== 13) { return; }
           var t = $(this), dropdown = t.closest(".dropdown"), p = dropdown.parent(), is_selected = t.hasClass("selected");
 
           t.toggleClass("selected");
           var autocomplete_id = p.attr("data-autocomplete-id");
           if(is_selected) {
-             //console.log("is selected");
             autocomplete.pop(autocomplete_id, t.attr("data-id"));
           }
           else {
-            //console.log("is not selected");
             autocomplete.push(autocomplete_id, t.attr("data-id"), t.text());
           }
-          // console.log(autocomplete);
           event.stopPropagation();
         });
         $(document).on("click keypress", ".autocomplete .dropdown li .tree-toggle", function(event) {
@@ -229,17 +219,17 @@ $(document).ready(function (){
             }
           });
         });
-        return Object.keys(t.data).length ? t.data : { "all": true };
+        return Object.keys(t.data).length ? t.data : { };
       },
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
-        // console.log("set_by_url donation", gon.donation_params);
-        if(gon.donation_params) {
-          Object.keys(gon.donation_params).forEach(function(k) {
+        console.log("set_by_url donation", gon.params);
+        if(gon.params) {
+          Object.keys(gon.params).forEach(function(k) {
             if(k == "filter" || !t.types.hasOwnProperty(k)) return;
               el = t.elem[k];
               tp = t.types[k];
-              v = gon.donation_params[k];
+              v = gon.params[k];
 
             if(tp === "period") {
               el.from.datepicker('setDate', new Date(+v[0]));
@@ -265,24 +255,29 @@ $(document).ready(function (){
         });
       },
       id: function(v) {
-        var period = [-1, -1], amount = [-1, -1];
-        if(v.hasOwnProperty("period")) {
-          period = v.period;
-        }
-        //console.log(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple].join(";"));
+        var period = v.hasOwnProperty("period") ? v.period : [-1, -1];
         return CryptoJS.MD5(["d", period.join(";")].join(";")).toString();
       },
       url: function(v) {
+        var params = this.as_array(v);
+        window.history.pushState(v, null, window.location.pathname + "?filter=donation" + (params.length ? ("&" + params.join("&")) : ""));
+      },
+      as_array: function (v) {
         var t = this, url = "?", params = [], tmp;
-
         Object.keys(this.elem).forEach(function(el){
           if(v.hasOwnProperty(el)) {
             tmp = v[el];
-            params.push(el + "=" + tmp);
+            if(Array.isArray(tmp)) {
+              tmp.forEach(function(r){
+                params.push(el + "[]=" + r);
+              });
+            }
+            else {
+              params.push(el + "=" + tmp);
+            }
           }
         });
-        window.history.pushState(v, null, window.location.pathname + "?filter=donation" + (params.length ? ("&" + params.join("&")) : ""));
-        t.download = window.location.pathname + "?filter=donation&" + (params.length ? (params.join("&") + "&") : "") + "format=csv";
+        return params;
       }
     },
     finance = {
@@ -324,29 +319,23 @@ $(document).ready(function (){
             }
           });
         });
-        return Object.keys(t.data).length ? t.data : { "all": true };
+        return Object.keys(t.data).length ? t.data : { };
       },
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
-        // console.log("set_by_url finance", gon.finance_params);
-        if(gon.finance_params) {
-          Object.keys(gon.finance_params).forEach(function(k) {
+         // console.log("set_by_url finance", gon.params);
+        if(gon.params) {
+          Object.keys(gon.params).forEach(function(k) {
             if(k == "filter" || !t.types.hasOwnProperty(k)) return;
               el = t.elem[k];
               tp = t.types[k];
-              v = gon.finance_params[k];
+              v = gon.params[k];
 
             if(tp === "autocomplete") {
               p = el.parent();
               Object.keys(v).forEach(function(kk){
-                var fld = p.attr("data-field"), tmp = fld, fl = false;
-                if(t.categories.indexOf(fld) !== -1) { fl = true; tmp = "category"; }
-                 //console.log("set by url",kk,v,fld,fl,tmp);
-                if(gon.main_categories_ids.indexOf(v[kk]) === -1) {
-                  list = fl ? gon.category_lists[fld] : gon[tmp + "_list"];
-                  autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], list.filter(function(d) { return d[0] == v[kk]; })[0][1]);
-                }
-                if(fl) { emulate_category_click(fld); }
+                var list = gon[p.attr("data-field") + "_list"];
+                autocomplete.push(p.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"), v[kk], list.filter(function(d) { return d[0] == v[kk]; })[0][1]);
               });
             }
             else if(tp === "period_mix") {
@@ -390,8 +379,11 @@ $(document).ready(function (){
       },
       id: function(v) { return CryptoJS.MD5(["f", v.party, v.period].join(";")).toString(); },
       url: function(v) {
+        var params = this.as_array(v);
+        window.history.pushState(v, null, window.location.pathname + "?filter=finance" + (params.length ? ("&" + params.join("&")) : ""));
+      },
+      as_array: function (v) {
         var t = this, url = "?", params = [], tmp;
-        // console.log(v);
         Object.keys(this.elem).forEach(function(el){
           if(v.hasOwnProperty(el)) {
             tmp = v[el];
@@ -405,20 +397,21 @@ $(document).ready(function (){
             }
           }
         });
-        window.history.pushState(v, null, window.location.pathname + "?filter=finance" + (params.length ? ("&" + params.join("&")) : ""));
-        t.download = window.location.pathname + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "") + "format=csv";
+        return params;
       }
     };
 
   finance_toggle.click(function (event){
     var p = finance_toggle.closest(".filter").attr("data-type", "finance");
     is_type_donation = false;
+    filter();
     event.stopPropagation();
   });
 
   donation_toggle.click(function (event){
     var p = finance_toggle.closest(".filter").attr("data-type", "donation");
     is_type_donation = true;
+    filter();
     event.stopPropagation();
   });
 
@@ -604,86 +597,84 @@ $(document).ready(function (){
     //   $(".pane[data-type='finance'] .actions .download_list").attr("data-type", $(this).attr("data-view-toggle"));
     // });
     $(document).on("click", "#download_toggle_all", function () {
-      console.log("clicked all");
       var t = $(this), state = t.is(":checked");
-      console.log(state, view_table_object.$("tr", {"filter": "applied"}).find("td input[type='checkbox']"));
       $(view_table_object.$("tr", {"filter": "applied"}))
         .find("td input[type='checkbox'] + label")
         .trigger("click");
       t.next("label").trigger("click");
     });
     $(document).on("click", "#download_button", function () {
-      var ids = [];
-      $(view_table_object.$("tr", {"filter": "applied"})).find("td:first-of-type input:checked")
-        .each(function(){ ids.push($(this).attr("data-id")); });
-        //" + (params.length ? (params.join("&") + "&") : "") + "
-      window.location = window.location.pathname + "?filter=donation&format=zip";
-      // t.download.attr("href", )
-      // console.log("clicked to download", ids);
-      // var t = $(this), state = t.is(":checked");
-      // console.log(state, view_table_object.$("tr", {"filter": "applied"}).find("td input[type='checkbox']"));
-      // $(view_table_object.$("tr", {"filter": "applied"}))
-      //   .find("td input[type='checkbox'] + label")
-      //   .trigger("click");
-      // t.next("label").trigger("click");
+      var tp = "finance", tmp = [];
+      if(is_type_donation) {
+         tp = "donation";
+         tmp = donation.as_array(donation.get());
+      }
+      else {
+        $(view_table_object.$("tr", {"filter": "applied"})).find("td:first-of-type input:checked")
+          .each(function(){ tmp.push("ids[]=" + $(this).attr("data-id")); });
+      }
+      window.location = window.location.pathname + "?filter=" + (tp) + "&" + (tmp.length ? (tmp.join("&") + "&") : "") + "format=zip";
     });
 
   }
 
   function filter() {
     loader.fadeIn();
-    console.log("start filter", is_type_donation);
+    // console.log("start filter", is_type_donation);
 
-    var filters = {},
-      remote_required = false,
-      tmp, cacher_id,
+    var tmp, cacher_id,
       obj = is_type_donation ? donation : finance;
 
     if(gon.gonned) {
       obj.set_by_url();
-      tmp = obj.get();
-      _id = obj.id(tmp);
+    }
+
+    tmp = obj.get();
+    _id = obj.id(tmp);
+    obj.url(tmp);
+    tmp["filter"] = obj.name;
+    if(gon.gonned) {
       js.cache[_id] = gon.gonned_data;
-
       gon.gonned = false;
-      filter_callback(js.cache[_id], filters);
-    } else {
-      tmp = obj.get();
-      _id = obj.id(tmp);
-      obj.url(tmp);
-
-      if(!js.cache.hasOwnProperty(_id)) {
-        filters[obj.name] = tmp;
-        remote_required = true;
-      }
-      else {
-        filter_callback(js.cache[_id], filters);
-      }
-
-      if(remote_required) {
-        $.ajax({
-          dataType: 'json',
-          data: filters,
-          success: function(data) {
-            if(data.hasOwnProperty("table")) { filter_callback(js.cache[_id] = data, filters); }
+    }
+    if(!js.cache.hasOwnProperty(_id)) {
+      $.ajax({
+        url: "download",
+        dataType: 'json',
+        data: tmp,
+        success: function(data) {
+          if(data.hasOwnProperty("table")) {
+            js.cache[_id] = data;
+            filter_callback(_id, tmp);
           }
-        });
-      }
+        }
+      });
+    }
+    else {
+      filter_callback(_id, tmp);
     }
   }
-  function filter_callback(data, filters) {
-    if(typeof data !== "undefined") {
-      render_table(data.table);
-      $.getJSON("", Object.assign({ type: "info" }, filters )).done(function( json ) { render_table_refresh(json.size); });
+  function filter_callback(id, filters) {
+    if(js.cache.hasOwnProperty(id)) {
+      render_table(js.cache[id].table);
+      if(js.cache[id].hasOwnProperty("sz")) {
+        render_table_refresh(js.cache[id].sz);
+      }
+      else {
+        $.getJSON("download", Object.assign({ type: "info" }, filters )).done(function( json ) {
+          render_table_refresh(json.size);
+          js.cache[id].sz = json.size;
+        });
+      }
     }
     else {
       $(".view").addClass("not-found");
     }
     loader.fadeOut();
   }
-  TODO set by url is not working
+  // TODO set by url is not working
   function render_table(table) {
-    console.log("table data", table, table.header);
+    //console.log("table data", table, table.header);
     // if(type === "donation") {
       //view_content.html("new tab");
       //var prev = undefined, alt_color = true,

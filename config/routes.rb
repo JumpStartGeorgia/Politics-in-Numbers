@@ -38,17 +38,14 @@ Rails.application.routes.draw do
     get '/explore' => 'root#explore'
     get '/about' => 'root#about'
     get '/media' => 'root#media'
-    get '/download' => 'root#download'
     get '/api' => 'root#api'
     get '/parties' => 'root#parties'
     get '/embed' => 'root#embed'
     get '/share' => 'root#share'
-    get 'select/donors' => 'root#select_donors'
+    # get 'select/donors' => 'root#select_donors'
     get 'select/parties' => 'root#select_parties'
     get 'explore_filter' => 'root#explore_filter'
     get 'download' => 'root#download'
-    get 'download_filter' => 'root#download_filter'
-    get 'download_file' => 'root#download_file', defaults: { format: 'zip' }, constraints: { format: 'zip' }
 
     # get '/read' => 'root#read'
     # get '/read_details' => 'root#read_details'
