@@ -20,7 +20,7 @@ $(document).ready(function (){
     filter_extended = $("#filter_extended"),
     finance_category = $("#finance_category"),
     content = $("#content"),
-    overlay = $(".overlay"),
+    loader = $(".view-loader"),
     donation_total_amount = $("#donation_total_amount span"),
     donation_total_donations = $("#donation_total_donations span"),
     donation_table = $("#donation_table table"),
@@ -678,11 +678,11 @@ $(document).ready(function (){
     };
     filter_extended.find(".filter-toggle").click(function(){
       filter_extended.toggleClass("active");
-      overlay.removeClass("hidden");
+      loader.removeClass("hidden");
       event.stopPropagation();
     });
     filter_extended.find(".filter-header .close").click(function(){
-      overlay.addClass("hidden");
+      loader.addClass("hidden");
       filter_extended.toggleClass("active");
     });
     filter_extended.find(".filter-input .toggle").click(function(){
@@ -905,6 +905,7 @@ $(document).ready(function (){
   }
 
   function filter() {
+    loader.fadeIn();
     //console.log("start filter", is_type_donation);
     var filters = {},
       remote_required = false, tmp, cacher_id, donation_id, finance_id;
@@ -1082,6 +1083,7 @@ $(document).ready(function (){
       }
       render_table(partial, data.table);
     }
+    loader.fadeOut();
   }
   (function init() {
     Highcharts.setOptions({

@@ -188,12 +188,12 @@ class Donor
     tmp = params[:period]
     f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
      # Rails.logger.debug("--------------------------------------------#{f[:period]}")
-
+    chart_subtitle = ""
     if f[:period][0] != -1 && f[:period][1] != -1
       chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
     else
       dte = Donor.date_span
-      chart_subtitle = "#{I18n.l(dte[:first_date], format: :date)} - #{I18n.l(dte[:last_date], format: :date)}"
+      chart_subtitle = "#{I18n.l(dte[:first_date], format: :date)} - #{I18n.l(dte[:last_date], format: :date)}" if dte.present?
     end
 
     tmp = params[:amount]

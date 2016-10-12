@@ -994,15 +994,22 @@
         }
       }
     }
-    .overlay {
-      background-color:#5D675B;
-      opacity:.7;
+    .view-loader {
       position:absolute;
-      top:-45px;
+      top:0;
       right:0;
       bottom:0;
       left:0;
       z-index:15;
+      &:before {
+        display:inline-block;
+        content:"";
+        background:rgba(136,216,119,0.2) url(/assets/loading.svg) no-repeat center/200px;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 
@@ -1298,9 +1305,6 @@
         .pane[data-type='finance'] {
           width:100%;
         }
-      }
-      .overlay {
-        display:none;
       }
       .actions {
         display:flex;

@@ -1,6 +1,6 @@
-set :domain, 'alpha.jumpstart.ge'
-set :user, 'prisoners-staging'
-set :application, 'Starter-Template-Production'
+set :domain, 'pins.ge'
+set :user, 'pin'
+set :application, 'Politics-In-Numbers'
 set :repository, 'https://github.com/JumpStartGeorgia/Politics-in-Numbers.git'
 set :branch, 'master'
 set :web_url, ENV['PRODUCTION_WEB_URL']
