@@ -39,12 +39,11 @@ class Category
 
   #############################
   # indexes
-  index code: 1
   index title: 1
   index parent_id: 1
   index virtual: 1
   index sym: 1
-  index({_slugs: 1}, { unique: true, sparse: false })
+  #index({_slugs: 1}, { unique: true, sparse: false })
   #index simple: 1
   SYMS = [ :income, :income_campaign, :expenses, :expenses_campaign, :reform_expenses, :property_assets, :financial_assets, :debts ]
 
