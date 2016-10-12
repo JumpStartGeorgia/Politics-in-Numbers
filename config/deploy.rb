@@ -178,8 +178,8 @@ namespace :deploy do
   desc "Create MongoDB indexes"
   task :mongoid_indexes do
     queue %(echo "-----> Rebuilding Mongo Indexes")
-    queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:remove_indexes"
-    queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:create_indexes"
+    #queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:remove_indexes"
+    #queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:create_indexes"
   end
 
   namespace :assets do
