@@ -2,8 +2,8 @@
 ka:
   application:
     navbar_header:
-      explore: ნახვა
-      about: "პროექტის შესახებ"
+      explore: მონაცემები
+      about: ჩვენზე
       media: მედიაში
       download: ჩამოტვირთვა
       api: Api
