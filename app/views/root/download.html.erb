@@ -69,14 +69,8 @@
 </div>
 <div class="view" data-type="<%= @fltr %>">
   <div class="view-loader hidden"></div>
-  <div class="view-content"><table></table></div>
+  <div class="view-content"><table></table><div class="not-found hidden"><%= t('shared.msgs.data_not_found') %></div></div>
 </div>
 <% content_for :custom_js,  "download"  %>
-<% @custom_js = ["crypto.min.js"
-  # Warning uncomment this , "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5554a5643f1d9065"#,
-  #"datatables.buttons.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/dataTables.buttons.min.js",
-  #"datatables.buttons.html5.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/buttons.html5.min.js",
-  #"https://cdn.datatables.net/buttons/1.2.1/js/buttons.print.min.js"
- ] %>
-<%# @custom_css = [ "https://cdn.datatables.net/buttons/1.2.1/css/buttons.dataTables.min.css" ] %>
+<% @custom_js = ["crypto.min.js"] %>
 <% content_for :custom_css, "download" %>

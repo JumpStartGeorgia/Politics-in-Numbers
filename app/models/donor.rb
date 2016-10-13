@@ -231,6 +231,90 @@ class Donor
       ["total_donations_for_each_donor", "top_5_parties_donated_to"],
       ["donors_donations_sorted_by_amount", "parties_donations_sorted_by_amount"]
     ]
+
+
+# top_5_donors:
+
+# Top %{n} [Individual/Organization] Donors
+# [For: Party names, separated by commas]
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+
+#   top_5_parties:
+
+# Top %{n} Parties/Candidates
+# time period
+# Receiving [Monetary/Non-Monetary donation]  [of amount GEL]
+# from [Individual/Organization] Donors who
+# Have donated to multiple parties (only if YES)
+
+
+#   top_5_donors_for_party:
+# Top %{n} Donors for %{obj}
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+# last_5_donations_for_party:
+# Last %{n} Donations for %{obj}
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+
+
+# top_5_donors_for_parties:
+
+# Top %{n} Donors [For: Party names, separated by commas]
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+
+#  total_donations_for_parties:
+# Total Donations [For: Party names, separated by commas]
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+
+#   last_5_donations_for_donor:
+
+# Last %{n} Donations [for Donor Name]
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+
+#  top_5_parties_donated_to:
+# Top %{n} Parties Donated to by %{obj}
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+
+#  total_donations_for_each_donor:
+
+# Total Donations for [For: Donor names, separated by commas]
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+
+#  donors_donations_sorted_by_amount:
+# Top Donations by %{obj} to %{objb}
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+#  parties_donations_sorted_by_amount:
+# Top Donations to %{objb} by %{obj}
+# time period
+# Have donated to multiple parties (only if YES)
+# [Monetary/Non-Monetary donation]  [of amount GEL]
+
     chart1_meta_obj = { n: 0, obj: nil, objb: nil }
     chart2_meta_obj = { n: 0, obj: nil, objb: nil }
 

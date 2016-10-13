@@ -511,23 +511,26 @@ class Dataset
         },
       }
     elsif type == "file" || type == "info"
-      require "#{Rails.root}/lib/js/helper.rb"
-      compressed_filestream = Zip::OutputStream.write_buffer do |zp|
-        data.each_with_index{ |e, e_i|
-          tmp_party = parties[e[:party_id]]
-          p = periods[e[:period_id]]
-          max_date = p[:ed] if p[:ed] > max_date
-          min_date = p[:sd] if p[:sd] < min_date
-          zp.put_next_entry "%s%s.xlsx" % [Helper.sanitize("#{tmp_party} (#{p[:tp]} "), "#{I18n.l(p[:sd], format: :filename)}_#{I18n.l(p[:ed], format: :filename)})"]
-          zp.print IO.read(Rails.public_path.join("system/datasets/sources/#{e[:_id]}/original.xlsx"))
-        }
+      sz = 0
+       Rails.logger.fatal("fatal----------------------#{data.present?}#{ActionController::Base.helpers.number_to_human_size(sz)}")
+      if data.present?
+        require "#{Rails.root}/lib/js/helper.rb"
+        compressed_filestream = Zip::OutputStream.write_buffer do |zp|
+          data.each_with_index{ |e, e_i|
+            tmp_party = parties[e[:party_id]]
+            p = periods[e[:period_id]]
+            max_date = p[:ed] if p[:ed] > max_date
+            min_date = p[:sd] if p[:sd] < min_date
+            zp.put_next_entry "%s%s.xlsx" % [Helper.sanitize("#{tmp_party} (#{p[:tp]} "), "#{I18n.l(p[:sd], format: :filename)}_#{I18n.l(p[:ed], format: :filename)})"]
+            zp.print IO.read(Rails.public_path.join("system/datasets/sources/#{e[:_id]}/original.xlsx"))
+          }
+        end
+        compressed_filestream.rewind
+        sz = compressed_filestream.size # not sure if close is needed compressed_filestream.close
       end
-      compressed_filestream.rewind
-      sz = compressed_filestream.size # not sure if close is needed compressed_filestream.close
-
       { size: ActionController::Base.helpers.number_to_human_size(sz) }
       .merge(type == "file" ? {
-        file: compressed_filestream.read,
+        file: sz > 0 ? compressed_filestream.read : nil,
         filename: "#{I18n.t("root.download.filename_finance")}_#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)}_(pins.ge).zip" } : {})
     end
   end

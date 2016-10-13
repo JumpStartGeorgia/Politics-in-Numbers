@@ -103,4 +103,7 @@ $(document).ready(function (){
       }
     }
   });
+  $(document).on("click", ".notification button", function() {
+    $(this).parent().fadeOut();
+  });
 });

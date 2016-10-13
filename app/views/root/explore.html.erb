@@ -1,12 +1,12 @@
-<div id="explore" data-type="<%= @filter_type %>">
-  <div id="filter_type" class="filter-type" data-type="<%= @filter_type %>">
+<div id="explore" data-type="<%= @fltr %>">
+  <div id="fltr" class="filter-type" data-type="<%= @fltr %>">
     <div class="back"><%= image_tag("explore/back.svg", alt: t('shared.common.back'), title: t('shared.common.back')) %>
     </div>
-    <div class="donation<%= @filter_type == 'donation' ? ' active' : '' %>" data-type="donation">
+    <div class="donation<%= @button_state[0] %>" data-type="donation">
       <button type="button" id="donation_toggle" class="donation-toggle" tabindex="4"><%= t('shared.filters.donations') %></button>
     </div>
     <div class="sep"></div>
-    <div class="finance<%= @filter_type != 'donation' ? ' active' : '' %>" data-type="finance">
+    <div class="finance<%= @button_state[1] %>" data-type="finance">
       <div class="finance-container">
         <button type="button" id="finance_toggle" class="finance-toggle" tabindex="4"><%= t('shared.filters.party_finances').html_safe %><span>:</span></button><ul id="finance_category" >
           <li>
@@ -48,7 +48,7 @@
     </div>
   </div>
   <div class="filter-section">
-    <div id="filter_extended" class="filter-extended" data-type="<%= @filter_type %>">
+    <div id="filter_extended" class="filter-extended" data-type="<%= @fltr %>">
       <div class="filter-toggle"><i class="filter" title="<%= t('.filters') %>"></i><%= t('.filters') %></div>
       <div class="pane">
         <div class="filter-header">
@@ -169,7 +169,7 @@
         </div>
       </div>
     </div>
-    <div id="content" class="content">
+    <div class="view-content content">
       <div class="view-loader hidden"></div>
       <div class="panes" >
         <div class="pane" data-type="donation">
@@ -258,9 +258,8 @@
           </div>
           <div data-view="chart"><div id="finance_chart"></div></div>
           <div data-view="table"><div id="finance_table"><table></table></div></div>
-
         </div>
-        <div class="pane" data-type="not_found"><p class="not-found-text"><%= t('.not_found') %></p></div>
+        <div class="not-found hidden"><%= t('shared.msgs.data_not_found') %></div>
       </div>
     </div>
   </div>

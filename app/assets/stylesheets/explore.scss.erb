@@ -1013,24 +1013,18 @@
     }
   }
 
-  & #content .pane[data-type='donation'] ,
-  & #content .pane[data-type='finance'] ,
-  & #content .pane[data-type='not_found'] {
+  & .view-content .pane[data-type='donation'] ,
+  & .view-content .pane[data-type='finance'] {
     display:none;
   }
-  &[data-type='donation'] #content .pane[data-type='donation'],
-  &[data-type='finance'] #content .pane[data-type='finance'],
-  & #content .panes.not-found .pane[data-type='not_found'] {
+  &[data-type='donation'] .view-content .pane[data-type='donation'],
+  &[data-type='finance'] .view-content .pane[data-type='finance'] {
     display:block;
     width:100%;
   }
-  & #content .panes.not-found .pane[data-type='donation'] ,
-  & #content .panes.not-found .pane[data-type='finance'] {
+  & .view-content .panes.not-found .pane[data-type='donation'] ,
+  & .view-content .panes.not-found .pane[data-type='finance'] {
     display:none;
-  }
-  .not-found-text {
-    font:18px firasans_r;
-    color: rgb(93, 103, 91);
   }
 
   @media (min-width: 768px) {

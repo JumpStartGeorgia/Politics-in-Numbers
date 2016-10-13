@@ -65,6 +65,7 @@ en:
         ka: "ქართული"
         ru: "Русский"
     msgs:
+      data_not_found: Your requested data could not be found
       does_not_exist: You tried to access a page that does not exist.
       not_authorized: You are not authorized to view that page.
       missing_parameter: Data for some fields is missing. Fill in all required fields

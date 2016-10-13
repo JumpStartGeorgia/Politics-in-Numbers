@@ -16,14 +16,10 @@ class RootController < ApplicationController
   end
 
   def explore
+    @show_page_title = false
+
     pars = explore_params
-    is_csv = pars[:format] == 'csv'
-
-
-
-    which_filter = pars[:filter]
-    @filter_type = which_filter == "finance" ? "finance" : "donation"
-    has_filters = which_filter.present? && (which_filter == "donation" || which_filter == "finance")
+    @fltr = pars[:filter]
 
     @categories = Category.non_virtual # required for object explore calls
     gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
@@ -38,23 +34,23 @@ class RootController < ApplicationController
       period: Period.annual.limit(3).map{|m| m.permalink }
     }
 
-    if !has_filters
-      has_filters = true
-      @filter_type = "finance"
-      which_filter = "finance"
+    if !(@fltr.present? && ["finance", "donation"].index(@fltr).present?)
+      @fltr = "finance"
       pars.merge!(finance_pars)
     end
 
-    is_finance = which_filter == "finance"
+    is_finance = @fltr == "finance"
     is_donation = !is_finance
+
+    @button_state = ['', '']
+    @button_state[is_finance ? 1 : 0] = ' active'
 
     dt = []
 
     donation_pars = pars if !is_finance
     finance_pars = pars if is_finance
 
-
-    if !is_csv
+    if !request.format.csv?
 
       gon.url = root_url
       gon.app_name = "pins.ge"
@@ -73,8 +69,7 @@ class RootController < ApplicationController
       gon.period_list = Period.list
 
 
-
-      gon.gonned_type = which_filter
+      gon.is_donation = is_donation
 
       gon.donation_params = donation_pars
       gon.donation_data = Donor.explore(donation_pars)
@@ -115,7 +110,7 @@ class RootController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.csv { send_data csv_file, filename: "explore_#{which_filter}_#{Date.today}.csv" }
+      format.csv { csv_file.present? ? send_data(csv_file, filename: "explore_#{@fltr}_#{Date.today}.csv") : redirect_to(explore_path, :notice => t('shared.msgs.data_not_found')) }
     end
   end
 
@@ -180,19 +175,19 @@ class RootController < ApplicationController
     respond_to do |format|
       format.html
       format.json { render :json => dt }
-      format.zip { send_data dt[:file], filename: "#{dt[:filename]}" }
+      format.zip { dt[:file].present? ? send_data(dt[:file], filename: "#{dt[:filename]}") : redirect_to(download_path, :notice => t('shared.msgs.data_not_found')) }
     end
   end
 
   def about
+    @show_page_title = false
     @donations_page_content = PageContent.by_name('about_donations')
     @party_finances_page_content = PageContent.by_name('about_party_finances')
-    @show_page_title = false
   end
 
   def media
-    @media = Medium.is_public.sorted_public.page(params[:page]).per(2)
     @show_page_title = false
+    @media = Medium.is_public.sorted_public.page(params[:page]).per(2)
     gon.show_more = t('shared.common.show_more')
     gon.show_less = t('shared.common.show_less')
   end

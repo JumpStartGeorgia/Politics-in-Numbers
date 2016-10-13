@@ -16,6 +16,7 @@ $(document).ready(function (){
     finance_toggle = $(".filter-type-toggle[data-type='finance']"),
     donation_toggle = $(".filter-type-toggle[data-type='donation']"),
     view_content = $(".view-content"),
+    view_not_found = $(".not-found"),
     is_type_donation = true,
     loader = $(".view-loader"),
     view_action = $("#view_action"),
@@ -622,7 +623,7 @@ $(document).ready(function (){
     loader.fadeIn();
     // console.log("start filter", is_type_donation);
 
-    var tmp, cacher_id,
+    var tmp, cacher_id, _id,
       obj = is_type_donation ? donation : finance;
 
     if(gon.gonned) {
@@ -655,7 +656,8 @@ $(document).ready(function (){
     }
   }
   function filter_callback(id, filters) {
-    if(js.cache.hasOwnProperty(id)) {
+    if(js.cache.hasOwnProperty(id) && js.cache[id].hasOwnProperty("table") && js.cache[id].table.length) {
+      view_not_found.addClass("hidden");
       render_table(js.cache[id].table);
       if(js.cache[id].hasOwnProperty("sz")) {
         render_table_refresh(js.cache[id].sz);
@@ -668,7 +670,7 @@ $(document).ready(function (){
       }
     }
     else {
-      $(".view").addClass("not-found");
+      view_not_found.removeClass("hidden");
     }
     loader.fadeOut();
   }
@@ -724,7 +726,6 @@ $(document).ready(function (){
   (function init() {
     bind();
     is_type_donation = gon.is_donation;
-
     filter();
   })();
 });

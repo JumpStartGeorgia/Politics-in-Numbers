@@ -19,7 +19,8 @@ $(document).ready(function (){
     is_type_donation = true,
     filter_extended = $("#filter_extended"),
     finance_category = $("#finance_category"),
-    content = $("#content"),
+    view_content = $(".view-content"),
+    view_not_found = $(".not-found"),
     loader = $(".view-loader"),
     donation_total_amount = $("#donation_total_amount span"),
     donation_total_donations = $("#donation_total_donations span"),
@@ -197,6 +198,7 @@ $(document).ready(function (){
       }
     },
     donation = {
+      name: "donation",
       types: {
         donor: "autocomplete",
         period: "period",
@@ -391,6 +393,7 @@ $(document).ready(function (){
       }
     },
     finance = {
+      name: "finance",
       types: {
         party: "autocomplete",
         income: "autocomplete",
@@ -568,6 +571,7 @@ $(document).ready(function (){
         });
       }
     };
+
   finance_toggle.click(function (event){
     is_type_donation = false;
     var p = finance_toggle.parent().parent();
@@ -907,79 +911,62 @@ $(document).ready(function (){
   function filter() {
     loader.fadeIn();
     //console.log("start filter", is_type_donation);
-    var filters = {},
-      remote_required = false, tmp, cacher_id, donation_id, finance_id;
+    var tmp, cacher_id, _id, _id, finance_id, obj;
 
     if(gon.gonned) {
-      donation.set_by_url();
-
-      tmp = donation.get();
-      donation_id = donation.id(tmp);
-
-      js.cache[donation_id] = gon.donation_data;
-
-      filter_callback(js.cache[donation_id], "donation");
-
-
-      finance.set_by_url();
-      tmp = finance.get();
-      if(tmp === null) { return; }
-      finance_id = finance.id(tmp);
-
-      js.cache[finance_id] = gon.finance_data;
-
-      filter_callback(js.cache[finance_id], "finance");
-
+      [donation, finance].forEach( function (obj) {
+        obj.set_by_url();
+        tmp = obj.get();
+        _id = obj.id(tmp);
+        js.cache[_id] = gon[obj.name + "_data"];
+        filter_callback(js.cache[_id], obj.name);
+      });
       gon.gonned = false;
     } else {
-      if(is_type_donation) {
+      obj = is_type_donation ? donation : finance;
+      tmp = obj.get();
+      _id = obj.id(tmp);
+      obj.url(tmp);
 
-        tmp = donation.get();
-        donation_id = donation.id(tmp);
-
-        donation.url(tmp);
-
-        if(!js.cache.hasOwnProperty(donation_id)) {
-          filters["donation"] = tmp;
-          remote_required = true;
-        }
-        else {
-          filter_callback(js.cache[donation_id], "donation");
-        }
-      }
-      else {
-
-        tmp = finance.get();
-        if(tmp === null) { return; }
-        finance_id = finance.id(tmp);
-
-        finance.url(tmp);
-
-        if(!js.cache.hasOwnProperty(finance_id)) {
-          filters["finance"] = tmp;
-          remote_required = true;
-        }
-        else {
-          filter_callback(js.cache[finance_id], "finance");
-        }
-      }
-
-
-
-      if(remote_required) {
+      if(!js.cache.hasOwnProperty(_id)) {
+        var filters = {};
+        filters[obj.name] = tmp;
         $.ajax({
           url: "explore_filter",
           dataType: 'json',
           data: filters,
           success: function(data) {
-            if(data.hasOwnProperty("donation")) { filter_callback(js.cache[donation_id] = data.donation, "donation"); }
-            if(data.hasOwnProperty("finance")) { filter_callback(js.cache[finance_id] = data.finance, "finance"); }
+            js.cache[_id] = data[obj.name];
+            if(data.hasOwnProperty("donation")) { filter_callback(data.donation, "donation"); }
+            if(data.hasOwnProperty("finance")) { filter_callback(data.finance, "finance"); }
           }
         });
       }
+      else {
+        filter_callback(js.cache[_id], obj.name);
+      }
     }
   }
-
+  function filter_callback(data, partial) {
+    // console.log("filter_callback", data);
+    view_not_found.addClass("hidden");
+    var is_data_ok = typeof data !== "undefined";
+    if(is_data_ok) {
+      if(partial === "donation") {
+        bar_chart("#donation_chart_1", data.chart1, data.chart1_title, data.chart_subtitle, "#EBE187");
+        bar_chart("#donation_chart_2", data.chart2, data.chart2_title, data.chart_subtitle, "#B8E8AD");
+      }
+      else {
+        //grouped_column_chart("#finance_chart", data.chart1, "#fff");
+        grouped_advanced_column_chart("#finance_chart", data.chart1, "#fff");
+      }
+      render_table(partial, data.table);
+    }
+    else {
+      view_not_found.removeClass("hidden");
+    }
+    loader.fadeOut();
+  }
 
   function render_table(type, table) {
     // console.log("table data", table);
@@ -1065,61 +1052,7 @@ $(document).ready(function (){
         dom: "Bfltrp"
       });
     }
-
   }
-  function filter_callback(data, partial) {
-     console.log("filter_callback", data);
-     // data =  undefined; // test for not found data
-    var is_data_ok = typeof data !== "undefined";
-    content.find(".panes").toggleClass("not-found", !is_data_ok);
-    if(is_data_ok) {
-      if(partial === "donation") {
-        bar_chart("#donation_chart_1", data.chart1, data.chart1_title, data.chart_subtitle, "#EBE187");
-        bar_chart("#donation_chart_2", data.chart2, data.chart2_title, data.chart_subtitle, "#B8E8AD");
-      }
-      else {
-        //grouped_column_chart("#finance_chart", data.chart1, "#fff");
-        grouped_advanced_column_chart("#finance_chart", data.chart1, "#fff");
-      }
-      render_table(partial, data.table);
-    }
-    loader.fadeOut();
-  }
-  (function init() {
-    Highcharts.setOptions({
-      lang: {
-        numericSymbols: gon.numericSymbols
-      },
-      colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
-      credits: {
-        enabled: true,
-        href: gon.url,
-        // position: undefined
-        // style: undefined
-        text: gon.app_name
-      }
-    });
-    (function(H) { // for highchart to recognize maxPointWidth property
-        var each = H.each;
-        H.wrap(H.seriesTypes.column.prototype, 'drawPoints', function(proceed) {
-            var series = this;
-            if(series.data.length > 0 ){
-                var width = series.barW > series.options.maxPointWidth ? series.options.maxPointWidth : series.barW;
-                each(this.data, function(point) {
-                    point.shapeArgs.x += (point.shapeArgs.width - width) / 2;
-                    point.shapeArgs.width = width;
-                });
-            }
-            proceed.call(this);
-        })
-    })(Highcharts)
-
-    bind();
-    is_type_donation = gon.gonned_type === "donation";
-
-    filter();
-  })();
-
   function bar_chart(elem, series_data, title, subtitle, bg) {
     //console.log("chart", elem, series_data);
     $(elem).highcharts({
@@ -1127,7 +1060,7 @@ $(document).ready(function (){
           type: 'bar',
           backgroundColor: bg,
           height: 60*(Math.round(title.length/40)+1) + 40 * series_data.length,
-          width: w > 992 ? ($("#content").width()-386)/2 : w - 12,
+          width: w > 992 ? (view_content.width()-386)/2 : w - 12,
           events: {
             load: function () {
               var tls = $(this.container).find(".highcharts-xaxis-labels text title"),
@@ -1228,7 +1161,7 @@ $(document).ready(function (){
           type: 'column',
           backgroundColor: bg,
           height: 400,
-          width: w > 992 ? ($("#content").width()-28)/2 : w - 12,
+          width: w > 992 ? (view_content.width()-28)/2 : w - 12,
           spacingLeft: 20
       },
       exporting: {
@@ -1330,7 +1263,7 @@ $(document).ready(function (){
           type: 'column',
           backgroundColor: bg,
           height: 400,
-          width: w > 992 ? ($("#content").width()-28)/2 : w - 12
+          width: w > 992 ? (view_content.width()-28)/2 : w - 12
       },
       exporting: {
         buttons: {
@@ -1430,11 +1363,44 @@ $(document).ready(function (){
       }
     });
   }
-
+  function init_highchart () {
+    Highcharts.setOptions({
+      lang: {
+        numericSymbols: gon.numericSymbols
+      },
+      colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
+      credits: {
+        enabled: true,
+        href: gon.url,
+        // position: undefined
+        // style: undefined
+        text: gon.app_name
+      }
+    });
+    (function(H) { // for highchart to recognize maxPointWidth property
+        var each = H.each;
+        H.wrap(H.seriesTypes.column.prototype, 'drawPoints', function(proceed) {
+            var series = this;
+            if(series.data.length > 0 ){
+                var width = series.barW > series.options.maxPointWidth ? series.options.maxPointWidth : series.barW;
+                each(this.data, function(point) {
+                    point.shapeArgs.x += (point.shapeArgs.width - width) / 2;
+                    point.shapeArgs.width = width;
+                });
+            }
+            proceed.call(this);
+        })
+    })(Highcharts);
+  }
 
   // dev block
   // filter_extended.find(".filter-toggle").trigger("click");
   // filter_extended.find(".filter-input:nth-of-type(3) .toggle").trigger("click");
-
+  (function init() {
+    init_highchart();
+    bind();
+    is_type_donation = gon.is_donation;
+    filter();
+  })();
 });
 
