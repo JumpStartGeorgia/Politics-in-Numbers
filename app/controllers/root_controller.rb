@@ -88,7 +88,7 @@ class RootController < ApplicationController
 
     else
 
-      dt = is_finance ? Dataset.explore(finance_pars, true) : Donor.explore(donation_pars, true)
+      dt = is_finance ? Dataset.explore(finance_pars, true) : Donor.explore(donation_pars, "table")
 
       csv_file = CSV.generate do |csv|
         if is_donation
@@ -196,38 +196,41 @@ class RootController < ApplicationController
   # show the embed chart if the id was provided and can be decoded and parsed into hash
   # id - base64 encoded string of a hash of parameters
   def embed
+    @missing = false
+    pars = embed_params
+    @w = pars[:width]
+    @h = pars[:height]
+    @w = 640 if @w.blank?
+    @h = 360 if @h.blank?
+    tp = pars[:type] # if type is not defined than show empty or default
+    gon.tp = tp
+    # 1280  720; 853 480; 640 360; 560 315
+    @fltr = pars[:filter]
 
-    # @highlight_data = get_highlight_data(params[:id])
-    # puts @highlight_data.inspect
-    # if !@highlight_data[:error]
-    # puts "here"
-    #   # save the js data into gon
-    #   gon.highlight_data = {}
-    #   gon.highlight_data[@highlight_data[:highlight_id].to_s] = @highlight_data[:js]
+    if @fltr.present? && ["finance", "donation"].index(@fltr).present?
+      is_finance = @fltr == "finance"
+      is_donation = !is_finance
 
-    #   set_gon_highcharts
+      @button_state = ['', '']
+      @button_state[is_finance ? 1 : 0] = ' active'
 
-    #   gon.update_page_title = true
+      dt = []
 
-    #   gon.get_highlight_desc_link = highlights_get_description_path
-    #   gon.powered_by_link = @xtraktr_url
-    #   gon.powered_by_text = I18n.t('app.common.powered_by_xtraktr')
-    #   gon.powered_by_title = I18n.t('app.common.powered_by_xtraktr_title')
+      gon.url = root_url
+      gon.app_name = "pins.ge"
+      gon.numericSymbols = t('shared.common.numericSymbols')
 
-    #   gon.visual_type = @highlight_data[:visual_type]
-    #   if @highlight_data[:visual_type] != Highlight::VISUAL_TYPES[:map] # if the visual is a chart, include the highcharts file
-    #     @js.push('highcharts.js')
-    #   elsif @highlight_data[:visual_type] == Highlight::VISUAL_TYPES[:map] # if the visual is a map, include the highmaps file
-    #     @js.push('highcharts.js', 'highcharts-map.js')
+      gon.is_donation = is_donation
 
-    #     if @highlight_data[:type] == 'dataset'
-    #       @shapes_url = Dataset.shape_file_url(@highlight_data[:id]) # have to get the shape file url for this dataset
-    #     end
-    #   end
-    #   @js.push('highcharts-exporting.js')
-    # end
+      gon.data = is_donation ? Donor.explore(pars, tp) : Dataset.explore(pars)
+
+      pars.delete(:locale)
+    else
+      @missing = true
+    end
+
     respond_to do |format|
-      format.html # index.html.erb
+      format.html { render :layout => 'embed' }
     end
   # end
   end
@@ -324,6 +327,9 @@ class RootController < ApplicationController
     end
     def download_params
       params.permit([:filter, :locale, :format, :type, period: [], party: [], ids: []])
+    end
+    def embed_params
+      params.permit([:filter, :type, :width, :height, :monetary, :multiple, :nature, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
     end
 end
 

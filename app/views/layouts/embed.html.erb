@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>">
   <head>
-    <%#= render :partial => 'layouts/head', locals: {main_css: 'embed_layout'} %>
+    <%= include_gon %>
+    <%= stylesheet_link_tag  *(@css.present? ? ["embed",@css].flatten : ["embed"]), :media => "all" %>
   </head>
-  <body id="embed">
-
+  <body>
     <%= yield %>
-
-    <%#= render :partial => 'layouts/js', locals: {main_js: 'embed_layout'} %>
-
-    <%#= render :partial => 'layouts/modal' %>
-
+    <%= javascript_include_tag  *(@js.present? ? ["embed", @js].flatten : ["embed"]), :media => "all" %>
   </body>
 </html>

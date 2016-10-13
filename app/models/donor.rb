@@ -168,7 +168,7 @@ class Donor
     ).first
   end
 
-  def self.explore(params, only_table = false)
+  def self.explore(params, type = "all")
     limiter = 5
      # Rails.logger.debug("--------------------------------------------#{}")
     f = {
@@ -404,26 +404,41 @@ class Donor
     chart1_meta_obj[:n] = chart1.size
     chart2_meta_obj[:n] = chart2.size
 
-    {
-      table: {
-        data: table.sort { |x,y| [x[1], x[2]] <=> [y[1], y[2]] },
-        header: [human_attribute_name(:id), human_attribute_name(:name), human_attribute_name(:tin),
-          human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
-          Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
-          Donation.human_attribute_name(:monetary)],
-        classes: ["center", "", "center", "center", "center", "right", "", "center"],
-        total_amount: total_amount,
-        total_donations: total_donations
+
+
+    res = {}
+    if type == "table" || type == "all"
+      res = {
+        table: {
+          data: table.sort { |x,y| [x[1], x[2]] <=> [y[1], y[2]] },
+          header: [human_attribute_name(:id), human_attribute_name(:name), human_attribute_name(:tin),
+            human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
+            Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
+            Donation.human_attribute_name(:monetary)],
+          classes: ["center", "", "center", "center", "center", "right", "", "center"],
+          total_amount: total_amount,
+          total_donations: total_donations
+        }
       }
-    }.merge(only_table ? {} :
-      {
-        chart1: chart1,
-        chart1_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", chart1_meta_obj),
-        chart2: chart2,
-        chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart2_meta_obj),
-        chart_subtitle: chart_subtitle
-      }
-    )
+    end
+    if type == "chart-a" || type == "all"
+      res.merge!({
+          chart1: chart1,
+          chart1_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", chart1_meta_obj)
+        })
+    end
+    if type == "chart-b" || type == "all"
+      res.merge!({
+          chart2: chart2,
+          chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart2_meta_obj)
+        })
+    end
+    if type == "chart-a" || type == "chart-b" || type == "all"
+      res.merge!({
+          chart_subtitle: chart_subtitle
+        })
+    end
+    res
   end
 
   def self.download_filter(params)
