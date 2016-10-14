@@ -1,5 +1,6 @@
 <%- if @missing %>
-  <div class="container not-found" style="width:<%= @w %>px;height:<%= @h %>px;"><span><%= t('shared.msgs.data_not_found') %><br/><%= link_to "pins.ge", root_url %></span></div>
+  <div class="container not-found"><span><%= t('shared.msgs.data_not_found') %></span></div>
 <%- else %>
-  <div id="chart" class="container loader" style="width:<%= @w %>px;height:<%= @h %>px;"></div>
+  <div id="chart" class="container loader"></div>
 <%- end %>
+<%= link_to "pins.ge", root_url, class: 'pins' %>

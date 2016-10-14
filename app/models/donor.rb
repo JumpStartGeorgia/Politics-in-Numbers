@@ -168,7 +168,7 @@ class Donor
     ).first
   end
 
-  def self.explore(params, type = "all")
+  def self.explore(params, type = "a")
     limiter = 5
      # Rails.logger.debug("--------------------------------------------#{}")
     f = {
@@ -211,10 +211,10 @@ class Donor
     data = filter(f).to_a
     # Rails.logger.debug("---------------------------------------#{params}--#{f}")
     # TODO refactor code to remove ambitious code
-    chart1 = []
-    chart2 = []
-    chart1_n = 0
-    chart2_n = 0
+    ca = []
+    cb = []
+    ca_n = 0
+    cb_n = 0
     table = []
     total_amount = 0
     total_donations = 0
@@ -233,90 +233,90 @@ class Donor
     ]
 
 
-# top_5_donors:
+    # top_5_donors:
 
-# Top %{n} [Individual/Organization] Donors
-# [For: Party names, separated by commas]
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
-
-
-#   top_5_parties:
-
-# Top %{n} Parties/Candidates
-# time period
-# Receiving [Monetary/Non-Monetary donation]  [of amount GEL]
-# from [Individual/Organization] Donors who
-# Have donated to multiple parties (only if YES)
+    # Top %{n} [Individual/Organization] Donors
+    # [For: Party names, separated by commas]
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
 
 
-#   top_5_donors_for_party:
-# Top %{n} Donors for %{obj}
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
+    #   top_5_parties:
 
-# last_5_donations_for_party:
-# Last %{n} Donations for %{obj}
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
+    # Top %{n} Parties/Candidates
+    # time period
+    # Receiving [Monetary/Non-Monetary donation]  [of amount GEL]
+    # from [Individual/Organization] Donors who
+    # Have donated to multiple parties (only if YES)
 
 
+    #   top_5_donors_for_party:
+    # Top %{n} Donors for %{obj}
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
 
-# top_5_donors_for_parties:
-
-# Top %{n} Donors [For: Party names, separated by commas]
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
-
-
-#  total_donations_for_parties:
-# Total Donations [For: Party names, separated by commas]
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
+    # last_5_donations_for_party:
+    # Last %{n} Donations for %{obj}
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
 
 
-#   last_5_donations_for_donor:
 
-# Last %{n} Donations [for Donor Name]
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
+    # top_5_donors_for_parties:
 
-
-#  top_5_parties_donated_to:
-# Top %{n} Parties Donated to by %{obj}
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
+    # Top %{n} Donors [For: Party names, separated by commas]
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
 
 
-#  total_donations_for_each_donor:
+    #  total_donations_for_parties:
+    # Total Donations [For: Party names, separated by commas]
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
 
-# Total Donations for [For: Donor names, separated by commas]
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
+
+    #   last_5_donations_for_donor:
+
+    # Last %{n} Donations [for Donor Name]
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
 
 
-#  donors_donations_sorted_by_amount:
-# Top Donations by %{obj} to %{objb}
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
+    #  top_5_parties_donated_to:
+    # Top %{n} Parties Donated to by %{obj}
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
 
-#  parties_donations_sorted_by_amount:
-# Top Donations to %{objb} by %{obj}
-# time period
-# Have donated to multiple parties (only if YES)
-# [Monetary/Non-Monetary donation]  [of amount GEL]
 
-    chart1_meta_obj = { n: 0, obj: nil, objb: nil }
-    chart2_meta_obj = { n: 0, obj: nil, objb: nil }
+    #  total_donations_for_each_donor:
+
+    # Total Donations for [For: Donor names, separated by commas]
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
+
+
+    #  donors_donations_sorted_by_amount:
+    # Top Donations by %{obj} to %{objb}
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
+
+    #  parties_donations_sorted_by_amount:
+    # Top Donations to %{objb} by %{obj}
+    # time period
+    # Have donated to multiple parties (only if YES)
+    # [Monetary/Non-Monetary donation]  [of amount GEL]
+
+    ca_meta_obj = { n: 0, obj: nil, objb: nil }
+    cb_meta_obj = { n: 0, obj: nil, objb: nil }
 
     ds = f[:donor_ids].nil? ? 0 : f[:donor_ids].length
     ps = f[:parties].nil? ? 0 : f[:parties].length
@@ -363,51 +363,51 @@ class Donor
 
     if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
 
-      chart1 = pull_n(data, limiter, :donated_amount, "shared.chart.label.donors")
-      chart2 = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, "shared.chart.label.parties")
+      ca = pull_n(data, limiter, :donated_amount, "shared.chart.label.donors")
+      cb = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, "shared.chart.label.parties")
 
     elsif chart_type == 1 # If select 1 party -> top 5 donors for party, last 5 donations for party
 
-      chart1_meta_obj[:obj], chart2_meta_obj[:obj] = parties[BSON::ObjectId(f[:parties][0])][:name]
-      chart1 = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donors")
-      chart2 = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
+      ca_meta_obj[:obj], cb_meta_obj[:obj] = parties[BSON::ObjectId(f[:parties][0])][:name]
+      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donors")
+      cb = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
 
     elsif chart_type == 2 || chart_type == 4 # If select > 1 party -> top 5 donors for parties, total donations for selected parties
       # If select > 1 donor-> total donations for each donor, top 5 parties donated to
 
-      chart1 = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.#{chart_type == 2 ? 'donors' : 'donations'}")
-      chart2 = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.#{chart_type == 2 ? 'donations' : 'parties'}")
+      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.#{chart_type == 2 ? 'donors' : 'donations'}")
+      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.#{chart_type == 2 ? 'donations' : 'parties'}")
 
-      chart1_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ") if chart_type == 4
-      chart2_meta_obj[:obj] = chart2.map{|m| m[0] }.join(", ") if chart_type == 4
+      ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ") if chart_type == 4
+      cb_meta_obj[:obj] = cb.map{|m| m[0] }.join(", ") if chart_type == 4
 
     elsif chart_type == 3 # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
 
-      chart1 = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
-      chart2 = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.parties")
+      ca = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
+      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.parties")
 
-      chart1_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ")
-      chart2_meta_obj[:obj] = chart2.map{|m| m[0] }.join(", ")
+      ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ")
+      cb_meta_obj[:obj] = cb.map{|m| m[0] }.join(", ")
 
     elsif chart_type == 5 # show selected donors sorted by who donated most and show selected parties sorted by who received most
 
-      chart1 = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donations")
-      chart2 = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, "shared.chart.label.donations")
+      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donations")
+      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, "shared.chart.label.donations")
 
-      chart1_meta_obj[:obj] = chart1.map{|m| m[0] }.join(", ")
-      chart1_meta_obj[:objb] = chart2.map{|m| m[0] }.join(", ")
+      ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ")
+      ca_meta_obj[:objb] = cb.map{|m| m[0] }.join(", ")
 
-      chart2_meta_obj[:obj] = chart2.map{|m| m[0] }.join(", ")
-      chart2_meta_obj[:objb] = chart1.map{|m| m[0] }.join(", ")
+      cb_meta_obj[:obj] = cb.map{|m| m[0] }.join(", ")
+      cb_meta_obj[:objb] = ca.map{|m| m[0] }.join(", ")
 
     end
-    chart1_meta_obj[:n] = chart1.size
-    chart2_meta_obj[:n] = chart2.size
+    ca_meta_obj[:n] = ca.size
+    cb_meta_obj[:n] = cb.size
 
 
 
     res = {}
-    if type == "table" || type == "all"
+    if type == "t" || type == "a"
       res = {
         table: {
           data: table.sort { |x,y| [x[1], x[2]] <=> [y[1], y[2]] },
@@ -421,19 +421,19 @@ class Donor
         }
       }
     end
-    if type == "chart-a" || type == "all"
+    if type == "ca" || type == "a" # a - all
       res.merge!({
-          chart1: chart1,
-          chart1_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", chart1_meta_obj)
+          ca: ca,
+          ca_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", ca_meta_obj)
         })
     end
-    if type == "chart-b" || type == "all"
+    if type == "cb" || type == "a"
       res.merge!({
-          chart2: chart2,
-          chart2_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", chart2_meta_obj)
+          cb: cb,
+          cb_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", cb_meta_obj)
         })
     end
-    if type == "chart-a" || type == "chart-b" || type == "all"
+    if type == "ca" || type == "cb" || type == "a"
       res.merge!({
           chart_subtitle: chart_subtitle
         })

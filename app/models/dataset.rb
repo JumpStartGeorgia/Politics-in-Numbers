@@ -130,7 +130,7 @@ class Dataset
      })
     collection.aggregate(options)
   end
-  def self.explore(params, only_table = false)
+  def self.explore(params, type = "a")
     limiter = 5
 
     f = { }
@@ -193,7 +193,7 @@ class Dataset
 
     chart_type = cs == 1 ? 0 : ( main_categories_count == 1 ? 1 : 2 )
 
-    chart1 = []
+    ca = []
     table = []
     # total_amount = 0
     # total_donations = 0
@@ -202,8 +202,8 @@ class Dataset
     # recent_donations = []
     parties_list = {}
     period_list = {}
-    chart1 = []
-    chart1_categories = []
+    ca = []
+    ca_categories = []
 
 
     # collect data
@@ -319,13 +319,13 @@ class Dataset
     classes = [nil]
     # prepaire data for charts
     if chart_type == 0 # one category
-      chart1 = parties_list.map{|k,v|
+      ca = parties_list.map{|k,v|
         table << ( [v[:name]] + v[:data] ) # data for table
         { name: v[:name], data: v[:data] } # data for chart
       }
 
       period_list.each_with_index{|e, i|
-        chart1_categories << e[:name] # chart categories (years)
+        ca_categories << e[:name] # chart categories (years)
         headers[0] << nil # table header first row
         headers[1] << e[:name] # table header second row
         header_classes[0] << nil # table header class first row
@@ -339,13 +339,13 @@ class Dataset
 
       selected_categories.each_with_index{|cat, cat_i|
 
-        chart1.push({
+        ca.push({
           name: categories[cat][:title],
           data: []
         });
         period_list.each { |per|
           parties_list.each{ |k,v|
-            chart1[cat_i][:data] << category_period_party[cat][per[:id]][BSON.ObjectId(k)]
+            ca[cat_i][:data] << category_period_party[cat][per[:id]][BSON.ObjectId(k)]
           }
         }
       }
@@ -368,7 +368,7 @@ class Dataset
         parties_list.each{ |k,v|
           item[:categories].push(v[:name])
         }
-        chart1_categories.push(item)
+        ca_categories.push(item)
 
 
         selected_categories.each{|cat|
@@ -388,14 +388,14 @@ class Dataset
          # Rails.logger.debug("-------------------------------#{main_categories}---------#{cat_k}----#{cat_v}")
         tmp = cat_v.map{ |m| categories[m][:title] }.join(", ")
 
-        chart1.push({
+        ca.push({
           name: tmp,
           data: []
         });
 
         period_list.each { |per|
           parties_list.each{ |k,v|
-            chart1[cat_i][:data] << category_grouped_period_party[cat_k][per[:id]][k]
+            ca[cat_i][:data] << category_grouped_period_party[cat_k][per[:id]][k]
           }
         }
         cat_i += 1
@@ -419,7 +419,7 @@ class Dataset
         parties_list.each{ |k,v|
           item[:categories].push(v[:name])
         }
-        chart1_categories.push(item)
+        ca_categories.push(item)
 
         main_categories.each{|cat_k, cat_v|
           headers[0] << nil # table header first row
@@ -434,24 +434,31 @@ class Dataset
 
     end
 
-    # returned data
-    {
-      table: {
-        data: table,
-        header: headers,
-        header_classes: header_classes,
-        classes: classes
+
+
+
+    res = {}
+    if type == "t" || type == "a"
+      res = {
+        table: {
+          data: table,
+          header: headers,
+          header_classes: header_classes,
+          classes: classes
+        }
       }
-    }.merge(only_table ? {} :
-      {
-        chart1: {
-          categories: chart1_categories,
-          series: chart1,
-          title: chart_title
+    end
+    if type == "ca" || type == "a" # a - all
+      res.merge!({
+        ca: {
+            categories: ca_categories,
+            series: ca,
+            title: chart_title
         },
         pars: params
-      }
-    )
+      })
+    end
+    res
   end
   def self.download_filter(params)
 

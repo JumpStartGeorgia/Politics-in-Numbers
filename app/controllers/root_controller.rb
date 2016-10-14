@@ -88,7 +88,7 @@ class RootController < ApplicationController
 
     else
 
-      dt = is_finance ? Dataset.explore(finance_pars, true) : Donor.explore(donation_pars, "table")
+      dt = is_finance ? Dataset.explore(finance_pars, "t") : Donor.explore(donation_pars, "t")
 
       csv_file = CSV.generate do |csv|
         if is_donation
@@ -196,14 +196,13 @@ class RootController < ApplicationController
   # show the embed chart if the id was provided and can be decoded and parsed into hash
   # id - base64 encoded string of a hash of parameters
   def embed
-    @missing = false
+    @missing = true
     pars = embed_params
-    @w = pars[:width]
-    @h = pars[:height]
-    @w = 640 if @w.blank?
-    @h = 360 if @h.blank?
+    # @w = pars[:width]
+    # @h = pars[:height]
+    # @w = 640 if @w.blank?
+    # @h = 360 if @h.blank?
     tp = pars[:type] # if type is not defined than show empty or default
-    gon.tp = tp
     # 1280  720; 853 480; 640 360; 560 315
     @fltr = pars[:filter]
 
@@ -211,22 +210,26 @@ class RootController < ApplicationController
       is_finance = @fltr == "finance"
       is_donation = !is_finance
 
-      @button_state = ['', '']
-      @button_state[is_finance ? 1 : 0] = ' active'
+      if (is_finance ? ["ca", "t"] : ["ca", "cb", "t"]).index(tp).present?
+        gon.tp = tp
+        @button_state = ['', '']
+        @button_state[is_finance ? 1 : 0] = ' active'
 
-      dt = []
+        dt = []
 
-      gon.url = root_url
-      gon.app_name = "pins.ge"
-      gon.numericSymbols = t('shared.common.numericSymbols')
+        gon.url = root_url
+        gon.app_name = "pins.ge"
+        gon.search = t('root.explore.search')
+        gon.table_length = t('root.explore.table_length')
+        gon.numericSymbols = t('shared.common.numericSymbols')
 
-      gon.is_donation = is_donation
+        gon.is_donation = is_donation
 
-      gon.data = is_donation ? Donor.explore(pars, tp) : Dataset.explore(pars)
+        gon.data = is_donation ? Donor.explore(pars, tp) : Dataset.explore(pars, tp)
 
-      pars.delete(:locale)
-    else
-      @missing = true
+        pars.delete(:locale)
+        @missing = false
+      end
     end
 
     respond_to do |format|
@@ -234,7 +237,11 @@ class RootController < ApplicationController
     end
   # end
   end
-
+  def embed_test
+    respond_to do |format|
+      format.html { render :layout => false }
+    end
+  end
   def share
     pars = share_params
     @return_url = pars[:return_url]

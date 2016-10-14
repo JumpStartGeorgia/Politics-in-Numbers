@@ -2,14 +2,13 @@
 //= require jquery_ujs
 //= require dataTables/jquery.dataTables
 //= require dataTables/extras/dataTables.responsive
+//= require dataTables.pagination.js
 //= require jquery-ui/tooltip
 //= require highcharts
 
 
-/* global $ */
-console.log("embed js");
+/* global $ gon */
 
-var dn;
 $(document).ready(function (){
   // console.log("explore ready");
   var js = {
@@ -104,28 +103,21 @@ $(document).ready(function (){
     var data = gon.data;
     console.log(data, gon.tp);
     if(data) {
-      if(gon.is_donation) {
-        if(gon.tp === "chart-a") {
-          bar_chart(data.chart1, data.chart1_title, data.chart_subtitle, "#EBE187");
-        }
-        else if(gon.tp === "chart-b") {
-          bar_chart(data.chart2, data.chart2_title, data.chart_subtitle, "#B8E8AD");
-
-        }
-        else if(gon.tp === "table") {
-          render_table("donation", data.table);
-        }
+      if(gon.tp === "t") {
+        render_table(data.table);
       }
       else {
-        if(gon.tp === "chart") {
-          grouped_advanced_column_chart(data.chart1, "#fff");
-
+        if(gon.is_donation) {
+          if(gon.tp === "ca" || gon.tp === "cb") {
+            bar_chart(data[gon.tp], data[gon.tp + "ca_title"], data.chart_subtitle, "#EBE187");
+          }
         }
-        else if(gon.tp === "table") {
-          render_table(partial, data.table);
-
+        else {
+          if(gon.tp === "ca") {
+            grouped_advanced_column_chart(data.ca, "#fff");
+            //grouped_column_chart("#finance_chart", data.ca, "#fff");
+          }
         }
-        //grouped_column_chart("#finance_chart", data.chart1, "#fff");
       }
     }
     else {
@@ -134,27 +126,28 @@ $(document).ready(function (){
     chart.removeClass("loader");
   }
 
-  function render_table(type, table) {
+  function render_table (table) {
     // console.log("table data", table);
-    if(type === "donation") {
-      var tbl = $("<table>").appendTo(chart);
+    var tbl = $("<table style='width:100%;height:100%;'>").appendTo(chart), dt;
+    if(gon.is_donation) {
+      tbl.addClass("highlighted");
       var prev = undefined, alt_color = true,
         dt = tbl.DataTable({
           responsive: true,
           destroy: true,
           order: [],
           "aaData": table.data,
-          "aoColumns": table.header.map(function (m,i) {
+          "aoColumns": table.header.map(function (m, i) {
             return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
           }),
           "info": false,
           dom: "fltrp",
-          createdRow: function ( row, data, index ) {
+          createdRow: function ( row, data ) {
             if(data[2] !== prev) {
               alt_color = !alt_color;
             }
             if(alt_color) {
-              $(row).addClass('alt');
+              $(row).addClass("alt");
             }
             prev = data[2];
           }
@@ -165,12 +158,13 @@ $(document).ready(function (){
         }
       });
     }
-    else if(type === "finance") {
+    else {
       var table_html = "<thead>", colspan = 0, tmp, klass;
-      table.header.forEach(function(row, row_i) {
+
+      table.header.forEach(function (row, row_i) {
 
         table_html += "<tr>";
-        row.forEach(function(col, col_i) {
+        row.forEach(function (col, col_i) {
           if(col === null) {
             ++colspan;
           }
@@ -190,10 +184,9 @@ $(document).ready(function (){
       });
       table_html += "</thead><tbody>";
 
-
-      table.data.forEach(function(row, row_i) {
+      table.data.forEach(function (row) {
         table_html += "<tr>";
-        row.forEach(function(col, col_i) {
+        row.forEach(function (col, col_i) {
           klass = table.classes[col_i];
           klass = klass !== null ? " class='" + klass + "'" : "";
           table_html += "<td" + klass + ">" + col + "</th>";
@@ -201,24 +194,18 @@ $(document).ready(function (){
         table_html += "</td>";
       });
       table_html += "</tbody>";
-
-      if(typeof finance_datatable !== "undefined") {
-        finance_datatable.destroy();
-      }
-      finance_table.html(table_html);
-      finance_datatable = finance_table.DataTable({
+      tbl.html(table_html);
+      dt = tbl.DataTable({
         destroy: true,
         responsive: true,
-        //"aaData": table.data,
-        // "aoColumns": table.header.map(function(m,i) {
-        //   return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
-        // }),
         "info": false,
-        dom: "Bfltrp"
+        order: [],
+        dom: "fltrp"
+
       });
     }
   }
-  function bar_chart(series_data, title, subtitle, bg) {
+  function bar_chart (series_data, title, subtitle, bg) {
     //console.log("chart", elem, series_data);
     chart.highcharts({
       chart: {
@@ -319,14 +306,14 @@ $(document).ready(function (){
       }
     });
   }
-  function grouped_column_chart(elem, resource, bg) {
+  function grouped_column_chart (resource, bg) {
     console.log("chart", elem, resource);
     chart.highcharts({
       chart: {
           type: 'column',
           backgroundColor: bg,
-          height: 400,
-          width: w > 992 ? (view_content.width()-28)/2 : w - 12,
+          // height: 400,
+          // width: w > 992 ? (view_content.width()-28)/2 : w - 12,
           spacingLeft: 20
       },
       exporting: {
@@ -421,14 +408,14 @@ $(document).ready(function (){
       }
     });
   }
-  function grouped_advanced_column_chart(elem, resource, bg) {
-    console.log(resource);
+  function grouped_advanced_column_chart (resource, bg) {
+    console.log(resource, "advanced");
     chart.highcharts({
       chart: {
           type: 'column',
           backgroundColor: bg,
-          height: 400,
-          width: w > 992 ? (view_content.width()-28)/2 : w - 12
+          // height: 400,
+          // width: w > 992 ? (view_content.width()-28)/2 : w - 12
       },
       exporting: {
         buttons: {
@@ -535,9 +522,10 @@ $(document).ready(function (){
       },
       colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
       credits: {
-        enabled: true,
-        href: gon.url,
-        text: gon.app_name
+        enabled: false
+        // ,
+        // href: gon.url,
+        // text: gon.app_name
       }
     });
     (function(H) { // for highchart to recognize maxPointWidth property

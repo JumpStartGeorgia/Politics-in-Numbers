@@ -1,6 +1,7 @@
 /* global $ */
 /*eslint no-console: "error"*/
 //= require jquery-ui/datepicker
+//= require jquery-ui/dialog
 //= require dataTables.pagination.js
 //= require jquery-ui/tooltip
 var dn;
@@ -897,14 +898,29 @@ $(document).ready(function (){
 
     // bind finance view_as buttons click event
     $(".pane[data-type='finance'] .actions .left > div[data-view-toggle]").on("click", function() {
-      $(".pane[data-type='finance']").attr("data-view-current", $(this).attr("data-view-toggle"));
-      $(".pane[data-type='finance'] .actions .download_list").attr("data-type", $(this).attr("data-view-toggle"));
+      var t = $(this), tp = t.attr("data-view-toggle"), p = t.closest(".actions");
+      $(".pane[data-type='finance']").attr("data-view-current", tp);
+      $(".pane[data-type='finance'] .actions .download_list").attr("data-type", tp);
+      p.find(".embed").attr("data-embed", tp === "chart" ? "f-ca" : "f-t");
+
     });
 
     $(document).tooltip({
       content: function() { return $(this).attr("data-retitle"); },
       items: "text[data-retitle]",
       track: true
+    });
+    $(document).on("click", "[data-embed]", function () {
+      var t = $(this);
+      console.log(t.attr("data-embed"));
+       $( "#embed_template" ).dialog({
+          modal: true,
+          buttons: {
+            Ok: function() {
+              $( this ).dialog( "close" );
+            }
+          }
+        });
     });
   }
 
@@ -948,17 +964,17 @@ $(document).ready(function (){
     }
   }
   function filter_callback(data, partial) {
-    // console.log("filter_callback", data);
+    console.log("filter_callback", data, partial);
     view_not_found.addClass("hidden");
     var is_data_ok = typeof data !== "undefined";
     if(is_data_ok) {
       if(partial === "donation") {
-        bar_chart("#donation_chart_1", data.chart1, data.chart1_title, data.chart_subtitle, "#EBE187");
-        bar_chart("#donation_chart_2", data.chart2, data.chart2_title, data.chart_subtitle, "#B8E8AD");
+        bar_chart("#donation_chart_1", data.ca, data.ca_title, data.chart_subtitle, "#EBE187");
+        bar_chart("#donation_chart_2", data.cb, data.cb_title, data.chart_subtitle, "#B8E8AD");
       }
       else {
-        //grouped_column_chart("#finance_chart", data.chart1, "#fff");
-        grouped_advanced_column_chart("#finance_chart", data.chart1, "#fff");
+        //grouped_column_chart("#finance_chart", data.ca, "#fff");
+        grouped_advanced_column_chart("#finance_chart", data.ca, "#fff");
       }
       render_table(partial, data.table);
     }
@@ -971,6 +987,7 @@ $(document).ready(function (){
   function render_table(type, table) {
     // console.log("table data", table);
     if(type === "donation") {
+      console.log(table);
       donation_total_amount.text(table.total_amount);
       donation_total_donations.text(table.total_donations);
       var prev = undefined, alt_color = true,
