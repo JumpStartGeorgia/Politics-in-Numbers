@@ -404,7 +404,8 @@ class Donor
     ca_meta_obj[:n] = ca.size
     cb_meta_obj[:n] = cb.size
 
-
+    f[:filter] = "donation"
+    sid = ShortUri.explore_uri(f)
 
     res = {}
     if type == "t" || type == "a"
@@ -435,8 +436,9 @@ class Donor
     end
     if type == "ca" || type == "cb" || type == "a"
       res.merge!({
-          chart_subtitle: chart_subtitle
-        })
+        chart_subtitle: chart_subtitle,
+        sid: sid
+      })
     end
     res
   end

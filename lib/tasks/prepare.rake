@@ -27,5 +27,33 @@ namespace :prepare do # WARNING ondeploy
       p.save
     }
   end
+
+  desc "Create sequence collection used by shortener"
+  task :create_sequence_collection => :environment do |t, args|
+    db = Mongoid.default_client
+    db.command({ create: "sequence" })
+  end
+
+  desc "Drop sequence collection used by shortener"
+  task :drop_sequence_collection => :environment do |t, args|
+    db = Mongoid.default_client
+    s = db.command({ listCollections: 1, filter: { name: "sequence" }  })
+    db.command({ drop: "sequence" }) if s.documents[0]["cursor"]["firstBatch"].present?
+    #
+  end
+
+  desc "Create sequence document for explore used by shortener"
+  task :insert_sequence_for_explore => :environment do |t, args|
+    db = Mongoid.default_client
+    db.command({ insert: "sequence", documents: [ { _id: "explore_id", seq: 1000000000000000000 } ] })
+  end
+
+  desc "Recreate sequence collection and document for explore used by shortener"
+  task :resequence_explore => :environment do |t, args|
+    Rake::Task["prepare:drop_sequence_collection"].invoke
+    Rake::Task["prepare:create_sequence_collection"].invoke
+    Rake::Task["prepare:insert_sequence_for_explore"].invoke
+  end
+
   # WARNING call slug generator function for Category, Donor, Party, Period
 end

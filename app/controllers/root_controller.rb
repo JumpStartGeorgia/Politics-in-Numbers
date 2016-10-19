@@ -17,8 +17,18 @@ class RootController < ApplicationController
 
   def explore
     @show_page_title = false
-
     pars = explore_params
+    sid = pars[:id]
+    if sid.present?
+      shr = ShortUri.by_sid(sid)
+      # Rails.logger.debug("------------------------------------------#{shr.inspect}")
+      if shr.present?
+        pars = shr.pars
+         Rails.logger.debug("-----------------------------------------explore shr---#{pars}")
+      else
+        redirect_to explore_path and return
+      end
+    end
     @fltr = pars[:filter]
 
     @categories = Category.non_virtual # required for object explore calls
@@ -115,15 +125,15 @@ class RootController < ApplicationController
   end
 
   def explore_filter
-    res = {}
     pars = explore_filter_params
-
-    if pars[:donation].present?
-      res[:donation] = Donor.explore(pars[:donation])
+    res = {}
+    p = pars[:donation]
+    if p.present?
+      res[:donation] = Donor.explore(p)
     elsif pars[:finance].present?
-      res[:finance] = Dataset.explore(pars[:finance])
+      p = pars[:finance]
+      res[:finance] = Dataset.explore(p)
     end
-
     render :json => res
   end
 
@@ -320,18 +330,50 @@ class RootController < ApplicationController
   #   }
   #   render :json => donors
   # end
+  def img
+     id = params[:id]
 
+
+    require 'net/http'
+    uri = URI.parse("http://127.0.0.1:3003/")
+    jsn = File.read("#{Rails.root}/vendor/assets/javascripts/highcharts-export-server/opts.json") #JSON.parse().to_s
+
+
+    headers = {
+      'Content-Type' => 'application/json', #'application/json',
+    #   'Accept'  => '*/*', #'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' #'application/json'#,
+    }
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    #http.set_debug_output $stderr
+    http.request_post(uri.path, jsn.gsub("%text", id), headers) {|response|
+      f = File.new("#{Rails.root}/public/system/share/#{I18n.locale}/#{id}.png", 'wb')
+      f << Base64.urlsafe_decode64(response.body)
+      f.close
+    }
+
+    send_file "#{Rails.root}/public/system/share/#{I18n.locale}/#{id}.png",
+       :type => 'image/png', :disposition => 'inline', filename: "#{id}.png"
+  end
   private
     def share_params
       params.permit(:return_url, :locale, {params: []})
     end
     def explore_params
-      params.permit([:filter, :monetary, :multiple, :nature, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
+      params.permit([:id, :filter, :monetary, :multiple, :nature, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
     end
     def explore_filter_params
-      params.permit(:donation => [:monetary, :multiple, :nature, :all, :locale, { donor: [], period: [], amount: [], party: []}],
-        :finance => [:all, :locale, { party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
+      params.permit(:locale, :donation => [:monetary, :multiple, :nature, { donor: [], period: [], amount: [], party: []}],
+        :finance => [{ party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
     end
+
+    # def explore_params_by_type(prs, tp)
+    #   pars = ActionController::Parameters.new(prs)
+
+    #   tp == "d" ? prs.permit(:monetary, :multiple, :nature, { donor: [], period: [], amount: [], party: []})
+    #     : prs.permit({ party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  })
+    # end
+
     def download_params
       params.permit([:filter, :locale, :format, :type, period: [], party: [], ids: []])
     end

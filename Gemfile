@@ -91,6 +91,8 @@ gem 'gon'
 
 gem "daemons"
 
+gem "base58"
+
 group :development do
   # Silences assets-related logging
   gem 'quiet_assets', '~> 1.0.3'

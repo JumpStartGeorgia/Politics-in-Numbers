@@ -434,8 +434,8 @@ class Dataset
 
     end
 
-
-
+    f[:filter] = "finance"
+    sid = ShortUri.explore_uri(f)
 
     res = {}
     if type == "t" || type == "a"
@@ -455,7 +455,7 @@ class Dataset
             series: ca,
             title: chart_title
         },
-        pars: params
+        sid: sid
       })
     end
     res

@@ -1,7 +1,7 @@
 /* global $ */
 /*eslint no-console: "error"*/
 //= require jquery-ui/datepicker
-//= require jquery-ui/dialog
+//= require embed_dialog
 //= require dataTables.pagination.js
 //= require jquery-ui/tooltip
 var dn;
@@ -288,7 +288,7 @@ $(document).ready(function (){
             }
           });
         });
-        return Object.keys(t.data).length ? t.data : { "all": true };
+        return Object.keys(t.data).length ? t.data : {}; // { "all": true };
       },
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
@@ -910,17 +910,9 @@ $(document).ready(function (){
       items: "text[data-retitle]",
       track: true
     });
+
     $(document).on("click", "[data-embed]", function () {
-      var t = $(this);
-      console.log(t.attr("data-embed"));
-       $( "#embed_template" ).dialog({
-          modal: true,
-          buttons: {
-            Ok: function() {
-              $( this ).dialog( "close" );
-            }
-          }
-        });
+      embed_dialog.open("embed", $(this).attr("data-embed"));
     });
   }
 
@@ -953,6 +945,7 @@ $(document).ready(function (){
           data: filters,
           success: function(data) {
             js.cache[_id] = data[obj.name];
+            console.log("explore_filter", data);
             if(data.hasOwnProperty("donation")) { filter_callback(data.donation, "donation"); }
             if(data.hasOwnProperty("finance")) { filter_callback(data.finance, "finance"); }
           }

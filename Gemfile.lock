@@ -53,6 +53,7 @@ GEM
       execjs
       json
     awesome_print (1.6.1)
+    base58 (0.1.0)
     bcrypt (3.1.10)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
@@ -390,6 +391,7 @@ PLATFORMS
 
 DEPENDENCIES
   awesome_print (~> 1.6, >= 1.6.1)
+  base58
   bootstrap-sass (~> 3.3.5)
   brakeman (~> 3.0.5)
   bullet (~> 5.1.0)

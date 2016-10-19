@@ -1,0 +1,296 @@
+dialog {
+  display:none;
+  background-color:transparent;
+  position:fixed;
+  top:0;
+  right:0;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:100%;
+  padding:0;
+  border:0;
+  margin:0;
+  z-index:99;
+  font: 14px firasans_l;
+  color: #5D675B;
+}
+dialog.active {
+  display:inline-block;
+}
+dialog .bg {
+  width:100%;
+  height:100%;
+  /*background-color:rgba(0,0,0,.35);*/
+  background-color: #343477;
+  opacity:.35;
+  z-index:100;
+}
+dialog section {
+  display:none;
+  background-color: #fff;
+  width: auto;
+  min-width:360px;
+  min-height:200px;
+  height: auto;
+
+  border:1px solid #d8d8d8;
+  position:absolute;
+  // top:50%;
+  // left:50%;
+  // -webkit-font-smoothing: antialiased;
+  // transform:translate3d( 0, 0, 0);
+  // -webkit-transform: perspective(1px) translate3d(-50%,-50%,0) !important;
+  // transform: perspective(1px) translate3d(-50%,-50%,0) !important;
+  // transform:translate(-50%, -50%);
+  z-index:101;
+  max-height: 100%;
+  overflow-y: auto;
+}
+dialog section.active {
+  display:flex;
+  flex-direction:column
+}
+dialog section .caption {
+  font: 20px firasans_book;
+  padding:10px 20px 9px 16px;
+  border-bottom: 1px dashed #a9afa8;
+}
+/*dialog section .sp {
+  padding: 0 20px 0 10px;
+}*/
+/*dialog section .sp:after {
+  display: block;
+  content: "";
+  width: 100%;
+  height: 1px;
+  background-color: #d8d8d8;
+}*/
+dialog section .content {
+  padding:20px 20px 19px 16px;
+  max-width:768px;
+  height:100%;
+}
+dialog section > div {
+  flex:1;
+}
+dialog section .button {
+  text-align: center;
+  padding: 8px;
+  align-self: center;
+}
+dialog {
+  textarea {
+    font:12px firasans_r;
+    color:#5D675B;
+    background-color:#fff;
+    padding:6px 10px;
+    border:1px solid #F78E69;
+    outline:none;
+    width:100%;
+    resize: none;
+  }
+  select {
+    font:12px firasans_r;
+    color:#5D675B;
+    background-color:#fff;
+    padding:6px 10px;
+    border:1px solid #F78E69;
+    outline:none;
+    height:31px;
+  }
+  button {
+    display: block;
+    font: 14px firasans_b;
+    color: #5D675B;
+    background-color: #fff;
+    border: 1px solid #C5CEC2;
+    padding: 8px 18px;
+    margin: 0px auto;
+    &:hover, &:focus {
+      color: #5D675B;
+    }
+  }
+  input {
+    font:12px firasans_r;
+    color:#5D675B;
+    background-color:#fff;
+    padding:6px 10px;
+    border:1px solid #F78E69;
+    outline:none;
+    height:31px;
+    width:60px;
+    &.datepicker {
+      max-width:100px;
+    }
+    &[type='checkbox'] {
+      width:auto;
+    }
+    &[type='checkbox'] {
+      border:1px solid #F78E69;
+      border-radius:0;
+    }
+  }
+}
+
+.dialog-embed {
+  .content {
+    > label {
+      display: block;
+      padding-bottom: 6px;
+    }
+  }
+  .embed-size {
+    margin-top:10px;
+  }
+  .iframe-custom {
+    display:inline-block;
+  }
+  .copied {
+    display:none;
+    text-align: right;
+  }
+}
+/*dialog section .button button:hover,
+dialog section .button button:focus {
+  background-color: #b7b7b7;
+  cursor:pointer;
+}*/
+
+/* dialog-room
+.dialog-room .content button {
+  display:block;
+  background-color:#8080B3;
+  color:#fff;
+  width:60%;
+  margin:0 auto;
+  vertical-align: top;
+}
+.dialog-room .content span {
+  font:16px Arial;
+  color:#343477;
+  padding: 6px 0;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+}
+.dialog-room .content .field {
+  position:relative;
+  text-align:center;
+
+}
+.dialog-room .content .field input {
+
+  width:60%;
+  max-width:60%;
+}
+.dialog-room .content .field.valid:before {
+  content:"";
+  display:inline-block;
+  position:absolute;
+  right:0;
+  background:transparent url(../images/valid.svg) no-repeat center/32px;
+  width:32px;
+  height:32px;
+  padding-right:10px;
+}
+.dialog-room .content .field.invalid:before {
+  content:"";
+  display:inline-block;
+  position:absolute;
+  right:0;
+  background:transparent url(../images/invalid.svg) no-repeat center/32px;
+  width:32px;
+  height:32px;
+  padding-right:10px;
+}
+.dialog-user .content .field {
+  display:block;
+  width:100%;
+  text-align:center;
+  margin:30px 0;
+}
+
+.dialog-user .content .field.field-chip input,
+.dialog-user .content .field.field-home input {
+  display:none;
+}
+.dialog-user .content .field.field-chip .wchip {
+  display:inline-block;
+  width:72px;
+  height:72px;
+  background:transparent url(../images/wchip.png) no-repeat center;
+  margin-right:20px;
+}
+.dialog-user .content .field.field-chip .bchip {
+  display:inline-block;
+  width:72px;
+  height:72px;
+  background:transparent url(../images/bchip.png) no-repeat center;
+}
+.dialog-user .content .field.field-chip label {
+  position:relative;
+  opacity:.7;
+}
+.dialog-user .content .field.field-chip label:hover {
+  cursor:pointer;
+  opacity:1;
+}
+.dialog-user .content .field.field-chip input:checked + label {
+  opacity:1;
+}
+.dialog-user .content .field.field-chip input:checked + label:before {
+  display:inline-block;
+  content:"";
+  width:80%;
+  height:80%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  -webkit-box-shadow: 0px 0px 60px 0px rgba(52,52,119,1);
+  -moz-box-shadow: 0px 0px 60px 0px rgba(52,52,119,1);
+  box-shadow: 0px 0px 60px 0px rgba(52,52,119,1);
+  border-radius:100%;
+  z-index:-1;
+}
+
+.dialog-user .content .field.field-home {
+  display: flex;
+  width: 140px;
+  height: 100px;
+  border: 1px solid #8080B3;
+  margin: 0 auto;
+  flex-direction: row;
+}
+.dialog-user .content .field.field-home .lhome,
+.dialog-user .content .field.field-home .rhome {
+  display:inline-block;
+  width:32px;
+  height:32px;
+  background:transparent url(../images/home.svg) no-repeat center bottom/32px;
+  background-position-y: 90%;
+  opacity:.4;
+  width: 50%;
+  height: 100%;
+  margin-bottom:10px;
+}
+.dialog-user .content .field.field-home label:hover {
+  cursor:pointer;
+  opacity:1;
+  background-color:rgba(128, 128, 179, 0.38);
+}
+.dialog-user .content .field.field-home input:checked + label {
+  opacity:1;
+}
+.dialog-user .content .field.field-home .lhome {
+  border-right:1px dashed #8080B3
+}
+
+
+dialog .content .field.require:after {
+  display:inline-block;
+  content:"*";
+  color:#8080B3;
+
+}*/

@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     end
 
     root 'root#index'
-    get '/explore' => 'root#explore'
+    get '/explore(/:id)' => 'root#explore', as: :explore
     get '/about' => 'root#about'
     get '/media' => 'root#media'
     get '/api' => 'root#api'
@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     get '/embed' => 'root#embed'
     get '/embed_test' => 'root#embed_test'
     get '/share' => 'root#share'
+    get '/img/:id' => 'root#img'
     # get 'select/donors' => 'root#select_donors'
     get 'select/parties' => 'root#select_parties'
     get 'explore_filter' => 'root#explore_filter'

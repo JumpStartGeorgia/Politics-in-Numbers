@@ -222,8 +222,6 @@
           </div>
           <div class="table">
               <div class="actions">
-                <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-                <div class="embed" data-embed="d-t" title="<%= t('.embed_chart') %>"><i></i></div>
                 <a href='<%= "#{@donation_download_link}" %>' id="donation_csv_download" class="download" title="<%= t('.download_table') %>"><i></i></a>
               </div>
             <div id="donation_table">
@@ -264,22 +262,35 @@
     </div>
   </div>
 </div>
-<div id="embed_template" class="embed" title="Embed chart" style="display:none;">
-  <div class="embed-icon"><i class="s i-embed"></i></div>
-  <div class="embed-text">Copy and paste this embed code into your web page:</div>
-  <div class="embed-code">
-  <textarea rows="4" cols="38" data-iframe-link="http://storybuilder.jumpstart.ge/en/embed/cronologiatjrock8016-5" readonly="" onfocus="setTimeout(function (t){ t.select(); }, 10, this);" onmouseup="return false;">&lt;iframe src='http://storybuilder.jumpstart.ge/en/embed/cronologiatjrock8016-5?type=partial' width='350' height='100%' frameborder='0'&gt;&lt;/iframe&gt;</textarea>
-    <div class="embed-type-switcher">
-      <div class="partial selected" title="Embed a link to the story that has the same look as the story links on the home page of StoryBuilder (image, title, author, etc)" data-width="350">Link to Story</div>
-      <div class="full" title="Embed the complete story on another website. We suggest you make the width as large as possible to produce the best look." data-width="1000">Full Story</div>
+<dialog id="embed">
+  <div class="bg"></div>
+  <section class="dialog-embed" data-type="embed">
+    <div class="caption">Embed</div>
+    <div class="content">
+      <label>Copy and paste this embed code into your web page:</label>
+      <textarea rows="4" cols="38" data-iframe-link="<%= embed_url %>" readonly="" onfocus="setTimeout(function (t){ t.select(); copy(t); }, 10, this);" onmouseup="return false;"></textarea>
+      <div class="copied">Copied</div>
+      <div class="embed-size">
+        <label>Frame size:</label>
+        <select class="iframe-sizes">
+          <option value="560x315">560x315</option>
+          <option value="640x360" selected>640x360</option>
+          <option value="853x480">853x480</option>
+          <option value="1280x720">1280x720</option>
+          <option value="custom">Custom size</option>
+        </select>
+        <div class="iframe-custom" style="display:none;">
+          <input type="number" value="640" min="100" step="10" class="iframe-width">
+          <span>×</span>
+          <input type="number" value="360" min="100" step="10" class="iframe-height">
+        </div>
+      </div>
     </div>
-    <div class="embed-size-w">
-      <input type="text" value="350" class="iframe-size">
-      <span>px wide</span>
+    <div class="button">
+      <button type="button" class="dialog-button">Close</button>
     </div>
-
-  </div>
-</div>
+  </section>
+</dialog>
 <% content_for :custom_js,  "explore"  %>
 <% @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "highcharts-grouped-categories.js", "crypto.min.js"
   # Warning uncomment this , "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5554a5643f1d9065"#,
