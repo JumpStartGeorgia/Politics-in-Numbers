@@ -42,7 +42,7 @@ class Party
   end
 
   def permalink
-    slug.present? ? slug : id.to_s
+    id.to_s #slug.present? ? slug : id.to_s
   end
 #scopes
   def self.sorted
@@ -91,6 +91,7 @@ class Party
     name.gsub!("მ.პ. გ ","")
     name.gsub!("პ.გ.","")
     name.gsub!("პ.პ","")
+    name.gsub!("ა.ა.ი.პ.","")
     name.gsub!("ა.ა.ი.პ","")
     name.gsub!("ა(ა)იპ","")
     name.gsub!("- ","")
@@ -104,12 +105,13 @@ class Party
     name.gsub!("საინიციტივო ჯგუფი","")
     name.gsub!("საინციატივო ჯგუფი","")
     name.gsub!("საინიციატივო","")
+    name.gsub!("შვილის","შვილი")
 
     return name.strip
   end
 
-  def self.by_name(party_name)
-    party_name = Party.clean_name(party_name)
+  def self.by_name(party_name, clean_require = true)
+    party_name = Party.clean_name(party_name) if clean_require
     Party.or({ name: party_name }, { title: party_name }).first
   end
 

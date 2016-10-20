@@ -53,7 +53,7 @@ class Period
   end
 
   def permalink
-    slug.present? ? slug : id.to_s
+    id.to_s #slug.present? ? slug : id.to_s
   end
 
   def period_start

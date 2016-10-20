@@ -23,6 +23,11 @@
       return this.replace(r, '');
     };
   }
+  if (!Array.isArray) {
+    Array.isArray = function(arg) {
+      return Object.prototype.toString.call(arg) === '[object Array]';
+    };
+  }
   // if(!Number.prototype.toLocaleString)
   // {
   //   String.prototype.toLocaleString = function(c) {

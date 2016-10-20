@@ -189,6 +189,7 @@ class Job
 
     def _donorset_file_process(item_id, user_id, links)
       begin
+        puts "------------------------------------------------------------------"
         # notifiers = [:user]
         # lg = Delayed::Worker.logger
         lg = Logger.new File.new('log/donorset.log', 'a')
@@ -196,7 +197,7 @@ class Job
           "#{msg}\n"
         end
         @donorset = Donorset.find(item_id)
-        donors = []
+        # donors = []
         @user = User.find(user_id)
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.donorset_not_found"))) if @donorset.nil?
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.operator_not_found"));) if @user.nil?
@@ -204,16 +205,21 @@ class Job
           ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ],
           ["N", "თარიღი", "სახელი/ სამართლებრივი ფორმა", "გვარი / იურიდიული პირის დასახელება", "პირადი ნომერი / საიდ. კოდი", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
         ]
+        ln = headers_map[0].length
+        puts "------------------------1 #{@donorset.source}"
 
-
+        puts "------------------------1--"
         workbook = RubyXL::Parser.parse(@donorset.source.path)
+        puts "------------------------1--2"
         worksheet = workbook[0]
         is_header = true
         missing_parties = []
+        puts "------------------------1.1"
+        st = Time.now
         # raise Exception.new("some")
         worksheet.each_with_index { |row, row_i|
           if row && row.cells
-            cells = Array.new(headers_map[0].length, nil)
+            cells = Array.new(ln, nil)
             row.cells.each_with_index do |c, c_i|
               if c && c.value.present?
                 cells[c_i] = c.value.class != String ? c.value : c.value.to_s.strip
@@ -223,37 +229,38 @@ class Job
               is_header = false if headers_map.any?{|hm| hm == cells }
             else
               break if cells[1].nil?
-              party = cells[6]
-              p = Party.by_name(party)
+              party_name = Party.clean_name(cells[6])
+              p = Party.by_name(party_name, false)
               if p.class != Party
-                clean_name = Party.clean_name(party)
-                missing_parties.each{|mp| (p = mp; break;) if mp.name == clean_name }
+                missing_parties.each{|mp| (p = mp; break;) if mp.name == party_name }
                 if p.class != Party
-                  p = Party.new({ name: [clean_name], title: clean_name, description: "საინიციატივო ჯგუფი #{clean_name}", tmp_id: -99, type: Party.type_is(:initiative) })
+                  p = Party.new({ name: [party_name], title: party_name, description: "საინიციატივო ჯგუფი #{party_name}", tmp_id: -99, type: Party.type_is(:initiative) })
                   if p.valid?
                     missing_parties << p
                   else
-                    raise Exception.new(I18n.t("notifier.job.donorset_file_process.invalid_party_name", name: clean_name, row: row_i))
+                    raise Exception.new(I18n.t("notifier.job.donorset_file_process.invalid_party_name", name: party_name, row: row_i))
                   end
                 end
               end
+              TODO
               donor = Donor.by_tin(cells[4]).first
               if !donor.present?
                 donor = Donor.new({ first_name_translations: { ka: cells[2], en: cells[2].latinize.capitalize }, last_name_translations: { ka: cells[3] }.merge(cells[3].present? ? { en: cells[3].latinize.capitalize } : {}), tin: cells[4], nature: cells[3].present? ? 0 : 1 }) # individual or organization
               end
-              donation = Donation.new({ give_date: cells[1], amount: cells[5].round(2), party_id: p._id, comment: cells[7], monetary: cells[7] != "არაფულადი",
-              donorset_id: @donorset.id })
-              donor.donations << donation
-              donors << donor
-              #@donorset.donations << donor.donations
+              # pss = Donation.new()
+              donor.donations.build(give_date: cells[1], amount: cells[5].round(2), party_id: p._id, comment: cells[7], monetary: cells[7] != "არაფულადი", donorset_id: @donorset.id )
+              donor.save
+              # donors << donor
+              # @donorset.donations << donor.donations
             end
           end
         }
+        puts "------------------------2 #{Time.now-st}"
         if is_header
           raise Exception.new(I18n.t("notifier.job.donorset_file_process.unmatched_header", header: headers_map))
         else
           @donorset.save
-          donors.each{|t| t.save }
+          # donors.each{|t| t.save }
           deffered = nil
           if missing_parties.present?
             missing_parties.each {|mp| mp.save; }
@@ -271,7 +278,7 @@ class Job
             ),
             @user)
         end
-
+        puts "------------------------3"
       rescue Exception => e
         @donorset.destroy if @donorset.present?
         lg.info e.inspect

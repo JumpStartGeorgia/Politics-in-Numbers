@@ -6,7 +6,7 @@ class Donor
 
   before_save :regenerate_fullname
   embeds_many :donations, after_add: :calculate_donated_amount, after_remove: :calculate_donated_amount
-
+  accepts_nested_attributes_for :donations
   NATURE_TYPES = ["individual", "organization"]
 
   field :first_name, type: String, localize: true
@@ -20,7 +20,8 @@ class Donor
 
   slug :full_name, history: true, localize: true
 
-  validates_presence_of :first_name, :last_name, :tin
+  validates_presence_of :first_name
+  # validates_presence_of :tin, :if => :last_name?
 
   scope :by_tin, -> v { where("tin" => v) }
 
@@ -36,7 +37,7 @@ class Donor
   index({_slugs: 1}, { unique: true, sparse: false })
 
   def permalink
-    slug.present? ? slug : id.to_s
+    id.to_s #slug.present? ? slug : id.to_s
   end
 
   def self.get_ids_by_slugs(id_or_slugs)
@@ -51,14 +52,19 @@ class Donor
   end
 
   def calculate_donated_amount(v)
-    self.donated_amount = 0
+    da = 0 # donated amount
     tmp_party_ids = []
     donations.each{ |e|
-      self.donated_amount += e.amount.round(2)
+      da += e.amount.round(2)
       tmp_party_ids.push(e.party_id.to_s)
     }
-    self.multiple = tmp_party_ids.uniq.size > 1
-    save
+    # self.update_attributes!(
+    #   donated_amount: da,
+    #   multiple:
+    # )
+    self.set(donated_amount: da)
+    self.set(multiple: tmp_party_ids.uniq.size > 1)
+    # save
   end
 
   def self.sorted
@@ -81,39 +87,43 @@ class Donor
     matches = []
     conditions = []
 
-    matches.push({ "_id": { "$in": params[:donor_ids].map{|m| BSON::ObjectId(m)} } }) if params[:donor_ids].present?
-    matches.push({ "multiple": { "$eq": params[:multiple] } }) if params[:multiple] == true
+    matches.push({ "_id": { "$in": params[:donor].map{|m| BSON::ObjectId(m)} } }) if params[:donor].present?
+    matches.push({ "multiple": { "$eq": params[:multiple] } }) if params[:multiple].present? && params[:multiple] == true
 
-    if params[:parties].present?
-      tmp = params[:parties].map{|m| BSON::ObjectId(m) }
+    if params[:party].present?
+      tmp = params[:party].map{|m| BSON::ObjectId(m) }
       matches.push({ "donations.party_id": { "$in": tmp } })
       ors = []
       tmp.each{|e| ors.push({ "$eq": ["$$donation.party_id", e ] }) }
       conditions.push({ "$or": ors });
     end
 
-    tmp = params[:period][0]
-    if tmp.present? && tmp != -1
-      matches.push({ "donations.give_date": { "$gte": tmp } })
-      conditions.push({"$gte": [ "$$donation.give_date", tmp ]})
+    if params[:period].present?
+      tmp = params[:period][0]
+      if tmp.present? && tmp != -1
+        matches.push({ "donations.give_date": { "$gte": tmp } })
+        conditions.push({"$gte": [ "$$donation.give_date", tmp ]})
+      end
+
+      tmp = params[:period][1]
+      if tmp.present? && tmp != -1
+        matches.push({ "donations.give_date": { "$lte": tmp } })
+        conditions.push({"$lte": [ "$$donation.give_date", tmp ]})
+      end
     end
 
-    tmp = params[:period][1]
-    if tmp.present? && tmp != -1
-      matches.push({ "donations.give_date": { "$lte": tmp } })
-      conditions.push({"$lte": [ "$$donation.give_date", tmp ]})
-    end
+    if params[:amount].present?
+      tmp = params[:amount][0]
+      if tmp.present? && tmp != -1
+        matches.push({ "donations.amount": { "$gte": tmp } })
+        conditions.push({"$gte": [ "$$donation.amount", tmp ]})
+      end
 
-    tmp = params[:amount][0]
-    if tmp.present? && tmp != -1
-      matches.push({ "donations.amount": { "$gte": tmp } })
-      conditions.push({"$gte": [ "$$donation.amount", tmp ]})
-    end
-
-    tmp = params[:amount][1]
-    if tmp.present? && tmp != -1
-      matches.push({ "donations.amount": { "$lte": tmp } })
-      conditions.push({"$lte": [ "$$donation.amount", tmp ]})
+      tmp = params[:amount][1]
+      if tmp.present? && tmp != -1
+        matches.push({ "donations.amount": { "$lte": tmp } })
+        conditions.push({"$lte": [ "$$donation.amount", tmp ]})
+      end
     end
 
     tmp = params[:monetary]
@@ -123,7 +133,7 @@ class Donor
     end
 
     tmp = params[:nature]
-    matches.push({ "nature": { "$eq": tmp } }) if tmp == 0 || tmp == 1
+    matches.push({ "nature": { "$eq": tmp } }) if tmp.present? && tmp == 0 || tmp == 1
 
     options.push({ "$match": { "$and": matches } }) if !matches.blank?
 
@@ -168,12 +178,12 @@ class Donor
     ).first
   end
 
-  def self.explore(params, type = "a")
+  def self.explore(params, type = "a", inner_pars = false)
     limiter = 5
      # Rails.logger.debug("--------------------------------------------#{}")
-    f = {
-      donor_ids: nil,
-      parties: nil,
+    default_f = {
+      donor: nil,
+      party: nil,
       monetary: nil,
       multiple: nil,
       period: [-1,-1],
@@ -181,33 +191,41 @@ class Donor
       nature: nil
     }
 
-    f[:donor_ids] = Donor.get_ids_by_slugs(params[:donor])
+    if inner_pars
+      f = params
+    else
+      f = default_f.dup
+      f[:donor] = Donor.get_ids_by_slugs(params[:donor])
 
-    # f[:period] = Period.get_ids_by_slugs(params[:period])
+      # f[:period] = Period.get_ids_by_slugs(params[:period])
 
-    tmp = params[:period]
-    f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
-     # Rails.logger.debug("--------------------------------------------#{f[:period]}")
+      tmp = params[:period]
+      f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
+
+      tmp = params[:amount]
+      f[:amount] = tmp.map{|t| t.to_i } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
+
+      f[:party] = Party.get_ids_by_slugs(params[:party])
+
+      tmp = params[:monetary]
+      f[:monetary] = tmp == "true" if tmp == "true" || tmp == "false"
+
+      f[:multiple] = true if params[:multiple] == "true"
+
+      tmp = params[:nature]
+      f[:nature] = tmp == "0" ? 0 : 1 if tmp == "0" || tmp == "1"
+    end
+
+     Rails.logger.debug("--------------------------------------------#{f.inspect}")
     chart_subtitle = ""
-    if f[:period][0] != -1 && f[:period][1] != -1
+    if f[:period].present? && f[:period][0] != -1 && f[:period][1] != -1
       chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
     else
       dte = Donor.date_span
       chart_subtitle = "#{I18n.l(dte[:first_date], format: :date)} - #{I18n.l(dte[:last_date], format: :date)}" if dte.present?
     end
 
-    tmp = params[:amount]
-    f[:amount] = tmp.map{|t| t.to_i } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
 
-    f[:parties] = Party.get_ids_by_slugs(params[:party])
-
-    tmp = params[:monetary]
-    f[:monetary] = tmp == "yes" if tmp == "yes" || tmp == "no"
-
-    f[:multiple] = true if params[:multiple] == "yes"
-
-    tmp = params[:nature]
-    f[:nature] = tmp == "individual" ? 0 : 1 if tmp == "individual" || tmp == "organization"
     data = filter(f).to_a
     # Rails.logger.debug("---------------------------------------#{params}--#{f}")
     # TODO refactor code to remove ambitious code
@@ -318,8 +336,8 @@ class Donor
     ca_meta_obj = { n: 0, obj: nil, objb: nil }
     cb_meta_obj = { n: 0, obj: nil, objb: nil }
 
-    ds = f[:donor_ids].nil? ? 0 : f[:donor_ids].length
-    ps = f[:parties].nil? ? 0 : f[:parties].length
+    ds = f[:donor].nil? ? 0 : f[:donor].length
+    ps = f[:party].nil? ? 0 : f[:party].length
 
     # ds == 0 && ps == 0
     # ds == 0 && ps == 1
@@ -368,7 +386,7 @@ class Donor
 
     elsif chart_type == 1 # If select 1 party -> top 5 donors for party, last 5 donations for party
 
-      ca_meta_obj[:obj], cb_meta_obj[:obj] = parties[BSON::ObjectId(f[:parties][0])][:name]
+      ca_meta_obj[:obj], cb_meta_obj[:obj] = parties[BSON::ObjectId(f[:party][0])][:name]
       ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donors")
       cb = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
 
@@ -404,8 +422,23 @@ class Donor
     ca_meta_obj[:n] = ca.size
     cb_meta_obj[:n] = cb.size
 
-    f[:filter] = "donation"
-    sid = ShortUri.explore_uri(f)
+
+    f.keys.each{|e|
+      if f[e].present?
+        if f[e] == default_f[e]
+          f.delete(e)
+        else
+          if f[e].class == Array
+            f[e].each_with_index{|ee,ii|
+              f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
+            }
+          end
+        end
+      else
+        f.delete(e)
+      end
+    }
+    sid = ShortUri.explore_uri(f.merge({filter: "donation"}))
 
     res = {}
     if type == "t" || type == "a"
@@ -437,7 +470,8 @@ class Donor
     if type == "ca" || type == "cb" || type == "a"
       res.merge!({
         chart_subtitle: chart_subtitle,
-        sid: sid
+        sid: sid,
+        pars: f
       })
     end
     res

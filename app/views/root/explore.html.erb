@@ -86,7 +86,7 @@
             <div class="list hidden"></div>
             <div class="input-group">
               <div class="block">
-                <input type="checkbox" id="donation_multiple_yes" name="donation_multiple" value="yes" data-type="checkbox">
+                <input type="checkbox" id="donation_multiple_yes" name="donation_multiple" value="true" data-type="checkbox">
                 <label for="donation_multiple_yes"><span></span><%= t('._yes') %></label>
               </div>
             </div>
@@ -96,11 +96,11 @@
             <div class="list hidden"></div>
             <div class="input-group">
               <div class="block b1">
-                <input type="radio" id="donation_monetary_yes" name="donation_monetary" value="yes" data-type="radio">
+                <input type="radio" id="donation_monetary_yes" name="donation_monetary" value="true" data-type="radio">
                 <label for="donation_monetary_yes"><span></span><%= t('.monetary') %></label>
               </div>
               <div class="block">
-                <input type="radio"  id="donation_monetary_no" name="donation_monetary" value="no" data-type="radio">
+                <input type="radio"  id="donation_monetary_no" name="donation_monetary" value="false" data-type="radio">
                 <label for="donation_monetary_no"><span></span><%= t('.non_monetary') %></label>
               </div>
             </div>
@@ -111,11 +111,11 @@
             <div class="list hidden"></div>
             <div class="input-group">
               <div class="block b1">
-                <input type="radio" id="donor_nature_individual" name="donor_nature" value="individual" data-type="radio">
+                <input type="radio" id="donor_nature_individual" name="donor_nature" value="0" data-type="radio">
                 <label for="donor_nature_individual"><span></span><%= t('.individual') %></label>
               </div>
               <div class="block">
-                <input type="radio"  id="donor_nature_organization" name="donor_nature" value="organization" data-type="radio">
+                <input type="radio"  id="donor_nature_organization" name="donor_nature" value="1" data-type="radio">
                 <label for="donor_nature_organization"><span></span><%= t('.organization') %></label>
               </div>
             </div>

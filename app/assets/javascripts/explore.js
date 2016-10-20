@@ -234,9 +234,9 @@ $(document).ready(function (){
       data: {},
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, tmp_o, lnk;
-        t.data = {};
+        t.data = { filter: "donation" };;
         Object.keys(this.elem).forEach(function(el){
-          var is_elem = ["period", "amount", "monetary", "nature"].indexOf(el) == -1;
+          var is_elem = ["period", "amount", "monetary", "nature"].indexOf(el) === -1;
 
           (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
             tmp = $(elem);
@@ -288,7 +288,7 @@ $(document).ready(function (){
             }
           });
         });
-        return Object.keys(t.data).length ? t.data : {}; // { "all": true };
+        return t.data;
       },
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
@@ -362,36 +362,40 @@ $(document).ready(function (){
             event.stopPropagation();
         });
       },
-      id: function(v) {
-        var period = [-1, -1], amount = [-1, -1];
-        if(v.hasOwnProperty("period")) {
-          period = v.period;
-        }
-        if(v.hasOwnProperty("amount")) {
-          amount = v.amount;
-        }
-        //console.log(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary,v.multiple].join(";"));
-        return CryptoJS.MD5(["d", v.donor, period.join(";"), amount.join(";"), v.party, v.monetary, v.multiple, v.nature].join(";")).toString();
-      },
-      url: function(v) {
-        var t = this, url = "?", params = [], tmp;
+      id: function() {
 
-        Object.keys(this.elem).forEach(function(el){
-          if(v.hasOwnProperty(el)) {
-            tmp = v[el];
-            if(el !== "monetary" && el !== "multiple" && el !== "nature" && Array.isArray(tmp)) {
-              tmp.forEach(function(r){
-                params.push(el + "[]=" + r);
-              });
-            }
-            else {
-              params.push(el + "=" + tmp);
-            }
-          }
+        var t = this, tmp = [], p, except = ["period", "amount"];
+        Object.keys(t.data).sort().forEach(function (k) {
+          p = t.data[k];
+          p = Array.isArray(p) && except.indexOf(k) === -1 ? p.sort() : [p];
+          tmp.push(k + "=" + p.join(","));
         });
-        window.history.pushState(v, null, window.location.pathname + "?filter=donation" + (params.length ? ("&" + params.join("&")) : ""));
-        t.download.attr("href", window.location.pathname + "?filter=donation&" + (params.length ? (params.join("&") + "&") : "") + "format=csv")
-      }
+        console.log(tmp.join("&"),  CryptoJS.MD5(tmp.join("&")).toString());
+        return CryptoJS.MD5(tmp.join("&")).toString();
+      },
+      url: function (sid) {
+        window.history.pushState(sid, null, gon.path + "/" + sid);
+        this.download.attr("href", gon.path + "/" + sid + "?format=csv")
+      },
+      // url: function(v) {
+      //   var t = this, url = "?", params = [], tmp;
+
+      //   Object.keys(this.elem).forEach(function(el){
+      //     if(v.hasOwnProperty(el)) {
+      //       tmp = v[el];
+      //       if(el !== "monetary" && el !== "multiple" && el !== "nature" && Array.isArray(tmp)) {
+      //         tmp.forEach(function(r){
+      //           params.push(el + "[]=" + r);
+      //         });
+      //       }
+      //       else {
+      //         params.push(el + "=" + tmp);
+      //       }
+      //     }
+      //   });
+      //   window.history.pushState(v, null, gon.path + "?filter=donation" + (params.length ? ("&" + params.join("&")) : ""));
+      //   t.download.attr("href", gon.path + "?filter=donation&" + (params.length ? (params.join("&") + "&") : "") + "format=csv")
+      // }
     },
     finance = {
       name: "finance",
@@ -434,9 +438,9 @@ $(document).ready(function (){
       data: {},
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, lnk;
-        t.data = {};
+        t.data = { filter: "finance" };
         Object.keys(this.elem).forEach(function(el){
-          var is_elem = [].indexOf(el) == -1;
+          var is_elem = [].indexOf(el) === -1;
           (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
             tmp = $(elem);
             tp = tmp.attr("data-type");
@@ -470,7 +474,7 @@ $(document).ready(function (){
           }
         });
         if(!at_least_one) { t.animate(); return null; }
-        return Object.keys(t.data).length ? t.data : { "all": true };
+        return t.data;
       },
       set_by_url: function() {
         var t = this, tmp, tp, v, p, el;
@@ -534,30 +538,38 @@ $(document).ready(function (){
             event.stopPropagation();
         });
       },
-      id: function(v) {
-        var tmp = ["f", v.party];
-        this.categories.forEach(function(d){ tmp.push(v[d]); });
-        tmp.push(v.period);
-        return CryptoJS.MD5(tmp.join(";")).toString();
-      },
-      url: function(v) {
-        var t = this, url = "?", params = [], tmp;
-        // console.log(v);
-        Object.keys(this.elem).forEach(function(el){
-          if(v.hasOwnProperty(el)) {
-            tmp = v[el];
-            if(Array.isArray(tmp)) {
-              tmp.forEach(function(r){
-                params.push(el + "[]=" + r);
-              });
-            }
-            else {
-              params.push(el + "=" + tmp);
-            }
-          }
+      id: function() {
+        var t = this, tmp = [], p;
+        Object.keys(t.data).sort().forEach(function (k) {
+          p = t.data[k];
+          p = Array.isArray(p) ? p.sort() : [p];
+          tmp.push(k + "=" + p.join(","));
         });
-        window.history.pushState(v, null, window.location.pathname + "?filter=finance" + (params.length ? ("&" + params.join("&")) : ""));
-        t.download.attr("href", window.location.pathname + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "") + "format=csv")
+        console.log(tmp.join("&"),  CryptoJS.MD5(tmp.join("&")).toString());
+        return CryptoJS.MD5(tmp.join("&")).toString();
+      },
+      // url: function(v) {
+      //   var t = this, url = "?", params = [], tmp;
+      //   // console.log(v);
+      //   Object.keys(this.elem).forEach(function(el){
+      //     if(v.hasOwnProperty(el)) {
+      //       tmp = v[el];
+      //       if(Array.isArray(tmp)) {
+      //         tmp.forEach(function(r){
+      //           params.push(el + "[]=" + r);
+      //         });
+      //       }
+      //       else {
+      //         params.push(el + "=" + tmp);
+      //       }
+      //     }
+      //   });
+      //   window.history.pushState(v, null, gon.path + "?filter=finance" + (params.length ? ("&" + params.join("&")) : ""));
+      //   t.download.attr("href", gon.path + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "") + "format=csv");
+      // },
+      url: function (sid) {
+        window.history.pushState(sid, null, gon.path + "/" + sid);
+        this.download.attr("href", gon.path + "/" + sid + "?format=csv");
       },
       toggle: function(element, turn_on) {
         //console.log(element, turn_on);
@@ -925,7 +937,7 @@ $(document).ready(function (){
       [donation, finance].forEach( function (obj) {
         obj.set_by_url();
         tmp = obj.get();
-        _id = obj.id(tmp);
+        _id = obj.id();
         js.cache[_id] = gon[obj.name + "_data"];
         filter_callback(js.cache[_id], obj.name);
       });
@@ -933,31 +945,35 @@ $(document).ready(function (){
     } else {
       obj = is_type_donation ? donation : finance;
       tmp = obj.get();
-      _id = obj.id(tmp);
-      obj.url(tmp);
+      _id = obj.id();
+
 
       if(!js.cache.hasOwnProperty(_id)) {
         var filters = {};
+        delete tmp["filter"];
         filters[obj.name] = tmp;
+        console.log("-------------------", _id);
         $.ajax({
           url: "explore_filter",
           dataType: 'json',
           data: filters,
           success: function(data) {
             js.cache[_id] = data[obj.name];
-            console.log("explore_filter", data);
+            obj.url(js.cache[_id].sid);
+            // console.log("explore_filter", data);
             if(data.hasOwnProperty("donation")) { filter_callback(data.donation, "donation"); }
             if(data.hasOwnProperty("finance")) { filter_callback(data.finance, "finance"); }
           }
         });
       }
       else {
+        obj.url(js.cache[_id].sid);
         filter_callback(js.cache[_id], obj.name);
       }
     }
   }
   function filter_callback(data, partial) {
-    console.log("filter_callback", data, partial);
+    //console.log("filter_callback", data, partial);
     view_not_found.addClass("hidden");
     var is_data_ok = typeof data !== "undefined";
     if(is_data_ok) {
@@ -980,7 +996,7 @@ $(document).ready(function (){
   function render_table(type, table) {
     // console.log("table data", table);
     if(type === "donation") {
-      console.log(table);
+      // console.log(table);
       donation_total_amount.text(table.total_amount);
       donation_total_donations.text(table.total_donations);
       var prev = undefined, alt_color = true,
@@ -1267,7 +1283,7 @@ $(document).ready(function (){
     });
   }
   function grouped_advanced_column_chart(elem, resource, bg) {
-    console.log(resource);
+    // console.log("fca", resource);
     $(elem).highcharts({
       chart: {
           type: 'column',

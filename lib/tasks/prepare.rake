@@ -55,5 +55,11 @@ namespace :prepare do # WARNING ondeploy
     Rake::Task["prepare:insert_sequence_for_explore"].invoke
   end
 
+  desc "Truncate ShortUri and recreate explore sequence"
+  task :reset_shorturi => :environment do |t, args|
+    ShortUri.destroy_all
+    Rake::Task["db:mongoid:remove_undefined_indexes"].invoke
+    Rake::Task["prepare:resequence_explore"].invoke
+  end
   # WARNING call slug generator function for Category, Donor, Party, Period
 end

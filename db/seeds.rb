@@ -28,10 +28,10 @@ if destroy_mode
   Category.destroy_all
   puts "  dataset data"
   Dataset.destroy_all
-  puts "  donorset data"
-  Donorset.destroy_all
   puts "  donor data"
   Donor.destroy_all
+  puts "  donorset data"
+  Donorset.destroy_all
   # puts "  role data"
   # Role.destroy_all
   # puts "  user data"
@@ -676,7 +676,7 @@ puts "Creating phase ----------------------"
   I18n.locale = :ka
   parties_data.each_with_index do |d,i|
     party = Party.create!(d)
-    puts "    #{party.name} was added"
+    # puts "    #{party.name} was added"
   end
 
   puts "  Period meta data"
@@ -685,10 +685,10 @@ puts "Creating phase ----------------------"
     d[:end_date] = Date.strptime(d[:end_date], "%d.%m.%Y")
 
     period = Period.create!(d)
-    puts "    #{period.type} #{period.title} was added"
+    # puts "    #{period.type} #{period.title} was added"
   end
 
-  puts "  Party data"
+  puts "  Detail data"
   details_data.each_with_index{ |d,i|
     notes = d.delete(:note)
 
@@ -713,7 +713,7 @@ puts "Creating phase ----------------------"
 
 
     detail.save!
-    puts "Detail #{detail.title} was added"
+    # puts "Detail #{detail.title} was added"
   }
 
   puts "  Category data"
@@ -733,7 +733,7 @@ puts "Creating phase ----------------------"
       end
     }
 
-    puts "    Category '#{cat.title_translations[:en]}' was added"
+    # puts "    Category '#{cat.title_translations[:en]}' was added"
   end
 
   puts "  Virtual Category data"
@@ -741,20 +741,7 @@ puts "Creating phase ----------------------"
     tmp_id = d.delete(:tmp_id)
     cat = Category.create(d)
     virtuals_data.each {|r| r[:parent_id] = cat._id if r[:parent_id] == tmp_id }
-    puts "    Virtual Category '#{d[:title_translations][:en]}' was added" #{d[:virtual_ids].inspect}
- end
+    # puts "    Virtual Category '#{d[:title_translations][:en]}' was added" #{d[:virtual_ids].inspect}
+  end
 
-  # begin
-  #   period.valid?
-  #   puts period.errors.inspect
-  # rescue Exception=>e
-  #   puts e.inspect
-  # end
-# mp = []
-# Period.each {|p| mp << p.id }
-# ln = mp.length
-# r = Random.new
-# Dataset.each{|d|
-#   d.period_id = mp[r.rand(0...ln)]
-#   d.save
-# }
+  puts " --- end --- "

@@ -97,7 +97,7 @@ class Dataset
     matches = []
     conditions = []
 
-    matches.push({ "party_id": { "$in": params[:parties].map{|m| BSON::ObjectId(m)} } }) if params[:parties].present?
+    matches.push({ "party_id": { "$in": params[:party].map{|m| BSON::ObjectId(m)} } }) if params[:party].present?
     matches.push({ "period_id": { "$in": params[:period].map{|m| BSON::ObjectId(m)} } }) if params[:period].present?
 
     cat_ids = []
@@ -130,20 +130,22 @@ class Dataset
      })
     collection.aggregate(options)
   end
-  def self.explore(params, type = "a")
+  def self.explore(params, type = "a", inner_pars = false)
     limiter = 5
 
-    f = { }
-
-    f[:parties] = Party.get_ids_by_slugs(params[:party])
-    f[:period] = Period.get_ids_by_slugs(params[:period])
-
+    if inner_pars
+      f = params
+    else
+      f = { }
+      f[:party] = Party.get_ids_by_slugs(params[:party])
+      f[:period] = Period.get_ids_by_slugs(params[:period])
+    end
     ln = 0
     main_categories_count = 0
     missing_category = true
     SYMS.each { |e|
       if params[e].present?
-        f[e] = Category.get_ids_by_slugs(params[e])
+        f[e] = inner_pars ? params[e].map{|m| BSON::ObjectId(m)} : Category.get_ids_by_slugs(params[e])
         if f[e].present?
           missing_category = false
         else
@@ -152,8 +154,9 @@ class Dataset
       end
     }
     if missing_category
-      f[:income] = [Category.only_sym.where(sym: :income).first._id]
-      params[:income] = [:income]
+      return nil
+      # f[:income] = [Category.only_sym.where(sym: :income).first._id]
+      # params[:income] = [:income]
     end
     data = filter(f).to_a
 
@@ -189,7 +192,7 @@ class Dataset
       end
     }
     cs = ln
-    ps = f[:parties].nil? ? 0 : f[:parties].length
+    ps = f[:party].nil? ? 0 : f[:party].length
 
     chart_type = cs == 1 ? 0 : ( main_categories_count == 1 ? 1 : 2 )
 
@@ -224,7 +227,7 @@ class Dataset
       end
     }
 
-    f[:parties].each { |p_id|
+    f[:party].each { |p_id|
       if !parties_list.key?(BSON::ObjectId(p_id))
         parties_list[p_id] = { name: parties[BSON::ObjectId(p_id)][:name], data: [] }
       end
@@ -297,7 +300,7 @@ class Dataset
       }
     end
 
-    chart_titles[1].concat(f[:parties].map{|m| parties[BSON::ObjectId(m)][:name] }) # grab selected party names
+    chart_titles[1].concat(f[:party].map{|m| parties[BSON::ObjectId(m)][:name] }) # grab selected party names
 
     if f[:period].present? # grab selected period names
 
@@ -434,8 +437,16 @@ class Dataset
 
     end
 
-    f[:filter] = "finance"
-    sid = ShortUri.explore_uri(f)
+    f.keys.each{|e|
+      if f[e].present?
+        f[e].each_with_index{|ee,ii|
+          f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
+        }
+      else
+        f.delete(e)
+      end
+    }
+    sid = ShortUri.explore_uri(f.merge({filter: "finance"}))
 
     res = {}
     if type == "t" || type == "a"
@@ -455,7 +466,8 @@ class Dataset
             series: ca,
             title: chart_title
         },
-        sid: sid
+        sid: sid,
+        pars: f
       })
     end
     res
@@ -467,7 +479,7 @@ class Dataset
     conditions = []
 
     matches.push({ "_id": { "$in": params[:ids].map{|m| BSON::ObjectId(m)} } }) if params[:ids].present?
-    matches.push({ "party_id": { "$in": params[:parties].map{|m| BSON::ObjectId(m)} } }) if params[:parties].present?
+    matches.push({ "party_id": { "$in": params[:party].map{|m| BSON::ObjectId(m)} } }) if params[:party].present?
     matches.push({ "period_id": { "$in": params[:period].map{|m| BSON::ObjectId(m)} } }) if params[:period].present?
 
     matches.push({ "state": { "$eq": 1 } }) # only processed datasets
@@ -488,7 +500,7 @@ class Dataset
 
     f = {}
     f[:ids] = Dataset.clean_ids(params[:ids]) if params[:ids].present?
-    f[:parties] = Party.get_ids_by_slugs(params[:party]) if params[:party].present?
+    f[:party] = Party.get_ids_by_slugs(params[:party]) if params[:party].present?
     f[:period] = Period.get_ids_by_slugs(params[:period]) if params[:period].present?
 
     data = download_filter(f).to_a

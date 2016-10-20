@@ -5,7 +5,7 @@ class ShortUri
   field :sid, type: String # base58 string from nid
   field :nid, type: Integer # sequence id
   field :mid, type: String # md5 string from uri, for ease of comparing
-  field :uri, type: String # raw uri
+  # field :uri, type: String # raw uri
   field :pars, type: Hash, default: {}
   # indexes
   index({ sid: 1 }, { unique: true })
@@ -37,13 +37,16 @@ class ShortUri
     return nil if pars.class != Hash || !pars.present?
 
     tmp = []
+    except = pars[:filter] == "donation" ? ["period", "amount"] : []
     pars.keys.sort.each{ |e|
       p = pars[e]
-      p = p.class == Array ? p.sort : p
-      tmp << "#{e}=#{p}"
+      p = p.class == Array && except.index(e).nil? ? p.sort : [p]
+      tmp << "#{e}=#{p.join(',')}"
     }
-    uri_str = tmp.join("&")
-    mid = Digest::MD5.hexdigest(uri_str)
+    mid = Digest::MD5.hexdigest(tmp.join("&"))
+    Rails.logger.fatal("************************")
+    Rails.logger.fatal("#{mid}")
+    Rails.logger.fatal("#{tmp.join("&")}")
     shr = ShortUri.limit(1).find_by({ mid: mid })
     sid = nil
     if shr.present?
@@ -58,9 +61,9 @@ class ShortUri
       })
       nid = res.documents[0][:value][:seq].to_i
       sid = Base58.encode(nid)
-      ShortUri.create({ sid: sid, nid: nid, mid: mid, uri: uri_str, pars: pars })
+      ShortUri.create({ sid: sid, nid: nid, mid: mid, pars: pars })
     end
-    Rails.logger.debug("----------------------------------------shorter----#{uri_str} #{sid} #{shr.present?}")
+    # Rails.logger.debug("----------------------------------------shorter----#{uri_str} #{sid} #{shr.present?}")
     sid
   end
 end

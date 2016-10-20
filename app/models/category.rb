@@ -63,7 +63,7 @@ class Category
   end
 
   def permalink
-    slug.present? ? slug : id.to_s
+    id.to_s #slug.present? ? slug : id.to_s
   end
 
   def self.full_names(cats, ids)
@@ -83,7 +83,7 @@ class Category
 
 
   def self.main_category_id(cats, id)
-     # Rails.logger.debug("--------------------------------------------#{cats[id].inspect} #{id}")
+     Rails.logger.debug("--------------------------------------------#{cats[id].inspect} #{id}")
     p = cats[id][:parent_id]
     p_id = id
     while(p.present?)

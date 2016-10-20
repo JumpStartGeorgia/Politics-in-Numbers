@@ -18,12 +18,14 @@ class RootController < ApplicationController
   def explore
     @show_page_title = false
     pars = explore_params
+    inner_pars = false
     sid = pars[:id]
     if sid.present?
       shr = ShortUri.by_sid(sid)
       # Rails.logger.debug("------------------------------------------#{shr.inspect}")
       if shr.present?
         pars = shr.pars
+        inner_pars = true
          Rails.logger.debug("-----------------------------------------explore shr---#{pars}")
       else
         redirect_to explore_path and return
@@ -63,6 +65,7 @@ class RootController < ApplicationController
     if !request.format.csv?
 
       gon.url = root_url
+      gon.path = explore_path
       gon.app_name = "pins.ge"
       gon.date_format = t('date.formats.jsdate')
       gon.filter_item_close = t('.filter_item_close')
@@ -82,9 +85,9 @@ class RootController < ApplicationController
       gon.is_donation = is_donation
 
       gon.donation_params = donation_pars
-      gon.donation_data = Donor.explore(donation_pars)
+      gon.donation_data = Donor.explore(donation_pars, "a", inner_pars)
 
-      tmp = Dataset.explore(finance_pars)
+      tmp = Dataset.explore(finance_pars, "a", inner_pars)
       gon.finance_params = tmp.delete(:pars)
       gon.finance_data = tmp
 
@@ -98,7 +101,7 @@ class RootController < ApplicationController
 
     else
 
-      dt = is_finance ? Dataset.explore(finance_pars, "t") : Donor.explore(donation_pars, "t")
+      dt = is_finance ? Dataset.explore(finance_pars, "t", inner_pars) : Donor.explore(donation_pars, "t", inner_pars)
 
       csv_file = CSV.generate do |csv|
         if is_donation
