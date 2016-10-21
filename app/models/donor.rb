@@ -23,12 +23,14 @@ class Donor
   validates_presence_of :first_name
   # validates_presence_of :tin, :if => :last_name?
 
-  scope :by_tin, -> v { where("tin" => v) }
+  # scope :by_tin, -> v { where("tin" => v) }
+  # scope :by_tin, -> v { where("tin" => v) }
+  # scope :by_tin, -> v { where("tin" => v) }
 
   #############################
   # indexes
   index ({ :tin => 1})
-  index ({ :first_name => 1, :last_name => 1})
+  index ({ :first_name => 1, :last_name => 1, :tin => 1 })
   index ({ :multiple => 1})
   index ({ :'donations.party_id' => 1})
   index ({ :'donations.give_data' => 1})
@@ -141,6 +143,8 @@ class Donor
       options.push({
         "$project": {
           name: { "$concat": ["$first_name.#{lang}", " ", "$last_name.#{lang}"] },
+          first_name: "$first_name.#{lang}",
+          last_name: "$last_name.#{lang}",
           tin: 1,
           nature: 1,
           donated_amount: 1,
@@ -356,7 +360,7 @@ class Donor
       e[:donations].each { |ee|
         am = ee[:amount]
         parties[ee[:party_id]][:value] += am if chart_type == 0
-
+        nm = "#{e[:first_name]} #{e[:last_name]}"
 
         if chart_type == 2 || chart_type == 3 || chart_type == 4 || chart_type == 5
           if !parties_list[ee[:party_id]].present?
@@ -365,13 +369,13 @@ class Donor
           parties_list[ee[:party_id]][:value] += am
         end
 
-        recent_donations.push({ date: ee[:give_date], out: { name: e[:name], value: am } }) if chart_type == 1
+        recent_donations.push({ date: ee[:give_date], out: { name: nm, value: am } }) if chart_type == 1
         recent_donations.push({ date: ee[:give_date], out: { name: parties[ee[:party_id]][:name], value: am } }) if chart_type == 3
 
         e[:partial_donated_amount] += am
         total_amount += am
         total_donations += 1
-        table.push(["#{ee[:_id]}", e[:name], e[:tin], nature_values[e[:nature]], I18n.l(ee[:give_date], format: :date), am, parties[ee[:party_id]][:name], monetary_values[ee[:monetary] ? 0 : 1] ])
+        table.push(["#{ee[:_id]}", nm, e[:tin], nature_values[e[:nature]], I18n.l(ee[:give_date], format: :date), am, parties[ee[:party_id]][:name], monetary_values[ee[:monetary] ? 0 : 1] ])
       }
       e[:partial_donated_amount] = e[:partial_donated_amount].round(2)
     }
@@ -439,7 +443,7 @@ class Donor
       end
     }
     sid = ShortUri.explore_uri(f.merge({filter: "donation"}))
-
+     Rails.logger.fatal("fatal----------------------#{table.select{|f| f[1].nil? || f[2].nil? }.map {|m| [m[1], m[2]]}}")
     res = {}
     if type == "t" || type == "a"
       res = {

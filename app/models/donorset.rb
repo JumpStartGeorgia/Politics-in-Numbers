@@ -41,10 +41,7 @@ class Donorset
 
   def set_state(st)
     st = STATES.index(st.to_sym)
-    if st.present?
-      self.state = st
-      self.save
-    end
+    self.set(state: st) if st.present?
   end
 
   def self.has_state(st)

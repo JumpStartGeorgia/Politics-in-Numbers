@@ -40,6 +40,9 @@ class ShortUri
     except = pars[:filter] == "donation" ? ["period", "amount"] : []
     pars.keys.sort.each{ |e|
       p = pars[e]
+      if e == "period"
+        p = p.map{ |m| (m.to_f * 1000).to_i }
+      end
       p = p.class == Array && except.index(e).nil? ? p.sort : [p]
       tmp << "#{e}=#{p.join(',')}"
     }
