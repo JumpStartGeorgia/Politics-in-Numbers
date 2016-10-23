@@ -40,7 +40,7 @@ Rails.application.routes.draw do
     get '/media' => 'root#media'
     get '/api' => 'root#api'
     get '/parties' => 'root#parties'
-    get '/embed' => 'root#embed'
+    get '/embed/:type/:id' => 'root#embed' , as: :embed, :constraints => { :type => /(static|dynamic)/ }, :defaults => { :type => 'dynamic' }
     get '/embed_test' => 'root#embed_test'
     get '/share' => 'root#share'
     get '/img/:id' => 'root#img'

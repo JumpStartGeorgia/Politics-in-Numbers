@@ -139,8 +139,14 @@ dialog {
       display: block;
       padding-bottom: 6px;
     }
+    label {
+      font: 14px firasans_l;
+      color: #5D675B;
+      text-align: left;
+      padding-right: 16px;
+    }
   }
-  .embed-size {
+  .embed-size, .embed-type {
     margin-top:10px;
   }
   .iframe-custom {
@@ -149,6 +155,27 @@ dialog {
   .copied {
     display:none;
     text-align: right;
+  }
+  .embed-type {
+    .toggle-group {
+      display:inline-block;
+      .toggle {
+        display:inline-block;
+        border-left-width:0;
+        border-right-width:0;
+        &:first-of-type {
+          border-left-width:1px;
+        }
+        &:last-of-type {
+          border-right-width:1px;
+        }
+      }
+      &[data-toggle='dynamic'] .toggle[data-toggle='dynamic'],
+      &[data-toggle='static'] .toggle[data-toggle='static'] {
+        background-color: #F78E69;
+        color:#fff;
+      }
+    }
   }
 }
 /*dialog section .button button:hover,

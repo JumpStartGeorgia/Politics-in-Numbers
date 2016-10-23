@@ -215,37 +215,53 @@ class RootController < ApplicationController
   def embed
     @missing = true
     pars = embed_params
+
+    sid = pars[:id]
+    type = pars[:type]
+    chart = pars[:chart]
+
+     Rails.logger.fatal("fatal---------d-------------#{sid}")
+    # 1280  720; 853 480; 640 360; 560 315
     # @w = pars[:width]
     # @h = pars[:height]
     # @w = 640 if @w.blank?
     # @h = 360 if @h.blank?
     tp = pars[:type] # if type is not defined than show empty or default
-    # 1280  720; 853 480; 640 360; 560 315
-    @fltr = pars[:filter]
 
-    if @fltr.present? && ["finance", "donation"].index(@fltr).present?
-      is_finance = @fltr == "finance"
-      is_donation = !is_finance
+    if sid.present?
+      if dynamic find in explore_id from short_url
+      else find in embed_static_id from short_url , initialize it before implementing
+        embedstatic will use explore id as starting point will generate it's own id and than will use chart par to define which chart
+        so embedstatic will save both chart in case of donation
+      shr = ShortUri.by_sid(sid)
 
-      if (is_finance ? ["ca", "t"] : ["ca", "cb", "t"]).index(tp).present?
-        gon.tp = tp
-        @button_state = ['', '']
-        @button_state[is_finance ? 1 : 0] = ' active'
+      if shr.present?
+        pars = shr.pars
 
-        dt = []
+        @fltr = pars[:filter]
 
-        gon.url = root_url
-        gon.app_name = "pins.ge"
-        gon.search = t('root.explore.search')
-        gon.table_length = t('root.explore.table_length')
-        gon.numericSymbols = t('shared.common.numericSymbols')
+        if @fltr.present? && ["finance", "donation"].index(@fltr).present?
+          is_finance = @fltr == "finance"
+          is_donation = !is_finance
 
-        gon.is_donation = is_donation
+          if (is_finance ? ["ca"] : ["ca", "cb"]).index(tp).present?
+            gon.tp = tp
 
-        gon.data = is_donation ? Donor.explore(pars, tp) : Dataset.explore(pars, tp)
+            # gon.app_name = "pins.ge"
+            # gon.search = t('root.explore.search')
+            # gon.table_length = t('root.explore.table_length')
+            # gon.numericSymbols = t('shared.common.numericSymbols')
 
-        pars.delete(:locale)
-        @missing = false
+            gon.is_donation = is_donation
+
+            gon.data = is_donation ? Donor.explore(pars, tp, true) : Dataset.explore(pars, tp, true)
+
+            pars.delete(:locale)
+            pars.delete(:pars)
+
+            @missing = false
+          end
+        end
       end
     end
 
@@ -255,6 +271,7 @@ class RootController < ApplicationController
   # end
   end
   def embed_test
+    @id = params[:id]
     respond_to do |format|
       format.html { render :layout => false }
     end
@@ -385,7 +402,7 @@ class RootController < ApplicationController
       params.permit([:filter, :locale, :format, :type, period: [], party: [], ids: []])
     end
     def embed_params
-      params.permit([:filter, :type, :width, :height, :monetary, :multiple, :nature, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
+      params.permit([:id, :type ]) #, :width, :height, :locale, :format
     end
 end
 

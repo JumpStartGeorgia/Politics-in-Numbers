@@ -934,7 +934,7 @@ $(document).ready(function (){
       var t = $(this), tp = t.attr("data-view-toggle"), p = t.closest(".actions");
       $(".pane[data-type='finance']").attr("data-view-current", tp);
       $(".pane[data-type='finance'] .actions .download_list").attr("data-type", tp);
-      p.find(".embed").attr("data-embed", tp === "chart" ? "f-ca" : "f-t");
+      // p.find(".embed").attr("data-embed", tp === "chart" ? "f-ca" : "f-t");
 
     });
 

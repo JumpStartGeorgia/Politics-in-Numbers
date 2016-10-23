@@ -177,7 +177,7 @@
             <div class="chart-container chart-container-1">
               <div class="actions">
                 <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-                <div class="embed" data-embed="d-ca" title="<%= t('.embed_chart') %>"><i></i></div>
+                <div class="embed" data-embed="ca" title="<%= t('.embed_chart') %>"><i></i></div>
                 <div class="download download_menu" title="<%= t('.download_chart') %>">
                   <i></i>
                   <ul class="chart_download" data-target="#donation_chart_1">
@@ -200,7 +200,7 @@
             <div class="chart-container chart-container-2">
               <div class="actions">
                 <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-                <div class="embed" data-embed="d-cb" title="<%= t('.embed_chart') %>"><i></i></div>
+                <div class="embed" data-embed="cb" title="<%= t('.embed_chart') %>"><i></i></div>
                 <div class="download download_menu" title="<%= t('.download_chart') %>">
                   <i></i>
                   <ul class="chart_download" data-target="#donation_chart_2">
@@ -240,7 +240,7 @@
               <div class="share" title="<%= t('.share_chart') %>"><i></i>
                   <div class="addthis_sharing_toolbox"></div>
               </div>
-              <div class="embed" data-embed="f-ca" title="<%= t('.embed_chart') %>"><i></i></div>
+              <div class="embed" data-embed="ca" title="<%= t('.embed_chart') %>"><i></i></div>
               <div class="download download_menu" title="<%= t('.download_chart') %>">
                 <i></i>
                 <ul class="download_list" data-type="chart" data-object="finance">
@@ -268,7 +268,7 @@
     <div class="caption">Embed</div>
     <div class="content">
       <label>Copy and paste this embed code into your web page:</label>
-      <textarea rows="4" cols="38" data-iframe-link="<%= embed_url %>" readonly="" onfocus="setTimeout(function (t){ t.select(); copy(t); }, 10, this);" onmouseup="return false;"></textarea>
+      <textarea rows="4" cols="38" data-iframe-link="<%= embed_url({ id: "_id_"}).gsub("/dynamic/", "/_type_/") %>" readonly="" onfocus="setTimeout(function (t){ t.select(); copy(t); }, 10, this);" onmouseup="return false;"></textarea>
       <div class="copied">Copied</div>
       <div class="embed-size">
         <label>Frame size:</label>
@@ -283,6 +283,12 @@
           <input type="number" value="640" min="100" step="10" class="iframe-width">
           <span>×</span>
           <input type="number" value="360" min="100" step="10" class="iframe-height">
+        </div>
+      </div>
+      <div class="embed-type">
+        <label>Embed Type:</label>
+        <div class="toggle-group" data-toggle="dynamic">
+          <button type="button" class="toggle" data-toggle="dynamic">Dynamic</button><button type="button" class="toggle" data-toggle="static">Static</button>
         </div>
       </div>
     </div>

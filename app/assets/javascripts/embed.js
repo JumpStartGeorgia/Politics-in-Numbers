@@ -103,20 +103,15 @@ $(document).ready(function (){
     var data = gon.data;
     console.log(data, gon.tp);
     if(data) {
-      if(gon.tp === "t") {
-        render_table(data.table);
+      if(gon.is_donation) {
+        if(gon.tp === "ca" || gon.tp === "cb") {
+          bar_chart(data[gon.tp], data[gon.tp + "ca_title"], data.chart_subtitle, (gon.tp === "ca" ? "#EBE187" : "#B8E8AD"));
+        }
       }
       else {
-        if(gon.is_donation) {
-          if(gon.tp === "ca" || gon.tp === "cb") {
-            bar_chart(data[gon.tp], data[gon.tp + "ca_title"], data.chart_subtitle, "#EBE187");
-          }
-        }
-        else {
-          if(gon.tp === "ca") {
-            grouped_advanced_column_chart(data.ca, "#fff");
-            //grouped_column_chart("#finance_chart", data.ca, "#fff");
-          }
+        if(gon.tp === "ca") {
+          grouped_advanced_column_chart(data.ca, "#fff");
+          //grouped_column_chart("#finance_chart", data.ca, "#fff");
         }
       }
     }
@@ -124,86 +119,6 @@ $(document).ready(function (){
       //view_not_found.removeClass("hidden");
     }
     chart.removeClass("loader");
-  }
-
-  function render_table (table) {
-    // console.log("table data", table);
-    var tbl = $("<table style='width:100%;height:100%;'>").appendTo(chart), dt;
-    if(gon.is_donation) {
-      tbl.addClass("highlighted");
-      var prev = undefined, alt_color = true,
-        dt = tbl.DataTable({
-          responsive: true,
-          destroy: true,
-          order: [],
-          "aaData": table.data,
-          "aoColumns": table.header.map(function (m, i) {
-            return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
-          }),
-          "info": false,
-          dom: "fltrp",
-          createdRow: function ( row, data ) {
-            if(data[2] !== prev) {
-              alt_color = !alt_color;
-            }
-            if(alt_color) {
-              $(row).addClass("alt");
-            }
-            prev = data[2];
-          }
-        });
-      dt.on("draw", function (e, settings) {
-        if(settings.aaSorting.length) {
-          $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
-        }
-      });
-    }
-    else {
-      var table_html = "<thead>", colspan = 0, tmp, klass;
-
-      table.header.forEach(function (row, row_i) {
-
-        table_html += "<tr>";
-        row.forEach(function (col, col_i) {
-          if(col === null) {
-            ++colspan;
-          }
-          else {
-            tmp = "";
-            klass = table.header_classes[row_i][col_i];
-            klass = klass !== null ? " class='" + klass + "'" : "";
-
-            if(colspan) {
-              tmp = " colspan='" + (colspan+1) + "'";
-              colspan = 0;
-            }
-            table_html += "<th" + klass + tmp +">" + col + "</th>";
-          }
-        });
-        table_html += "</tr>";
-      });
-      table_html += "</thead><tbody>";
-
-      table.data.forEach(function (row) {
-        table_html += "<tr>";
-        row.forEach(function (col, col_i) {
-          klass = table.classes[col_i];
-          klass = klass !== null ? " class='" + klass + "'" : "";
-          table_html += "<td" + klass + ">" + col + "</th>";
-        });
-        table_html += "</td>";
-      });
-      table_html += "</tbody>";
-      tbl.html(table_html);
-      dt = tbl.DataTable({
-        destroy: true,
-        responsive: true,
-        "info": false,
-        order: [],
-        dom: "fltrp"
-
-      });
-    }
   }
   function bar_chart (series_data, title, subtitle, bg) {
     //console.log("chart", elem, series_data);

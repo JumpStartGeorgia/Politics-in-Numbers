@@ -42,6 +42,10 @@ var embed_dialog = (function () {
     dgel.find(".iframe-custom input").change(function () {
       iframe();
     });
+    dgel.find(".embed-type .toggle-group .toggle").click(function () {
+      var t = $(this);
+      t.parent().attr("data-toggle", t.attr("data-toggle"));
+    });
   })();
 
   function resize () {
@@ -53,24 +57,22 @@ var embed_dialog = (function () {
       originator = prev_originator;
     }
     var textarea = dgel.find("section.active textarea"),
-      ors = originator.split("-");
-      if(ors.length === 2) {
-        var sel = dgel.find(".iframe-sizes option:selected"),
-          tmp_w, tmp_h;
-        if(sel.val() === "custom") {
-          tmp_w = dgel.find(".iframe-width").val();
-          tmp_h = dgel.find(".iframe-height").val();
-        }
-        else {
-          var tmp = sel.val().split("x");
-          tmp_w = tmp[0];
-          tmp_h = tmp[1];
-        }
-        textarea.text("<iframe src='" + textarea.attr("data-iframe-link") + "?filter=" + ors[0] + "&type=" + ors[1] + "' width='"+tmp_w+"px' height='" + tmp_h + "px' frameborder='0'></iframe>");
-
-        prev_originator = originator;
+      sel = dgel.find(".iframe-sizes option:selected"),
+      type = dgel.find(".embed-type .toggle-group").attr("data-toggle"),
+      tmp_w, tmp_h;
+      if(sel.val() === "custom") {
+        tmp_w = dgel.find(".iframe-width").val();
+        tmp_h = dgel.find(".iframe-height").val();
       }
+      else {
+        var tmp = sel.val().split("x");
+        tmp_w = tmp[0];
+        tmp_h = tmp[1];
+      }
+      var uri = textarea.attr("data-iframe-link").replace("_type_", type).replace("_id_", "111");
+      textarea.text("<iframe src='" + uri + "?tp=" + originator + "' width='"+tmp_w+"px' height='" + tmp_h + "px' frameborder='0'></iframe>");
 
+      prev_originator = originator;
   }
 
   obj = {
