@@ -36,6 +36,7 @@ ka:
       long: "%B %d, %Y"
       short: "%b %d"
       date: "%d/%m/%Y"
+      jsmomentdate: "DD/MM/YYYY"
       jsdate: "dd/mm/yy"
       filename: "%d-%m-%Y"
     month_names:

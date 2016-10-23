@@ -4,6 +4,7 @@
 //= require embed_dialog
 //= require dataTables.pagination.js
 //= require jquery-ui/tooltip
+//= require moment
 var dn;
 $(document).ready(function (){
   // console.log("explore ready");
@@ -178,6 +179,7 @@ $(document).ready(function (){
           }
           else {
             //console.log("is not selected");
+            console.log(autocomplete_id, t.attr("data-id"), t.text());
             autocomplete.push(autocomplete_id, t.attr("data-id"), t.text());
           }
           // console.log(autocomplete);
@@ -244,14 +246,20 @@ $(document).ready(function (){
             if(tp === "autocomplete") {
               lnk = tmp.attr("data-autocomplete-view");
               if(autocomplete.hasOwnProperty(lnk)) {
-                t.data[el] = Object.keys(autocomplete[lnk]);
+                tmp_v = Object.keys(autocomplete[lnk]);
+                if(tmp_v.length) {
+                  t.data[el] = tmp_v;
+                }
+                else {
+                  delete t.data[el];
+                }
               }
             }
             else if(tp === "period") {
               tmp_v = tmp.datepicker('getDate');
               tmp_d = t.data.hasOwnProperty(el) ? t.data[el] : [-1, -1];
               if(isDate(tmp_v)) {
-                tmp_d[elem_i] = tmp_v.getTime();
+                tmp_d[elem_i] =  Date.UTC(tmp_v.getFullYear(), tmp_v.getMonth(), tmp_v.getDate(), 0, 0, 0);
               }
               if(tmp_d.toString() === [-1, -1].toString()) {
                 delete t.data[el];
@@ -311,9 +319,10 @@ $(document).ready(function (){
               });
             }
             else if(tp === "period") {
-              el.from.datepicker('setDate', new Date(+v[0]));
-              el.to.datepicker('setDate', new Date(+v[1]));
-              tmp = formatRange([el.from.datepicker("getDate").format(gon.date_format), el.to.datepicker("getDate").format(gon.date_format)]);
+              v = [moment.utc(v[0]).format(gon.mdate_format), moment.utc(v[1]).format(gon.mdate_format)];
+              el.from.datepicker('setDate', v[0]);
+              el.to.datepicker('setDate', v[1]);
+              tmp = formatRange(v);
               create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
             }
             else if(tp === "range") {
@@ -329,7 +338,7 @@ $(document).ready(function (){
               create_list_item(p.find(".list"), tmp.next().text(), tmp.length);
             }
             else if(tp === "checkbox") {
-              tmp = el.prop("checked", el.val() === v ? true : false);
+              tmp = el.prop("checked", v);
               create_list_item(el.closest(".filter-input").find(".list"), tmp.next().text(), tmp.length);
             }
           });
@@ -365,12 +374,13 @@ $(document).ready(function (){
       id: function() {
 
         var t = this, tmp = [], p, except = ["period", "amount"];
+        // console.log(t.data);
         Object.keys(t.data).sort().forEach(function (k) {
           p = t.data[k];
           p = Array.isArray(p) && except.indexOf(k) === -1 ? p.sort() : [p];
           tmp.push(k + "=" + p.join(","));
         });
-        console.log(tmp.join("&"),  CryptoJS.MD5(tmp.join("&")).toString());
+        // console.log(tmp.join("&"),  CryptoJS.MD5(tmp.join("&")).toString());
         return CryptoJS.MD5(tmp.join("&")).toString();
       },
       url: function (sid) {
@@ -439,23 +449,31 @@ $(document).ready(function (){
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, lnk;
         t.data = { filter: "finance" };
+        console.log(autocomplete, "before", t.data);
         Object.keys(this.elem).forEach(function(el){
           var is_elem = [].indexOf(el) === -1;
           (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
             tmp = $(elem);
+            tmp_v = [];
             tp = tmp.attr("data-type");
             if(tp === "autocomplete") {
               lnk = tmp.attr("data-autocomplete-view");
               if(autocomplete.hasOwnProperty(lnk)) {
-                t.data[el] = Object.keys(autocomplete[lnk]);
+                tmp_v = Object.keys(autocomplete[lnk]);
               }
               else if(t.states[el]) {
-                t.data[el] = [gon.main_categories[el]];
+                tmp_v = [gon.main_categories[el]];
+              }
+
+              if(tmp_v.length) {
+                t.data[el] = tmp_v;
+              }
+              else {
+                delete t.data[el];
               }
             }
             else if(tp === "period_mix") {
               tmp_d = tmp.find("li[data-id]");
-              tmp_v = [];
               if(tmp_d.length) {
                 tmp_d.each(function(){ tmp_v.push(this.dataset.id); });
                 t.data[el] = tmp_v;
@@ -474,6 +492,7 @@ $(document).ready(function (){
           }
         });
         if(!at_least_one) { t.animate(); return null; }
+        console.log("after", t.data);
         return t.data;
       },
       set_by_url: function() {
@@ -545,7 +564,7 @@ $(document).ready(function (){
           p = Array.isArray(p) ? p.sort() : [p];
           tmp.push(k + "=" + p.join(","));
         });
-        console.log(tmp.join("&"),  CryptoJS.MD5(tmp.join("&")).toString());
+        // console.log(tmp.join("&"),  CryptoJS.MD5(tmp.join("&")).toString());
         return CryptoJS.MD5(tmp.join("&")).toString();
       },
       // url: function(v) {
@@ -702,8 +721,8 @@ $(document).ready(function (){
       loader.addClass("hidden");
       filter_extended.toggleClass("active");
     });
-    filter_extended.find(".filter-input .toggle").click(function(){
-      var t = $(this).parent(),
+    filter_extended.find(".filter-input .toggle, input").click(function(){
+      var t = $(this).closest(".filter-input"),
         field = t.attr("data-field"),
         type = t.attr("data-type"),
         html = "",
@@ -753,7 +772,9 @@ $(document).ready(function (){
         //   list.addClass("hidden");
         // }
       }
-      t.toggleClass("expanded", !state);
+      if($(this).hasClass("toggle")) {
+        t.toggleClass("expanded", !state);
+      }
     });
     filter_extended.find(".filter-input button.clear").click(function () {
       autocomplete.clear($(this).parent().attr("data-autocomplete-id"));
@@ -952,15 +973,15 @@ $(document).ready(function (){
         var filters = {};
         delete tmp["filter"];
         filters[obj.name] = tmp;
-        console.log("-------------------", _id);
+        console.log("-------------------", _id, filters);
         $.ajax({
-          url: "explore_filter",
+          url: gon.filter_path,
           dataType: 'json',
           data: filters,
           success: function(data) {
+            console.log("explore_filter", data);
             js.cache[_id] = data[obj.name];
             obj.url(js.cache[_id].sid);
-            // console.log("explore_filter", data);
             if(data.hasOwnProperty("donation")) { filter_callback(data.donation, "donation"); }
             if(data.hasOwnProperty("finance")) { filter_callback(data.finance, "finance"); }
           }

@@ -204,7 +204,12 @@ class Donor
       # f[:period] = Period.get_ids_by_slugs(params[:period])
 
       tmp = params[:period]
-      f[:period] = tmp.map{|t| Time.at(t.to_i/1000) } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
+      if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.size == 13 && t.to_i.to_s == t }
+        f[:period] = tmp.map { |t|
+            n = Time.at(t.to_i/1000)
+            Time.utc(n.year, n.month, n.day, 0, 0, 0)
+          }
+      end
 
       tmp = params[:amount]
       f[:amount] = tmp.map{|t| t.to_i } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
@@ -220,7 +225,7 @@ class Donor
       f[:nature] = tmp == "0" ? 0 : 1 if tmp == "0" || tmp == "1"
     end
 
-     Rails.logger.debug("--------------------------------------------#{f.inspect}")
+     Rails.logger.fatal("---------------------232-----------------------#{f.inspect}")
     chart_subtitle = ""
     if f[:period].present? && f[:period][0] != -1 && f[:period][1] != -1
       chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
@@ -426,24 +431,27 @@ class Donor
     ca_meta_obj[:n] = ca.size
     cb_meta_obj[:n] = cb.size
 
-
+     Rails.logger.fatal("fatal----------------------#{f.keys}")
     f.keys.each{|e|
-      if f[e].present?
-        if f[e] == default_f[e]
-          f.delete(e)
-        else
-          if f[e].class == Array
+      if f[e] == default_f[e]
+        f.delete(e)
+      else
+        if f[e].class == Array
+          if f[e].empty?
+            f.delete(e)
+          else
             f[e].each_with_index{|ee,ii|
               f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
             }
           end
         end
-      else
-        f.delete(e)
       end
     }
+     Rails.logger.fatal("fatal----------------------#{f.keys}")
     sid = ShortUri.explore_uri(f.merge({filter: "donation"}))
-     Rails.logger.fatal("fatal----------------------#{table.select{|f| f[1].nil? || f[2].nil? }.map {|m| [m[1], m[2]]}}")
+
+
+     # Rails.logger.fatal("fatal----------------------#{table.select{|f| f[1].nil? || f[2].nil? }.map {|m| [m[1], m[2]]}}")
     res = {}
     if type == "t" || type == "a"
       res = {

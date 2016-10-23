@@ -37,6 +37,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
       date: "%m/%d/%Y"
+      jsmomentdate: "MM/DD/YYYY"
       jsdate: "mm/dd/yy"
       filename: "%m-%d-%Y"
     month_names:

@@ -36,6 +36,7 @@ ru:
       long: "%-d %B %Y"
       short: "%-d %b"
       date: "%d.%m.%Y"
+      jsmomentdate: "DD.MM.YYYY"
       jsdate: "dd.mm.yy"
     month_names:
     -

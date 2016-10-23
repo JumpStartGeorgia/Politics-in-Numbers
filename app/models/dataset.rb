@@ -135,6 +135,8 @@ class Dataset
 
     if inner_pars
       f = params
+      f[:party] = [] unless f[:party].present?
+      f[:period] = [] unless f[:period].present?
     else
       f = { }
       f[:party] = Party.get_ids_by_slugs(params[:party])
@@ -436,14 +438,15 @@ class Dataset
       }
 
     end
-
     f.keys.each{|e|
-      if f[e].present?
-        f[e].each_with_index{|ee,ii|
-          f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
-        }
-      else
-        f.delete(e)
+      if f[e].class == Array
+        if f[e].empty?
+          f.delete(e)
+        else
+          f[e].each_with_index{|ee,ii|
+            f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
+          }
+        end
       end
     }
     sid = ShortUri.explore_uri(f.merge({filter: "finance"}))
@@ -531,7 +534,7 @@ class Dataset
       }
     elsif type == "file" || type == "info"
       sz = 0
-       Rails.logger.fatal("fatal----------------------#{data.present?}#{ActionController::Base.helpers.number_to_human_size(sz)}")
+       # Rails.logger.fatal("fatal----------------------#{data.present?}#{ActionController::Base.helpers.number_to_human_size(sz)}")
       if data.present?
         require "#{Rails.root}/lib/js/helper.rb"
         compressed_filestream = Zip::OutputStream.write_buffer do |zp|

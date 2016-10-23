@@ -22,11 +22,9 @@ class RootController < ApplicationController
     sid = pars[:id]
     if sid.present?
       shr = ShortUri.by_sid(sid)
-      # Rails.logger.debug("------------------------------------------#{shr.inspect}")
       if shr.present?
         pars = shr.pars
         inner_pars = true
-         Rails.logger.debug("-----------------------------------------explore shr---#{pars}")
       else
         redirect_to explore_path and return
       end
@@ -66,8 +64,10 @@ class RootController < ApplicationController
 
       gon.url = root_url
       gon.path = explore_path
+      gon.filter_path = explore_filter_path
       gon.app_name = "pins.ge"
       gon.date_format = t('date.formats.jsdate')
+      gon.mdate_format = t('date.formats.jsmomentdate')
       gon.filter_item_close = t('.filter_item_close')
       gon.all = t('shared.common.all')
       gon.campaign = t('.campaign')
@@ -84,8 +84,9 @@ class RootController < ApplicationController
 
       gon.is_donation = is_donation
 
-      gon.donation_params = donation_pars
-      gon.donation_data = Donor.explore(donation_pars, "a", inner_pars)
+      tmp = Donor.explore(donation_pars, "a", inner_pars)
+      gon.donation_params = tmp.delete(:pars)
+      gon.donation_data = tmp
 
       tmp = Dataset.explore(finance_pars, "a", inner_pars)
       gon.finance_params = tmp.delete(:pars)
@@ -132,10 +133,13 @@ class RootController < ApplicationController
     res = {}
     p = pars[:donation]
     if p.present?
-      res[:donation] = Donor.explore(p)
+      tmp = Donor.explore(p)
+      tmp.delete(:pars)
+      res[:donation] = tmp
     elsif pars[:finance].present?
-      p = pars[:finance]
-      res[:finance] = Dataset.explore(p)
+      tmp = Dataset.explore(pars[:finance])
+      tmp.delete(:pars)
+      res[:finance] = tmp
     end
     render :json => res
   end

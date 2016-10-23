@@ -27,6 +27,8 @@ gem 'uglifier', '>= 1.3.0'
 # Makes jQuery available in rails JS
 gem 'jquery-rails', '~> 4.0.3'
 
+# Moment.js library for manipulating dates
+gem 'momentjs-rails'
 # Uses caching to improve performance for internal page changes
 #gem 'turbolinks', '~> 2.5.3'
 

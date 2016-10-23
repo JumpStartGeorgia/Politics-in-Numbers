@@ -14,7 +14,7 @@
     </div>
     <div class="filter-inputs" data-type="donation">
       <div class="row filter-input" data-field="period" data-type="period">
-        <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
+        <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
         <div class="list"></div>
         <div class="input-group">
           <input id="donation_period_from" type="text" placeholder="<%= t('.from') %>" class="datepicker" data-type="period">
@@ -22,7 +22,7 @@
           <div class="sublabel"><%= t('.campaign') %>:</div>
           <ul id="donation_period_campaigns">
             <% Period.campaigns.each {|r| %>
-              <li><a href="#" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date, format: :date} - #{l r.end_date, format: :date}"%></a></li>
+              <li><a href="javascript:void(0);" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date, format: :date} - #{l r.end_date, format: :date}"%></a></li>
             <% } %>
           </ul>
         </div>
@@ -33,7 +33,7 @@
       <% lists = Category.by_sym(@categories) %>
 
       <div class="row filter-input" data-field="period" data-type="period_mix">
-        <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
+        <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
         <ul id="finance_period" class="list" data-type="period_mix"></ul>
         <div class="input-group">
           <div class="input-radio-group">

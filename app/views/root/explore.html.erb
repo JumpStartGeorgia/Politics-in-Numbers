@@ -59,7 +59,7 @@
         <div class="donation filter-inputs" data-type="donation">
           <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "donor", on: true, source: "donor_list", category_label: 0 } %>
           <div class="row filter-input" data-field="period" data-type="period">
-            <a href="#" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
             <div class="list"></div>
             <div class="input-group">
               <input id="donation_period_from" type="text" placeholder="<%= t('.from') %>" class="datepicker" data-type="period">
@@ -67,13 +67,13 @@
               <div class="sublabel"><%= t('.campaign') %>:</div>
               <ul id="donation_period_campaigns">
                 <% Period.campaigns.each {|r| %>
-                  <li><a href="#" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date, format: :date} - #{l r.end_date, format: :date}"%></a></li>
+                  <li><a href="javascript:void(0);" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date, format: :date} - #{l r.end_date, format: :date}"%></a></li>
                 <% } %>
               </ul>
             </div>
           </div>
           <div class="row filter-input" data-field="amount" data-type="range">
-            <a href="#" class="toggle" tabindex="5"><%= t('.amount') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.amount') %><i title="<%= t('.filter_toggle') %>"></i></a>
             <div class="list hidden"></div>
             <div class="input-group">
               <input id="donation_amount_from" type="number" min="1" placeholder="<%= t('.from') %>" class="datepicker" data-type="range">
@@ -82,7 +82,7 @@
           </div>
           <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "party", on: true, list: generate_li_list(Party.list), category_label: 0, label: "party_candidate" } %>
           <div class="row filter-input" data-field="multiple" data-type="checkbox">
-            <a href="#" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><i title="<%= t('.filter_toggle') %>"></i></a>
             <div class="list hidden"></div>
             <div class="input-group">
               <div class="block">
@@ -92,7 +92,7 @@
             </div>
           </div>
           <div class="row filter-input" data-field="type" data-type="radio">
-            <a href="#" class="toggle" tabindex="5"><%= t('.donation_type') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.donation_type') %><i title="<%= t('.filter_toggle') %>"></i></a>
             <div class="list hidden"></div>
             <div class="input-group">
               <div class="block b1">
@@ -107,7 +107,7 @@
           </div>
 
           <div class="row filter-input" data-field="nature" data-type="radio">
-            <a href="#" class="toggle" tabindex="5"><%= t('.donor_nature') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.donor_nature') %><i title="<%= t('.filter_toggle') %>"></i></a>
             <div class="list hidden"></div>
             <div class="input-group">
               <div class="block b1">
@@ -135,7 +135,7 @@
           <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "debts", on: false, list: lists[:debts].html_safe } %>
 
           <div class="row filter-input" data-field="period" data-type="period_mix">
-            <a href="#" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
+            <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.time') %><i title="<%= t('.filter_toggle') %>"></i></a>
             <ul id="finance_period" class="list" data-type="period_mix"></ul>
             <div class="input-group">
               <div class="input-radio-group">
@@ -181,11 +181,11 @@
                 <div class="download download_menu" title="<%= t('.download_chart') %>">
                   <i></i>
                   <ul class="chart_download" data-target="#donation_chart_1">
-                    <li><a href="#" data-type="print">print</a></li>
-                    <li><a href="#" data-type="pdf">pdf</a></li>
-                    <li><a href="#" data-type="svg">svg</a></li>
-                    <li><a href="#" data-type="jpeg">jpeg</a></li>
-                    <li><a href="#" data-type="png">png</a></li>
+                    <li><a href="javascript:void(0);" data-type="print">print</a></li>
+                    <li><a href="javascript:void(0);" data-type="pdf">pdf</a></li>
+                    <li><a href="javascript:void(0);" data-type="svg">svg</a></li>
+                    <li><a href="javascript:void(0);" data-type="jpeg">jpeg</a></li>
+                    <li><a href="javascript:void(0);" data-type="png">png</a></li>
                   </ul>
                 </div>
               </div>
@@ -204,11 +204,11 @@
                 <div class="download download_menu" title="<%= t('.download_chart') %>">
                   <i></i>
                   <ul class="chart_download" data-target="#donation_chart_2">
-                    <li><a href="#" data-type="print">print</a></li>
-                    <li><a href="#" data-type="pdf">pdf</a></li>
-                    <li><a href="#" data-type="svg">svg</a></li>
-                    <li><a href="#" data-type="png">png</a></li>
-                    <li><a href="#" data-type="jpeg">jpeg</a></li>
+                    <li><a href="javascript:void(0);" data-type="print">print</a></li>
+                    <li><a href="javascript:void(0);" data-type="pdf">pdf</a></li>
+                    <li><a href="javascript:void(0);" data-type="svg">svg</a></li>
+                    <li><a href="javascript:void(0);" data-type="png">png</a></li>
+                    <li><a href="javascript:void(0);" data-type="jpeg">jpeg</a></li>
                   </ul>
                 </div>
               </div>
@@ -245,11 +245,11 @@
                 <i></i>
                 <ul class="download_list" data-type="chart" data-object="finance">
                   <li data-only="table"><a href="<%= "#{@finance_download_link}" %>" id="finance_csv_download" data-type="csv"><%= t('.export_type.csv') %></a></li>
-                  <li data-only="chart"><a href="#" data-type="print"><%= t('.export_type.print') %></a></li>
-                  <li data-only="chart"><a href="#" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
-                  <li data-only="chart"><a href="#" data-type="svg"><%= t('.export_type.svg') %></a></li>
-                  <li data-only="chart"><a href="#" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
-                  <li data-only="chart"><a href="#" data-type="png"><%= t('.export_type.png') %></a></li>
+                  <li data-only="chart"><a href="javascript:void(0);" data-type="print"><%= t('.export_type.print') %></a></li>
+                  <li data-only="chart"><a href="javascript:void(0);" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
+                  <li data-only="chart"><a href="javascript:void(0);" data-type="svg"><%= t('.export_type.svg') %></a></li>
+                  <li data-only="chart"><a href="javascript:void(0);" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
+                  <li data-only="chart"><a href="javascript:void(0);" data-type="png"><%= t('.export_type.png') %></a></li>
                 </ul>
               </div>
             </div>

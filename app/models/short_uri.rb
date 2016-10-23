@@ -35,14 +35,25 @@ class ShortUri
   def self.explore_uri(pars)
     pars = pars.to_h
     return nil if pars.class != Hash || !pars.present?
-
+    is_donation = pars[:filter] == "donation"
     tmp = []
-    except = pars[:filter] == "donation" ? ["period", "amount"] : []
+    except = []
+    if is_donation
+      if pars[:period].present?
+        pars[:period_mils] = pars[:period].map{ |m| (m.to_f * 1000).to_i }
+        except = [:period, :amount]
+      end
+    end
     pars.keys.sort.each{ |e|
       p = pars[e]
-      if e == "period"
-        p = p.map{ |m| (m.to_f * 1000).to_i }
+      if is_donation
+        next if e == :period_mils
+        if e == :period
+          p = pars[:period_mils]
+          pars.delete(:period_mils)
+        end
       end
+
       p = p.class == Array && except.index(e).nil? ? p.sort : [p]
       tmp << "#{e}=#{p.join(',')}"
     }
