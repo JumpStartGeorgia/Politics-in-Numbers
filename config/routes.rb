@@ -41,9 +41,10 @@ Rails.application.routes.draw do
     get '/api' => 'root#api'
     get '/parties' => 'root#parties'
     get '/embed/:type/:id' => 'root#embed' , as: :embed, :constraints => { :type => /(static|dynamic)/ }, :defaults => { :type => 'dynamic' }
-    get '/embed_test' => 'root#embed_test'
-    get '/share' => 'root#share'
-    get '/img/:id' => 'root#img'
+    get '/embed_static/:id' => 'root#embed_static', as: :embed_static, constraints: lambda { |req| req.format == :json }
+    get '/embed_test/:type/:id/:chart' => 'root#embed_test', as: :embed_test
+    get '/share/:id' => 'root#share', as: :share
+    get '/img/:id' => 'root#img', as: :img
     # get 'select/donors' => 'root#select_donors'
     get 'select/parties' => 'root#select_parties'
     get 'explore_filter' => 'root#explore_filter'

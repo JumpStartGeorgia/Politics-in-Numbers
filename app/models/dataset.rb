@@ -438,21 +438,22 @@ class Dataset
       }
 
     end
-    f.keys.each{|e|
-      if f[e].class == Array
-        if f[e].empty?
-          f.delete(e)
-        else
-          f[e].each_with_index{|ee,ii|
-            f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
-          }
+    if ["a"].index(type).present?
+      f.keys.each{|e|
+        if f[e].class == Array
+          if f[e].empty?
+            f.delete(e)
+          else
+            f[e].each_with_index{|ee,ii|
+              f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
+            }
+          end
         end
-      end
-    }
-    sid = ShortUri.explore_uri(f.merge({filter: "finance"}))
-
+      }
+      sid = ShortUri.explore_uri(f.merge({filter: "finance"}))
+    end
     res = {}
-    if type == "t" || type == "a"
+    if ["t", "a"].index(type).present?
       res = {
         table: {
           data: table,
@@ -462,17 +463,22 @@ class Dataset
         }
       }
     end
-    if type == "ca" || type == "a" # a - all
+    if ["ca", "a", "co", "coa"].index(type).present?
       res.merge!({
         ca: {
             categories: ca_categories,
             series: ca,
             title: chart_title
-        },
+        }
+      })
+    end
+    if ["a"].index(type).present?
+      res.merge!({
         sid: sid,
         pars: f
       })
     end
+
     res
   end
   def self.download_filter(params)

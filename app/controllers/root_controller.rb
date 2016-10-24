@@ -21,7 +21,7 @@ class RootController < ApplicationController
     inner_pars = false
     sid = pars[:id]
     if sid.present?
-      shr = ShortUri.by_sid(sid)
+      shr = ShortUri.by_sid(sid, :explore)
       if shr.present?
         pars = shr.pars
         inner_pars = true
@@ -65,6 +65,7 @@ class RootController < ApplicationController
       gon.url = root_url
       gon.path = explore_path
       gon.filter_path = explore_filter_path
+      gon.embed_path = embed_static_path(id: "_id_")
       gon.app_name = "pins.ge"
       gon.date_format = t('date.formats.jsdate')
       gon.mdate_format = t('date.formats.jsmomentdate')
@@ -209,58 +210,35 @@ class RootController < ApplicationController
     gon.show_less = t('shared.common.show_less')
   end
 
+  def embed_static
+    pars = embed_static_params
+    sid =
+    nsid = ShortUri.embed_static_uri(pars[:id])
+
+    respond_to do |format|
+      format.json { render :json => { sid: nsid } }
+    end
+  end
 
   # show the embed chart if the id was provided and can be decoded and parsed into hash
   # id - base64 encoded string of a hash of parameters
   def embed
     @missing = true
+
     pars = embed_params
 
     sid = pars[:id]
     type = pars[:type]
-    chart = pars[:chart]
-
-     Rails.logger.fatal("fatal---------d-------------#{sid}")
-    # 1280  720; 853 480; 640 360; 560 315
-    # @w = pars[:width]
-    # @h = pars[:height]
-    # @w = 640 if @w.blank?
-    # @h = 360 if @h.blank?
-    tp = pars[:type] # if type is not defined than show empty or default
+    is_static = type == "static"
+    gon.tp = pars[:c]
 
     if sid.present?
-      if dynamic find in explore_id from short_url
-      else find in embed_static_id from short_url , initialize it before implementing
-        embedstatic will use explore id as starting point will generate it's own id and than will use chart par to define which chart
-        so embedstatic will save both chart in case of donation
-      shr = ShortUri.by_sid(sid)
-
-      if shr.present?
-        pars = shr.pars
-
-        @fltr = pars[:filter]
-
-        if @fltr.present? && ["finance", "donation"].index(@fltr).present?
-          is_finance = @fltr == "finance"
-          is_donation = !is_finance
-
-          if (is_finance ? ["ca"] : ["ca", "cb"]).index(tp).present?
-            gon.tp = tp
-
-            # gon.app_name = "pins.ge"
-            # gon.search = t('root.explore.search')
-            # gon.table_length = t('root.explore.table_length')
-            # gon.numericSymbols = t('shared.common.numericSymbols')
-
-            gon.is_donation = is_donation
-
-            gon.data = is_donation ? Donor.explore(pars, tp, true) : Dataset.explore(pars, tp, true)
-
-            pars.delete(:locale)
-            pars.delete(:pars)
-
-            @missing = false
-          end
+      shr = ShortUri.by_sid(sid, is_static ? :embed_static : :explore)
+      if shr.present? && shr.other.present? && (shr.other == 0 || shr.other == 1)
+        gon.is_donation = shr.other == 0
+        if (gon.is_donation ? ["a", "b"] : ["a"]).index(gon.tp).present?
+          gon.data = is_static ? shr.pars : ((gon.is_donation ? Donor : Dataset).explore(shr.pars, "co" + gon.tp, true))
+          @missing = false
         end
       end
     end
@@ -268,92 +246,39 @@ class RootController < ApplicationController
     respond_to do |format|
       format.html { render :layout => 'embed' }
     end
+  end
+
+  # def embed_test
+  #   @id = params[:id]
+  #   @type = params[:type]
+  #   @chart = params[:chart]
+  #   respond_to do |format|
+  #     format.html { render :layout => false }
+  #   end
   # end
-  end
-  def embed_test
-    @id = params[:id]
-    respond_to do |format|
-      format.html { render :layout => false }
-    end
-  end
+
   def share
     pars = share_params
-    @return_url = pars[:return_url]
-    @return_url = root_path if !@return_url.present?
-    #Rails.logger.info("--------------------------------------------#{request.user_agent}")
-     #dev-pin.jumpstart.ge/share?return_url=http://google.com&params[]=2
-     #http://localhost:3000/ka/share?return_url=/about&params[]=123&params[]=abc
-     #http://localhost:3000/ka/share?return_url=http://www.dev-pin.jumpstart.ge&params[]=123&params[]=abc
-     @inner_pars = []
-     @inner_pars = pars[:params] if pars[:params].present?
-     #facebookexternalhit
-    if (request.user_agent.include?("facebook") && request.user_agent.include?("externalhit")) # if facebook robot Rails.env.development? ||
-      #https://www.facebook.com/sharer/sharer.php?app_id=570138349825593&sdk=joey&u=http%3A%2F%2Fdev-pin.jumpstart.ge%2Fen%2Fshare%3Freturn_url%3D%252Fka%252Fshare_test%26params%255B0%255D%3D123%26params%255B1%255D%3Dabc&display=popup&ref=plugin&src=share_button
-      # if p.present?
-      #   encodedP = Base64.urlsafe_encode64(p.to_param)
-      #   require 'game_data'
 
-      #   @url = request.original_url.split('?').first + '?f=' + encodedP
-      #   tick = 12
-      #   cur_ticks = p['t'].to_i
-      #   gender = p['g']
-      #   category = GameData.category(p['c'])
-      #   salary = p['s'].to_i
+    sid = pars[:id]
+     Rails.logger.fatal("fatal----------------------#{sid}")
+    gon.tp = pars[:c]
+    @locale = I18n.locale
+    @descr = "Lorem Ipsum Desc"
+    @title = t('shared.common.name')
+    @sitename = t('shared.common.name')
+    @image = img_url({ id: sid }) #image_url("share.png")
+    @share_url = share_url({ id: sid})
 
-      #   msalary = 0
-      #   if(gender=='m')
-      #     msalary = salary
-      #     fsalary = salary + (category[:outrun]==1 ? 1 : -1)*(salary * category[:percent] / 100);
-      #   else
-      #     fsalary = salary
-      #     msalary = salary + (category[:outrun]==1 ? -1 : 1)*(salary * category[:percent] / 100);
-      #   end
-      #   fsalary_total = ((gender == 'm' ? msalary : fsalary) * (cur_ticks * tick)).floor
-      #   ssalary_total = ((gender == 'm' ? fsalary : msalary) * (cur_ticks * tick)).floor
-      #   salary_total_diff = (fsalary_total - ssalary_total).abs.floor
-
-
-      #   # params needed for t('.desc1') that is in the share page
-      #   @years = ((cur_ticks * tick) / 12).to_s
-      #   @job = ''
-      #   if p['c'] != 'hyn3wmKk' # do not show job title for 'all jobs'
-      #     @job = I18n.t('gap.share.job', job: I18n.t("gap.gamedata.share_category.#{p['c']}"))
-      #   end
-
-
-      #   @salary = view_context.number_with_delimiter(salary_total_diff)
-      #   @more_less = ((gender == 'm' && msalary > fsalary) || (gender == 'f' && fsalary > msalary)) ? t('gap.share.more') : t('gap.share.less')
-      #   @gender = I18n.t("gap.share.#{gender == 'f' ? 'm' : 'f'}")
-
-
-      #   @descr = "Gender " + I18n.t("gap.gamedata.gender.#{p['g']}") + ", Age " + p['a'] + ", Category " + I18n.t("gap.gamedata.category.#{p['c']}") + ", Salary " + p['s'] + ", Interest " +  I18n.t("gap.gamedata.interest.#{p['i']}") + ", Salary Percent " + p['p']
-      #   respond_to do |format|
-      #     format.html
-      #   end
-      # else
-      #   redirect_to gap_path and return
-      # end
-      #Rails.logger.info("--------------------------------------------inside")
+    if true || request.user_agent.include?("facebookexternalhit")
+        respond_to do |format|
+          format.html
+        end
     else
-      #Rails.logger.info("--------------------------------------------redirecting")
-      redirect_to @return_url and return
+      redirect_to explore_path({ id: sid }) and return
     end
   end
-  # def select_donors
-  #   q = params[:q].split
-  #   donors = []
-  #   if q.length == 1
-  #     regex1 =  /^#{Regexp.escape(q[0])}/i
-  #     regex2 = /.*/i
-  #   else
-  #     regex1 =  /^#{Regexp.escape(q[0])}/i
-  #     regex2 = /^#{Regexp.escape(q[1])}/i
-  #   end
-  #   Donor.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
-  #     donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
-  #   }
-  #   render :json => donors
-  # end
+
   def img
      id = params[:id]
 
@@ -379,31 +304,34 @@ class RootController < ApplicationController
     send_file "#{Rails.root}/public/system/share/#{I18n.locale}/#{id}.png",
        :type => 'image/png', :disposition => 'inline', filename: "#{id}.png"
   end
+
   private
-    def share_params
-      params.permit(:return_url, :locale, {params: []})
-    end
+
     def explore_params
       params.permit([:id, :filter, :monetary, :multiple, :nature, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
     end
+
     def explore_filter_params
       params.permit(:locale, :donation => [:monetary, :multiple, :nature, { donor: [], period: [], amount: [], party: []}],
         :finance => [{ party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
     end
 
-    # def explore_params_by_type(prs, tp)
-    #   pars = ActionController::Parameters.new(prs)
-
-    #   tp == "d" ? prs.permit(:monetary, :multiple, :nature, { donor: [], period: [], amount: [], party: []})
-    #     : prs.permit({ party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  })
-    # end
-
     def download_params
       params.permit([:filter, :locale, :format, :type, period: [], party: [], ids: []])
     end
+
     def embed_params
-      params.permit([:id, :type ]) #, :width, :height, :locale, :format
+      params.permit([:id, :type, :c ]) #, :width, :height, :locale, :format
     end
+
+    def embed_static_params
+      params.permit([ :id ]) #, :width, :height, :locale, :format
+    end
+
+    def share_params
+      params.permit(:id)
+    end
+
 end
 
 

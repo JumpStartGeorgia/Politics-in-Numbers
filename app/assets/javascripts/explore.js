@@ -1,16 +1,15 @@
 /* global $ */
 /*eslint no-console: "error"*/
 //= require jquery-ui/datepicker
-//= require embed_dialog
 //= require dataTables.pagination.js
 //= require jquery-ui/tooltip
 //= require moment
-var dn;
+//= require explore_global
+//= require embed_dialog
+
 $(document).ready(function (){
   // console.log("explore ready");
-  var js = {
-      cache: {}
-    },
+  var
     w = 0,
     h = 0,
     explore = $("#explore"),
@@ -18,7 +17,6 @@ $(document).ready(function (){
     finance_toggle = $("#finance_toggle"),
     donation_toggle = $("#donation_toggle"),
     filter_type = $("#filter_type"),
-    is_type_donation = true,
     filter_extended = $("#filter_extended"),
     finance_category = $("#finance_category"),
     view_content = $(".view-content"),
@@ -384,8 +382,11 @@ $(document).ready(function (){
         return CryptoJS.MD5(tmp.join("&")).toString();
       },
       url: function (sid) {
-        window.history.pushState(sid, null, gon.path + "/" + sid);
-        this.download.attr("href", gon.path + "/" + sid + "?format=csv")
+        if(js.is_donation) {
+          js.sid = sid;
+          window.history.pushState(sid, null, gon.path + "/" + sid);
+          this.download.attr("href", gon.path + "/" + sid + "?format=csv")
+        }
       },
       // url: function(v) {
       //   var t = this, url = "?", params = [], tmp;
@@ -587,8 +588,11 @@ $(document).ready(function (){
       //   t.download.attr("href", gon.path + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "") + "format=csv");
       // },
       url: function (sid) {
-        window.history.pushState(sid, null, gon.path + "/" + sid);
-        this.download.attr("href", gon.path + "/" + sid + "?format=csv");
+        if(!js.is_donation) {
+          js.sid = sid;
+          window.history.pushState(sid, null, gon.path + "/" + sid);
+          this.download.attr("href", gon.path + "/" + sid + "?format=csv");
+        }
       },
       toggle: function(element, turn_on) {
         //console.log(element, turn_on);
@@ -605,7 +609,8 @@ $(document).ready(function (){
     };
 
   finance_toggle.click(function (event){
-    is_type_donation = false;
+    js.is_donation = false;
+    finance.url();
     var p = finance_toggle.parent().parent();
     donation_toggle.parent().removeClass("active");
 
@@ -621,7 +626,8 @@ $(document).ready(function (){
   });
 
   donation_toggle.click(function (event){
-    is_type_donation = true;
+    js.is_donation = true;
+    finance.url();
     var p = donation_toggle.parent();
     finance_toggle.parent().parent().removeClass("active");
 
@@ -638,8 +644,8 @@ $(document).ready(function (){
     filter_type.toggleClass("in-depth");
   });
   finance_category.find(".finance-category-toggle").click(function(event) {
-    // console.log("toggle", is_type_donation);
-    if(is_type_donation) { finance_toggle.trigger("click"); }
+    // console.log("toggle", js.is_donation);
+    if(js.is_donation) { finance_toggle.trigger("click"); }
     var t = $(this), state = t.attr("data-state"), sub, sub_state, cat = t.attr("data-cat");
     global_click_callback = undefined;
     if(typeof state === "undefined" || state === "") {
@@ -840,14 +846,15 @@ $(document).ready(function (){
       event.stopPropagation();
     });
     $("#reset").click(function(){
-      if(is_type_donation) {
+      clear_embed();
+      if(js.is_donation) {
         donation.reset();
       }
       else {
         finance.reset();
       }
     });
-    explore_button.click(function(){ filter(); });
+    explore_button.click(function(){ clear_embed(); filter(); });
 
     function export_object(source, source_type, action) {
       console.log(source,source_type,action);
@@ -951,7 +958,7 @@ $(document).ready(function (){
 
   function filter() {
     loader.fadeIn();
-    //console.log("start filter", is_type_donation);
+    //console.log("start filter", js.is_donation);
     var tmp, cacher_id, _id, _id, finance_id, obj;
 
     if(gon.gonned) {
@@ -960,11 +967,12 @@ $(document).ready(function (){
         tmp = obj.get();
         _id = obj.id();
         js.cache[_id] = gon[obj.name + "_data"];
+        obj.url(js.cache[_id].sid);
         filter_callback(js.cache[_id], obj.name);
       });
       gon.gonned = false;
     } else {
-      obj = is_type_donation ? donation : finance;
+      obj = js.is_donation ? donation : finance;
       tmp = obj.get();
       _id = obj.id();
 
@@ -1446,8 +1454,7 @@ $(document).ready(function (){
   (function init() {
     init_highchart();
     bind();
-    is_type_donation = gon.is_donation;
+    js.is_donation = gon.is_donation;
     filter();
   })();
 });
-

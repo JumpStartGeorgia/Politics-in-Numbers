@@ -15,6 +15,8 @@ require_relative 'deploy_modules/maintenance'
 require_relative 'deploy_modules/puma'
 require_relative 'deploy_modules/nginx'
 
+require 'mina/whenever'
+
 set :user_path, -> { "/home/#{user}" }
 set :deploy_to, -> { "#{user_path}/#{application}" }
 set :full_current_path, -> { "#{deploy_to}/#{current_path}" }
@@ -359,7 +361,6 @@ task deploy: :environment do
       set :rsync_verbose, ''
       set :bundle_options, "#{bundle_options} --quiet"
     end
-
     invoke :'delayed_job:stop'
     invoke :'deploy:check_revision'
     invoke :'deploy:assets:decide_whether_to_precompile'
@@ -374,6 +375,7 @@ task deploy: :environment do
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
+    invoke :'whenever:update'
     invoke :'delayed_job:start'
 
     to :launch do

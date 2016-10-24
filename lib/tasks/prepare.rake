@@ -42,24 +42,25 @@ namespace :prepare do # WARNING ondeploy
     #
   end
 
-  desc "Create sequence document for explore used by shortener"
-  task :insert_sequence_for_explore => :environment do |t, args|
+  desc "Create sequence document for explore and embed_static used by shortener"
+  task :populate_sequence => :environment do |t, args|
     db = Mongoid.default_client
     db.command({ insert: "sequence", documents: [ { _id: "explore_id", seq: 1000000000000000000 } ] })
+    db.command({ insert: "sequence", documents: [ { _id: "embed_static_id", seq: 2000000000000000000 } ] })
   end
 
-  desc "Recreate sequence collection and document for explore used by shortener"
-  task :resequence_explore => :environment do |t, args|
+  desc "Recreate sequence collection and document for explore and embed_static used by shortener"
+  task :resequence => :environment do |t, args|
     Rake::Task["prepare:drop_sequence_collection"].invoke
     Rake::Task["prepare:create_sequence_collection"].invoke
-    Rake::Task["prepare:insert_sequence_for_explore"].invoke
+    Rake::Task["prepare:populate_sequence"].invoke
   end
 
-  desc "Truncate ShortUri and recreate explore sequence"
+  desc "Truncate ShortUri and recreate explore and embed_static sequence"
   task :reset_shorturi => :environment do |t, args|
     ShortUri.destroy_all
     Rake::Task["db:mongoid:remove_undefined_indexes"].invoke
-    Rake::Task["prepare:resequence_explore"].invoke
+    Rake::Task["prepare:resequence"].invoke
   end
   # WARNING call slug generator function for Category, Donor, Party, Period
 end

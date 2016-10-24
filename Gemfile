@@ -93,7 +93,11 @@ gem 'gon'
 
 gem "daemons"
 
-gem "base58"
+gem "base58" # generating base58 string from input used in shorturi to generate user friendly uri
+
+gem 'whenever'
+
+
 
 group :development do
   # Silences assets-related logging
@@ -109,10 +113,13 @@ group :development do
   gem 'i18n-tasks', '~> 0.8.3'
 
   # Server-related tasks (such as deploy)
-  gem 'mina', '~> 0.3.3', require: false
+  gem 'mina'#, '~> 0.3.3', require: false
 
   # Mina for multiple servers
   gem 'mina-multistage', '~> 1.0.1', require: false
+
+  # Mina for whenever
+  gem 'mina-whenever'
 
   # Prints arrays, hashes, etc. beautifully
   gem 'awesome_print', '~> 1.6', '>= 1.6.1'

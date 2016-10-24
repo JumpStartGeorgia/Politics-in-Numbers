@@ -248,7 +248,10 @@ class Donor
     monetary_values = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
     nature_values = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
     parties = {}
-    Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
+     Rails.logger.fatal("---------------------------langgggggggggggggg-----------------#{I18n.locale}")
+    Party.each{|e| parties[e.id] = { value: 0, name: e.title }
+       Rails.logger.fatal("fatal----------------------#{e.title}")
+     }
 
     chart_meta = [
       ["top_5_donors", "top_5_parties"],
@@ -432,28 +435,29 @@ class Donor
     cb_meta_obj[:n] = cb.size
 
      Rails.logger.fatal("fatal----------------------#{f.keys}")
-    f.keys.each{|e|
-      if f[e] == default_f[e]
-        f.delete(e)
-      else
-        if f[e].class == Array
-          if f[e].empty?
-            f.delete(e)
-          else
-            f[e].each_with_index{|ee,ii|
-              f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
-            }
+    if ["a"].index(type).present?
+      f.keys.each{|e|
+        if f[e] == default_f[e]
+          f.delete(e)
+        else
+          if f[e].class == Array
+            if f[e].empty?
+              f.delete(e)
+            else
+              f[e].each_with_index{|ee,ii|
+                f[e][ii] = ee.to_s if ee.class == BSON::ObjectId
+              }
+            end
           end
         end
-      end
-    }
-     Rails.logger.fatal("fatal----------------------#{f.keys}")
-    sid = ShortUri.explore_uri(f.merge({filter: "donation"}))
-
+      }
+      # Rails.logger.fatal("fatal----------------------#{f.keys}")
+      sid = ShortUri.explore_uri(f.merge({filter: "donation"}))
+    end
 
      # Rails.logger.fatal("fatal----------------------#{table.select{|f| f[1].nil? || f[2].nil? }.map {|m| [m[1], m[2]]}}")
     res = {}
-    if type == "t" || type == "a"
+    if ["t", "a"].index(type).present?
       res = {
         table: {
           data: table.sort { |x,y| [x[1], x[2]] <=> [y[1], y[2]] },
@@ -467,21 +471,25 @@ class Donor
         }
       }
     end
-    if type == "ca" || type == "a" # a - all
+    if ["ca", "a", "co", "coa"].index(type).present?
       res.merge!({
           ca: ca,
           ca_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", ca_meta_obj)
         })
     end
-    if type == "cb" || type == "a"
+    if ["cb", "a", "co", "cob"].index(type).present?
       res.merge!({
           cb: cb,
           cb_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", cb_meta_obj)
         })
     end
-    if type == "ca" || type == "cb" || type == "a"
+    if ["ca", "cb", "a", "co", "cob"].index(type).present?
       res.merge!({
         chart_subtitle: chart_subtitle,
+      })
+    end
+    if ["a"].index(type).present?
+      res.merge!({
         sid: sid,
         pars: f
       })
