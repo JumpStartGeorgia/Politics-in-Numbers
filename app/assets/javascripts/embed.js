@@ -246,9 +246,6 @@ $(document).ready(function (){
       colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
       credits: {
         enabled: false
-        // ,
-        // href: gon.url,
-        // text: gon.app_name
       }
     });
     (function(H) { // for highchart to recognize maxPointWidth property

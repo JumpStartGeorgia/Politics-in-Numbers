@@ -5,7 +5,7 @@
 //= require jquery-ui/tooltip
 //= require moment
 //= require explore_global
-//= require embed_dialog
+//= require js_dialog
 
 $(document).ready(function (){
   // console.log("explore ready");
@@ -382,7 +382,7 @@ $(document).ready(function (){
         return CryptoJS.MD5(tmp.join("&")).toString();
       },
       url: function (sid) {
-        if(js.is_donation) {
+        if(typeof sid !== "undefined" && js.is_donation) {
           js.sid = sid;
           window.history.pushState(sid, null, gon.path + "/" + sid);
           this.download.attr("href", gon.path + "/" + sid + "?format=csv")
@@ -588,7 +588,7 @@ $(document).ready(function (){
       //   t.download.attr("href", gon.path + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "") + "format=csv");
       // },
       url: function (sid) {
-        if(!js.is_donation) {
+        if(typeof sid !== "undefined" && !js.is_donation) {
           js.sid = sid;
           window.history.pushState(sid, null, gon.path + "/" + sid);
           this.download.attr("href", gon.path + "/" + sid + "?format=csv");
@@ -610,7 +610,7 @@ $(document).ready(function (){
 
   finance_toggle.click(function (event){
     js.is_donation = false;
-    finance.url();
+    finance.url(js.sid);
     var p = finance_toggle.parent().parent();
     donation_toggle.parent().removeClass("active");
 
@@ -627,7 +627,7 @@ $(document).ready(function (){
 
   donation_toggle.click(function (event){
     js.is_donation = true;
-    finance.url();
+    donation.url(js.sid);
     var p = donation_toggle.parent();
     finance_toggle.parent().parent().removeClass("active");
 
@@ -856,42 +856,6 @@ $(document).ready(function (){
     });
     explore_button.click(function(){ clear_embed(); filter(); });
 
-    function export_object(source, source_type, action) {
-      console.log(source,source_type,action);
-
-      var tmp,
-      mimes = {
-        "png": "image/png",
-        "jpeg": "image/jpeg",
-        "svg": "image/svg+xml",
-        "pdf": "application/pdf",
-      };
-
-      if(source_type === "chart") {
-        tmp = $(source).highcharts();
-        if(action === "print") {
-          chart.print();
-        }
-        else {
-          tmp.exportChart({ type: mimes[action] });
-        }
-      }
-      else if(source_type === "table") {
-        // if(action == "csv") {
-        //   $(source).find(".dt-buttons [data-action='" + action + "'] a[]").trigger("click");
-        // }
-      }
-
-
-    }
-    $(".download_list a").click(function(){
-      var t = $(this), action = t.attr("data-type"), li = t.parent(),
-        ul = li.parent(), source_type = ul.attr("data-type"),
-        source = "#" + ul.attr("data-object") + "_" + source_type;
-
-      export_object(source, source_type, action);
-    });
-
     $(".chart_download a").click(function(){
       var t = $(this), type = t.attr("data-type"), p = t.parent().parent(), target = p.attr("data-target"),
       chart = $(target).highcharts(),
@@ -901,8 +865,6 @@ $(document).ready(function (){
         "svg": "image/svg+xml",
         "pdf": "application/pdf",
       };
-      //<a href="/en/explore?expenses%5B%5D=5784e800fbb6bd2f46a9e344&amp;filter=finance&amp;income%5B%5D=5784e800fbb6bd2f46a9e328&amp;income%5B%5D=5784e800fbb6bd2f46a9e319&amp;party%5B%5D=5784e800fbb6bd2f46a9e1d5&amp;party%5B%5D=5784e800fbb6bd2f46a9e1f8&amp;period%5B%5D=5784e800fbb6bd2f46a9e20b&amp;period%5B%5D=5784e800fbb6bd2f46a9e20a&amp;period%5B%5D=5784e800fbb6bd2f46a9e209&amp;format=csv" id="donation_csv_download" class="download" title="Download table"><i></i></a>
-      //console.log(target, type, mimes[type]);
       if(type === "print") {
         chart.print();
       }
@@ -938,9 +900,10 @@ $(document).ready(function (){
 
     // bind finance view_as buttons click event
     $(".pane[data-type='finance'] .actions .left > div[data-view-toggle]").on("click", function() {
-      var t = $(this), tp = t.attr("data-view-toggle"), p = t.closest(".actions");
-      $(".pane[data-type='finance']").attr("data-view-current", tp);
-      $(".pane[data-type='finance'] .actions .download_list").attr("data-type", tp);
+      var t = $(this), tp = t.attr("data-view-toggle"), p = t.closest(".actions"), r = p.find(".right .share, .right .embed");
+      p.attr("data-type", tp);
+      $(".pane[data-type='finance']").attr("data-view-type", tp);
+      //$(".pane[data-type='finance'] .actions .download_list").attr("data-type", tp);
       // p.find(".embed").attr("data-embed", tp === "chart" ? "f-ca" : "f-t");
 
     });
@@ -951,8 +914,14 @@ $(document).ready(function (){
       track: true
     });
 
-    $(document).on("click", "[data-embed]", function () {
-      embed_dialog.open("embed", $(this).attr("data-embed"));
+    $(document).on("click", "[data-dialog]", function () {
+      var t = $(this), pars = t.attr("data-dialog").split(";"),
+        options = { chart: (pars.length === 2 ? pars[1] : "") };
+      if(pars[0] === "share") {
+        options["title"] = js.share["#" + t.attr("data-share-title")];
+      }
+      console.log(pars, options);
+      js_dialog.open(pars[0], options);
     });
   }
 
@@ -1110,6 +1079,7 @@ $(document).ready(function (){
   }
   function bar_chart(elem, series_data, title, subtitle, bg) {
     //console.log("chart", elem, series_data);
+    js.share[elem] = encodeURI(title + "( " + subtitle + " )" + " | " + gon.app_name_long);
     $(elem).highcharts({
       chart: {
           type: 'bar',
@@ -1313,6 +1283,7 @@ $(document).ready(function (){
   }
   function grouped_advanced_column_chart(elem, resource, bg) {
     // console.log("fca", resource);
+    js.share[elem] = encodeURI(resource.title + " | " + gon.app_name_long);
     $(elem).highcharts({
       chart: {
           type: 'column',
@@ -1426,7 +1397,7 @@ $(document).ready(function (){
       colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
       credits: {
         enabled: true,
-        href: gon.url,
+        href: gon.root_url,
         // position: undefined
         // style: undefined
         text: gon.app_name

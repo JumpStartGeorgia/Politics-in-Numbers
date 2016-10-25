@@ -117,6 +117,21 @@ en:
       financial_assets: Financial Assets
       debts: Debts
       campaign: Campaign
+    dialog:
+      close: Close
+      embed:
+        caption: Embed
+        copy_code: "Copy and paste this embed code into your web page:"
+        copied: Copied
+        frame_size: "Frame size:"
+        custom_size: Custom size
+        embed_type: "Embed type:"
+        dynamic: Dynamic
+        static: Static
+        type_hint: "Dynamic embed will be regenerated each time you access it,<br/> on other hand Static embed will be stick to current point in time"
+      share:
+        caption: Share
+        share_chart: "Share chart:"
   notifier:
     job:
       donorset_file_process:

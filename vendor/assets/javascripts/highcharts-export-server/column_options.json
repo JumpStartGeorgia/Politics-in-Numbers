@@ -1,0 +1,85 @@
+{
+  "infile": "{\"chart\": {\"type\": \"column\", \"backgroundColor\": \"#FFFFFF\"}, \"title\": {\"text\": \"_title_\", \"margin\": 40, \"style\": {\"fontFamily\":\"firasans_r\", \"fontSize\":\"18px\", \"color\": \"#5d675b\"}, \"useHTML\": true }, \"xAxis\": {\"type\": \"category\", \"categories\": \"_categories_\", \"gridLineColor\": \"#5D675B\", \"gridLineWidth\":1, \"gridLineDashStyle\": \"Dash\", \"lineWidth\": 1, \"lineColor\": \"#5D675B\", \"tickWidth\": 1, \"tickColor\": \"#5D675B\", \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"firasans_book\", \"textShadow\": \"none\"}, \"step\":1 } }, \"yAxis\": [{\"title\": { \"enabled\": false }, \"gridLineColor\": \"#eef0ee\", \"gridLineWidth\":1, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"firasans_book\", \"textShadow\": \"none\"} }, {\"linkedTo\":0, \"title\": { \"enabled\": false }, \"opposite\": true, \"style\": {\"color\": \"#7F897D\", \"fontSize\":\"12px\", \"fontFamily\": \"firasans_r\", \"textShadow\": \"none\"} } ], \"legend\": {\"enabled\": true, \"symbolWidth\":10, \"symbolHeight\":10, \"shadow\": false, \"itemStyle\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"firasans_book\", \"textShadow\": \"none\", \"fontWeight\":\"normal\"} }, \"plotOptions\": {\"column\":{\"maxPointWidth\": 40 } }, \"series\": \"_series_\"}",
+  "type": "png",
+  "constr": "Chart",
+  "width": 1200
+}
+ // {
+//   "chart": {
+//     "type": "column",
+//     "backgroundColor": "#FFFFFF"
+//   },
+//   "title": {
+//     "text": "_title_",
+//     "margin": 40,
+//     "style": {
+//         "fontFamily":"firasans_r",
+//         "fontSize":"18px",
+//         "color": "#5d675b"
+//     },
+//     "useHTML": true
+//   },
+//   "xAxis": {
+//     "type": "category",
+//     "categories": "_categories_",
+//     "gridLineColor": "#5D675B",
+//     "gridLineWidth":1,
+//     "gridLineDashStyle": "Dash",
+//     "lineWidth": 1,
+//     "lineColor": "#5D675B",
+//     "tickWidth": 1,
+//     "tickColor": "#5D675B",
+//     "labels": {
+//       "style": {
+//         "color": "#5d675b",
+//         "fontSize":"14px",
+//         "fontFamily": "firasans_book",
+//         "textShadow": "none"
+//       },
+//       "step":1
+//     }
+//   },
+//   "yAxis": [
+//     {
+//       "title": { "enabled": false },
+//       "gridLineColor": "#eef0ee",
+//       "gridLineWidth":1,
+//       "style": {
+//         "color": "#5d675b",
+//         "fontSize":"14px",
+//         "fontFamily": "firasans_book",
+//         "textShadow": "none"
+//       }
+//     },
+//     {
+//       "linkedTo":0,
+//       "title": { "enabled": false },
+//       "opposite": true,
+//       "style": {
+//         "color": "#7F897D",
+//         "fontSize":"12px",
+//         "fontFamily": "firasans_r",
+//         "textShadow": "none"
+//       }
+//     }
+//   ],
+//   "legend": {
+//       "enabled": true,
+//       "symbolWidth":10,
+//       "symbolHeight":10,
+//       "shadow": false,
+//       "itemStyle": {
+//         "color": "#5d675b",
+//         "fontSize":"14px",
+//         "fontFamily": "firasans_book",
+//         "textShadow": "none",
+//         "fontWeight":"normal"
+//       }
+//    },
+//   "plotOptions": {
+//     "column":{
+//       "maxPointWidth": 40
+//     }
+//   },
+//   "series": "_series_"
+// }

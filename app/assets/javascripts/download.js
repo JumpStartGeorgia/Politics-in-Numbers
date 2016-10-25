@@ -557,15 +557,6 @@ $(document).ready(function (){
     filter_submit.click(function(){ filter(); });
 
 
-    // $(".download_list a").click(function(){
-    //   var t = $(this), action = t.attr("data-type"), li = t.parent(),
-    //     ul = li.parent(), source_type = ul.attr("data-type"),
-    //     source = "#" + ul.attr("data-object") + "_" + source_type;
-
-    //   export_object(source, source_type, action);
-    // });
-
-
     autocomplete.bind();
 
     $(document).on("click", ".filter-input[data-type='period_mix'] .input-radio-group input + label", function(event) {
@@ -592,11 +583,6 @@ $(document).ready(function (){
 
     });
 
-    // bind finance view_as buttons click event
-    // $(".pane[data-type='finance'] .actions .left > div[data-view-toggle]").on("click", function() {
-    //   $(".pane[data-type='finance']").attr("data-view-current", $(this).attr("data-view-toggle"));
-    //   $(".pane[data-type='finance'] .actions .download_list").attr("data-type", $(this).attr("data-view-toggle"));
-    // });
     $(document).on("click", "#download_toggle_all", function () {
       var t = $(this), state = t.is(":checked");
       $(view_table_object.$("tr", {"filter": "applied"}))

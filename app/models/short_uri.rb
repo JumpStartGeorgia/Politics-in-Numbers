@@ -1,7 +1,7 @@
 # Short class - Map class for url to short url
 class ShortUri
   include Mongoid::Document
-  include Mongoid::Timestamp
+  include Mongoid::Timestamps
 
   TYPES = [:explore, :embed_static]
   OTHER_STATES = [:donation, :finance]
@@ -18,6 +18,8 @@ class ShortUri
   field :other, type: Integer # currently saves if it is donation or finance
 
   scope :by_type, -> v { where("tp" => v) }
+  scope :embed_static_only, -> { where("tp" => 1) }
+  scope :not_activated, -> { where("activated" => false) }
 
   # indexes
   index({ sid: 1 }, { unique: true })
@@ -103,6 +105,9 @@ class ShortUri
     ShortUri.create({ sid: sid, nid: nid, rid: rid, pars: pars, tp: 1, other: is_donation ? 0 : 1 })
 
     sid
+  end
+  def self.prune_inactive_records
+    ShortUri.embed_static_only.not_activated.where({ created_at: { "$lt": 1.week.ago } }).destroy_all
   end
   private
     def self.type_is(tp)

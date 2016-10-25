@@ -62,11 +62,15 @@ class RootController < ApplicationController
 
     if !request.format.csv?
 
-      gon.url = root_url
+      gon.root_url = root_url
+
       gon.path = explore_path
       gon.filter_path = explore_filter_path
       gon.embed_path = embed_static_path(id: "_id_")
+      gon.share_url = share_url({ id: "_id_", chart: "_chart_" })
+      gon.share_desc = t("shared.common.description").html_safe
       gon.app_name = "pins.ge"
+      gon.app_name_long = t('shared.common.name')
       gon.date_format = t('date.formats.jsdate')
       gon.mdate_format = t('date.formats.jsmomentdate')
       gon.filter_item_close = t('.filter_item_close')
@@ -261,14 +265,26 @@ class RootController < ApplicationController
     pars = share_params
 
     sid = pars[:id]
-     Rails.logger.fatal("fatal----------------------#{sid}")
-    gon.tp = pars[:c]
-    @locale = I18n.locale
-    @descr = "Lorem Ipsum Desc"
-    @title = t('shared.common.name')
+    chart = pars[:chart]
+
+    Rails.logger.fatal("fatal----------------------#{sid} #{chart} #{pars}")
+
+    if sid.present?
+      shr = ShortUri.by_sid(sid, :explore)
+      if shr.present? && shr.other.present? && (shr.other == 0 || shr.other == 1)
+        is_donation = shr.other == 0
+        if (is_donation ? ["a", "b"] : ["a"]).index(chart).present?
+          data = (is_donation ? Donor : Dataset).explore(shr.pars, "co" + chart, true)
+          @missing = false
+        end
+      end
+    end
+
+    # @descr = "Lorem Ipsum Desc"
+    # @title = t('shared.common.name')
     @sitename = t('shared.common.name')
-    @image = img_url({ id: sid }) #image_url("share.png")
-    @share_url = share_url({ id: sid})
+    @image = generate_highchart_png(sid, chart)
+    @share_url = share_url({ id: sid, chart: chart })
 
     if true || request.user_agent.include?("facebookexternalhit")
         respond_to do |format|
@@ -279,31 +295,7 @@ class RootController < ApplicationController
     end
   end
 
-  def img
-     id = params[:id]
 
-
-    require 'net/http'
-    uri = URI.parse("http://127.0.0.1:3003/")
-    jsn = File.read("#{Rails.root}/vendor/assets/javascripts/highcharts-export-server/opts.json") #JSON.parse().to_s
-
-
-    headers = {
-      'Content-Type' => 'application/json', #'application/json',
-    #   'Accept'  => '*/*', #'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8' #'application/json'#,
-    }
-
-    http = Net::HTTP.new(uri.host, uri.port)
-    #http.set_debug_output $stderr
-    http.request_post(uri.path, jsn.gsub("%text", id), headers) {|response|
-      f = File.new("#{Rails.root}/public/system/share/#{I18n.locale}/#{id}.png", 'wb')
-      f << Base64.urlsafe_decode64(response.body)
-      f.close
-    }
-
-    send_file "#{Rails.root}/public/system/share/#{I18n.locale}/#{id}.png",
-       :type => 'image/png', :disposition => 'inline', filename: "#{id}.png"
-  end
 
   private
 
@@ -329,7 +321,59 @@ class RootController < ApplicationController
     end
 
     def share_params
-      params.permit(:id)
+      params.permit(:id, :chart)
+    end
+
+    def highchart_options_by_type ( type )
+      if type == :bar
+        infile = "{}"#"{\"chart\": {\"type\": \"bar\", \"backgroundColor\": \"_bg_\", }, \"title\": {\"text\": \"_title_\"}, \"subtitle\": {\"text\": \"_subtitle_\"}, \"xAxis\": {\"type\": \"category\"}, \"yAxis\": { \"visible\": false }, \"legend\": { \"enabled\": false }, \"series\": [{ \"data\": _series_ }] }"
+        #"{\"chart\": {\"type\": \"bar\", \"backgroundColor\": \"_bg_\", }, \"title\": {\"text\": \"_title_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"18px\", \"fontFamily\": \"firasans_r\", \"textShadow\": \"none\"} }, \"subtitle\": {\"text\": \"_subtitle_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"12px\", \"fontFamily\": \"firasans_book\", \"textShadow\": \"none\"} }, \"xAxis\": {\"type\": \"category\", \"lineWidth\": 0, \"tickWidth\": 0, \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"firasans_book\", \"textShadow\": \"none\"} } }, \"yAxis\": { \"visible\": false }, \"legend\": { \"enabled\": false }, \"plotOptions\": {\"bar\": {\"color\":\"#ffffff\", \"dataLabels\": {\"enabled\": true, \"padding\": 6, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"firasans_r\", \"textShadow\": \"none\"} }, \"pointInterval\":1, \"pointWidth\":17, \"pointPadding\": 0, \"groupPadding\": 0, \"borderWidth\": 0, \"shadow\": false } }, \"series\": [{ \"data\": _series_}] }"
+      elsif type == :column
+        infile = "{\"chart\": {\"type\": \"column\", \"backgroundColor\": \"#FFFFFF\"}, \"title\": {\"text\": \"_title_\", \"margin\": 40, \"style\": {\"fontFamily\":\"firasans_r\", \"fontSize\":\"18px\", \"color\": \"#5d675b\"}, \"useHTML\": true }, \"xAxis\": {\"type\": \"category\", \"categories\": \"_categories_\", \"gridLineColor\": \"#5D675B\", \"gridLineWidth\":1, \"gridLineDashStyle\": \"Dash\", \"lineWidth\": 1, \"lineColor\": \"#5D675B\", \"tickWidth\": 1, \"tickColor\": \"#5D675B\", \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"firasans_book\", \"textShadow\": \"none\"}, \"step\":1 } }, \"yAxis\": [{\"title\": { \"enabled\": false }, \"gridLineColor\": \"#eef0ee\", \"gridLineWidth\":1, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"firasans_book\", \"textShadow\": \"none\"} }, {\"linkedTo\":0, \"title\": { \"enabled\": false }, \"opposite\": true, \"style\": {\"color\": \"#7F897D\", \"fontSize\":\"12px\", \"fontFamily\": \"firasans_r\", \"textShadow\": \"none\"} } ], \"legend\": {\"enabled\": true, \"symbolWidth\":10, \"symbolHeight\":10, \"shadow\": false, \"itemStyle\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"firasans_book\", \"textShadow\": \"none\", \"fontWeight\":\"normal\"} }, \"plotOptions\": {\"column\":{\"maxPointWidth\": 40 } }, \"series\": \"_series_\"}"
+      end
+      {
+        "infile" => infile,
+        "type" => "png",
+        "constr" => "Chart",
+        "width" => 1200
+      }
+    end
+    def generate_highchart_png(id, chart)
+      # id = params[:id]
+      # chart = params[:chart]
+
+      require 'net/http'
+      uri = URI.parse("http://127.0.0.1:3003/")
+      headers = { 'Content-Type' => 'application/json' }
+
+      # jsn = File.read("#{Rails.root}/vendor/assets/javascripts/highcharts-export-server/opts.json") #JSON.parse().to_s
+      jsn = highchart_options_by_type(:bar)
+      # jsn[:infile].gsub!("_bg_", chart == "a" ? "#EBE187" : "#B8E8AD")
+      # jsn[:infile].gsub!("_title_", "Top 4 Donors")
+      # jsn[:infile].gsub!("_subtitle_", "01/12/2012 - 08/31/2016")
+      # jsn[:infile].gsub!("_series_", "[[Ilia Kechakmadze,147000],[Aleqsandre Sulaberidze,146000],[Nato Khaindrava,137600],[17 Donors,120000]]")
+      Rails.logger.fatal("fatal----------------------#{jsn.to_json}")
+      # bar:
+      #   bg
+      #   title
+      #   subtitle
+      #   series
+      # column:
+      #   title
+      #   categories
+      #   series
+      # json.replace()
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      #http.set_debug_output $stderr
+      http.request_post(uri.path, jsn.to_json, headers) {|response|
+        f = File.new("#{Rails.root}/public/system/share/#{I18n.locale}/#{id}#{chart}.png", 'wb')
+        f << Base64.urlsafe_decode64(response.body)
+        f.close
+      }
+      return "some image path"
+      # send_file "#{Rails.root}/public/system/share/#{I18n.locale}/#{id}.png",
+      #    :type => 'image/png', :disposition => 'inline', filename: "#{id}.png"
     end
 
 end

@@ -1,12 +1,15 @@
 /* global $ js gon */
 /*eslint no-console: "error"*/
-var embed_dialog = (function () {
+var js_dialog = (function () {
   var obj = undefined,
-    dgel = $("dialog#embed"),
+    dgel = $("dialog"),
     state = 0,
     Key = { ESC: 27 },
     prev_originator = undefined,
-    sid = undefined;
+    sid = undefined,
+    target_type = undefined,
+    callback = function() {},
+    close_callback = function () {};
   // var el: $("#embed_template"),
   // mn: $("main"),
 
@@ -22,30 +25,23 @@ var embed_dialog = (function () {
         obj.close();
       }
     });
-    $(".dialog-button").click(function () {
-      // validate data is good
-      // send to receiver
-      obj.close();
-    });
+    $(".dialog-button").click(function () { obj.close(); });
     $(window).on("resize.dialog", function () { resize(); });
 
     // embed dialog
-    dgel.find(".iframe-sizes").change(function () {
+    dgel.find("[data-type='embed'] .iframe-sizes").change(function () {
       if(this.value === "custom") {
         dgel.find(".iframe-custom").fadeIn();
       }
       else {
         dgel.find(".iframe-custom").fadeOut();
-        // var tmp = this.value.split("x");
-        // dgel.find(".iframe-width").val(tmp[0]);
-        // dgel.find(".iframe-height").val(tmp[1]);
       }
-      iframe();
+      callback();
     });
-    dgel.find(".iframe-custom input").change(function () {
-      iframe();
+    dgel.find("[data-type='embed'] .iframe-custom input").change(function () {
+      callback();
     });
-    dgel.find(".embed-type .toggle-group .toggle").click(function () {
+    dgel.find("[data-type='embed'] .embed-type .toggle-group .toggle").click(function () {
       var t = $(this), tp = t.attr("data-toggle");
       t.parent().attr("data-toggle", tp);
       if(tp === "static") {
@@ -53,7 +49,7 @@ var embed_dialog = (function () {
           var tmp = js.esid[js.is_donation ? "d" : "f"];
           if(typeof tmp !== "undefined") {
             sid = tmp;
-            iframe();
+            callback();
           }
           else {
             console.log("remote embed static id");
@@ -64,7 +60,7 @@ var embed_dialog = (function () {
                 if(data.hasOwnProperty("sid")) {
                   sid = data.sid;
                   js.esid[js.is_donation ? "d" : "f"] = sid;
-                  iframe();
+                  callback();
                 }
               }
             });
@@ -75,15 +71,18 @@ var embed_dialog = (function () {
         }
       }
       else {
-        iframe();
+        callback();
       }
     });
+
   })();
+
+
   function resize () {
     var sec = dgel.find("section.active").first();
     sec.css({ top: $(window).height()/2 - sec.height()/2, left: $(window).width()/2 - sec.width()/2 });
   }
-  function iframe (originator) {
+  function embed_callback (originator) {
     if(typeof originator === "undefined") {
       originator = prev_originator;
     }
@@ -106,23 +105,47 @@ var embed_dialog = (function () {
 
     prev_originator = originator;
   }
+  function embed_close_callback () {
+    dgel.find(".embed-type .toggle-group .toggle[data-toggle='dynamic']").trigger("click");
+  }
+  function share_callback (option) {
+    console.log("share_callback", option);
+    var lnk = dgel.find(".facebook a"), uri = gon.share_url.replace("_id_", js.sid).replace("_chart_", option.chart);
+
+    lnk.attr("href", lnk.attr("data-href").replace("_url_", uri));
+    lnk = dgel.find(".twitter a");
+    lnk.attr("href", lnk.attr("data-href").replace("_url_", uri).replace("_text_", option.title));
+    lnk = dgel.find(".more .addthis_inline_share_toolbox");
+    lnk.attr("data-url", uri);
+    lnk.attr("data-title", option.title);
+    lnk.attr("data-description", gon.share_desc);
+  }
+  function share_close_callback () { }
 
   obj = {
-    open: function open (type, originator) {
+    open: function open (type, options) {
+      if(type === "embed") {
+        callback = embed_callback;
+        close_callback = embed_close_callback;
+        options = options.chart;
+      }
+      else {
+        callback = share_callback;
+        close_callback = share_close_callback;
+      }
       sid = undefined;
+
       var sec = dgel.find("section[data-type='" + type + "']");
+
       dgel.find("section.active").removeClass("active");
       sec.addClass("active");
-      iframe(originator);
-      // this.mn.attr("tabindex", 0);
-      // sec.find("input, button").first().focus();
+      callback(options);
       dgel.addClass("active");
       resize();
       state = 1;
     },
     close: function close () {
-      // this.mn.removeAttr("tabindex");
-      dgel.find(".embed-type .toggle-group .toggle[data-toggle='dynamic']").trigger("click");
+      close_callback();
       dgel.find("section.active").removeClass("active");
       dgel.removeClass("active");
       state = 0;

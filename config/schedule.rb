@@ -18,3 +18,7 @@
 # end
 
 # Learn more: http://github.com/javan/whenever
+
+every :day, :at => '2:00am' do
+  runner "ShortUri.prune_inactive_records"
+end

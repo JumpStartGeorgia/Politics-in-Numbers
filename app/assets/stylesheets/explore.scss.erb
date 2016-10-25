@@ -1,6 +1,6 @@
 /*
 *= require jquery-ui/tooltip
-*= require components/embed_dialog
+*= require components/js_dialog
 */
 #explore {
   // margin: -100px -42px 0 -42px;
@@ -906,7 +906,7 @@
         [data-view] {
           display:none;
         }
-        &[data-view-current='chart'] {
+        &[data-view-type='chart'] {
           .actions .left [data-view-toggle='chart'] {
             border:1px dashed #AEB3AD;
             background-image:url("<%= asset_path('explore/chart_a.svg') %>");
@@ -915,7 +915,7 @@
             display:initial;
           }
         }
-        &[data-view-current='table'] {
+        &[data-view-type='table'] {
           .actions .left [data-view-toggle='table'] {
             border:1px dashed #AEB3AD;
             background-image:url("<%= asset_path('explore/table_a.svg') %>");
@@ -1300,6 +1300,17 @@
         }
         .pane[data-type='finance'] {
           width:100%;
+          &[data-view-type] {
+            [data-only='chart'],
+            [data-only='table']
+            { display:none; }
+          }
+          &[data-view-type='chart'] [data-only='chart'] {
+            display:inline-block;
+          }
+          &[data-view-type='table'] [data-only='table'] {
+            display:inline-block;
+          }
         }
       }
       .actions {
@@ -1319,6 +1330,7 @@
           height: 36px;
           padding:7px 8px;
           border:1px dashed transparent;
+          vertical-align:top;
           i {
             display:block;
             width:24px;
@@ -1380,22 +1392,6 @@
           i { background-position: -50px -44px; }
           &:hover i { background-position: -50px -66px; }
         }
-
-        .download_menu {
-          .download_list {
-            &[data-type] {
-              [data-only='chart'],
-              [data-only='table']
-              { display:none; }
-            }
-            &[data-type='chart'] [data-only='chart'] {
-              display:initial;
-            }
-            &[data-type='table'] [data-only='table'] {
-              display:initial;
-            }
-          }
-        }
       }
     }
   }
@@ -1421,6 +1417,7 @@
       background-color:#fff;
       border:1px dashed #aeb3ad;
       li a {
+        white-space:nowrap;
         display:block;
         font: 14px firasans_l;
         color: #5D675B;

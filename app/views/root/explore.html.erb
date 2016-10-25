@@ -176,16 +176,16 @@
           <div class="charts">
             <div class="chart-container chart-container-1">
               <div class="actions">
-                <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-                <div class="embed" data-embed="a" title="<%= t('.embed_chart') %>"><i></i></div>
+                <div class="share" data-dialog="share;a" data-share-title="donation_chart_1" title="<%= t('.share_chart') %>"><i></i></div>
+                <div class="embed" data-dialog="embed;a" title="<%= t('.embed_chart') %>"><i></i></div>
                 <div class="download download_menu" title="<%= t('.download_chart') %>">
                   <i></i>
                   <ul class="chart_download" data-target="#donation_chart_1">
-                    <li><a href="javascript:void(0);" data-type="print">print</a></li>
-                    <li><a href="javascript:void(0);" data-type="pdf">pdf</a></li>
-                    <li><a href="javascript:void(0);" data-type="svg">svg</a></li>
-                    <li><a href="javascript:void(0);" data-type="jpeg">jpeg</a></li>
-                    <li><a href="javascript:void(0);" data-type="png">png</a></li>
+                    <li><a href="javascript:void(0);" data-type="print"><%= t('.export_type.print') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="svg"><%= t('.export_type.svg') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="png"><%= t('.export_type.png') %></a></li>
                   </ul>
                 </div>
               </div>
@@ -199,16 +199,16 @@
             </div>
             <div class="chart-container chart-container-2">
               <div class="actions">
-                <div class="share" title="<%= t('.share_chart') %>"><i></i></div>
-                <div class="embed" data-embed="b" title="<%= t('.embed_chart') %>"><i></i></div>
+                <div class="share" data-dialog="share;b" data-share-title="donation_chart_2" title="<%= t('.share_chart') %>"><i></i></div>
+                <div class="embed" data-dialog="embed;b" title="<%= t('.embed_chart') %>"><i></i></div>
                 <div class="download download_menu" title="<%= t('.download_chart') %>">
                   <i></i>
                   <ul class="chart_download" data-target="#donation_chart_2">
-                    <li><a href="javascript:void(0);" data-type="print">print</a></li>
-                    <li><a href="javascript:void(0);" data-type="pdf">pdf</a></li>
-                    <li><a href="javascript:void(0);" data-type="svg">svg</a></li>
-                    <li><a href="javascript:void(0);" data-type="png">png</a></li>
-                    <li><a href="javascript:void(0);" data-type="jpeg">jpeg</a></li>
+                    <li><a href="javascript:void(0);" data-type="print"><%= t('.export_type.print') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="svg"><%= t('.export_type.svg') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="png"><%= t('.export_type.png') %></a></li>
                   </ul>
                 </div>
               </div>
@@ -229,7 +229,7 @@
             </div>
           </div>
         </div>
-        <div class="pane" data-type="finance" data-view-current="chart">
+        <div class="pane" data-type="finance" data-view-type="chart">
           <div class="actions">
             <div class="left">
               <label><%= t('.view_as') %>:</label>
@@ -237,21 +237,25 @@
               <div data-view-toggle="table" title="<%= t('.view_as_table') %>"></div>
             </div>
             <div class="right">
-              <div class="share" title="<%= t('.share_chart') %>"><i></i>
+              <div class="share" data-dialog="share;a" data-share-title="finance_chart" title="<%= t('.share_chart') %>" data-only="chart"><i></i>
                   <div class="addthis_sharing_toolbox"></div>
               </div>
-              <div class="embed" data-embed="a" title="<%= t('.embed_chart') %>"><i></i></div>
-              <div class="download download_menu" title="<%= t('.download_chart') %>">
-                <i></i>
-                <ul class="download_list" data-type="chart" data-object="finance">
-                  <li data-only="table"><a href="<%= "#{@finance_download_link}" %>" id="finance_csv_download" data-type="csv"><%= t('.export_type.csv') %></a></li>
-                  <li data-only="chart"><a href="javascript:void(0);" data-type="print"><%= t('.export_type.print') %></a></li>
-                  <li data-only="chart"><a href="javascript:void(0);" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
-                  <li data-only="chart"><a href="javascript:void(0);" data-type="svg"><%= t('.export_type.svg') %></a></li>
-                  <li data-only="chart"><a href="javascript:void(0);" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
-                  <li data-only="chart"><a href="javascript:void(0);" data-type="png"><%= t('.export_type.png') %></a></li>
-                </ul>
+              <div class="embed" data-dialog="embed;a" data-only="chart" title="<%= t('.embed_chart') %>"><i></i></div>
+              <div class="download">
+                <a href='<%= "#{@finance_download_link}" %>' id="finance_csv_download" data-only="table" title="<%= t('.export_type.csv') %>"><i></i></a>
+                <div class="download_menu" data-only="chart" title="<%= t('.download_chart') %>">
+                  <i></i>
+                  <ul class="chart_download" data-target="#finance_chart">
+                    <li><a href="javascript:void(0);" data-type="print"><%= t('.export_type.print') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="svg"><%= t('.export_type.svg') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="jpeg"><%= t('.export_type.jpeg') %></a></li>
+                    <li><a href="javascript:void(0);" data-type="png"><%= t('.export_type.png') %></a></li>
+                  </ul>
+                </div>
               </div>
+
+
             </div>
           </div>
           <div data-view="chart"><div id="finance_chart"></div></div>
@@ -262,22 +266,22 @@
     </div>
   </div>
 </div>
-<dialog id="embed">
+<dialog>
   <div class="bg"></div>
-  <section class="dialog-embed" data-type="embed">
-    <div class="caption">Embed</div>
+  <section id="embed" class="dialog-embed" data-type="embed">
+    <div class="caption"><%= t('shared.dialog.embed.caption') %></div>
     <div class="content">
-      <label>Copy and paste this embed code into your web page:</label>
+      <label><%= t('shared.dialog.embed.copy_code') %></label>
       <textarea rows="4" cols="38" data-iframe-link="<%= embed_url({ id: "_id_"}).gsub("/dynamic/", "/_type_/") %>" readonly="" onfocus="setTimeout(function (t){ t.select(); copy(t); }, 10, this);" onmouseup="return false;"></textarea>
-      <div class="copied">Copied</div>
+      <div class="copied"><%= t('shared.dialog.embed.copied') %></div>
       <div class="embed-size">
-        <label>Frame size:</label>
+        <label><%= t('shared.dialog.embed.frame_size') %></label>
         <select class="iframe-sizes">
           <option value="560x315">560x315</option>
           <option value="640x360" selected>640x360</option>
           <option value="853x480">853x480</option>
           <option value="1280x720">1280x720</option>
-          <option value="custom">Custom size</option>
+          <option value="custom"><%= t('shared.dialog.embed.custom_size') %></option>
         </select>
         <div class="iframe-custom" style="display:none;">
           <input type="number" value="640" min="100" step="10" class="iframe-width">
@@ -286,14 +290,36 @@
         </div>
       </div>
       <div class="embed-type">
-        <label>Embed Type:</label>
+        <label><%= t('shared.dialog.embed.embed_type') %></label>
         <div class="toggle-group" data-toggle="dynamic">
-          <button type="button" class="toggle" data-toggle="dynamic">Dynamic</button><button type="button" class="toggle" data-toggle="static">Static</button>
+          <button type="button" class="toggle" data-toggle="dynamic"><%= t('shared.dialog.embed.dynamic') %></button><button type="button" class="toggle" data-toggle="static"><%= t('shared.dialog.embed.static') %></button>
         </div>
+        <span class="hint">* <%= t('shared.dialog.embed.type_hint').html_safe %></span>
       </div>
     </div>
     <div class="button">
-      <button type="button" class="dialog-button">Close</button>
+      <button type="button" class="dialog-button"><%= t('shared.dialog.close') %></button>
+    </div>
+  </section>
+  <section id="share" class="dialog-share" data-type="share">
+    <div class="caption"><%= t('shared.dialog.share.caption') %></div>
+    <div class="content">
+      <label><%= t('shared.dialog.embed.share_chart') %></label>
+      <div class="facebook">
+        <a target="_blank" data-href="https://www.facebook.com/sharer/sharer.php?u=_url_" onclick="javascript:window.open(this.href,
+                          '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><%= image_tag('facebook.svg', alt: t('shared.common.facebook'), title: t('shared.common.facebook')) %><%= t('shared.common.facebook') %></a>
+      </div>
+      <div class="twitter">
+        <a target="_blank" data-href='https://twitter.com/share?url=_url_&text=_text_' onclick="javascript:window.open(this.href,
+                          '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"><%= image_tag('twitter.svg', alt: t('shared.common.twitter'), title: t('shared.common.twitter')) %><%= t('shared.common.twitter') %>
+        </a>
+      </div>
+      <div class="more">
+        <div class="addthis_inline_share_toolbox"></div>
+      </div>
+    </div>
+    <div class="button">
+      <button type="button" class="dialog-button"><%= t('shared.dialog.close') %></button>
     </div>
   </section>
 </dialog>
