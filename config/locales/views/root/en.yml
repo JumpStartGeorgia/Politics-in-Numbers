@@ -108,7 +108,7 @@ en:
         png: Png image
         csv: Csv document
       placeholder:
-        donor: Select donor
+        donor: Search donor
         party: Select party
         income: Select category
         income_campaign: Select category

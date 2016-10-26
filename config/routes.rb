@@ -45,8 +45,8 @@ Rails.application.routes.draw do
     get '/embed_test/:type/:id/:chart' => 'root#embed_test', as: :embed_test
     get '/share/:id/:chart' => 'root#share', as: :share
     get '/img/:id/:chart' => 'root#img', as: :img
-    # get 'select/donors' => 'root#select_donors'
-    get 'select/parties' => 'root#select_parties'
+    get 'filter/donors' => 'root#donors_filter'
+    # get 'select/parties' => 'root#select_parties'
     get 'explore_filter' => 'root#explore_filter'
     get 'download' => 'root#download'
 

@@ -7,7 +7,7 @@
 $(document).ready(function (){
   var chart = $("#chart");
 
-  function bar_chart (series_data, title, subtitle, bg) {
+  function bar_chart (resource, bg) {
     chart.highcharts({
       chart: {
         type: "bar",
@@ -31,7 +31,7 @@ $(document).ready(function (){
         }
       },
       title: {
-        text: title,
+        text: resource.title,
         style: {
           color: "#5d675b",
           fontSize:"18px",
@@ -40,7 +40,7 @@ $(document).ready(function (){
         }
       },
       subtitle: {
-        text: subtitle,
+        text: resource.subtitle,
         style: {
           color: "#5d675b",
           fontSize:"12px",
@@ -88,7 +88,7 @@ $(document).ready(function (){
           shadow: false
         }
       },
-      series: [{ data: series_data }],
+      series: [{ data: resource.series }],
       tooltip: {
         backgroundColor: "#DCE0DC",
         followPointer: true,
@@ -218,7 +218,7 @@ $(document).ready(function (){
     if(data) {
       if(gon.is_donation) {
         if(gon.tp === "a" || gon.tp === "b") {
-          bar_chart(data["c" + gon.tp], data["c" + gon.tp + "_title"], data.chart_subtitle, (gon.tp === "a" ? "#EBE187" : "#B8E8AD"));
+          bar_chart(data["c" + gon.tp], (gon.tp === "a" ? "#EBE187" : "#B8E8AD"));
         }
       }
       else {

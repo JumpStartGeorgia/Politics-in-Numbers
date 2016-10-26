@@ -1,13 +1,18 @@
+<%
+  @title = h @title
+  @descr = h @descr
+  @image = h @image
+%>
 <html lang="<%= I18n.locale %>">
   <head>
     <title><%= @title %></title>
     <meta charset="utf-8">
     <meta name="description" content="<%= @descr %>">
     <meta property="og:title" content="<%= @title %>" />
-    <meta property="og:site_name" content="<%= @sitename %>" />
+    <meta property="og:site_name" content="<%= h @sitename %>" />
     <meta property="og:image" content="<%= @image %>" />
     <meta property="og:description" content="<%= @descr %>" />
-    <meta property="og:url" content="<%= @share_url %>" />
+    <meta property="og:url" content="<%= h @share_url %>" />
     <meta property="og:type"   content="website" />
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@pins.ge">

@@ -76,7 +76,23 @@ $(document).ready(function (){
         else {
           if(v.length >= 3 && t.data("previous") !== v) {
             t.data("previous", v);
-            if(p.is("[data-local]")) {
+
+            if(p.is("[data-url]")) {
+              $.ajax({
+                url: p.attr("data-url"),
+                dataType: "json",
+                data: { q: v },
+                success: function(data) {
+                  var html = "";
+                  // console.log("back", data);
+                  data.forEach(function(d) {
+                    html += "<li><div class='item" + (autocomplete.has(autocomplete_id, d[0]) ? " selected" : "") + "' data-id='" + d[0] + "' data-extra='" + d[2] + "'>" + d[1] + "</li>";
+                  });
+                  p.find("ul").html(html);//.addClass("active");
+                }
+              });
+            }
+            else if(p.is("[data-local]")) {
               ul.find("li").hide();
               var regex = new RegExp(".*" + v + ".*", "i"),
                 local = p.attr("data-local"),
@@ -109,23 +125,6 @@ $(document).ready(function (){
                   ul.find("li .item[data-id='" + ts + "']").parent().show();
                 });
               }
-            }
-            else {
-              console.log("ajax");
-              $.ajax({
-                url: p.attr("data-url"),
-                dataType: 'json',
-                data: { q: v },
-                success: function(data) {
-                  var html = "";
-                  console.log("back", data);
-                  data.forEach(function(d) {
-                    html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
-                  });
-                  p.find("ul").html(html).addClass("active");
-                  //console.log("ajax success");
-                }
-              });
             }
           }
           else {
@@ -232,6 +231,7 @@ $(document).ready(function (){
         }
       },
       data: {},
+      sid: undefined,
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, tmp_o, lnk;
         t.data = { filter: "donation" };;
@@ -370,43 +370,21 @@ $(document).ready(function (){
         });
       },
       id: function() {
-
         var t = this, tmp = [], p, except = ["period", "amount"];
-        // console.log(t.data);
         Object.keys(t.data).sort().forEach(function (k) {
           p = t.data[k];
           p = Array.isArray(p) && except.indexOf(k) === -1 ? p.sort() : [p];
           tmp.push(k + "=" + p.join(","));
         });
-        // console.log(tmp.join("&"),  CryptoJS.MD5(tmp.join("&")).toString());
         return CryptoJS.MD5(tmp.join("&")).toString();
       },
       url: function (sid) {
-        if(typeof sid !== "undefined" && js.is_donation) {
-          js.sid = sid;
-          window.history.pushState(sid, null, gon.path + "/" + sid);
-          this.download.attr("href", gon.path + "/" + sid + "?format=csv")
-        }
-      },
-      // url: function(v) {
-      //   var t = this, url = "?", params = [], tmp;
-
-      //   Object.keys(this.elem).forEach(function(el){
-      //     if(v.hasOwnProperty(el)) {
-      //       tmp = v[el];
-      //       if(el !== "monetary" && el !== "multiple" && el !== "nature" && Array.isArray(tmp)) {
-      //         tmp.forEach(function(r){
-      //           params.push(el + "[]=" + r);
-      //         });
-      //       }
-      //       else {
-      //         params.push(el + "=" + tmp);
-      //       }
-      //     }
-      //   });
-      //   window.history.pushState(v, null, gon.path + "?filter=donation" + (params.length ? ("&" + params.join("&")) : ""));
-      //   t.download.attr("href", gon.path + "?filter=donation&" + (params.length ? (params.join("&") + "&") : "") + "format=csv")
-      // }
+        if(typeof sid === "undefined") { sid = this.sid; }
+        js.sid = sid;
+        this.sid = sid;
+        window.history.pushState(sid, null, gon.path + "/" + sid);
+        this.download.attr("href", gon.path + "/" + sid + "?format=csv");
+      }
     },
     finance = {
       name: "finance",
@@ -447,6 +425,7 @@ $(document).ready(function (){
         period: $("#finance_period")
       },
       data: {},
+      sid: undefined,
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, lnk;
         t.data = { filter: "finance" };
@@ -565,37 +544,16 @@ $(document).ready(function (){
           p = Array.isArray(p) ? p.sort() : [p];
           tmp.push(k + "=" + p.join(","));
         });
-        // console.log(tmp.join("&"),  CryptoJS.MD5(tmp.join("&")).toString());
         return CryptoJS.MD5(tmp.join("&")).toString();
       },
-      // url: function(v) {
-      //   var t = this, url = "?", params = [], tmp;
-      //   // console.log(v);
-      //   Object.keys(this.elem).forEach(function(el){
-      //     if(v.hasOwnProperty(el)) {
-      //       tmp = v[el];
-      //       if(Array.isArray(tmp)) {
-      //         tmp.forEach(function(r){
-      //           params.push(el + "[]=" + r);
-      //         });
-      //       }
-      //       else {
-      //         params.push(el + "=" + tmp);
-      //       }
-      //     }
-      //   });
-      //   window.history.pushState(v, null, gon.path + "?filter=finance" + (params.length ? ("&" + params.join("&")) : ""));
-      //   t.download.attr("href", gon.path + "?filter=finance&" + (params.length ? (params.join("&") + "&") : "") + "format=csv");
-      // },
       url: function (sid) {
-        if(typeof sid !== "undefined" && !js.is_donation) {
-          js.sid = sid;
-          window.history.pushState(sid, null, gon.path + "/" + sid);
-          this.download.attr("href", gon.path + "/" + sid + "?format=csv");
-        }
+        if(typeof sid === "undefined") { sid = this.sid; }
+        js.sid = sid;
+        this.sid = sid;
+        window.history.pushState(sid, null, gon.path + "/" + sid);
+        this.download.attr("href", gon.path + "/" + sid + "?format=csv");
       },
       toggle: function(element, turn_on) {
-        //console.log(element, turn_on);
         var t = this;
         t.elem[element].parent().attr("data-on", turn_on);
         t.states[element] = turn_on;
@@ -610,7 +568,7 @@ $(document).ready(function (){
 
   finance_toggle.click(function (event){
     js.is_donation = false;
-    finance.url(js.sid);
+    finance.url();
     var p = finance_toggle.parent().parent();
     donation_toggle.parent().removeClass("active");
 
@@ -627,7 +585,7 @@ $(document).ready(function (){
 
   donation_toggle.click(function (event){
     js.is_donation = true;
-    donation.url(js.sid);
+    donation.url();
     var p = donation_toggle.parent();
     finance_toggle.parent().parent().removeClass("active");
 
@@ -936,6 +894,7 @@ $(document).ready(function (){
         tmp = obj.get();
         _id = obj.id();
         js.cache[_id] = gon[obj.name + "_data"];
+        console.log("gonnned",js.cache[_id].sid);
         obj.url(js.cache[_id].sid);
         filter_callback(js.cache[_id], obj.name);
       });
@@ -950,7 +909,7 @@ $(document).ready(function (){
         var filters = {};
         delete tmp["filter"];
         filters[obj.name] = tmp;
-        console.log("-------------------", _id, filters);
+        // console.log("-------------------", _id, filters);
         $.ajax({
           url: gon.filter_path,
           dataType: 'json',
@@ -976,8 +935,8 @@ $(document).ready(function (){
     var is_data_ok = typeof data !== "undefined";
     if(is_data_ok) {
       if(partial === "donation") {
-        bar_chart("#donation_chart_1", data.ca, data.ca_title, data.chart_subtitle, "#EBE187");
-        bar_chart("#donation_chart_2", data.cb, data.cb_title, data.chart_subtitle, "#B8E8AD");
+        bar_chart("#donation_chart_1", data.ca, "#EBE187");
+        bar_chart("#donation_chart_2", data.cb, "#B8E8AD");
       }
       else {
         //grouped_column_chart("#finance_chart", data.ca, "#fff");
@@ -1077,14 +1036,14 @@ $(document).ready(function (){
       });
     }
   }
-  function bar_chart(elem, series_data, title, subtitle, bg) {
-    //console.log("chart", elem, series_data);
-    js.share[elem] = encodeURI(title + "( " + subtitle + " )" + " | " + gon.app_name_long);
+  function bar_chart(elem, resource, bg) {
+    console.log("chart", elem, resource);
+    js.share[elem] = encodeURI(resource.title + "( " + resource.subtitle + " )" + " | " + gon.app_name_long);
     $(elem).highcharts({
       chart: {
           type: 'bar',
           backgroundColor: bg,
-          height: 60*(Math.round(title.length/40)+1) + 40 * series_data.length,
+          height: 60*(Math.round(resource.title.length/40)+1) + 40 * resource.series.length,
           width: w > 992 ? (view_content.width()-386)/2 : w - 12,
           events: {
             load: function () {
@@ -1103,7 +1062,7 @@ $(document).ready(function (){
         }
       },
       title: {
-        text: title,
+        text: resource.title,
         style: {
           color: "#5d675b",
           fontSize:"18px",
@@ -1112,7 +1071,7 @@ $(document).ready(function (){
         }
       },
       subtitle: {
-        text: subtitle,
+        text: resource.subtitle,
         style: {
           color: "#5d675b",
           fontSize:"12px",
@@ -1160,7 +1119,7 @@ $(document).ready(function (){
               shadow: false
           }
       },
-      series: [{ data: series_data }],
+      1: [{ data: resource.series }],
       tooltip: {
         backgroundColor: "#DCE0DC",
         followPointer: true,

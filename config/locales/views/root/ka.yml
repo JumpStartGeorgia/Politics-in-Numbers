@@ -108,7 +108,7 @@ ka:
         png: Png
         csv: Csv
       placeholder:
-        donor: დონორის არჩევა
+        donor: დონორის ძებნა
         party: პარტიის არჩევა
         income: კატეგორიის არჩევა
         income_campaign: კატეგორიის არჩევა

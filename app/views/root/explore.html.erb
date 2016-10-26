@@ -57,7 +57,7 @@
         </div>
 
         <div class="donation filter-inputs" data-type="donation">
-          <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "donor", on: true, source: "donor_list", category_label: 0 } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "donor", on: true, source: "donor_list", category_label: 0, remote_url: "#{filter_donors_path}" } %>
           <div class="row filter-input" data-field="period" data-type="period">
             <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.time_period') %><i title="<%= t('.filter_toggle') %>"></i></a>
             <div class="list"></div>

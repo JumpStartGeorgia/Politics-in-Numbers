@@ -5,6 +5,8 @@ class Donor
   include Mongoid::Slug
 
   before_save :regenerate_fullname
+  after_create  :prune_share_images
+
   embeds_many :donations, after_add: :calculate_donated_amount, after_remove: :calculate_donated_amount
   accepts_nested_attributes_for :donations
   NATURE_TYPES = ["individual", "organization"]
@@ -78,7 +80,26 @@ class Donor
   end
 
   def self.list_with_tin
-    sorted.map{|t| [t.permalink, t.full_name, t.tin, t.color]}
+    # map = %Q{
+    #   function() {
+    #     emit(this.name, { likes: this.likes });
+    #   }
+    # }
+
+    # reduce = %Q{
+    #   function(key, values) {
+    #     var result = { likes: 0 };
+    #     values.forEach(function(value) {
+    #       result.likes += value.likes;
+    #     });
+    #     return result;
+    #   }
+    # }
+    # Band.map_reduce(map, reduce).out(inline: 1).each do |document|
+    #   p document # { "_id" => "Tool", "value" => { "likes" => 200 }}
+    # end
+
+    sorted.map{|t| [t.permalink, t.full_name, t.tin]}
   end
 
   def self.filter(params)
@@ -248,10 +269,7 @@ class Donor
     monetary_values = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
     nature_values = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
     parties = {}
-     Rails.logger.fatal("---------------------------langgggggggggggggg-----------------#{I18n.locale}")
-    Party.each{|e| parties[e.id] = { value: 0, name: e.title }
-       Rails.logger.fatal("fatal----------------------#{e.title}")
-     }
+    Party.each{ |e| parties[e.id] = { value: 0, name: e.title } }
 
     chart_meta = [
       ["top_5_donors", "top_5_parties"],
@@ -473,19 +491,20 @@ class Donor
     end
     if ["ca", "a", "co", "coa"].index(type).present?
       res.merge!({
-          ca: ca,
-          ca_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", ca_meta_obj)
-        })
+        ca: {
+          series: ca,
+          title: I18n.t("shared.chart.title.#{chart_meta[chart_type][0]}", ca_meta_obj),
+          subtitle: chart_subtitle
+        }
+      })
     end
     if ["cb", "a", "co", "cob"].index(type).present?
       res.merge!({
-          cb: cb,
-          cb_title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", cb_meta_obj)
-        })
-    end
-    if ["ca", "cb", "a", "co", "cob"].index(type).present?
-      res.merge!({
-        chart_subtitle: chart_subtitle,
+        cb: {
+          series: cb,
+          title: I18n.t("shared.chart.title.#{chart_meta[chart_type][1]}", cb_meta_obj),
+          subtitle: chart_subtitle
+        }
       })
     end
     if ["a"].index(type).present?
@@ -626,6 +645,22 @@ class Donor
   end
 
   private
+
+    def prune_share_images
+      begin
+        I18n.available_locales.each { |lang|
+          path = "#{Rails.root}/public/share_images/donation/#{lang}"
+          if File.directory?(path)
+            FileUtils.remove_entry_secure(path, force = true)
+            FileUtils.mkdir_p(path)
+          end
+        }
+        return true
+      rescue
+        return false
+      end
+    end
+
     def regenerate_fullname
       tmp = {}
       self.first_name_translations.each{|k,v|

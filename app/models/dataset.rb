@@ -5,6 +5,7 @@ class Dataset
   include Mongoid::Timestamps
   include Mongoid::Paperclip
 
+  after_create  :prune_share_images
 
   STATES = [:pending, :processed, :discontinued]  # 0 pending 1 processed 2 discontinued
   SYMS = [ :income, :income_campaign, :expenses, :expenses_campaign, :reform_expenses, :property_assets, :financial_assets, :debts ]
@@ -562,4 +563,21 @@ class Dataset
         filename: "#{I18n.t("root.download.filename_finance")}_#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)}_(pins.ge).zip" } : {})
     end
   end
+
+  private
+
+    def prune_share_images
+      begin
+        I18n.available_locales.each { |lang|
+          path = "#{Rails.root}/public/share_images/finance/#{lang}"
+          if File.directory?(path)
+            FileUtils.remove_entry_secure(path, force = true)
+            FileUtils.mkdir_p(path)
+          end
+        }
+        return true
+      rescue
+        return false
+      end
+    end
 end
