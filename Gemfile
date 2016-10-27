@@ -95,7 +95,7 @@ gem "daemons"
 
 gem "base58" # generating base58 string from input used in shorturi to generate user friendly uri
 
-gem 'whenever'
+# gem 'whenever'
 
 gem 'mina-whenever' # Mina for whenever
 
