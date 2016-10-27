@@ -97,7 +97,6 @@ gem "base58" # generating base58 string from input used in shorturi to generate 
 
 # gem 'whenever'
 
-gem 'mina-whenever' # Mina for whenever
 
 group :development do
   # Silences assets-related logging
@@ -127,6 +126,8 @@ group :development do
   gem 'locales_export_import', '~> 0.4.2'
 
 end
+
+gem 'mina-whenever' # Mina for whenever
 
 group :test do
   # Specification testing
