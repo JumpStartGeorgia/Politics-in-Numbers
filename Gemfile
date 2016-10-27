@@ -97,7 +97,7 @@ gem "base58" # generating base58 string from input used in shorturi to generate 
 
 gem 'whenever'
 
-
+gem 'mina-whenever' # Mina for whenever
 
 group :development do
   # Silences assets-related logging
@@ -118,8 +118,7 @@ group :development do
   # Mina for multiple servers
   gem 'mina-multistage', '~> 1.0.1', require: false
 
-  # Mina for whenever
-  gem 'mina-whenever'
+
 
   # Prints arrays, hashes, etc. beautifully
   gem 'awesome_print', '~> 1.6', '>= 1.6.1'
