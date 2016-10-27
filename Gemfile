@@ -127,7 +127,7 @@ group :development do
 
 end
 
-gem 'mina-whenever' # Mina for whenever
+# gem 'mina-whenever' # Mina for whenever
 
 group :test do
   # Specification testing

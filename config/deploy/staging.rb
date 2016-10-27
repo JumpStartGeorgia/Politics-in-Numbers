@@ -7,4 +7,3 @@ set :branch, 'embed'
 set :web_url, 'dev-pin.jumpstart.ge'
 set :visible_to_robots, false
 set :use_ssl, true
-set :whenever_name, 'staging'
