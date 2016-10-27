@@ -95,7 +95,7 @@ gem "daemons"
 
 gem "base58" # generating base58 string from input used in shorturi to generate user friendly uri
 
-# gem 'whenever'
+gem 'whenever'
 
 
 group :development do
@@ -124,8 +124,6 @@ group :development do
   gem 'locales_export_import', '~> 0.4.2'
 
 end
-
-# gem 'mina-whenever' # Mina for whenever
 
 group :test do
   # Specification testing

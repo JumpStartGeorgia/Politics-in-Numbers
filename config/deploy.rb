@@ -374,6 +374,7 @@ task deploy: :environment do
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
+    invoke :'whenever:update'
     invoke :'delayed_job:start'
 
     to :launch do
