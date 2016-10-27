@@ -819,7 +819,9 @@ $(document).ready(function (){
       }
     });
     explore_button.click(function(){ clear_embed(); filter(); });
-
+    function clear_embed() {
+      js.esid[js.is_donation ? "d" : "f"] = undefined;
+    }
     $(".chart_download a").click(function(){
       var t = $(this), type = t.attr("data-type"), p = t.parent().parent(), target = p.attr("data-target"),
       chart = $(target).highcharts(),
