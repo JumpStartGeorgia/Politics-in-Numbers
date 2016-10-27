@@ -293,7 +293,7 @@ class RootController < ApplicationController
       @image = view_context.image_url("/share_images/missing.png")
     end
 
-    if true || request.user_agent.include?("facebookexternalhit")
+    if request.user_agent.include?("facebookexternalhit") || request.user_agent.include?("Twitterbot")
         respond_to do |format|
           format.html
         end
