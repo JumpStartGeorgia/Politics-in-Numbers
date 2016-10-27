@@ -375,10 +375,10 @@ task deploy: :environment do
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
-    invoke :'whenever:update'
     invoke :'delayed_job:start'
 
     to :launch do
+      invoke :'whenever:update'
       queue! "mkdir -p #{full_current_path}/tmp/"
       queue! "touch #{full_current_path}/tmp/restart.txt"
       if first_deploy
