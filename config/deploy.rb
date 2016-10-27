@@ -306,37 +306,6 @@ namespace :delayed_job do
   end
 end
 
-# ----------------------------------mine/whenever----------------------------------
-
-set :whenever_name, -> { "#{fetch(:domain)}_#{fetch(:rails_env)}" }
-
-namespace :whenever do
-  desc 'Clear crontab'
-  task clear: :environment do
-    comment "Clear contrab for #{fetch(:whenever_name)}"
-    in_path fetch(:current_path) do
-      command "#{fetch(:bundle_bin)} exec whenever --clear-crontab #{fetch(:whenever_name)} --set 'environment=#{fetch(:rails_env)}&path=#{fetch(:current_path)}'"
-    end
-  end
-
-  desc 'Update crontab'
-  task update: :environment do
-    comment "Update crontab for #{fetch(:whenever_name)}"
-    in_path fetch(:current_path) do
-      command "#{fetch(:bundle_bin)} exec whenever --update-crontab #{fetch(:whenever_name)} --set 'environment=#{fetch(:rails_env)}&path=#{fetch(:current_path)}'"
-    end
-  end
-
-  desc 'Write crontab'
-  task write: :environment do
-    comment "Write crontab for #{fetch(:whenever_name)}"
-    in_path fetch(:current_path) do
-      command "#{fetch(:bundle_bin)} exec whenever --write-crontab #{fetch(:whenever_name)} --set 'environment=#{fetch(:rails_env)}&path=#{fetch(:current_path)}'"
-    end
-  end
-end
-
-# ----------------------------------mine/whenever end------------------------------
 desc 'Setup directories and .env file; should be run before first deploy.'
 task setup: :environment do
   if capture(%(ls #{full_shared_path}/.env))
@@ -405,7 +374,6 @@ task deploy: :environment do
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
-    invoke :'whenever:update'
     invoke :'delayed_job:start'
 
     to :launch do

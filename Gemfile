@@ -112,9 +112,9 @@ group :development do
   gem 'i18n-tasks', '~> 0.8.3'
 
   # Server-related tasks (such as deploy)
-  gem 'mina', require: false #, '~> 0.3.3'
+  gem 'mina', '~> 0.3.3', require: false
 
-  # Mina for multiple servers
+  # # Mina for multiple servers
   gem 'mina-multistage', '~> 1.0.1', require: false
 
   # Prints arrays, hashes, etc. beautifully
