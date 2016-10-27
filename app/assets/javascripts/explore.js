@@ -78,6 +78,7 @@ $(document).ready(function (){
             t.data("previous", v);
 
             if(p.is("[data-url]")) {
+              ul.addClass("loading");
               $.ajax({
                 url: p.attr("data-url"),
                 dataType: "json",
@@ -88,7 +89,10 @@ $(document).ready(function (){
                   data.forEach(function(d) {
                     html += "<li><div class='item" + (autocomplete.has(autocomplete_id, d[0]) ? " selected" : "") + "' data-id='" + d[0] + "' data-extra='" + d[2] + "'>" + d[1] + "</li>";
                   });
-                  p.find("ul").html(html);//.addClass("active");
+                  ul.html(html);//.addClass("active");
+                },
+                complete: function () {
+                  ul.removeClass("loading");
                 }
               });
             }
@@ -176,8 +180,10 @@ $(document).ready(function (){
           }
           else {
             //console.log("is not selected");
-            console.log(autocomplete_id, t.attr("data-id"), t.text());
-            autocomplete.push(autocomplete_id, t.attr("data-id"), t.text());
+            // console.log(autocomplete_id, t.attr("data-id"), t.text());
+            var extra = t.attr("data-extra");
+            extra = typeof extra  !== "undefined" ? " (" + extra + ")": "";
+            autocomplete.push(autocomplete_id, t.attr("data-id"), t.text() + extra);
           }
           // console.log(autocomplete);
           event.stopPropagation();
@@ -1119,7 +1125,7 @@ $(document).ready(function (){
               shadow: false
           }
       },
-      1: [{ data: resource.series }],
+      series: [{ data: resource.series }],
       tooltip: {
         backgroundColor: "#DCE0DC",
         followPointer: true,

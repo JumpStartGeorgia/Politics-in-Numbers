@@ -642,7 +642,9 @@ $(document).ready(function (){
     }
   }
   function filter_callback(id, filters) {
-    if(js.cache.hasOwnProperty(id) && js.cache[id].hasOwnProperty("table") && js.cache[id].table.length) {
+    console.log(id, filters, js);
+      console.log("here");
+    if(js.cache.hasOwnProperty(id) && js.cache[id].hasOwnProperty("table")) {
       view_not_found.addClass("hidden");
       render_table(js.cache[id].table);
       if(js.cache[id].hasOwnProperty("sz")) {
@@ -662,7 +664,7 @@ $(document).ready(function (){
   }
   // TODO set by url is not working
   function render_table(table) {
-    //console.log("table data", table, table.header);
+    console.log("table data", table, table.header);
     // if(type === "donation") {
       //view_content.html("new tab");
       //var prev = undefined, alt_color = true,

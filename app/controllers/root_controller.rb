@@ -313,10 +313,20 @@ class RootController < ApplicationController
       regex1 =  /^#{Regexp.escape(q[0])}/i
       regex2 = /^#{Regexp.escape(q[1])}/i
     end
-     Rails.logger.fatal("fatal------------------select_donors----#{q}")
-    Donor.any_of({ first_name: regex1 , last_name: regex2 }, { first_name: regex2 , last_name: regex1 }, {tin: regex1 }).each{ |m|
+    args1 = []
+    args2 = []
+    I18n.available_locales.each{|locale|
+      args1 << { "first_name.#{locale}": regex1 }
+      args1 << { "last_name.#{locale}": regex1 }
+      args1 << { "tin": regex1 }
+
+      args2 << { "first_name.#{locale}": regex2 }
+      args2 << { "last_name.#{locale}": regex2 }
+      args2 << { "tin": regex2 }
+    }
+
+    Donor.all_of({"$or" => args1 }, {"$or" => args2 }).each{ |m|
       donors << [ m.permalink, m.full_name, m.tin ]
-      # donors << [ "#{m.first_name} #{m.last_name}", "#{m.id}"]
     }
     render :json => donors
   end
