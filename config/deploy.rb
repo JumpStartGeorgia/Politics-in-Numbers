@@ -265,6 +265,40 @@ namespace :deploy do
 
 end
 
+namespace :phantomjs do
+  desc 'Stop phantomjs server'
+  task stop: :environment do
+    comment 'Stop phantomjs server'
+    in_path(fetch(:current_path)) do
+      command "ruby ./lib/highcharts-server/phantomjs_daemon.rb stop"
+    end
+  end
+
+  desc 'Start phantomjs server'
+  task start: :environment do
+    comment 'Start phantomjs server'
+    in_path(fetch(:current_path)) do
+      command "ruby ./lib/highcharts-server/phantomjs_daemon.rb start"
+    end
+  end
+
+  desc 'Restart phantomjs server'
+  task restart: :environment do
+    comment 'Restart phantomjs server'
+    in_path(fetch(:current_path)) do
+      command "ruby ./lib/highcharts-server/phantomjs_daemon.rb restart"
+    end
+  end
+
+  desc 'Phantomjs server status'
+  task status: :environment do
+    comment 'Phantomjs server Status'
+    in_path(fetch(:current_path)) do
+      command "ruby ./lib/highcharts-server/phantomjs_daemon.rb status"
+    end
+  end
+end
+
 namespace :delayed_job do
   desc 'Stop delayed_job'
   task stop: :environment do
@@ -362,6 +396,7 @@ task deploy: :environment do
       set :bundle_options, "#{bundle_options} --quiet"
     end
     invoke :'delayed_job:stop'
+    invoke :'phantomjs:stop'
     invoke :'deploy:check_revision'
     invoke :'deploy:assets:decide_whether_to_precompile'
     invoke :'deploy:assets:local_precompile' if precompile_assets
@@ -375,6 +410,7 @@ task deploy: :environment do
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
+    invoke :'phantomjs:start'
     invoke :'delayed_job:start'
 
     to :launch do

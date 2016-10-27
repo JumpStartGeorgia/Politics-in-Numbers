@@ -16,6 +16,7 @@
 /.env
 /public/assets
 /public/system
+/public/share_images
 /public/tmp
 # Temporary files often end with ~ character
 *~
@@ -23,3 +24,5 @@
 
 #ignore db config
 /config/mongoid.yml
+
+/lib/highcharts-server/tmp
