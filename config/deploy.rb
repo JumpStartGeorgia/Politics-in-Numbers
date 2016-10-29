@@ -270,7 +270,7 @@ namespace :phantomjs do
   task stop: :environment do
     comment 'Stop phantomjs server'
     in_path(fetch(:current_path)) do
-      command "#{fetch(:bundle_bin)} exec ruby ./lib/highcharts-server/phantomjs_daemon.rb stop"
+      command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb stop"
     end
   end
 
@@ -278,7 +278,7 @@ namespace :phantomjs do
   task start: :environment do
     comment 'Start phantomjs server'
     in_path(fetch(:current_path)) do
-      command "#{fetch(:bundle_bin)} exec ruby ./lib/highcharts-server/phantomjs_daemon.rb start"
+      command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb start"
     end
   end
 
@@ -286,7 +286,7 @@ namespace :phantomjs do
   task restart: :environment do
     comment 'Restart phantomjs server'
     in_path(fetch(:current_path)) do
-      command "#{fetch(:bundle_bin)} exec ruby ./lib/highcharts-server/phantomjs_daemon.rb restart"
+      command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb restart"
     end
   end
 
@@ -294,7 +294,7 @@ namespace :phantomjs do
   task status: :environment do
     comment 'Phantomjs server Status'
     in_path(fetch(:current_path)) do
-      command "#{fetch(:bundle_bin)} exec ruby ./lib/highcharts-server/phantomjs_daemon.rb status"
+      command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb status"
     end
   end
 end
