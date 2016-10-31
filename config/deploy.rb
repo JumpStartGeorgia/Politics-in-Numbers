@@ -268,6 +268,7 @@ end
 namespace :phantomjs do
   desc 'Stop phantomjs server'
   task stop: :environment do
+    queue %(echo "-----> Stop phantomjs server")
     comment 'Stop phantomjs server'
     in_path(fetch(:current_path)) do
       command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb stop"
@@ -276,6 +277,7 @@ namespace :phantomjs do
 
   desc 'Start phantomjs server'
   task start: :environment do
+    queue %(echo "-----> Start phantomjs server")
     comment 'Start phantomjs server'
     in_path(fetch(:current_path)) do
       command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb start"
@@ -284,6 +286,7 @@ namespace :phantomjs do
 
   desc 'Restart phantomjs server'
   task restart: :environment do
+    queue %(echo "-----> Restart phantomjs server")
     comment 'Restart phantomjs server'
     in_path(fetch(:current_path)) do
       command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb restart"
@@ -292,6 +295,7 @@ namespace :phantomjs do
 
   desc 'Phantomjs server status'
   task status: :environment do
+    queue %(echo "-----> Phantomjs server Status")
     comment 'Phantomjs server Status'
     in_path(fetch(:current_path)) do
       command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb status"
@@ -303,6 +307,7 @@ namespace :delayed_job do
   desc 'Stop delayed_job'
   task stop: :environment do
     comment 'Stop delayed_job'
+    queue %(echo "-----> Stop delayed_job")
     in_path(fetch(:current_path)) do
       command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} stop --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
     end
@@ -311,6 +316,7 @@ namespace :delayed_job do
   desc 'Start delayed_job'
   task start: :environment do
     comment 'Start delayed_job'
+    queue %(echo "-----> Start delayed_job")
     in_path(fetch(:current_path)) do
       command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} start -n #{delayed_job_processes} --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
     end
@@ -318,6 +324,7 @@ namespace :delayed_job do
 
   desc 'Restart delayed_job'
   task restart: :environment do
+    queue %(echo "-----> Restart delayed_job")
     comment 'Restart delayed_job'
     in_path(fetch(:current_path)) do
       command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} restart -n #{delayed_job_processes} --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
@@ -326,6 +333,7 @@ namespace :delayed_job do
 
   desc 'delayed_job status'
   task status: :environment do
+    queue %(echo "-----> Delayed job status")
     comment 'Delayed job Status'
     in_path(fetch(:current_path)) do
       command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} status --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
@@ -334,6 +342,7 @@ namespace :delayed_job do
 
   desc 'delayed_job setup'
   task setup: :environment do
+    queue %(echo "-----> Delayed job Setup (generate bin/delayed_job script)")
     comment 'Delayed job Setup (generate bin/delayed_job script)'
     in_path(fetch(:current_path)) do
       command "RAILS_ENV='#{fetch(:rails_env)}' bundle exec rails generate delayed_job"
