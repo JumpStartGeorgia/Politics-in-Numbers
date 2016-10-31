@@ -267,6 +267,7 @@ class RootController < ApplicationController
 
     sid = pars[:id]
     chart = pars[:chart]
+    img = pars[:img]
     data = nil
     is_donation = nil
     @title = "#{t('shared.common.name')}"
@@ -292,8 +293,8 @@ class RootController < ApplicationController
     if @missing
       @image = view_context.image_url("/share_images/missing.png")
     end
-
-    if request.user_agent.include?("facebookexternalhit") || request.user_agent.include?("Twitterbot")
+     Rails.logger.fatal("fatal----------------------#{img.inspect}")
+    if img.present? || request.user_agent.include?("facebookexternalhit") || request.user_agent.include?("Twitterbot")
         respond_to do |format|
           format.html
         end
@@ -355,7 +356,7 @@ class RootController < ApplicationController
     end
 
     def share_params
-      params.permit(:id, :chart)
+      params.permit(:id, :chart, :img, :locale)
     end
     def donors_filter_params
       params.permit(:q)
