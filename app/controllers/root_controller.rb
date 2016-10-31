@@ -396,7 +396,7 @@ class RootController < ApplicationController
           if is_donation
             jsn["infile"].gsub!("_bg_", chart == "a" ? "#EBE187" : "#B8E8AD")
             jsn["infile"].gsub!("_subtitle_", data[k][:subtitle])
-            jsn["infile"].gsub!("_series_", data[k][:data].to_s)
+            jsn["infile"].gsub!("_series_", data[k][:series].to_s)
           else
             jsn["infile"].gsub!("_categories_", data[k][:categories].to_s)
             jsn["infile"].gsub!("_series_", data[k][:series].to_json.to_s)
