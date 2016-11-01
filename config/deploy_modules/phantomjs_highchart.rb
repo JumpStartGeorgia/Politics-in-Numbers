@@ -3,7 +3,7 @@ namespace :phantomjs_highcharts do
   task :start do |task|
     system %(echo "")
     system %(echo "Starting Phantomjs Highcharts.")
-    system %(#{sudo_ssh_cmd(task)} 'sudo service phantomjs-highchart-pin start')
+    system %(#{sudo_ssh_cmd(task)} 'sudo start phantomjs-highchart-pin')
     system %(echo "")
   end
 
@@ -11,7 +11,7 @@ namespace :phantomjs_highcharts do
   task :stop do |task|
     system %(echo "")
     system %(echo "Stopping Phantomjs Highcharts.")
-    system %(#{sudo_ssh_cmd(task)} 'sudo service phantomjs-highchart-pin stop')
+    system %(#{sudo_ssh_cmd(task)} 'sudo stop phantomjs-highchart-pin')
     system %(echo "")
   end
 
@@ -19,15 +19,15 @@ namespace :phantomjs_highcharts do
   task :restart do |task|
     system %(echo "")
     system %(echo "Restarts Phantomjs Highcharts.")
-    system %(#{sudo_ssh_cmd(task)} 'sudo service phantomjs-highchart-pin restart')
+    system %(#{sudo_ssh_cmd(task)} 'sudo restart phantomjs-highchart-pin')
     system %(echo "")
   end
 
-  desc 'Force reload the Phantomjs Highcharts server.'
-  task :restart do |task|
+  desc 'Reload the Phantomjs Highcharts server.'
+  task :reload do |task|
     system %(echo "")
-    system %(echo "Force reload Phantomjs Highcharts.")
-    system %(#{sudo_ssh_cmd(task)} 'sudo service phantomjs-highchart-pin force-reload')
+    system %(echo "Reload Phantomjs Highcharts.")
+    system %(#{sudo_ssh_cmd(task)} 'sudo reload phantomjs-highchart-pin')
     system %(echo "")
   end
 
@@ -35,7 +35,7 @@ namespace :phantomjs_highcharts do
   task :status do |task|
     system %(echo "")
     system %(echo "Checking Phantomjs Highcharts status.")
-    system %(#{sudo_ssh_cmd(task)} 'sudo service phantomjs-highchart-pin status')
+    system %(#{sudo_ssh_cmd(task)} 'status phantomjs-highchart-pin')
     system %(echo "")
   end
 end

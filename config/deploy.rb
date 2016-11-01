@@ -367,7 +367,7 @@ task deploy: :environment do
       set :rsync_verbose, ''
       set :bundle_options, "#{bundle_options} --quiet"
     end
-    invoke :'phantomjs_highcharts:stop'
+    # invoke :'phantomjs_highcharts:stop'
     invoke :'delayed_job:stop'
     invoke :'deploy:check_revision'
     invoke :'deploy:assets:decide_whether_to_precompile'
@@ -382,7 +382,7 @@ task deploy: :environment do
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
-    invoke :'phantomjs_highcharts:start'
+    # invoke :'phantomjs_highcharts:start'
     invoke :'delayed_job:start'
 
     to :launch do
@@ -422,6 +422,7 @@ task deploy: :environment do
           invoke :'puma:phased_restart'
         else
           invoke :'puma:restart'
+          invoke :'phantomjs_highcharts:restart'
         end
         invoke :finished_deploy_message
       end
