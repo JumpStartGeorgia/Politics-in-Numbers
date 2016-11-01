@@ -422,8 +422,8 @@ task deploy: :environment do
           invoke :'puma:phased_restart'
         else
           invoke :'puma:restart'
-          invoke :'phantomjs_highcharts:restart'
         end
+        invoke :'phantomjs_highcharts:restart'
         invoke :finished_deploy_message
       end
     end
