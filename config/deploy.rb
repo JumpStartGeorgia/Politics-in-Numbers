@@ -15,6 +15,7 @@ require 'mina/whenever'
 require_relative 'deploy_modules/maintenance'
 require_relative 'deploy_modules/puma'
 require_relative 'deploy_modules/nginx'
+require_relative 'deploy_modules/phantomjs_highchart'
 
 
 set :user_path, -> { "/home/#{user}" }
@@ -265,44 +266,6 @@ namespace :deploy do
 
 end
 
-namespace :phantomjs do
-  desc 'Stop phantomjs server'
-  task stop: :environment do
-    queue %(echo "-----> Stop phantomjs server")
-    comment 'Stop phantomjs server'
-    in_path(fetch(:current_path)) do
-      command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb stop"
-    end
-  end
-
-  desc 'Start phantomjs server'
-  task start: :environment do
-    queue %(echo "-----> Start phantomjs server")
-    comment 'Start phantomjs server'
-    in_path(fetch(:current_path)) do
-      command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb start"
-    end
-  end
-
-  desc 'Restart phantomjs server'
-  task restart: :environment do
-    queue %(echo "-----> Restart phantomjs server")
-    comment 'Restart phantomjs server'
-    in_path(fetch(:current_path)) do
-      command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb restart"
-    end
-  end
-
-  desc 'Phantomjs server status'
-  task status: :environment do
-    queue %(echo "-----> Phantomjs server Status")
-    comment 'Phantomjs server Status'
-    in_path(fetch(:current_path)) do
-      command "#{fetch(:bundle_bin)} exec ruby lib/highcharts-server/phantomjs_daemon.rb status"
-    end
-  end
-end
-
 namespace :delayed_job do
   desc 'Stop delayed_job'
   task stop: :environment do
@@ -404,8 +367,8 @@ task deploy: :environment do
       set :rsync_verbose, ''
       set :bundle_options, "#{bundle_options} --quiet"
     end
+    invoke :'phantomjs_highcharts:stop'
     invoke :'delayed_job:stop'
-    invoke :'phantomjs:stop'
     invoke :'deploy:check_revision'
     invoke :'deploy:assets:decide_whether_to_precompile'
     invoke :'deploy:assets:local_precompile' if precompile_assets
@@ -419,7 +382,7 @@ task deploy: :environment do
     invoke :'puma:generate_conf'
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
-    invoke :'phantomjs:start'
+    invoke :'phantomjs_highcharts:start'
     invoke :'delayed_job:start'
 
     to :launch do

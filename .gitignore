@@ -16,8 +16,6 @@
 /.env
 /public/assets
 /public/system
-!/public/system/share_images/missing.png
-#!/public/system/share_images/.gitkeep
 /public/tmp
 # Temporary files often end with ~ character
 *~

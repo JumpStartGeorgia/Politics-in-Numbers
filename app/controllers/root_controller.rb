@@ -291,7 +291,7 @@ class RootController < ApplicationController
     end
 
     if @missing
-      @image = view_context.image_url("/system/share_images/missing.png")
+      @image = view_context.image_url("missing_share.png")
     end
      Rails.logger.fatal("fatal----------------------#{img.inspect}")
     if img.present? || request.user_agent.include?("facebookexternalhit") || request.user_agent.include?("Twitterbot")
@@ -364,26 +364,33 @@ class RootController < ApplicationController
 
     def highchart_options_by_type (type)
       if type == :bar
-        infile = "{\"chart\": {\"type\": \"bar\", \"backgroundColor\": \"_bg_\", }, \"title\": {\"text\": \"_title_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"18px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"subtitle\": {\"text\": \"_subtitle_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, \"xAxis\": {\"type\": \"category\", \"lineWidth\": 0, \"tickWidth\": 0, \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} } }, \"yAxis\": { \"visible\": false }, \"legend\": { \"enabled\": false }, \"plotOptions\": {\"bar\": {\"color\":\"#ffffff\", \"dataLabels\": {\"enabled\": true, \"padding\": 6, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"pointInterval\":1, \"pointWidth\":17, \"pointPadding\": 0, \"groupPadding\": 0, \"borderWidth\": 0, \"shadow\": false } }, \"series\": [{ \"data\": _series_}] }"
+        infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"bar\", \"backgroundColor\": \"_bg_\", }, \"title\": {\"text\": \"_title_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"18px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"subtitle\": {\"text\": \"_subtitle_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, \"xAxis\": {\"type\": \"category\", \"lineWidth\": 0, \"tickWidth\": 0, \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} } }, \"yAxis\": { \"visible\": false }, \"legend\": { \"enabled\": false }, \"plotOptions\": {\"bar\": {\"color\":\"#ffffff\", \"dataLabels\": {\"enabled\": true, \"padding\": 6, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"pointInterval\":1, \"pointWidth\":17, \"pointPadding\": 0, \"groupPadding\": 0, \"borderWidth\": 0, \"shadow\": false } }, \"series\": [{ \"data\": _series_}] }"
       elsif type == :column
-        infile = "{\"chart\": {\"type\": \"column\", \"backgroundColor\": \"#FFFFFF\"}, \"title\": {\"text\": \"_title_\", \"margin\": 40, \"style\": {\"fontFamily\":\"Fira Sans\", \"fontSize\":\"18px\", \"color\": \"#5d675b\"}, \"useHTML\": true }, \"xAxis\": {\"type\": \"category\", \"categories\": _categories_, \"gridLineColor\": \"#5D675B\", \"gridLineWidth\":1, \"gridLineDashStyle\": \"Dash\", \"lineWidth\": 1, \"lineColor\": \"#5D675B\", \"tickWidth\": 1, \"tickColor\": \"#5D675B\", \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\",  \"textShadow\": \"none\"}, \"step\":1 } }, \"yAxis\": [{\"title\": { \"enabled\": false }, \"gridLineColor\": \"#eef0ee\", \"gridLineWidth\":1, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, {\"linkedTo\":0, \"title\": { \"enabled\": false }, \"opposite\": true, \"style\": {\"color\": \"#7F897D\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} } ], \"legend\": {\"enabled\": true, \"symbolWidth\":10, \"symbolHeight\":10, \"shadow\": false, \"itemStyle\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"plotOptions\": {\"column\":{\"maxPointWidth\": 40 } }, \"series\": _series_}"
+        infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"column\", \"backgroundColor\": \"#FFFFFF\"}, \"title\": {\"text\": \"_title_\", \"margin\": 40, \"style\": {\"fontFamily\":\"Fira Sans\", \"fontSize\":\"18px\", \"color\": \"#5d675b\"}, \"useHTML\": true }, \"xAxis\": {\"type\": \"category\", \"categories\": _categories_, \"gridLineColor\": \"#5D675B\", \"gridLineWidth\":1, \"gridLineDashStyle\": \"Dash\", \"lineWidth\": 1, \"lineColor\": \"#5D675B\", \"tickWidth\": 1, \"tickColor\": \"#5D675B\", \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\",  \"textShadow\": \"none\"}, \"step\":1 } }, \"yAxis\": [{\"title\": { \"enabled\": false }, \"gridLineColor\": \"#eef0ee\", \"gridLineWidth\":1, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, {\"linkedTo\":0, \"title\": { \"enabled\": false }, \"opposite\": true, \"style\": {\"color\": \"#7F897D\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} } ], \"legend\": {\"enabled\": true, \"symbolWidth\":10, \"symbolHeight\":10, \"shadow\": false, \"itemStyle\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"plotOptions\": {\"column\":{\"maxPointWidth\": 40 } }, \"series\": _series_}"
       end
+      infile.gsub!("_colors_", "colors: [ \"#D36135\", \"#DDCD37\", \"#5B85AA\", \"#F78E69\", \"#A69888\", \"#88D877\", \"#5D675B\", \"#A07F9F\", \"#549941\", \"#35617C\", \"#694966\", \"#B9C4B7\"]")
+      infile.gsub!("_credits_", "credits: {enabled: true, text: \"pins.ge\"}")
+
       {
         "infile" => infile,
         "type" => "png",
         "constr" => "Chart",
         "width" => 1200,
-        "callback" => "function(chart) { Highcharts.setOptions({lang: { numericSymbols: #{t('shared.common.numericSymbols')} }, colors: [ \"#D36135\", \"#DDCD37\", \"#5B85AA\", \"#F78E69\", \"#A69888\", \"#88D877\", \"#5D675B\", \"#A07F9F\", \"#549941\", \"#35617C\", \"#694966\", \"#B9C4B7\"], credits: {enabled: true, href: \"#{root_url}\", text: \"pins.ge\"} }); }"
+        "globaloptions" => "{ lang: { numericSymbols: #{t('shared.common.numericSymbols')} } }"
       }
 
     end
     # WARNINGGGGGGGGGG Fira sans regular and book should be installed on server pc
     def generate_highchart_png(id, chart, data, is_donation)
       begin
-        pth = "/system/share_images/#{is_donation ? 'donation' : 'finance'}/#{I18n.locale}/#{id}#{chart}.png"
-        full_pth = "#{Rails.root}/public#{pth}"
-        if File.file?(full_pth)
-          return view_context.image_url(pth)
+        image_name = "#{id}#{chart}.png"
+        image_rel_dir = "/system/share_images/#{is_donation ? 'donation' : 'finance'}/#{I18n.locale}"
+        image_abs_dir = "#{Rails.root}/public#{image_rel_dir}"
+        image_rel_path = "#{image_rel_dir}/#{image_name}"
+        image_abs_path = "#{image_abs_dir}/#{image_name}"
+
+        if File.file?(image_abs_path)
+          return view_context.image_url(image_rel_path)
         else
           # require 'net/http'
           uri = URI.parse("http://127.0.0.1:3003/")
@@ -401,18 +408,18 @@ class RootController < ApplicationController
             jsn["infile"].gsub!("_series_", data[k][:series].to_json.to_s)
           end
 
-          Rails.logger.fatal("fatal----------------------#{data} #{k}")
           http = Net::HTTP.new(uri.host, uri.port)
           #http.set_debug_output $stderr
           http.request_post(uri.path, jsn.to_json, headers) {|response|
-            f = File.new(full_pth, 'wb')
+            FileUtils.mkdir_p(image_abs_dir) unless File.directory?(image_abs_dir)
+            f = File.new(image_abs_path, 'wb')
             f << Base64.urlsafe_decode64(response.body)
             f.close
-            return view_context.image_url(pth)
+            return view_context.image_url(image_rel_path)
           }
         end
       rescue
-        return view_context.image_url("/system/share_images/missing.png")
+        return view_context.image_url("missing_share.png")
       end
     end
 
