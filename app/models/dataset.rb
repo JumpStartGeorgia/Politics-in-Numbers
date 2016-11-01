@@ -569,7 +569,7 @@ class Dataset
     def prune_share_images
       begin
         I18n.available_locales.each { |lang|
-          path = "#{Rails.root}/public/share_images/finance/#{lang}"
+          path = "#{Rails.root}/public/system/share_images/finance/#{lang}"
           if File.directory?(path)
             FileUtils.remove_entry_secure(path, force = true)
             FileUtils.mkdir_p(path)

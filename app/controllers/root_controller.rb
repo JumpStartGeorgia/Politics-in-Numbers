@@ -291,7 +291,7 @@ class RootController < ApplicationController
     end
 
     if @missing
-      @image = view_context.image_url("/share_images/missing.png")
+      @image = view_context.image_url("/system/share_images/missing.png")
     end
      Rails.logger.fatal("fatal----------------------#{img.inspect}")
     if img.present? || request.user_agent.include?("facebookexternalhit") || request.user_agent.include?("Twitterbot")
@@ -380,7 +380,7 @@ class RootController < ApplicationController
     # WARNINGGGGGGGGGG Fira sans regular and book should be installed on server pc
     def generate_highchart_png(id, chart, data, is_donation)
       begin
-        pth = "/share_images/#{is_donation ? 'donation' : 'finance'}/#{I18n.locale}/#{id}#{chart}.png"
+        pth = "/system/share_images/#{is_donation ? 'donation' : 'finance'}/#{I18n.locale}/#{id}#{chart}.png"
         full_pth = "#{Rails.root}/public#{pth}"
         if File.file?(full_pth)
           return view_context.image_url(pth)
@@ -391,7 +391,6 @@ class RootController < ApplicationController
           jsn = highchart_options_by_type(is_donation ? :bar : :column)
 
           k = ("c#{chart}").to_sym
-
           jsn["infile"].gsub!("_title_", data[k][:title])
           if is_donation
             jsn["infile"].gsub!("_bg_", chart == "a" ? "#EBE187" : "#B8E8AD")
@@ -402,6 +401,7 @@ class RootController < ApplicationController
             jsn["infile"].gsub!("_series_", data[k][:series].to_json.to_s)
           end
 
+          Rails.logger.fatal("fatal----------------------#{data} #{k}")
           http = Net::HTTP.new(uri.host, uri.port)
           #http.set_debug_output $stderr
           http.request_post(uri.path, jsn.to_json, headers) {|response|
@@ -412,7 +412,7 @@ class RootController < ApplicationController
           }
         end
       rescue
-        return view_context.image_url("/share_images/missing.png")
+        return view_context.image_url("/system/share_images/missing.png")
       end
     end
 
