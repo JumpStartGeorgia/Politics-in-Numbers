@@ -51,7 +51,7 @@ gem 'formtastic', '~> 3.1.3'
 gem 'therubyracer', '~> 0.12.1'
 
 # Needed for twitter-bootstrap-rails gem
-gem 'less-rails', '~> 2.7.0'
+gem 'less-rails', '~> 2.8.0'
 
 # Bootstrap JS and various bootstrap-related generators/helpers
 gem 'twitter-bootstrap-rails', '~> 3.2.2'

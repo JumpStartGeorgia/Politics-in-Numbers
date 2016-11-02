@@ -15,6 +15,7 @@ require 'mina/whenever'
 require_relative 'deploy_modules/maintenance'
 require_relative 'deploy_modules/puma'
 require_relative 'deploy_modules/nginx'
+require_relative 'deploy_modules/delayed_job'
 require_relative 'deploy_modules/phantomjs_highchart'
 
 
@@ -181,8 +182,8 @@ namespace :deploy do
   desc "Create MongoDB indexes"
   task :mongoid_indexes do
     queue %(echo "-----> Rebuilding Mongo Indexes")
-    #queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:remove_indexes"
-    #queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:create_indexes"
+    queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:remove_indexes"
+    queue! "cd #{full_current_path} && RAILS_ENV=#{rails_env} bundle exec rake db:mongoid:create_indexes"
   end
 
   namespace :assets do
@@ -266,52 +267,6 @@ namespace :deploy do
 
 end
 
-namespace :delayed_job do
-  desc 'Stop delayed_job'
-  task stop: :environment do
-    comment 'Stop delayed_job'
-    queue %(echo "-----> Stop delayed_job")
-    in_path(fetch(:current_path)) do
-      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} stop --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
-    end
-  end
-
-  desc 'Start delayed_job'
-  task start: :environment do
-    comment 'Start delayed_job'
-    queue %(echo "-----> Start delayed_job")
-    in_path(fetch(:current_path)) do
-      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} start -n #{delayed_job_processes} --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
-    end
-  end
-
-  desc 'Restart delayed_job'
-  task restart: :environment do
-    queue %(echo "-----> Restart delayed_job")
-    comment 'Restart delayed_job'
-    in_path(fetch(:current_path)) do
-      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} restart -n #{delayed_job_processes} --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
-    end
-  end
-
-  desc 'delayed_job status'
-  task status: :environment do
-    queue %(echo "-----> Delayed job status")
-    comment 'Delayed job Status'
-    in_path(fetch(:current_path)) do
-      command "RAILS_ENV='#{fetch(:rails_env)}' #{fetch(:delayed_job)} #{fetch(:delayed_job_additional_params)} status --pid-dir='#{fetch(:shared_path)}/#{fetch(:delayed_job_pid_dir)}'"
-    end
-  end
-
-  desc 'delayed_job setup'
-  task setup: :environment do
-    queue %(echo "-----> Delayed job Setup (generate bin/delayed_job script)")
-    comment 'Delayed job Setup (generate bin/delayed_job script)'
-    in_path(fetch(:current_path)) do
-      command "RAILS_ENV='#{fetch(:rails_env)}' bundle exec rails generate delayed_job"
-    end
-  end
-end
 
 desc 'Setup directories and .env file; should be run before first deploy.'
 task setup: :environment do

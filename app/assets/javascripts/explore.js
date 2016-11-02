@@ -435,7 +435,7 @@ $(document).ready(function (){
       get: function() {
         var t = this, tp, tmp, tmp_v, tmp_d, lnk;
         t.data = { filter: "finance" };
-        console.log(autocomplete, "before", t.data);
+        // console.log(autocomplete, "before", t.data);
         Object.keys(this.elem).forEach(function(el){
           var is_elem = [].indexOf(el) === -1;
           (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
@@ -478,7 +478,6 @@ $(document).ready(function (){
           }
         });
         if(!at_least_one) { t.animate(); return null; }
-        console.log("after", t.data);
         return t.data;
       },
       set_by_url: function() {
@@ -886,7 +885,6 @@ $(document).ready(function (){
       if(pars[0] === "share") {
         options["title"] = js.share["#" + t.attr("data-share-title")];
       }
-      console.log(pars, options);
       js_dialog.open(pars[0], options);
     });
   }
@@ -902,7 +900,7 @@ $(document).ready(function (){
         tmp = obj.get();
         _id = obj.id();
         js.cache[_id] = gon[obj.name + "_data"];
-        console.log("gonnned",js.cache[_id].sid);
+        // console.log("gonnned",js.cache[_id].sid);
         obj.url(js.cache[_id].sid);
         filter_callback(js.cache[_id], obj.name);
       });
@@ -923,7 +921,7 @@ $(document).ready(function (){
           dataType: 'json',
           data: filters,
           success: function(data) {
-            console.log("explore_filter", data);
+            // console.log("explore_filter", data);
             js.cache[_id] = data[obj.name];
             obj.url(js.cache[_id].sid);
             if(data.hasOwnProperty("donation")) { filter_callback(data.donation, "donation"); }
@@ -1045,7 +1043,7 @@ $(document).ready(function (){
     }
   }
   function bar_chart(elem, resource, bg) {
-    console.log("chart", elem, resource);
+    // console.log("chart", elem, resource);
     js.share[elem] = encodeURI(resource.title + "( " + resource.subtitle + " )" + " | " + gon.app_name_long);
     $(elem).highcharts({
       chart: {
@@ -1147,7 +1145,7 @@ $(document).ready(function (){
     });
   }
   function grouped_column_chart(elem, resource, bg) {
-    console.log("chart", elem, resource);
+    // console.log("chart", elem, resource);
     $(elem).highcharts({
       chart: {
           type: 'column',
