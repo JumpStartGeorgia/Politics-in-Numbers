@@ -101,45 +101,45 @@ Replace
 1. System scope
   * Create folder<br/>
     `sudo mkdir -p /usr/share/fonts/:type/:familyname`
-  * Copy fonts to folder
+  * Copy fonts to folder<br/>
     `sudo cp ~/folder-containing-font-files/*.:ext /usr/share/fonts/:type/:family`
-  * Refresh font cache ( if command is not found install it `sudo apt-get install fontconfig` )
+  * Refresh font cache ( if command is not found install it `sudo apt-get install fontconfig` )<br/>
     `sudo fc-cache -f -v`
-  * (optional) To see installed fonts
+  * (optional) To see installed fonts<br/>
     `fc-list`
 
 2. User scope
   * Create folder
-    `mkdir -p ~/.fonts/:type/:family`
+    `mkdir -p ~/.fonts/:type/:family`<br/>
   * Copy fonts to folder
-    `cp ~/folder-containing-font-files/*.:ext ~/.fonts/:type/:family`
+    `cp ~/folder-containing-font-files/*.:ext ~/.fonts/:type/:family`<br/>
   * Refresh font cache ( if command is not found install it `sudo apt-get install fontconfig` )
-    `fc-cache -f -v`
+    `fc-cache -f -v`<br/>
   * (optional) To see installed fonts
-    `fc-list`
+    `fc-list`<br/>
 
 ######For current project Fira Sans Regular is required in user scope:
-  `mkdir -p ~/.fonts/opentype/fira`
-  `cp ~/firasans_r.otf ~/.fonts/opentype/fira`
-  `fc-cache -f -v`
+  `mkdir -p ~/.fonts/opentype/fira`<br/>
+  `cp ~/firasans_r.otf ~/.fonts/opentype/fira`<br/>
+  `fc-cache -f -v`<br/>
   `fc-list`
 
 ##### Prepare phantomjs binary file [guide](http://attester.ariatemplates.com/usage/phantom.html)
-  Current project uses [phantomjs-2.1.1-linux-x86_64](https://bitbucket.org/ariya/phantomjs/downloads), so next commands will download, unzip and create symbolic links.
-  `cd /usr/local/share`
-  `sudo wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2`
-  `sudo tar xjf phantomjs-1.9.7-linux-x86_64.tar.bz2`
-  `sudo ln -s /usr/local/share/phantomjs-2.1.1-linux-x86_64/ /usr/local/share/phantomjs`
+  Current project uses [phantomjs-2.1.1-linux-x86_64](https://bitbucket.org/ariya/phantomjs/downloads), so next commands will download, unzip and create symbolic links.<br/>
+  `cd /usr/local/share`<br/>
+  `sudo wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2`<br/>
+  `sudo tar xjf phantomjs-1.9.7-linux-x86_64.tar.bz2`<br/>
+  `sudo ln -s /usr/local/share/phantomjs-2.1.1-linux-x86_64/ /usr/local/share/phantomjs`<br/>
   `sudo ln -s /usr/local/share/phantomjs/bin/phantomjs /usr/local/bin/phantomjs`
 
 ##### Prepare highchart server conversion [script](https://github.com/highcharts/highcharts-export-server/blob/master/phantomjs/highcharts-convert.js)
-All scripts related to current project are in lib/phantomjs-highchart-pin folder. It has converstion script, phantomjs-highchart-pin.conf that is used as upstart configuration file for phantomjs and assets folder with all scripts to generate images. So you need to copy that folder to remote server.
-  `cp lib/phantomjs-highchart-pin to remote server`
-  `sudo mv remote/phantomjs-highchart-pin/phantomjs-highchart-pin.conf /etc/init/`
+All scripts related to current project are in lib/phantomjs-highchart-pin folder. It has converstion script, phantomjs-highchart-pin.conf that is used as upstart configuration file for phantomjs and assets folder with all scripts to generate images. So you need to copy that folder to remote server.<br/>
+  `cp lib/phantomjs-highchart-pin to remote server`<br/>
+  `sudo mv remote/phantomjs-highchart-pin/phantomjs-highchart-pin.conf /etc/init/`<br/>
   `sudo mv remote/phantomjs-highchart-pin /usr/local/share/phantomjs-highchart-pin/`
 
-######For testing purpose you can call phantomjs with options and it will stdout in terminal, phantomjs should be in known and in case of example call it from highcharts-convert.js folder with json file prepared. Everything in options should be properly escaped otherwise it will not generate there would be no output.
-`phantomjs highcharts-convert.js -host 127.0.0.1 -port 3003`
+######For testing purpose you can call phantomjs with options and it will stdout in terminal, phantomjs should be in known and in case of example call it from highcharts-convert.js folder with json file prepared. Everything in options should be properly escaped otherwise it will not generate there would be no output.<br/>
+`phantomjs highcharts-convert.js -host 127.0.0.1 -port 3003`<br/>
 `curl -XPOST http://localhost:3003 -H 'Content-Type: application/json' -d @opts.json`
 
 
