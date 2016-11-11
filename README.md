@@ -94,13 +94,13 @@ First if any font is used while generating images system should know about it so
 
 ##### Prepare fonts
 Replace
-  - :type with font type path ex: ttf = truetype, otf = opentype,
+  - :type with font type ex: ttf = truetype, otf = opentype
   - :family font family ex: fira
   - :ext ttf|otf or any other
 
 1. System scope
   * Create folder<br/>
-    `sudo mkdir -p /usr/share/fonts/:type/:familyname`
+    `sudo mkdir -p /usr/share/fonts/:type/:family`
   * Copy fonts to folder<br/>
     `sudo cp ~/folder-containing-font-files/*.:ext /usr/share/fonts/:type/:family`
   * Refresh font cache ( if command is not found install it `sudo apt-get install fontconfig` )<br/>
@@ -109,20 +109,20 @@ Replace
     `fc-list`
 
 2. User scope
-  * Create folder
-    `mkdir -p ~/.fonts/:type/:family`<br/>
-  * Copy fonts to folder
-    `cp ~/folder-containing-font-files/*.:ext ~/.fonts/:type/:family`<br/>
-  * Refresh font cache ( if command is not found install it `sudo apt-get install fontconfig` )
-    `fc-cache -f -v`<br/>
-  * (optional) To see installed fonts
+  * Create folder<br/>
+    `mkdir -p ~/.fonts/:type/:family`
+  * Copy fonts to folder<br/>
+    `cp ~/folder-containing-font-files/*.:ext ~/.fonts/:type/:family`
+  * Refresh font cache ( if command is not found install it `sudo apt-get install fontconfig` )<br/>
+    `fc-cache -f -v`
+  * (optional) To see installed fonts<br/>
     `fc-list`<br/>
 
 ######For current project Fira Sans Regular is required in user scope:
-  `mkdir -p ~/.fonts/opentype/fira`<br/>
-  `cp ~/firasans_r.otf ~/.fonts/opentype/fira`<br/>
-  `fc-cache -f -v`<br/>
-  `fc-list`
+  `mkdir -p ~/.fonts/opentype/fira
+  cp ~/firasans_r.otf ~/.fonts/opentype/fira
+  fc-cache -f -v
+  fc-list`
 
 ##### Prepare phantomjs binary file [guide](http://attester.ariatemplates.com/usage/phantom.html)
   Current project uses [phantomjs-2.1.1-linux-x86_64](https://bitbucket.org/ariya/phantomjs/downloads), so next commands will download, unzip and create symbolic links.<br/>
