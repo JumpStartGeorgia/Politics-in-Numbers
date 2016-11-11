@@ -100,13 +100,13 @@ Replace
 
 1. System scope
   * Create folder
-    `sudo mkdir -p /usr/share/fonts/:type/:familyname`
+  `sudo mkdir -p /usr/share/fonts/:type/:familyname`
   * Copy fonts to folder
-    `sudo cp ~/folder-containing-font-files/*.:ext /usr/share/fonts/:type/:family`
+`sudo cp ~/folder-containing-font-files/*.:ext /usr/share/fonts/:type/:family`
   * Refresh font cache ( if command is not found install it `sudo apt-get install fontconfig` )
-    `sudo fc-cache -f -v`
+  `sudo fc-cache -f -v`
   * (optional) To see installed fonts
-    `fc-list`
+  `fc-list`
 
 2. User scope
   * Create folder
