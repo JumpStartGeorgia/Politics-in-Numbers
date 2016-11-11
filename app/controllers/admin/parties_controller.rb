@@ -1,7 +1,8 @@
+# Admin page for managing parties
 class Admin::PartiesController < AdminController
   before_filter :authenticate_user!
   authorize_resource
-  before_filter do @model = Party; end
+  before_filter { @model = Party; }
 
   # GET /parties
   # GET /parties.json
@@ -52,12 +53,17 @@ class Admin::PartiesController < AdminController
 
     respond_to do |format|
       if @item.save
-        format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_created', :obj => t('mongoid.models.party.one'))} }
+        format.html do
+          redirect_to admin_parties_path, flash: {
+            success:  t('shared.msgs.success_created',
+                        obj: t('mongoid.models.party.one'))
+          }
+        end
         format.json { render json: @item, status: :created, location: @item }
       else
         set_tabbed_translation_form_settings
 
-        format.html { render action: "new" }
+        format.html { render action: 'new' }
         format.json { render json: @item.errors, status: :unprocessable_entity }
       end
     end
@@ -69,12 +75,17 @@ class Admin::PartiesController < AdminController
     @item = @model.find(params[:id])
     respond_to do |format|
       if @item.update_attributes(_params)
-        format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.party.one'))} }
+        format.html do
+          redirect_to admin_parties_path, flash: {
+            success:  t('shared.msgs.success_updated',
+                        obj: t('mongoid.models.party.one'))
+          }
+        end
         format.json { head :no_content }
       else
         set_tabbed_translation_form_settings
 
-        format.html { render action: "edit" }
+        format.html { render action: 'edit' }
         format.json { render json: @item.errors, status: :unprocessable_entity }
       end
     end
@@ -83,12 +94,14 @@ class Admin::PartiesController < AdminController
   def bulk
     @deffered = current_user.deffereds.find(params[:id])
     if !@deffered.present?
-      redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.not_found") }
+      redirect_to admin_parties_path, flash: {
+        notice: t('mongoid.messages.deffered.not_found') }
     else
       @items = @model.where(:id.in => @deffered.related_ids)
-      if !@items.present?
+      unless @items.present?
         @deffered.destroy
-        redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.no_related_objects") }
+        redirect_to admin_parties_path, flash: {
+          notice: t('mongoid.messages.deffered.no_related_objects') }
       end
     end
   end
@@ -96,32 +109,40 @@ class Admin::PartiesController < AdminController
   def bulk_update
     @deffered = current_user.deffereds.find(params[:id])
     if !@deffered.present?
-      redirect_to admin_parties_path, flash: { notice: t("mongoid.messages.deffered.not_found") }
+      redirect_to admin_parties_path, flash: {
+        notice: t('mongoid.messages.deffered.not_found') }
     else
       related_ids = @deffered.related_ids
       has_error = false
       @items = []
 
-      parties = _bulk_params["parties"]
-      parties.each { |k, v|
+      parties = _bulk_params['parties']
+      parties.each do |k, v|
         party = @model.find(k)
 
         if party.present? && related_ids.include?(party._id)
-          if !party.update({ type: v["type"].to_i })
-            has_error = true
-          end
+          has_error = true unless party.update(type: v['type'].to_i)
           @items << party
         else
-          redirect_to bulk_admin_parties_path(@deffered.id), flash: { notice: t("mongoid.messages.deffered.missing_parameter") }
+          redirect_to bulk_admin_parties_path(@deffered.id), flash: {
+            notice: t('mongoid.messages.deffered.missing_parameter') }
         end
-      }
+      end
 
       respond_to do |format|
         if !has_error
           @deffered.soft_destroy
-          format.html { redirect_to admin_parties_path, flash: {success:  t('shared.msgs.success_updated', :obj => t('mongoid.models.party.one'))} }
+          format.html do
+            redirect_to admin_parties_path, flash: {
+              success:  t('shared.msgs.success_updated',
+                          obj: t('mongoid.models.party.one'))
+            }
+          end
         else
-          format.html { render 'bulk', id: @deffered.id, flash: {notice:  t('shared.msgs.unexpected_error')} }
+          format.html do
+            render 'bulk', id: @deffered.id, flash: {
+              notice:  t('shared.msgs.unexpected_error') }
+          end
         end
       end
     end
@@ -134,30 +155,41 @@ class Admin::PartiesController < AdminController
     @item.destroy
 
     respond_to do |format|
-      format.html { redirect_to admin_parties_url, flash: {success:  t('shared.msgs.success_destroyed', :obj => t('mongoid.models.party.one'))} }
+      format.html do
+        redirect_to admin_parties_url, flash: {
+          success:  t('shared.msgs.success_destroyed',
+                      obj: t('mongoid.models.party.one'))
+        }
+      end
       format.json { head :no_content }
     end
   end
 
   private
-    def _params
-      pars = params.clone
-      puts "=================================#{pars}"
-      default = I18n.default_locale
-      locales = [:ka, :en, :ru]
-      [:title_translations, :description_translations].each{|f|
-        pars[:party][f].delete_if{|k,v| !v.present? }
-      }
-      # sls = pars[:party][:_slugs_translations];
-      # sls.each{|k,v| sls[k] = [v] }
-      pars.require(:party).permit(:_id, :id, :title, :type, :color, :name, :tmp_id, title_translations: [:ka, :en, :ru], description_translations: [:ka, :en, :ru])
+
+  def _params
+    pars = params.clone
+    puts "=================================#{pars}"
+    # default = I18n.default_locale
+    # locales = [:ka, :en, :ru]
+    [:title_translations, :description_translations].each do |f|
+      pars[:party][f].delete_if { |_k, v| !v.present? }
     end
-    def _bulk_params
-      #params.permit(:id).permit(:parties).permit!
-      # pars = params.clone
-      params.permit(:id, parties: {}).tap do |whitelisted|
-        whitelisted[:parties] = params[:parties]
-        whitelisted[:id] = params[:id]
-      end
+    # sls = pars[:party][:_slugs_translations];
+    # sls.each{|k,v| sls[k] = [v] }
+    pars.require(:party).permit(
+      :_id, :id, :title, :type, :color, :name, :tmp_id,
+      title_translations: [:ka, :en, :ru],
+      description_translations: [:ka, :en, :ru]
+    )
+  end
+
+  def _bulk_params
+    # params.permit(:id).permit(:parties).permit!
+    # pars = params.clone
+    params.permit(:id, parties: {}).tap do |whitelisted|
+      whitelisted[:parties] = params[:parties]
+      whitelisted[:id] = params[:id]
     end
+  end
 end

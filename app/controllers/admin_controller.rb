@@ -1,13 +1,12 @@
+# Entrance to admin page
 class AdminController < ApplicationController
+  layout 'admin'
+
   before_filter :authenticate_user!
-  layout "admin"
-  # before_filter do |controller_instance|
-  #   controller_instance.send(:valid_role?, @site_admin_role)
-  # end
 
   def index
     respond_to do |format|
-      format.html # index.html.erb
+      format.html
       format.json { render json: @pages }
     end
   end
@@ -15,9 +14,8 @@ class AdminController < ApplicationController
   def category
     # @virtual = Category.tree(true)
     # @non_virtual = Category.tree(false)
-
     respond_to do |format|
-      format.html # index.html.erb
+      format.html
     end
   end
 
@@ -26,17 +24,19 @@ class AdminController < ApplicationController
     locale = params[:locale]
     locales = I18n.available_locales
     perm = nil
-    #object = params[:object].present?
+
     if value.present? && locale.present? && locales.include?(locale.to_sym)
       begin
         orig_locale = I18n.locale
         I18n.locale = locale
-        perm = Mongoid::Slug::UniqueSlug.new(Party.new).find_unique(value) if value.present?
+
+        if value.present?
+          perm = Mongoid::Slug::UniqueSlug.new(Party.new).find_unique(value)
+        end
       ensure
         I18n.locale = orig_locale
       end
     end
     render json: { permalink: perm }
   end
-
 end
