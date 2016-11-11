@@ -144,7 +144,7 @@ All scripts related to current project are in lib/phantomjs-highchart-pin folder
     sudo mv remote/phantomjs-highchart-pin /usr/local/share/phantomjs-highchart-pin/
   ```
 
-######For testing purpose you can call phantomjs with options and it will stdout in terminal, phantomjs should be in known and in case of example call it from highcharts-convert.js folder with json file prepared. Everything in options should be properly escaped otherwise it will not generate there would be no output.<br/>
+######For testing purpose you can call phantomjs with options and it will stdout in terminal, phantomjs should be in path and in case of example call it should be executed from highcharts-convert.js folder with json file prepared. Everything in options should be properly escaped otherwise it will not generate anything and there would be no output (weak debug ability).<br/>
 ```bash
   phantomjs highcharts-convert.js -host 127.0.0.1 -port 3003
   curl -XPOST http://localhost:3003 -H 'Content-Type: application/json' -d @opts.json
