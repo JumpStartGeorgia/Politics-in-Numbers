@@ -119,10 +119,12 @@ Replace
     `fc-list`<br/>
 
 ######For current project Fira Sans Regular is required in user scope:
-  `mkdir -p ~/.fonts/opentype/fira
-  cp ~/firasans_r.otf ~/.fonts/opentype/fira
-  fc-cache -f -v
-  fc-list`
+  ```bash
+    mkdir -p ~/.fonts/opentype/fira
+    cp ~/firasans_r.otf ~/.fonts/opentype/fira
+    fc-cache -f -v
+    fc-list
+  ```
 
 ##### Prepare phantomjs binary file [guide](http://attester.ariatemplates.com/usage/phantom.html)
   Current project uses [phantomjs-2.1.1-linux-x86_64](https://bitbucket.org/ariya/phantomjs/downloads), so next commands will download, unzip and create symbolic links.<br/>
