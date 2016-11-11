@@ -99,7 +99,7 @@ Replace
   - :ext ttf|otf or any other
 
 1. System scope
-  * Create folder
+  * Create folder<br/>
     `sudo mkdir -p /usr/share/fonts/:type/:familyname`
   * Copy fonts to folder
     `sudo cp ~/folder-containing-font-files/*.:ext /usr/share/fonts/:type/:family`
