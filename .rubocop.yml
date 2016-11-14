@@ -5,3 +5,13 @@ AllCops:
     - db/schema.rb
     - app/models/language.rb
     - app/models/custom_translation.rb
+# Allow classes longer than 100 lines of code
+Metrics/ClassLength:
+  Max: 250 # or whatever ends up being appropriate def(100)
+Metrics/MethodLength:
+  CountComments: false  # count full line comments?
+  Max: 50 # def(10)
+Metrics/AbcSize:
+  # The ABC size is a calculated magnitude, so this number can be an Integer or
+  # a Float.
+  Max: 50 # def(15)

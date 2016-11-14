@@ -26,3 +26,5 @@
 /config/mongoid.yml
 
 /lib/highcharts-server/tmp
+
+.rubocop.yml

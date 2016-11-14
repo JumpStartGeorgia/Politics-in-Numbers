@@ -901,7 +901,7 @@ $(document).ready(function (){
         _id = obj.id();
         js.cache[_id] = gon[obj.name + "_data"];
         // console.log("gonnned",js.cache[_id].sid);
-        obj.url(js.cache[_id].sid);
+        if(obj.name === (gon.is_donation ? "donation" : "finance")) { obj.url(js.cache[_id].sid); }
         filter_callback(js.cache[_id], obj.name);
       });
       gon.gonned = false;
@@ -915,7 +915,7 @@ $(document).ready(function (){
         var filters = {};
         delete tmp["filter"];
         filters[obj.name] = tmp;
-        // console.log("-------------------", _id, filters);
+        // console.log("-----------remote--------", _id, filters);
         $.ajax({
           url: gon.filter_path,
           dataType: 'json',

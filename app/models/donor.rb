@@ -75,8 +75,9 @@ class Donor
     order_by([[:first_name, :asc], [:last_name, :asc]])
   end
 
-  def self.list
-    sorted.map{|t| [t.permalink, t.full_name]}
+  def self.list(collection_ids = [])
+    collection_ids = Donor.get_ids_by_slugs(collection_ids)
+    where({'_id' => { "$in" => collection_ids}}).sorted.map{|t| [t.permalink, t.full_name]}
   end
 
   def self.list_with_tin
@@ -215,6 +216,7 @@ class Donor
       amount: [-1,-1],
       nature: nil
     }
+    title_options = {}
 
     if inner_pars
       f = params
@@ -233,20 +235,30 @@ class Donor
       end
 
       tmp = params[:amount]
-      f[:amount] = tmp.map{|t| t.to_i } if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
-
+      if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
+        f[:amount] = tmp.map{|t| t.to_i }
+        title_options[:amount] = f[:amount].join(" - ")
+      end
       f[:party] = Party.get_ids_by_slugs(params[:party])
 
       tmp = params[:monetary]
-      f[:monetary] = tmp == "true" if tmp == "true" || tmp == "false"
+      if tmp == "true" || tmp == "false"
+        f[:monetary] = tmp == "true"
+        title_options[:monetary] = f[:monetary]
+      end
 
-      f[:multiple] = true if params[:multiple] == "true"
+      if params[:multiple] == "true"
+        f[:multiple] = true
+        title_options[:multiple] = true
+      end
 
       tmp = params[:nature]
-      f[:nature] = tmp == "0" ? 0 : 1 if tmp == "0" || tmp == "1"
+      if tmp == "0" || tmp == "1"
+        f[:nature] = tmp == "0" ? 0 : 1
+        title_options[:nature] = f[:nature]
+      end
     end
 
-     Rails.logger.fatal("---------------------232-----------------------#{f.inspect}")
     chart_subtitle = ""
     if f[:period].present? && f[:period][0] != -1 && f[:period][1] != -1
       chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
@@ -271,7 +283,6 @@ class Donor
     parties = {}
     Party.each{ |e| parties[e.id] = { value: 0, name: e.title } }
 
-
     ca_meta_obj = { n: 0, obj: nil, objb: nil }
     cb_meta_obj = { n: 0, obj: nil, objb: nil }
 
@@ -289,8 +300,14 @@ class Donor
 
     recent_donations = []
     parties_list = {}
-
+    donors_list = {}
+     # Rails.logger.fatal("fatal----------------------#{f[:donor]}")
     data.each{|e|
+      if chart_type == 3 || chart_type == 4
+         Rails.logger.fatal("fatal---------------------another id-#{e[:_id]}")
+        donors_list[e[:_id]] = { name: e[:name] }
+      end
+
       e[:partial_donated_amount] = 0
       e[:donations].each { |ee|
         am = ee[:amount]
@@ -318,14 +335,18 @@ class Donor
     parties_list.each_pair { |k, v| parties_list[k][:value] = v[:value].round(2) }
     total_amount = total_amount.round(2)
 
+    Rails.logger.fatal("fatal----------------------#{chart_type} #{donors_list}")
     if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
-
+      if title_options.key?(:nature)
+        ca_meta_obj[:obj] = " " + I18n.t("shared.chart.title.nature_#{title_options[:nature] == 0 ? 'individual' : 'organization'}")
+      end
       ca = pull_n(data, limiter, :donated_amount, "shared.chart.label.donors")
       cb = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, "shared.chart.label.parties")
 
     elsif chart_type == 1 # If select 1 party -> top 5 donors for party, last 5 donations for party
-
-      ca_meta_obj[:obj], cb_meta_obj[:obj] = parties[BSON::ObjectId(f[:party][0])][:name]
+      tmp = parties[BSON::ObjectId(f[:party][0])][:name]
+      ca_meta_obj[:obj] = tmp
+      cb_meta_obj[:obj] = tmp
       ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donors")
       cb = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
 
@@ -335,16 +356,16 @@ class Donor
       ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.#{chart_type == 2 ? 'donors' : 'donations'}")
       cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.#{chart_type == 2 ? 'donations' : 'parties'}")
 
-      ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ") if chart_type == 4
-      cb_meta_obj[:obj] = cb.map{|m| m[0] }.join(", ") if chart_type == 4
+      ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ")# if chart_type == 4
+      cb_meta_obj[:obj] = chart_type == 4 ? donors_list.map{ |k,v| v[:name] }.join(", ") : cb.map{|m| m[0] }.join(", ")#
 
     elsif chart_type == 3 # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
 
       ca = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
       cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.parties")
-
-      ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ")
-      cb_meta_obj[:obj] = cb.map{|m| m[0] }.join(", ")
+      tmp = donors_list.map{|k,v| v[:name] }.join(", ")
+      ca_meta_obj[:obj] = tmp # ca.map{|m| m[0] }.join(", ")
+      cb_meta_obj[:obj] = tmp # cb.map{|m| m[0] }.join(", ")
 
     elsif chart_type == 5 # show selected donors sorted by who donated most and show selected parties sorted by who received most
 
@@ -361,7 +382,6 @@ class Donor
     ca_meta_obj[:n] = ca.size
     cb_meta_obj[:n] = cb.size
 
-     Rails.logger.fatal("fatal----------------------#{f.keys}")
     if ["a"].index(type).present?
       f.keys.each{|e|
         if f[e] == default_f[e]
@@ -378,7 +398,6 @@ class Donor
           end
         end
       }
-      # Rails.logger.fatal("fatal----------------------#{f.keys}")
       sid = ShortUri.explore_uri(f.merge({filter: "donation"}))
     end
 
@@ -402,7 +421,7 @@ class Donor
       res.merge!({
         ca: {
           series: ca,
-          title: generate_title(ca_meta_obj, [chart_type, 0]),
+          title: Donor.generate_title(ca_meta_obj.merge(title_options), [chart_type, 0]),
           subtitle: chart_subtitle
         }
       })
@@ -411,7 +430,7 @@ class Donor
       res.merge!({
         cb: {
           series: cb,
-          title: generate_title(cb_meta_obj, [chart_type, 1]),
+          title: Donor.generate_title(cb_meta_obj.merge(title_options), [chart_type, 1]),
           subtitle: chart_subtitle
         }
       })
@@ -601,22 +620,19 @@ class Donor
         end
       }
     end
-
-    def generate_title(data, indexes)
-
+    def self.generate_title(data, indexes)
       title = []
 
       template_names = [
-        ["top_5_donors", "top_5_parties"],
-        ["top_5_donors_for_party", "last_5_donations_for_party"],
-        ["top_5_donors_for_parties", "total_donations_for_parties"],
-        ["last_5_donations_for_donor", "top_5_parties_donated_to"],
-        ["total_donations_for_each_donor", "top_5_parties_donated_to"],
-        ["donors_donations_sorted_by_amount", "parties_donations_sorted_by_amount"]
+        ["top_5_donors", "top_5_parties"], # If select anything other than party and donor -> charts show the top 5
+        ["top_5_donors_for_party", "last_5_donations_for_party"], # If select 1 party -> top 5 donors for party, last 5 donations for party
+        ["top_5_donors_for_parties", "total_donations_for_parties"], # If select > 1 party -> top 5 donors for parties, total donations for selected parties
+        ["last_5_donations_for_donor", "top_5_parties_donated_to"], # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
+        ["total_donations_for_each_donor", "top_5_parties_donated_to"], # If select > 1 donor-> total donations for each donor, top 5 parties donated to
+        ["donors_donations_sorted_by_amount", "parties_donations_sorted_by_amount"] # show selected donors sorted by who donated most and show selected parties sorted by who received most
       ]
-
       templates = {
-        top_5_donors:                       [ :for_parties, :block ],
+        top_5_donors:                       [ :block ],
         top_5_parties:                      [ :receiving_monetary_amount, :from_donors ],
         top_5_donors_for_party:             [ :block ],
         last_5_donations_for_party:         [ :block ],
@@ -629,14 +645,17 @@ class Donor
         parties_donations_sorted_by_amount: [ :block ],
       }
       template_name = template_names[indexes[0]][indexes[1]]
-      template = templates[template_name]
+      template = templates[template_name.to_sym]
+
+
       title << I18n.t("shared.chart.title.#{template_name}", data)
       template.each { |t|
+
         if t == :block
           title << I18n.t("shared.chart.title.to_multiple") if data[:multiple].present?
 
           tmp = []
-          if data[:monetary].present?
+          if data[:monetary] == true || data[:monetary] == false
             tmp = [I18n.t("shared.chart.title.monetary_donation",
              { s: I18n.t("shared.chart.title.monetary_#{data[:monetary].to_s}") })]
           end
@@ -644,69 +663,40 @@ class Donor
             if tmp.present?
               tmp << I18n.t("shared.chart.title.of_amount", { s: data[:amount] })
             else
-              tmp [I18n.t("shared.chart.title.donation_of_amount", { s: data[:amount] })]
+              tmp << [I18n.t("shared.chart.title.donation_of_amount", { s: data[:amount] })]
             end
           end
           title << tmp.join(" ") if tmp.present?
-        # elsif t == :multiple && data[:multiple].present?
-          # title << I18n.t("shared.chart.title.to_multiple")
-        else t == :for_parties && data[:parties].present?
+        elsif t == :for_parties && data[:parties].present?
           title << I18n.t("shared.chart.title.for_parties", { s: data[:parties].join(", ") })
         elsif t == :receiving_monetary_amount
           tmp = ["", ""]
-          if data[:monetary].present?
+          if data[:monetary] == true || data[:monetary] == false
             tmp[0] = I18n.t("shared.chart.title.monetary_#{data[:monetary].to_s}")
           end
           if data[:amount].present?
-            tmp[1] = I18n.t("shared.chart.title.of_amount", { s: data[:amount] })
+            tmp[1] = " " + I18n.t("shared.chart.title.of_amount", { s: data[:amount] })
           end
-          title << I18n.t("shared.chart.title.receiving_monetary_amount", { m: tmp[0] , a: tmp[1] }
+          if tmp[0] != "" || tmp[1] != ""
+            title << I18n.t("shared.chart.title.receiving_monetary_amount", { m: tmp[0] , a: tmp[1] })
+          end
         elsif t == :from_donors
           tmp = nil
           if data[:nature].present?
             tmp = I18n.t("shared.chart.title.from_donors#{data[:multiple].present? ? '_who' : ''}",
-             { s: I18n.t("shared.chart.title.nature_#{data[:nature]}") }
+             { s: I18n.t("shared.chart.title.nature_#{data[:nature] == 0 ? 'individual' : 'organization'}") })
           end
           title << tmp if tmp.present?
           title << I18n.t("shared.chart.title.to_multiple") if data[:multiple].present?
         end
       }
 
-      title.join("\n")
-
-
-      # todo
-        # top_5_donors: Top %{n}%{cs} Donors
-        # top_5_parties: Top %{n} Parties/Candidates
-        # top_5_donors_for_party: Top %{n} Donors for %{obj}
-        # last_5_donations_for_party: Last %{n} Donations for %{obj}
-        # top_5_donors_for_parties: Top %{n} Donors for %{obj}
-        # total_donations_for_parties: Total Donations for %{obj}
-        # last_5_donations_for_donor: Last %{n} Donations for %{obj}
-        # top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj}
-        # total_donations_for_each_donor: Total Donations for %{obj}
-        # donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb}
-        # parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj}
-
-        # templates = {
-        #   top_5_donors:                       [ title: [:n, :nature], :for_parties, :block ],
-        #   top_5_parties:                      [ title: [:n], :receiving_monetary_amount, :from_donors ],
-        #   top_5_donors_for_party:             [ title: [:n, :parties], :block ],
-        #   last_5_donations_for_party:         [ title: [:n, :party], :block ],
-        #   top_5_donors_for_parties:           [ title: [:n, :for_parties], :block ],
-        #   total_donations_for_parties:        [ title: [:for_parties], :block ],
-        #   last_5_donations_for_donor:         [ title: [:n, :for_donor], :block ],
-        #   top_5_parties_donated_to:           [ title: [:n, :donor], :block ],
-        #   total_donations_for_each_donor:     [ title: [:donors], :block ],
-        #   donors_donations_sorted_by_amount:  [ title: [:donors, :parties], :block ],
-        #   parties_donations_sorted_by_amount: [ title: [:parties, :donors], :block ],
-        # }
+      title.join("<br/>")
 
         #-------------------------------------------------------------------------------
         #--------------------------- top_5_donors
 
           # Top {{n}} {{nature}} Donors
-          # {{for_parties}}
           # {{block}}
 
         #--------------------------- top_5_parties
@@ -716,52 +706,29 @@ class Donor
           # from {{nature}} Donors {{who}}
           # {{multiple}}
 
+        # all below have {{block}}
         #--------------------------- top_5_donors_for_party
-
           # Top {{n}} Donors for {{parties}}
-          # {{block}}
-
         #--------------------------- last_5_donations_for_party
-
           # Last {{n}} Donations for {{party}}
-          # {{block}}
-
         #--------------------------- top_5_donors_for_parties
-
           # Top {{n}} Donors for {{parties}}
-          # {{block}}
-
         #--------------------------- total_donations_for_parties
-
           # Total Donations for {{parties}}
-          # {{block}}
-
         #--------------------------- last_5_donations_for_donor
-
           # Last {{n}} Donations for {{donor}}
-          # {{block}}
-
         #--------------------------- top_5_parties_donated_to
-
           # Top {{n}} Parties Donated to by {{donor}}
-          # {{block}}
-
         #--------------------------- total_donations_for_each_donor
-
           # Total Donations for {{donors}}
-          # {{block}}
-
         #--------------------------- donors_donations_sorted_by_amount
-
           # Top Donations by {{donors}} to {{parties}}
-          # {{block}}
-
         #--------------------------- parties_donations_sorted_by_amount
-
           # Top Donations to {{parties}} by {{donors}}
-          # {{block}}
+
 
         #---------------------------
 
     end
+
 end

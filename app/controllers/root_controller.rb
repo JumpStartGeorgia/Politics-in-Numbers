@@ -83,7 +83,7 @@ class RootController < ApplicationController
       gon.gonned = true
 
       gon.party_list = Party.list
-      # gon.donor_list = Donor.list_with_tin
+      gon.donor_list = Donor.list(donation_pars[:donor]) if donation_pars.key?(:donor)
       gon.period_list = Period.list
 
 
