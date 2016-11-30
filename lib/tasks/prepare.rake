@@ -63,4 +63,5 @@ namespace :prepare do # WARNING ondeploy
     Rake::Task["prepare:resequence"].invoke
   end
   # WARNING call slug generator function for Category, Donor, Party, Period
+
 end

@@ -58,15 +58,15 @@ class Party
 
 #scoped data
   def self.list
-    sorted.map{|t| [t.permalink, t.title]} # used while creating list in view
+    sorted.sorted.map{|t| [t.permalink, t.title]}.sort{|x,y| x[1] <=> y[1] } # used while creating list in view
   end
 
   def self.for_collection
-    sorted.map{|t| [t.title, t.id]} # used while creating list in view
+    sorted.map{|t| [t.title, t.id]}.sort{|x,y| x[0] <=> y[0] } # used while creating list in view
   end
 
   def self.member_party_list
-    only_parties.members.sorted.map{|t| [t.permalink, t.title]} # used while creating list in view
+    only_parties.members.sorted.map{|t| [t.permalink, t.title]}.sort{|x,y| x[1] <=> y[1] } # used while creating list in view
   end
 
 #getters

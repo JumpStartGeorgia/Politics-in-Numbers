@@ -232,7 +232,7 @@ class Job
               end
               donor = Donor.find_by( first_name: cells[2], last_name: cells[3], tin: cells[4])
               if !donor.present?
-                donor = Donor.create!( first_name_translations: { ka: cells[2], en: cells[2].latinize.capitalize }, last_name_translations: { ka: cells[3] }.merge(cells[3].present? ? { en: cells[3].latinize.capitalize } : {}), tin: cells[4], nature: cells[3].present? ? 0 : 1 ) # individual or organization
+                donor = Donor.create!( first_name_translations: { ka: cells[2], en: cells[2].latinize.soft_titleize }, last_name_translations: { ka: cells[3] }.merge(cells[3].present? ? { en: cells[3].latinize.soft_titleize } : {}), tin: cells[4], nature: cells[3].present? ? 0 : 1 ) # individual or organization
               end
               donor.donations.create!(give_date: cells[1], amount: cells[5].round(2), party_id: p._id, comment: cells[7], monetary: cells[7] != "არაფულადი", donorset_id: @donorset.id )
               # donor.save

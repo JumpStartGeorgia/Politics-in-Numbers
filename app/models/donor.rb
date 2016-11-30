@@ -77,7 +77,7 @@ class Donor
 
   def self.list(collection_ids = [])
     collection_ids = Donor.get_ids_by_slugs(collection_ids)
-    where({'_id' => { "$in" => collection_ids}}).sorted.map{|t| [t.permalink, t.full_name]}
+    where({'_id' => { "$in" => collection_ids}}).sorted.map{|t| [t.permalink, t.full_name]}.sort{|x,y| x[1] <=> y[1] }
   end
 
   def self.list_with_tin
@@ -220,6 +220,7 @@ class Donor
 
     if inner_pars
       f = params
+      title_options = f
     else
       f = default_f.dup
       f[:donor] = Donor.get_ids_by_slugs(params[:donor])
@@ -259,6 +260,7 @@ class Donor
       end
     end
 
+     Rails.logger.fatal("fatal----------------------311#{f}")
     chart_subtitle = ""
     if f[:period].present? && f[:period][0] != -1 && f[:period][1] != -1
       chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
@@ -621,8 +623,28 @@ class Donor
       }
     end
     def self.generate_title(data, indexes)
-      title = []
 
+#       top_5_donors: Top %{n}%{obj} Donors for All Parties -> No Donations for All Parties
+# top_5_parties: Top %{n} Parties/Candidates for All Donors -> No Donations for All Parties
+
+# top_5_donors_for_party: Top %{n} Donors for %{obj} -> No Donations for %{name}
+# last_5_donations_for_party: Last %{n} Donations for %{obj} -> No Donations for %{obj}
+
+# top_5_donors_for_parties: Top %{n} Donors for %{obj} -> No Donations for %{name}
+# total_donations_for_parties: Total Donations for %{obj} -> No Donations for %{names}
+
+
+# last_5_donations_for_donor: Last %{n} Donations by %{obj} -> No Donations by %{obj}
+# top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj} No Parties Donated to by %{names}
+
+# total_donations_for_each_donor: Total Donations for %{obj} -> No donations for %{obj}
+# top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj} No Parties Donated to by %{names} ########
+
+# donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb} -> No Donations by %{obj} to %{objb}
+# parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj} -> No Donations to %{objb} by %{obj}
+
+
+      title = []
       template_names = [
         ["top_5_donors", "top_5_parties"], # If select anything other than party and donor -> charts show the top 5
         ["top_5_donors_for_party", "last_5_donations_for_party"], # If select 1 party -> top 5 donors for party, last 5 donations for party

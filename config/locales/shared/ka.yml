@@ -57,7 +57,7 @@ ka:
       show_less: მეტის ჩვენება
       and: და
       all: ყველა
-      numericSymbols: '[ null , "მლნ" , "მლრდ" , "ტრილ" , "კვადრ" , "E"]'
+      numericSymbols: [ null , "მლნ" , "მლრდ" , "ტრილ" , "კვადრ" , "E"]
     locale:
       short:
         en: En

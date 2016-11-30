@@ -23,7 +23,7 @@ class RootController < ApplicationController
     if sid.present?
       shr = ShortUri.by_sid(sid, :explore)
       if shr.present?
-        pars = shr.pars
+        pars = Hash.transform_keys_to_symbols(shr.pars)
         inner_pars = true
       else
         redirect_to explore_path and return
@@ -82,7 +82,9 @@ class RootController < ApplicationController
 
       gon.gonned = true
 
-      gon.party_list = Party.list
+
+      @party_list = Party.list
+      gon.party_list = @party_list
       gon.donor_list = Donor.list(donation_pars[:donor]) if donation_pars.key?(:donor)
       gon.period_list = Period.list
 
@@ -216,7 +218,7 @@ class RootController < ApplicationController
 
   def embed_static
     pars = embed_static_params
-    sid =
+    # sid =
     nsid = ShortUri.embed_static_uri(pars[:id])
 
     respond_to do |format|
@@ -280,7 +282,7 @@ class RootController < ApplicationController
       if shr.present? && shr.other.present? && (shr.other == 0 || shr.other == 1)
         is_donation = shr.other == 0
         if (is_donation ? ["a", "b"] : ["a"]).index(chart).present?
-          data = (is_donation ? Donor : Dataset).explore(shr.pars, "co" + chart, true)
+          data = (is_donation ? Donor : Dataset).explore(Hash.transform_keys_to_symbols(shr.pars), "co" + chart, true)
 
           k = ("c#{chart}").to_sym
           @title = "#{data[k][:title]} | #{@title}"
@@ -293,7 +295,7 @@ class RootController < ApplicationController
     if @missing
       @image = view_context.image_url("missing_share.png")
     end
-     Rails.logger.fatal("fatal----------------------#{img.inspect}")
+     # Rails.logger.fatal("fatal----------------------#{img.inspect}")
     if img.present? || request.user_agent.include?("facebookexternalhit") || request.user_agent.include?("Twitterbot")
         respond_to do |format|
           format.html
@@ -326,10 +328,10 @@ class RootController < ApplicationController
       args2 << { "tin": regex2 }
     }
 
-    Donor.all_of({"$or" => args1 }, {"$or" => args2 }).each{ |m|
+    Donor.all_of({"$or" => args1 }, {"$or" => args2 }).sorted.each{ |m|
       donors << [ m.permalink, m.full_name, m.tin ]
     }
-    render :json => donors
+    render :json => donors.sort{|x,y| x[1] <=> y[1] }
   end
 
   private

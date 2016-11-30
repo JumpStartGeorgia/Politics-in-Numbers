@@ -80,7 +80,7 @@
               <input id="donation_amount_to" type="number" min="1" placeholder="<%= t('.to') %>" class="datepicker" data-type="range">
             </div>
           </div>
-          <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "party", on: true, list: generate_li_list(Party.list), category_label: 0, label: "party_candidate" } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "donation", input_field: "party", on: true, list: generate_li_list(@party_list), category_label: 0, label: "party_candidate" } %>
           <div class="row filter-input" data-field="multiple" data-type="checkbox">
             <a href="javascript:void(0);" class="toggle" tabindex="5"><%= t('.donated_multiple_parties') %><i title="<%= t('.filter_toggle') %>"></i></a>
             <div class="list hidden"></div>
