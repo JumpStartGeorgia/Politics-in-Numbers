@@ -390,6 +390,9 @@ $(document).ready(function (){
         this.sid = sid;
         window.history.pushState(sid, null, gon.path + "/" + sid);
         this.download.attr("href", gon.path + "/" + sid + "?format=csv");
+      },
+      set_sid: function(sid) {
+        if(typeof sid !== "undefined") { this.sid = sid; }
       }
     },
     finance = {
@@ -557,6 +560,9 @@ $(document).ready(function (){
         this.sid = sid;
         window.history.pushState(sid, null, gon.path + "/" + sid);
         this.download.attr("href", gon.path + "/" + sid + "?format=csv");
+      },
+      set_sid: function(sid) {
+        if(typeof sid !== "undefined") { this.sid = sid; }
       },
       toggle: function(element, turn_on) {
         var t = this;
@@ -901,6 +907,7 @@ $(document).ready(function (){
         _id = obj.id();
         js.cache[_id] = gon[obj.name + "_data"];
         // console.log("gonnned",js.cache[_id].sid);
+        obj.set_sid(js.cache[_id].sid);
         if(obj.name === (gon.is_donation ? "donation" : "finance")) { obj.url(js.cache[_id].sid); }
         filter_callback(js.cache[_id], obj.name);
       });

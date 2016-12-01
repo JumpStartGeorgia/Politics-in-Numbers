@@ -262,24 +262,22 @@ class Dataset
 
 
 
-
+    data_sum = 0
     data.each{|e|
-
-
       pp = period_list.index{ |s| s[:id] == e[:period_id] }
       per = period_list[pp]
       e[:category_datas].each { |ee|
-
+        v = ee[:value].round(2)
+        data_sum += v
         #one category and common
-        parties_list[e[:party_id]][:data][pp] = ee[:value].round(2)
+        parties_list[e[:party_id]][:data][pp] = v
 
         # one main multiple sub
         category_period_party[ee[:category_id]][e[:period_id]] = {}
-        category_period_party[ee[:category_id]][e[:period_id]][e[:party_id]] = ee[:value].round(2)
+        category_period_party[ee[:category_id]][e[:period_id]][e[:party_id]] = v
 
         # more than one main category
-        category_grouped_period_party[main_to_sub_category_map[ee[:category_id]]][e[:period_id]][e[:party_id]] += ee[:value].round(2)
-
+        category_grouped_period_party[main_to_sub_category_map[ee[:category_id]]][e[:period_id]][e[:party_id]] += v
       }
     }
 
@@ -306,7 +304,6 @@ class Dataset
     chart_titles[1].concat(f[:party].map{|m| parties[BSON::ObjectId(m)][:name] }) # grab selected party names
 
     if f[:period].present? # grab selected period names
-
       chart_titles[2].concat(f[:period].map{|m| "#{periods[BSON::ObjectId(m)][:name]}" })
     end
 
@@ -319,6 +316,7 @@ class Dataset
       }
     }
     chart_title = chart_title[2..chart_title.size-1] if chart_title.size > 1
+    chart_title = I18n.t("shared.common.no_result_found_for") + " " + chart_title if data_sum == 0
 
     headers = [[""],[I18n.t("shared.common.parties")]]
     header_classes = [["empty"], ["outer"]]
@@ -541,7 +539,6 @@ class Dataset
       }
     elsif type == "file" || type == "info"
       sz = 0
-       # Rails.logger.fatal("fatal----------------------#{data.present?}#{ActionController::Base.helpers.number_to_human_size(sz)}")
       if data.present?
         require "#{Rails.root}/lib/js/helper.rb"
         compressed_filestream = Zip::OutputStream.write_buffer do |zp|

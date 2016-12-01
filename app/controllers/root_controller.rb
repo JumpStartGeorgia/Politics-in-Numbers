@@ -295,7 +295,6 @@ class RootController < ApplicationController
     if @missing
       @image = view_context.image_url("missing_share.png")
     end
-     # Rails.logger.fatal("fatal----------------------#{img.inspect}")
     if img.present? || request.user_agent.include?("facebookexternalhit") || request.user_agent.include?("Twitterbot")
         respond_to do |format|
           format.html

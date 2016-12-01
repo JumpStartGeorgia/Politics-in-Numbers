@@ -55,6 +55,7 @@ en:
       and: and
       all: All
       numericSymbols: [ "k" , "M" , "G" , "T" , "P" , "E"]
+      no_result_found_for: "No Results Found for"
     locale:
       short:
         en: En
@@ -80,7 +81,7 @@ en:
       forgot_password: Forgot your password?
     chart:
       title:
-        top_5_donors: Top %{n}%{obj} Donors for All Parties
+        top_5_donors: Top %{n} Donors for All Parties
         top_5_parties: Top %{n} Parties/Candidates for All Donors
         top_5_donors_for_party: Top %{n} Donors for %{obj}
         last_5_donations_for_party: Last %{n} Donations for %{obj}
@@ -103,6 +104,18 @@ en:
         from_donors_who: from %{s} Donors who
         nature_individual: Individual
         nature_organization: Organization
+        no_data:
+          top_5_donors: No Donations for All Parties
+          top_5_parties: No Donations for All Parties
+          top_5_donors_for_party: No Donations for %{obj}
+          last_5_donations_for_party: No Donations for %{obj}
+          top_5_donors_for_parties: No Donations for %{obj}
+          total_donations_for_parties: No Donations for %{obj}
+          last_5_donations_for_donor: No Donations by %{obj}
+          top_5_parties_donated_to: No Parties Donated to by %{obj}
+          total_donations_for_each_donor: No donations for %{obj}
+          donors_donations_sorted_by_amount: No Donations by %{obj} to %{objb}
+          parties_donations_sorted_by_amount: No Donations to %{objb} by %{obj}
       finance:
         title:
           party_donations_for: "Party - Donations for"

@@ -32,10 +32,7 @@ ka:
         slogan: JumpStart Georgia - ჩვენ გაწვდით ინფორმაციას მონაცემებით და დიზაინით
       name: პოლიტიკა რიცხვებში
       slogan: დაათვალიერე პარტიების ფინანსები
-      description:  |
-        “პოლიტიკა რიცხვებში” აშშ სახელმწიფო დეპარტამენტის მიერ დაფინანსებული პროექტია, რომელიც მიზნად ისახავს საქართველოში პოლიტიკური პარტიების ფინანსების გამჭვირვალეობის გაზრდას და პოლიტიკური ამბების გაშუქებაში მონაცემებისა და ვიზუალიზაციების გამოყენების ხელშეწყობას.
-
-        პროექტის ავტორები არიან  Digital Communication Network პროგრამის კურსდამთავრებულები ქეთევან ბოჯგუა და ნინო მაჭარაშვილი. პროექტი ხორციელდება “ჯამპსტარტ ჯორჯიასთან” და საქართველოს სახელმწიფო აუდიტის სამსახურთან თანამშრომლობით.
+      description:  “პოლიტიკა რიცხვებში” აშშ სახელმწიფო დეპარტამენტის მიერ დაფინანსებული პროექტია, რომელიც მიზნად ისახავს საქართველოში პოლიტიკური პარტიების ფინანსების გამჭვირვალეობის გაზრდას და პოლიტიკური ამბების გაშუქებაში მონაცემებისა და ვიზუალიზაციების გამოყენების ხელშეწყობას. პროექტის ავტორები არიან  Digital Communication Network პროგრამის კურსდამთავრებულები ქეთევან ბოჯგუა და ნინო მაჭარაშვილი. პროექტი ხორციელდება “ჯამპსტარტ ჯორჯიასთან” და საქართველოს სახელმწიფო აუდიტის სამსახურთან თანამშრომლობით.
       language: ენის გადამრთველი
       twitter: Twitter-ზე გაზიარება
       facebook: Facebook-ზე გაზიარება
@@ -58,6 +55,7 @@ ka:
       and: და
       all: ყველა
       numericSymbols: [ null , "მლნ" , "მლრდ" , "ტრილ" , "კვადრ" , "E"]
+      no_result_found_for: "No Results Found for"
     locale:
       short:
         en: En
@@ -83,17 +81,41 @@ ka:
       forgot_password: დაგავიწყდათ პაროლი?
     chart:
       title:
-        top_5_donors: "Top %{n} შემომწირველი"
-        top_5_parties: "Top %{n} პარტია"
-        top_5_donors_for_party: "%{obj}-ის Top %{n} შემომწირველი"
-        last_5_donations_for_party: "%{obj}-ის ბოლო %{n} შემოწირულობა"
-        top_5_donors_for_parties: "Top %{n} შემომწირველი ყველა პარტიისთვის"
-        total_donations_for_parties: მთლიანი შემოწირულობები პარტიებისთვის
-        last_5_donations_for_donor: "ბოლო %{n} შემოწირულობა"
-        top_5_parties_donated_to: "პარტია, რომელსაც შემოწირულობა გაუკეთა %{obj}-მ"
-        total_donations_for_each_donor: შემომწირველების ჯამური შემოწირულობა"
-        donors_donations_sorted_by_amount: "%{obj} -ის Top შემოწირულობები %{objb}-ს"
-        parties_donations_sorted_by_amount: "%{obj} -ის Top შემოწირულობები %{objb}-ს"
+        top_5_donors: Top %{n} Donors for All Parties
+        top_5_parties: Top %{n} Parties/Candidates for All Donors
+        top_5_donors_for_party: Top %{n} Donors for %{obj}
+        last_5_donations_for_party: Last %{n} Donations for %{obj}
+        top_5_donors_for_parties: Top %{n} Donors for %{obj}
+        total_donations_for_parties: Total Donations for %{obj}
+        last_5_donations_for_donor: Last %{n} Donations by %{obj}
+        top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj}
+        total_donations_for_each_donor: Total Donations for %{obj}
+        donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb}
+        parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj}
+        to_multiple: Have donated to multiple parties
+        monetary_donation: "%{s} donation"
+        monetary_true: Monetary
+        monetary_false: Non-Monetary
+        of_amount: of %{s} GEL
+        donation_of_amount: Donation of %{s} GEL
+        for_parties: "For: %{s}"
+        receiving_monetary_amount: Receiving %{m} donation%{a}
+        from_donors: from %{s} Donors
+        from_donors_who: from %{s} Donors who
+        nature_individual: Individual
+        nature_organization: Organization
+        no_data:
+          top_5_donors: No Donations for All Parties
+          top_5_parties: No Donations for All Parties
+          top_5_donors_for_party: No Donations for %{obj}
+          last_5_donations_for_party: No Donations for %{obj}
+          top_5_donors_for_parties: No Donations for %{obj}
+          total_donations_for_parties: No Donations for %{obj}
+          last_5_donations_for_donor: No Donations by %{obj}
+          top_5_parties_donated_to: No Parties Donated to by %{obj}
+          total_donations_for_each_donor: No donations for %{obj}
+          donors_donations_sorted_by_amount: No Donations by %{obj} to %{objb}
+          parties_donations_sorted_by_amount: No Donations to %{objb} by %{obj}
       finance:
         title:
           party_donations_for: "პარტია - შემოწირულობები"

@@ -238,7 +238,7 @@ class Donor
       tmp = params[:amount]
       if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
         f[:amount] = tmp.map{|t| t.to_i }
-        title_options[:amount] = f[:amount].join(" - ")
+        title_options[:amount] = format_range(f[:amount])
       end
       f[:party] = Party.get_ids_by_slugs(params[:party])
 
@@ -260,7 +260,6 @@ class Donor
       end
     end
 
-     Rails.logger.fatal("fatal----------------------311#{f}")
     chart_subtitle = ""
     if f[:period].present? && f[:period][0] != -1 && f[:period][1] != -1
       chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
@@ -303,10 +302,8 @@ class Donor
     recent_donations = []
     parties_list = {}
     donors_list = {}
-     # Rails.logger.fatal("fatal----------------------#{f[:donor]}")
     data.each{|e|
       if chart_type == 3 || chart_type == 4
-         Rails.logger.fatal("fatal---------------------another id-#{e[:_id]}")
         donors_list[e[:_id]] = { name: e[:name] }
       end
 
@@ -337,7 +334,6 @@ class Donor
     parties_list.each_pair { |k, v| parties_list[k][:value] = v[:value].round(2) }
     total_amount = total_amount.round(2)
 
-    Rails.logger.fatal("fatal----------------------#{chart_type} #{donors_list}")
     if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
       if title_options.key?(:nature)
         ca_meta_obj[:obj] = " " + I18n.t("shared.chart.title.nature_#{title_options[:nature] == 0 ? 'individual' : 'organization'}")
@@ -403,7 +399,6 @@ class Donor
       sid = ShortUri.explore_uri(f.merge({filter: "donation"}))
     end
 
-     # Rails.logger.fatal("fatal----------------------#{table.select{|f| f[1].nil? || f[2].nil? }.map {|m| [m[1], m[2]]}}")
     res = {}
     if ["t", "a"].index(type).present?
       res = {
@@ -419,11 +414,12 @@ class Donor
         }
       }
     end
+    has_no_data = total_amount == 0
     if ["ca", "a", "co", "coa"].index(type).present?
       res.merge!({
         ca: {
           series: ca,
-          title: Donor.generate_title(ca_meta_obj.merge(title_options), [chart_type, 0]),
+          title: Donor.generate_title(ca_meta_obj.merge(title_options), [chart_type, 0], has_no_data),
           subtitle: chart_subtitle
         }
       })
@@ -432,7 +428,7 @@ class Donor
       res.merge!({
         cb: {
           series: cb,
-          title: Donor.generate_title(cb_meta_obj.merge(title_options), [chart_type, 1]),
+          title: Donor.generate_title(cb_meta_obj.merge(title_options), [chart_type, 1], has_no_data),
           subtitle: chart_subtitle
         }
       })
@@ -622,7 +618,7 @@ class Donor
         end
       }
     end
-    def self.generate_title(data, indexes)
+    def self.generate_title(data, indexes, has_no_data)
 
 #       top_5_donors: Top %{n}%{obj} Donors for All Parties -> No Donations for All Parties
 # top_5_parties: Top %{n} Parties/Candidates for All Donors -> No Donations for All Parties
@@ -669,8 +665,9 @@ class Donor
       template_name = template_names[indexes[0]][indexes[1]]
       template = templates[template_name.to_sym]
 
+      title << I18n.t("shared.chart.title.#{has_no_data ? 'no_data.' : ''}#{template_name}", data)
+      data[:amount] = format_range(data[:amount]) if data[:amount].present?
 
-      title << I18n.t("shared.chart.title.#{template_name}", data)
       template.each { |t|
 
         if t == :block
@@ -752,5 +749,17 @@ class Donor
         #---------------------------
 
     end
-
+    def self.format_range (range)
+      ret = ""
+      if range.length == 2
+        if range[0] != -1 && range[1] != -1
+          ret = range.join(" - ")
+        elsif range[0] != -1
+          ret =  " > #{range[0]}"
+        elsif range[1] != -1
+          ret =  " < #{range[1]}"
+        end
+      end
+      ret
+    end
 end
