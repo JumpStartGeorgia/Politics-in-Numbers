@@ -131,7 +131,7 @@ class Dataset
      })
     collection.aggregate(options)
   end
-  def self.explore(params, type = "a", inner_pars = false)
+  def self.explore(params, type = "a", inner_pars = false, global_data = {})
     limiter = 5
 
     if inner_pars
@@ -166,9 +166,10 @@ class Dataset
     parties = {}
     periods = {}
     categories = {}
-    Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
-    # Rails.logger.fatal("----------------------------------------#{parties.inspect}----#{I18n.locale}")
-    Period.each{|e| periods[e.id] = { name: e.title, date: e.start_date, type: e.type } }
+    (global_data.key?(:parties) ? global_data[:parties] : Party).each{ |e| parties[e[0]] = { value: 0, name: e[1] } }
+    (global_data.key?(:periods) ? global_data[:periods] : Period).each{ |e| periods[e[0]] = { name: e[1], date: e[3], type: e[4] } }
+    # Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
+    # Period.each{|e| periods[e.id] = { name: e.title, date: e.start_date, type: e.type } }
     Category.each{|e| categories[e.id] = { title: e.title, parent_id: e.parent_id } }
 
     selected_categories = []

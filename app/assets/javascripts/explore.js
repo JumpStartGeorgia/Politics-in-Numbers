@@ -967,34 +967,9 @@ $(document).ready(function (){
     // console.log("table data", table);
     if(type === "donation") {
       // console.log(table);
-      donation_total_amount.text(table.total_amount);
-      donation_total_donations.text(table.total_donations);
-      var prev = undefined, alt_color = true,
-        dt = donation_table.DataTable({
-          responsive: true,
-          destroy: true,
-          order: [],
-          "aaData": table.data,
-          "aoColumns": table.header.map(function(m,i) {
-            return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
-          }),
-          "info": false,
-          dom: "fltrp",
-          createdRow: function ( row, data, index ) {
-            if(data[2] !== prev) {
-              alt_color = !alt_color;
-            }
-            if(alt_color) {
-              $(row).addClass('alt');
-            }
-            prev = data[2];
-          }
-        });
-      dt.on("draw", function (e, settings) {
-        if(settings.aaSorting.length) {
-          $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
-        }
-      });
+      // console.log("---",donation, donation.sid);
+      render_donation_table(table);
+
     }
     else if(type === "finance") {
       var table_html = "<thead>", colspan = 0, tmp, klass;
@@ -1048,6 +1023,71 @@ $(document).ready(function (){
         dom: "Bfltrp"
       });
     }
+  }
+  function render_donation_table(table) {
+    console.log(table);
+    // donation_total_amount.text(table.total_amount);
+    // donation_total_donations.text(table.total_donations);
+    var prev = undefined, alt_color = true,
+
+    // $('#users-datatable').dataTable({
+    //    "processing": true,
+    //    "serverSide": true,
+    //    "ajax": $('#users-datatable').data('source'),
+    //    "order": [[4, 'desc']],
+    //    "language": {
+    //     "url": gon.datatable_i18n_url
+    //    },
+    //    "columnDefs": [
+    //      { orderable: false, targets: [-1] }
+    //    ]
+    //  });
+
+      dt = donation_table.DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        destroy: true,
+        ajax: {
+          url: gon.donations_filter_path,
+          data: function ( d ) {
+            return $.extend( {}, d, {
+              "sid": donation.sid
+            });
+          },
+          dataSrc: function ( json ) {
+            console.log("dataSrc", json);
+            // for ( var i=0, ien=json.length ; i<ien ; i++ ) {
+            //   json[i][0] = '<a href="/message/'+json[i][0]+'>View message</a>';
+            // }
+            return json.data;
+          }
+        },
+        // gon.donations_filter_path,
+        // aoColumns: [{ title: "first" }, { title: "last"}],
+        order: [],
+        // "aaData": table.data,
+        "aoColumns": table.header.map(function(m,i) {
+          return { "title": m, "sClass": table.classes[i] };
+        }),
+        "info": false,
+        dom: "fltrp",
+
+        // createdRow: function ( row, data, index ) {
+        //   if(data[2] !== prev) {
+        //     alt_color = !alt_color;
+        //   }
+        //   if(alt_color) {
+        //     $(row).addClass('alt');
+        //   }
+        //   prev = data[2];
+        // }
+      });
+    // dt.on("draw", function (e, settings) {
+    //   if(settings.aaSorting.length) {
+    //     $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
+    //   }
+    // });
   }
   function bar_chart(elem, resource, bg) {
     // console.log("chart", elem, resource);

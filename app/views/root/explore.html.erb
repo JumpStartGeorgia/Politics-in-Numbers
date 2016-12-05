@@ -66,7 +66,8 @@
               <input id="donation_period_to" type="text" placeholder="<%= t('.to') %>" class="datepicker" data-type="period">
               <div class="sublabel"><%= t('.campaign') %>:</div>
               <ul id="donation_period_campaigns">
-                <% Period.campaigns.each {|r| %>
+                <% period_campaigns = Period.campaigns.to_a %>
+                <% period_campaigns.each {|r| %>
                   <li><a href="javascript:void(0);" data-value="<%= "#{r.start_date};#{r.end_date}"%>"><%= "#{l r.start_date, format: :date} - #{l r.end_date, format: :date}"%></a></li>
                 <% } %>
               </ul>
@@ -122,7 +123,9 @@
           </div>
         </div>
         <div class="finance filter-inputs" data-type="finance">
-          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true, list: generate_li_list(Party.member_party_list), category_label: 0 } %>
+          <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "party", on: true,
+            list: generate_li_list(@party_list.select{|s| s[3] == true }) , category_label: 0 } %>
+            <%# Party.member_party_list), category_label: 0 } %>
           <% lists = Category.by_sym(@categories) %>
 
           <%= render partial: 'autocomplete_input', :locals => { input_for: "finance", input_field: "income", on: false, list: lists[:income].html_safe } %>
@@ -153,7 +156,7 @@
                   <% } %>
                 </ul>
                 <ul class="hidden" data-type="campaign">
-                  <% Period.campaigns.each{|e| %>
+                  <% period_campaigns.each{|e| %>
                     <li><input type="checkbox" id='finance_period_campaign_<%= "#{e.permalink}" %>' name='finance_period_campaign' value="<%= "#{e.permalink}" %>">
                     <label for='finance_period_campaign_<%= "#{e.permalink}" %>'><span></span><%= "#{e.title}" %></label></li>
                   <% } %>

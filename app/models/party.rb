@@ -58,7 +58,11 @@ class Party
 
 #scoped data
   def self.list
-    sorted.sorted.map{|t| [t.permalink, t.title]}.sort{|x,y| x[1] <=> y[1] } # used while creating list in view
+    sorted.map{|t| [t.permalink, t.title]}.sort{|x,y| x[1] <=> y[1] } # used while creating list in view
+  end
+
+  def self.list_from(parties)
+    parties.map{|t| [t[2], t[1]]}.sort{|x,y| x[1] <=> y[1] } # used while creating list in view
   end
 
   def self.for_collection

@@ -76,6 +76,10 @@ class Period
     sorted.map{|t| [t.permalink, t.title]}
   end
 
+  def self.list_from(periods)
+    periods.map{|t| [t[2], t[1]]}
+  end
+
   def self.for_collection
     sorted.map{|t| [t.title, t.id]}
   end

@@ -36,7 +36,8 @@ module StarterTemplate
     # config.i18n.available_locales = [:ka, :en]
     config.i18n.available_locales = [:ka, :en, :ru]
     # config.i18n.fallbacks = {'en' => ['ka'], 'ka' => ['en']}
-    config.i18n.fallbacks = {'en' => ['ka', 'ru'], 'ka' => ['en', 'ru'], 'ru' => ['ka', 'en']}
+    # config.i18n.fallbacks = {'en' => ['ka', 'ru'], 'ka' => ['en', 'ru'], 'ru' => ['ka', 'en']}
+    config.i18n.fallbacks = {'en' => 'ka', 'ka' => 'en', 'ru' => 'ka'}
 
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
@@ -49,10 +50,10 @@ module StarterTemplate
     config.active_job.queue_adapter = :delayed_job
 
     # Custom I18n fallbacks
-    config.after_initialize do
-      I18n.fallbacks = I18n::Locale::Fallbacks.new(en: :ka, ka: :en, ru: :ka)
-      # I18n.fallbacks = I18n::Locale::Fallbacks.new(en: :ka, ka: :en)
-    end
+    # config.after_initialize do
+    #   I18n.fallbacks = I18n::Locale::Fallbacks.new(en: :ka, ka: :en, ru: :ka)
+    #   # I18n.fallbacks = I18n::Locale::Fallbacks.new(en: :ka, ka: :en)
+    # end
     # config.log_level = :fatal
     #config.mongoid.logger = nil #Logger.new($stdout, :info)
     config.middleware.use Rack::Deflater

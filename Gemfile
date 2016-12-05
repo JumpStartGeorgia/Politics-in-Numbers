@@ -89,6 +89,8 @@ gem "rubyXL"
 # jQuery DataTables plugin - provides all the basic DataTables files, and a few of the extras.
 gem 'jquery-datatables-rails', '~> 3.4.0'
 
+gem 'ajax-datatables-rails'
+
 gem 'gon'
 
 gem "daemons"
