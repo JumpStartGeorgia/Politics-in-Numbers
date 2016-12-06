@@ -46,7 +46,7 @@ Rails.application.routes.draw do
     get '/share/:id/:chart' => 'root#share', as: :share
     get '/img/:id/:chart' => 'root#img', as: :img
     get 'filter/donors' => 'root#donors_filter'
-    get 'filter/donations' => 'root#donations_datatable_filter', constraints: lambda { |req| req.format == :json }
+    get 'filter/donations' => 'root#donations_datatable_filter', constraints: lambda { |req| req.format == :json || req.format == :csv }
     # get 'select/parties' => 'root#select_parties'
     get 'explore_filter' => 'root#explore_filter'
     get 'download' => 'root#download'

@@ -83,7 +83,7 @@ class Category
 
 
   def self.main_category_id(cats, id)
-     Rails.logger.debug("--------------------------------------------#{cats[id].inspect} #{id}")
+    # Rails.logger.debug("--------------------------------------------#{cats[id].inspect} #{id}")
     p = cats[id][:parent_id]
     p_id = id
     while(p.present?)

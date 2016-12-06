@@ -166,8 +166,8 @@ class Dataset
     parties = {}
     periods = {}
     categories = {}
-    (global_data.key?(:parties) ? global_data[:parties] : Party).each{ |e| parties[e[0]] = { value: 0, name: e[1] } }
-    (global_data.key?(:periods) ? global_data[:periods] : Period).each{ |e| periods[e[0]] = { name: e[1], date: e[3], type: e[4] } }
+    (global_data.key?(:parties) ? global_data[:parties] : Party.sorted.map { |m| [m.id, m.title, m.permalink, m.type == 0 && m.member == true] }).each{ |e| parties[e[0]] = { value: 0, name: e[1] } }
+    (global_data.key?(:periods) ? global_data[:periods] : Period.sorted.map { |m| [m.id, m.title, m.permalink, m.start_date, m.type] }).each{ |e| periods[e[0]] = { name: e[1], date: e[3], type: e[4] } }
     # Party.each{|e| parties[e.id] = { value: 0, name: e.title } }
     # Period.each{|e| periods[e.id] = { name: e.title, date: e.start_date, type: e.type } }
     Category.each{|e| categories[e.id] = { title: e.title, parent_id: e.parent_id } }

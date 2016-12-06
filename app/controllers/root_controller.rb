@@ -16,7 +16,6 @@ class RootController < ApplicationController
   end
 
   def explore
-puts "fatal----------------------#{I18n.fallbacks}"
     @show_page_title = false
     pars = explore_params
     inner_pars = false
@@ -39,13 +38,11 @@ puts "fatal----------------------#{I18n.fallbacks}"
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
 
     donation_pars = {}
-     Rails.logger.debug("--------------------------------------------1")
     finance_pars = {
       income: [gon.main_categories[:income]],
       party: Party.where(:tmp_id.in => [1,2]).map{|m| m.permalink },
       period: Period.annual.limit(3).map{|m| m.permalink }
     }
-     Rails.logger.debug("--------------------------------------------")
     if !(@fltr.present? && ["finance", "donation"].index(@fltr).present?)
       @fltr = "finance"
       pars.merge!(finance_pars)
@@ -81,14 +78,10 @@ puts "fatal----------------------#{I18n.fallbacks}"
       gon.search = t('.search')
       gon.table_length = t('.table_length')
       gon.numericSymbols = t('shared.common.numericSymbols')
-      gon.donations_filter_path = filter_donations_path(format: :json)
+      gon.donations_filter_path = filter_donations_path
 
       gon.gonned = true
 
-      # Rails.logger.debug("--------------------------------------------party1")
-      # Rails.logger.debug("--------------------------------------------party1 end")
-      # Rails.logger.debug("--------------------------------------------party1 end 2")
-      # Rails.logger.debug("--------------------------------------------party1 ?")
 
       @party_list = Party.sorted.map { |m| [m.id, m.title, m.permalink, m.type == 0 && m.member == true] }
       gon.party_list = Party.list_from(@party_list)
@@ -100,34 +93,27 @@ puts "fatal----------------------#{I18n.fallbacks}"
 
       gon.is_donation = is_donation
 
-      # Rails.logger.debug("--------------------------------------------donor explore wrapper #{defined? @party_list}")
       tmp = Donor.explore(donation_pars, "a", inner_pars, { parties: @party_list })
-      # Rails.logger.debug("--------------------------------------------donor explore wrapper end #{defined? @party_list}")
       gon.donation_params = tmp.delete(:pars)
       gon.donation_data = tmp
 
-      Rails.logger.debug("--------------------------------------------dataset explore wrapper")
       tmp = Dataset.explore(finance_pars, "a", inner_pars, { parties: @party_list, periods: @period_list })
-      Rails.logger.debug("--------------------------------------------dataset explore wrapper end")
       gon.finance_params = tmp.delete(:pars)
       gon.finance_data = tmp
 
       dt = is_finance ? gon.finance_data : gon.donation_data
 
       pars.delete(:locale)
-      @donation_download_link = request.path + "?filter=donation&" +  donation_pars.reject{|k,v| k == "filter" }.to_param  + "#{donation_pars.empty? ? '' : '&'}#{'format=csv'}"
-      @finance_download_link = request.path + "?filter=finance&" +  finance_pars.reject{|k,v| k == "filter" }.to_param  + "#{finance_pars.empty? ? '' : '&'}#{'format=csv'}"
 
+      @finance_download_link = gon.path + "/" + gon.finance_data[:sid] + "?format=csv"
+
+      gon.donation_table_download_title = t('root.explore.download_table')
       gon.params = pars
 
     else
-
-      dt = is_finance ? Dataset.explore(finance_pars, "t", inner_pars) : Donor.explore(donation_pars, "t", inner_pars)
-
-      csv_file = CSV.generate do |csv|
-        if is_donation
-          csv << dt[:table][:header]
-        else
+      if is_finance
+        dt = Dataset.explore(finance_pars, "t", inner_pars)
+        csv_file = CSV.generate do |csv|
           dt[:table][:header].each{|e|
             tmp = []
             tmp_prev = ""
@@ -137,11 +123,10 @@ puts "fatal----------------------#{I18n.fallbacks}"
             }
             csv << tmp
           }
+          dt[:table][:data].each { |r| csv << r }
         end
-        dt[:table][:data].each { |r| csv << r }
       end
     end
-    Rails.logger.debug("-------------------------------------------- respond to begin ")
     respond_to do |format|
       format.html
       format.csv { csv_file.present? ? send_data(csv_file, filename: "explore_#{@fltr}_#{Date.today}.csv") : redirect_to(explore_path, :notice => t('shared.msgs.data_not_found')) }
@@ -347,92 +332,17 @@ puts "fatal----------------------#{I18n.fallbacks}"
   end
 
   def donations_datatable_filter
-
-
-
-  #     include Rails.application.routes.url_helpers
-  # delegate :params, :h, :link_to, :number_to_currency, :number_with_delimiter, to: :@view
-  # delegate :current_user, to: :@current_user
-
-#   def initialize(view, current_user)
-#     @view = view
-#     @current_user = current_user
-#   end
-
-#   def as_json(options = {})
-
-#   end
-
-# private
-
-#   def data
-#     users.map do |user|
-#       [
-#         user.nickname,
-#         user.email,
-#         user.role_name.humanize,
-#         I18n.l(user.created_at, :format => :file),
-#         user.current_sign_in_at.present? ? I18n.l(user.current_sign_in_at, :format => :file) : nil,
-#         user.sign_in_count,
-#         action_links(user)
-
-#       ]
-#     end
-#   end
-
-#   def users
-#     @users ||= fetch_users
-#   end
-
-#   def action_links(user)
-#     x = ''
-#     x << link_to(I18n.t("helpers.links.edit"),
-#                       edit_admin_user_path(user, :locale => I18n.locale), :class => 'btn btn-default btn-xs')
-#     x << " "
-#     x << link_to(I18n.t("helpers.links.destroy"),
-#                       admin_user_path(user, :locale => I18n.locale),
-#                       :method => :delete,
-#                       :data => { :confirm => I18n.t("helpers.links.confirm") },
-#                       :class => 'btn btn-xs btn-danger')
-#     return x.html_safe
-#   end
-
-#   def user_query
-#     if @current_user.present? && @current_user.role == User::ROLES[:admin]
-#       User
-#     else
-#       User.no_admins
-#     end
-#   end
-
-#   def fetch_users
-#     users = user_query.order("#{sort_column} #{sort_direction}")
-#     users = users.page(page).per_page(per_page)
-#     if params[:search].present? && params[:search][:value].present?
-#       users = users.where("users.email like :search", search: "%#{params[:search][:value]}%")
-#     end
-#     users
-#   end
-
-#   def page
-#     params[:start].to_i/per_page + 1
-#   end
-
-#   def per_page
-#     params[:length].to_i > 0 ? params[:length].to_i : 10
-#   end
-
-#   def sort_column
-#     columns = %w[users.nickname users.email users.role users.created_at users.current_sign_in_at users.sign_in_count]
-#     columns[params[:order]['0'][:column].to_i]
-#   end
-
-#   def sort_direction
-#     params[:order]['0'][:dir] == "desc" ? "desc" : "asc"
-#   end
-    Rails.logger.fatal("fatal----------------------donations_datatable_filter#{params}")
-
-    render :json => Donor.explore_table(params)
+    dt = Donor.explore_table(params, request.format)
+    if request.format.csv?
+      csv_file = CSV.generate do |csv|
+        csv << dt[:table][:header]
+        dt[:table][:data].each { |r| csv << r }
+      end
+    end
+    respond_to do |format|
+      format.json { render :json => dt }
+      format.csv { csv_file.present? ? send_data(csv_file, filename: "explore_donation_#{Date.today}.csv") : redirect_to(explore_path, :notice => t('shared.msgs.data_not_found')) }
+    end
   end
 
   private

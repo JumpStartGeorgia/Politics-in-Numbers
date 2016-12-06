@@ -287,7 +287,7 @@ input[type="radio"] + label{
 
 
 .dataTables_wrapper {
-  margin-top: 20px;
+  // margin-top: 20px;
   .dataTables_paginate {
     .pagination {
       li {
@@ -299,13 +299,23 @@ input[type="radio"] + label{
       font:16px firasans_b;
       color:#88d877;
     }
-    .paginate_button.disabled {
-      opacity:.5;
+    .paginate_button {
+      opacity:.8;
+      &:hover {
+        background-image:none;
+        background-color:transparent;
+        border-width:0;
+        opacity:1;
+      }
+      &.disabled {
+        opacity:.5;
+      }
     }
 
     .paginate_text {
       font:16px firasans_r;
       color:#5d675b;
+      opacity:.8;
     }
     .paginate_count {
       font:14px firasans_r;

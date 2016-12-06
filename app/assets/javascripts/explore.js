@@ -214,7 +214,7 @@ $(document).ready(function (){
         multiple: "checkbox",
         nature: "radio"
       },
-      download: $("#donation_csv_download"),
+      // download: $("#donation_csv_download"),
       elem: {
         donor: $("#donation_donor"),
         period: {
@@ -389,7 +389,7 @@ $(document).ready(function (){
         js.sid = sid;
         this.sid = sid;
         window.history.pushState(sid, null, gon.path + "/" + sid);
-        this.download.attr("href", gon.path + "/" + sid + "?format=csv");
+        // this.download.attr("data-href", gon.path + "/" + sid + "?format=csv");
       },
       set_sid: function(sid) {
         if(typeof sid !== "undefined") { this.sid = sid; }
@@ -559,7 +559,7 @@ $(document).ready(function (){
         js.sid = sid;
         this.sid = sid;
         window.history.pushState(sid, null, gon.path + "/" + sid);
-        this.download.attr("href", gon.path + "/" + sid + "?format=csv");
+        this.download.attr("data-href", gon.path + "/" + sid + "?format=csv");
       },
       set_sid: function(sid) {
         if(typeof sid !== "undefined") { this.sid = sid; }
@@ -964,12 +964,8 @@ $(document).ready(function (){
   }
 
   function render_table(type, table) {
-    // console.log("table data", table);
     if(type === "donation") {
-      // console.log(table);
-      // console.log("---",donation, donation.sid);
       render_donation_table(table);
-
     }
     else if(type === "finance") {
       var table_html = "<thead>", colspan = 0, tmp, klass;
@@ -1025,24 +1021,9 @@ $(document).ready(function (){
     }
   }
   function render_donation_table(table) {
-    console.log(table);
-    // donation_total_amount.text(table.total_amount);
-    // donation_total_donations.text(table.total_donations);
+    console.log(table, donation.download);
+    //
     var prev = undefined, alt_color = true,
-
-    // $('#users-datatable').dataTable({
-    //    "processing": true,
-    //    "serverSide": true,
-    //    "ajax": $('#users-datatable').data('source'),
-    //    "order": [[4, 'desc']],
-    //    "language": {
-    //     "url": gon.datatable_i18n_url
-    //    },
-    //    "columnDefs": [
-    //      { orderable: false, targets: [-1] }
-    //    ]
-    //  });
-
       dt = donation_table.DataTable({
         processing: true,
         serverSide: true,
@@ -1056,38 +1037,45 @@ $(document).ready(function (){
             });
           },
           dataSrc: function ( json ) {
-            console.log("dataSrc", json);
-            // for ( var i=0, ien=json.length ; i<ien ; i++ ) {
-            //   json[i][0] = '<a href="/message/'+json[i][0]+'>View message</a>';
-            // }
+            donation_total_amount.text(json.total_amount);
+            donation_total_donations.text(json.total_donations);
             return json.data;
           }
         },
-        // gon.donations_filter_path,
-        // aoColumns: [{ title: "first" }, { title: "last"}],
         order: [],
-        // "aaData": table.data,
-        "aoColumns": table.header.map(function(m,i) {
-          return { "title": m, "sClass": table.classes[i] };
-        }),
+        "aoColumns": table.header.map(function(m,i) { return { "title": m, "sClass": table.classes[i], orderable: i != 0 }; }),
         "info": false,
-        dom: "fltrp",
-
-        // createdRow: function ( row, data, index ) {
-        //   if(data[2] !== prev) {
-        //     alt_color = !alt_color;
-        //   }
-        //   if(alt_color) {
-        //     $(row).addClass('alt');
-        //   }
-        //   prev = data[2];
-        // }
+        dom: "<'#DataTables_Table_0_download'>fltrp",
+        createdRow: function ( row, data, index ) {
+          if(data[2] !== prev) {
+            alt_color = !alt_color;
+          }
+          if(alt_color) {
+            $(row).addClass('alt');
+          }
+          prev = data[2];
+        }
       });
-    // dt.on("draw", function (e, settings) {
-    //   if(settings.aaSorting.length) {
-    //     $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
-    //   }
-    // });
+      donation_table.parent().find("#DataTables_Table_0_download")
+        .html("<a id='donation_csv_download' class='download' title='" + gon.donation_table_download_title + "'><i></i></a>");
+      $("#donation_csv_download").click(function () {
+        var t = $(this), href = gon.donations_filter_path + "?format=csv&sid=" + donation.sid,
+          params = dt.ajax.params();
+        if(params.hasOwnProperty("search") && params.search.hasOwnProperty("value") && params.search.value !== "") {
+          href += "&search[value]=" + params.search.value;
+        }
+        if(params.hasOwnProperty("order") && params.order.hasOwnProperty("0")
+          && params.order["0"].hasOwnProperty("column") && params.order["0"].hasOwnProperty("dir")) {
+          href += "&order[0][column]=" + params.order["0"].column;
+          href += "&order[0][dir]=" + params.order["0"].dir;
+        }
+        t.attr("href", href);
+      });
+      dt.on("draw", function (e, settings) {
+        if(settings.aaSorting.length) {
+          $(this).toggleClass("highlighted", settings.aaSorting[0][0] === 1);
+        }
+      });
   }
   function bar_chart(elem, resource, bg) {
     // console.log("chart", elem, resource);
@@ -1097,7 +1085,7 @@ $(document).ready(function (){
           type: 'bar',
           backgroundColor: bg,
           height: 60*(Math.round(resource.title.length/40)+1) + 40 * resource.series.length,
-          width: w > 992 ? (view_content.width()-386)/2 : w - 12,
+          width: w > 992 ? Math.floor((view_content.width()-386)/2) : w - 12,
           events: {
             load: function () {
               var tls = $(this.container).find(".highcharts-xaxis-labels text title"),
@@ -1301,7 +1289,7 @@ $(document).ready(function (){
           type: 'column',
           backgroundColor: bg,
           height: 400,
-          width: w > 992 ? (view_content.width()-28)/2 : w - 12
+          width: w > 992 ? Math.floor((view_content.width()-28)/2) : w - 12
       },
       exporting: {
         buttons: {

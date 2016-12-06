@@ -674,6 +674,7 @@
     width:100%;
     .panes {
       .pane[data-type='donation'] {
+        margin-left: -1px;
         // .caption {
         //   font:18px firasans_r;
         //   color:#5d675b;
@@ -738,7 +739,7 @@
         }
         .total {
 
-          margin:20px 0 42px;
+          margin:80px 0 0;
           > div {
             display:table-cell;
             &:not(.separator) {
@@ -774,7 +775,7 @@
               width: 0;
               height: 0;
               border-style: solid;
-              border-width: 14px 27px 0 27px;
+              border-width: 15px 28px 0 28px;
               border-color: #F78E69 transparent transparent transparent;
               line-height: 0px;
               _border-color: #F78E69 #000000 #000000 #000000;
@@ -785,38 +786,33 @@
           }
         }
         .table {
-          .actions {
+          #DataTables_Table_0_filter {
+            vertical-align: top;
+          }
+          #DataTables_Table_0_download {
+            display:inline-block;
             text-align:right;
-            padding:0 16px 18px;
+            padding:0 32px 0 0;
             > div, > a
-              {
-                display:inline-block;
-                position:relative;
-                width:36px;
-                height:28px;
-                > i {
-                  display:block;
-                  width:24px;
-                  height:21px;
-                  position:absolute;
-                  top:50%;
-                  left:50%;
-                  transform:translate(-50%, -50%);
-                  background:transparent url("<%= asset_path('explore/actions.svg') %>") no-repeat top left;
-                  &:hover, &:focus, &:active {
-                    cursor:pointer;
-                  }
-                  margin:0px auto;
+            {
+              display:inline-block;
+              position:relative;
+              width:36px;
+              height:28px;
+              > i {
+                display:block;
+                width:24px;
+                height:21px;
+                position:absolute;
+                top:50%;
+                left:50%;
+                transform:translate(-50%, -50%);
+                background:transparent url("<%= asset_path('explore/actions.svg') %>") no-repeat top left;
+                &:hover, &:focus, &:active {
+                  cursor:pointer;
                 }
+                margin:0px auto;
               }
-
-            .share {
-              i { background-position: 0px -43px; }
-              &:hover i { background-position: 0px -65px; }
-            }
-            .embed {
-              i { background-position: -25px -43px; }
-              &:hover i { background-position: -25px -65px; }
             }
             .download {
               i { background-position: -49px -43px; }
@@ -825,7 +821,7 @@
           }
           #donation_table {
             width:100%;
-            padding:0px 6px;
+            padding:0px 4px;
             table {
               width:100%;
               thead {
@@ -1127,7 +1123,7 @@
     .content {
       // margin-left:222px;
       // display:table-cell;
-      padding: 10px 0 10px 10px;
+      padding: 10px 0 10px 0;//10px;
       .panes {
         .pane {
           width:100%;
@@ -1157,7 +1153,7 @@
             .separator {
               position:relative;
               display:table-cell;
-              min-width:330px;
+              min-width:328px;
               height:286px;
               max-height:286px;
               vertical-align:middle;
@@ -1200,7 +1196,7 @@
           }
           .total {
 
-            margin:20px auto 42px;
+            margin:80px auto 0;
             display:table;
             > div {
               display:table-cell;
@@ -1236,7 +1232,7 @@
                 width: 0;
                 height: 0;
                 border-style: solid;
-                border-width: 14px 27px 0 27px;
+                border-width: 15px 28px 0 28px;
                 border-color: #F78E69 transparent transparent transparent;
                 line-height: 0px;
                 _border-color: #F78E69 #000000 #000000 #000000;
@@ -1249,7 +1245,7 @@
           .table {
             #donation_table {
               width:100%;
-              padding:0px 6px;
+              padding:0px 4px;
               table {
                 width:100%;
                 border:1px solid #e2e6e0;
@@ -1570,4 +1566,7 @@ table.highlighted .alt {
   border-radius:0;
   border:0;
   border-bottom: 1px dashed #a9afa8;
+}
+table:not(.collapsed) .no-padding {
+  padding:0px !important;
 }
