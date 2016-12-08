@@ -197,7 +197,7 @@ class RootController < ApplicationController
     respond_to do |format|
       format.html
       format.json { render :json => dt }
-      format.zip { dt[:file].present? ? send_data(dt[:file], filename: "#{dt[:filename]}") : redirect_to(download_path, :notice => t('shared.msgs.data_not_found')) }
+      format.zip { dt.key?(:file) ? send_data(dt[:file], filename: "#{dt[:filename]}") : redirect_to(download_path, :notice => t('shared.msgs.data_not_found')) }
     end
   end
 
