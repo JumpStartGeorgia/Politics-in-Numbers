@@ -77,7 +77,7 @@ class Donor
 
   def self.list(collection_ids = [])
     collection_ids = Donor.get_ids_by_slugs(collection_ids)
-    where({'_id' => { "$in" => collection_ids}}).sorted.map{|t| [t.permalink, t.full_name]}.sort{|x,y| x[1] <=> y[1] }
+    where({'_id' => { "$in" => collection_ids}}).sorted.map{|t| [t.permalink, "#{t.full_name} (#{t.tin})"]}.sort{|x,y| x[1] <=> y[1] }
   end
 
   def self.date_span
