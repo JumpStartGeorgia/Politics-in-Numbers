@@ -41,7 +41,7 @@
   // }
 
 })();
-function escapeRegExp(string){ return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } // $& means the whole matched string 
+function escapeRegExp(string){ return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } // $& means the whole matched string
 function exist(v) { return typeof v !== 'undefined' && v !== null && v !== '';}
 function isNumber(v) { return /^\d+$/.test(v); }
 function isDate(v) { return v !== null; }
@@ -79,15 +79,22 @@ function debounce(func, wait, immediate) {
   };
 }
 function copy (element) {
-  var $temp = $("<input>"), el = $(element);
-  $("body").append($temp);
-  $temp.val(el.text()).select();
+  element.select();
   if(document.execCommand("copy")) {
-    var cp = el.next(".copied");
+    var cp = $(element).next(".copied");
     cp.fadeIn(function () { cp.fadeOut(); });
   }
-  $temp.remove();
 }
+// function copy (element) {
+//   var $temp = $("<input>"), el = $(element);
+//   $("body").append($temp);
+//   $temp.val(el.text()).select();
+//   if(document.execCommand("copy")) {
+//     var cp = el.next(".copied");
+//     cp.fadeIn(function () { cp.fadeOut(); });
+//   }
+//   $temp.remove();
+// }
 // function web_safe_colors () {
 //   var ray = [], steps = [ "00", "33", "66", "99", "cc", "ff" ], i = 1, str = "";
 //   steps.forEach(function (r) {

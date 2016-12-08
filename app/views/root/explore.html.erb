@@ -272,7 +272,7 @@
     <div class="caption"><%= t('shared.dialog.embed.caption') %></div>
     <div class="content">
       <label><%= t('shared.dialog.embed.copy_code') %></label>
-      <textarea rows="4" cols="38" data-iframe-link="<%= embed_url({ id: "_id_"}).gsub("/dynamic/", "/_type_/") %>" readonly="" onfocus="setTimeout(function (t){ t.select(); copy(t); }, 10, this);" onmouseup="return false;"></textarea>
+      <textarea rows="4" cols="38" data-iframe-link="<%= embed_url({ id: "_id_"}).gsub("/dynamic/", "/_type_/") %>" readonly="" onfocus="copy(this);"></textarea>
       <div class="copied"><%= t('shared.dialog.embed.copied') %></div>
       <div class="embed-size">
         <label><%= t('shared.dialog.embed.frame_size') %></label>

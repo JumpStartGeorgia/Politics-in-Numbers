@@ -151,7 +151,7 @@ ka:
         embed_type: "Embed type:"
         dynamic: Dynamic
         static: Static
-        type_hint: "Dynamic embed will be regenerated each time you access it,<br/> on other hand Static embed will be stick to current point in time"
+        type_hint: "A dynamic embed will use the most up-to-date information<br/> while a static embed will be frozen to the data that is currently showing."
       share:
         caption: Share
         share_chart: "Share chart:"
