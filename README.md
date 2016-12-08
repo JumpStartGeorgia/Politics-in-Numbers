@@ -90,7 +90,8 @@ This starter template provides access to the puma jungle through mina commands, 
 
 #### Highchart standalone server
 Highchart standalone server is a [phantomjs](http://phantomjs.org/) server for generating highchart images based on input options via [highcharts-convert.js](http://www.highcharts.com/docs/export-module/render-charts-serverside) script. Server itself will be triggered on deploy.
-First if any font is used while generating images system should know about it so we need to install it, there is two options to install system wide or user wide choose one that better fits to app logic:
+First if any font is used while generating images system should know about it so we need to install it
+#, there is two options to install system wide or user wide choose one that better fits to app logic:
 
 ##### Prepare fonts
 Replace
@@ -108,7 +109,7 @@ Replace
   * (optional) To see installed fonts<br/>
     `fc-list`
 
-2. User scope
+2. Use System scope was not working on dev -  *** User scope
   * Create folder<br/>
     `mkdir -p ~/.fonts/:type/:family`
   * Copy fonts to folder<br/>

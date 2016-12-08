@@ -1,5 +1,4 @@
-/* global $ */
-/*eslint no-console: "error"*/
+/* global $ gon Highcharts*/
 //= require jquery-ui/datepicker
 //= require dataTables.pagination.js
 //= require jquery-ui/tooltip
@@ -29,7 +28,7 @@ $(document).ready(function (){
     finance_table = $("#finance_table table"),
     finance_datatable,
     autocomplete = {
-      push: function(autocomplete_id, key, value) {
+      push: function (autocomplete_id, key, value) {
         if(!this.hasOwnProperty(autocomplete_id)) {
           this[autocomplete_id] = {};
         }
@@ -39,24 +38,24 @@ $(document).ready(function (){
         }
         //console.log(autocomplete);
       },
-      pop: function(autocomplete_id, key) {
+      pop: function (autocomplete_id, key) {
         if(this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key)) {
           $("[data-autocomplete-view='" + autocomplete_id + "'] li[data-id='" + key + "']").remove();
           $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li .item[data-id='" + key + "']").removeClass("selected");
           delete this[autocomplete_id][key];
         }
       },
-      clear: function(autocomplete_id) {
+      clear: function (autocomplete_id) {
         if(this.hasOwnProperty(autocomplete_id)) {
           $("[data-autocomplete-view='" + autocomplete_id + "'] li").remove();
           $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li .item").removeClass("selected");
           delete this[autocomplete_id];
         }
       },
-      has: function(autocomplete_id, key) {
+      has: function (autocomplete_id, key) {
         return this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key);
       },
-      onchange: debounce(function(event) {
+      onchange: debounce(function (event) {
         var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul"), autocomplete_id = p.attr("data-autocomplete-id");
         if(event.type === "keyup" && event.keyCode === 40) {
           // ul.find("li:first").addClass("focus").focus();
@@ -697,7 +696,7 @@ $(document).ready(function (){
       loader.addClass("hidden");
       filter_extended.toggleClass("active");
     });
-    filter_extended.find(".filter-input .toggle, input").click(function(){
+    filter_extended.find(".filter-input .toggle, .filter-input input").on("click change", function(){
       var t = $(this).closest(".filter-input"),
         field = t.attr("data-field"),
         type = t.attr("data-type"),
@@ -1184,108 +1183,6 @@ $(document).ready(function (){
       }
     });
   }
-  function grouped_column_chart(elem, resource, bg) {
-    // console.log("chart", elem, resource);
-    $(elem).highcharts({
-      chart: {
-          type: 'column',
-          backgroundColor: bg,
-          height: 400,
-          width: w > 992 ? (view_content.width()-28)/2 : w - 12,
-          spacingLeft: 20
-      },
-      exporting: {
-        buttons: {
-          contextButton: {
-            enabled: false
-          }
-        }
-      },
-      title: {
-        text: resource.title,
-        margin: 40,
-        style: {
-            fontFamily:"firasans_r",
-            fontSize:"18px",
-            color: "#5d675b"
-        },
-        useHTML: true
-      },
-      xAxis: {
-        type: "category",
-        categories: resource.categories,
-        lineWidth: 1,
-        lineColor: "#5D675B",
-        tickWidth: 0,
-        min: 0,
-        labels: {
-          style: {
-            color: "#5d675b",
-            fontSize:"14px",
-            fontFamily: "firasans_book",
-            textShadow: 'none'
-          }
-        }
-      },
-      yAxis: [
-      {
-        title: { enabled: false },
-        gridLineColor: "#eef0ee",
-        gridLineWidth:1,
-        style: {
-          color: "#5d675b",
-          fontSize:"14px",
-          fontFamily: "firasans_book",
-          textShadow: 'none'
-        }
-      },
-      {
-        linkedTo:0,
-        title: { enabled: false },
-        opposite: true,
-        style: {
-          color: "#7F897D",
-          fontSize:"12px",
-          fontFamily: "firasans_r",
-          textShadow: 'none'
-        }
-      }
-      ],
-      legend: {
-          enabled: true,
-          symbolWidth:10,
-          symbolHeight:10,
-          shadow: false,
-          itemStyle: {
-            color: "#5d675b",
-            fontSize:"14px",
-            fontFamily: "firasans_book",
-            textShadow: 'none',
-            fontWeight:'normal'
-          }
-       },
-
-      plotOptions: {
-        column:{
-          maxPointWidth: 60
-        }
-      },
-      series: resource.series,
-      tooltip: {
-        backgroundColor: "#DCE0DC",
-        followPointer: true,
-        shadow: false,
-        borderWidth:0,
-        style: {
-          color: "#5D675B",
-          fontSize:"14px",
-          fontFamily: "firasans_r",
-          textShadow: 'none',
-          fontWeight:'normal'
-        }
-      }
-    });
-  }
   function grouped_advanced_column_chart(elem, resource, bg) {
     // console.log("fca", resource);
     js.share[elem] = encodeURI(resource.title + " | " + gon.app_name_long);
@@ -1337,19 +1234,37 @@ $(document).ready(function (){
       },
       yAxis: [
       {
-        title: { enabled: false },
+        title: {
+          enabled: true,
+          text: gon.lari,
+          style: {
+            color: "#7F897D",
+            fontSize:"12px",
+            fontFamily: "firasans_r",
+            textShadow: "none"
+          }
+        },
         gridLineColor: "#eef0ee",
         gridLineWidth:1,
         style: {
           color: "#5d675b",
           fontSize:"14px",
           fontFamily: "firasans_book",
-          textShadow: 'none'
+          textShadow: "none"
         }
       },
       {
         linkedTo:0,
-        title: { enabled: false },
+        title: {
+          enabled: true,
+          text: gon.lari,
+          style: {
+            color: "#7F897D",
+            fontSize:"12px",
+            fontFamily: "firasans_r",
+            textShadow: 'none'
+          }
+        },
         opposite: true,
         style: {
           color: "#7F897D",

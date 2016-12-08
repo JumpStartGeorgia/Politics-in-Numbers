@@ -56,6 +56,7 @@ ka:
       all: ყველა
       numericSymbols: [ null , "მლნ" , "მლრდ" , "ტრილ" , "კვადრ" , "E"]
       no_result_found_for: "No Results Found for"
+      lari: ლარი
     locale:
       short:
         en: En
@@ -134,12 +135,9 @@ ka:
       income_campaign: კამპანიის შემოსავალი
       expenses: ხარჯები
       expenses_campaign: კამპანიის ხარჯები
-      reform_expenses_button: რეფორმების ფონდი <br/>ხარჯები
-      reform_expenses: რეფორმების ფონდი ხარჯები
-      property_assets_button: უძრავი ქონება
-      property_assets:  უძრავი ქონება
-      financial_assets_button: ფინანსური <br/>სახსრები
-      financial_assets: ფინანსური სახსრები
+      reform_expenses: რეფორმების ფონდი <br/>ხარჯები
+      property_assets: უძრავი ქონება
+      financial_assets: ფინანსური <br/>სახსრები
       debts: ვალდებულებები
       campaign: კამპანია
     dialog:

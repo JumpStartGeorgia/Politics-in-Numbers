@@ -56,6 +56,7 @@ en:
       all: All
       numericSymbols: [ "k" , "M" , "G" , "T" , "P" , "E"]
       no_result_found_for: "No Results Found for"
+      lari: Lari
     locale:
       short:
         en: En
@@ -134,13 +135,10 @@ en:
       income_campaign: Income Campaign
       expenses: Expenses
       expenses_campaign: Expenses Campaign
-      reform_expenses_button: REFORMS FUND <br/>EXPENSES
-      reform_expenses: Reforms Fund Expenses
-      property_assets_button: PROPERTY <br/>ASSETS
-      property_assets: Property Assets
-      financial_assets_button: FINANCIAL <br/>ASSETS
-      financial_assets: Financial Assets
-      debts: Debts
+      reform_expenses: REFORMS FUND <br/>EXPENSES
+      property_assets: PROPERTY <br/>ASSETS
+      financial_assets: FINANCIAL <br/>ASSETS
+      debts: DEBTS
       campaign: Campaign
     dialog:
       close: Close

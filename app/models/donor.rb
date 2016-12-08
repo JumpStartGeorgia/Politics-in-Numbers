@@ -493,6 +493,7 @@ class Donor
     elsif chart_type == 2 || chart_type == 4 # If select > 1 party -> top 5 donors for parties, total donations for selected parties
       # If select > 1 donor-> total donations for each donor, top 5 parties donated to
 
+       Rails.logger.debug("--------------------------------------------#{data.inspect}")
       ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.#{chart_type == 2 ? 'donors' : 'donations'}")
       cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.#{chart_type == 2 ? 'donations' : 'parties'}")
 
@@ -854,7 +855,7 @@ class Donor
       }
       template_name = template_names[indexes[0]][indexes[1]]
       template = templates[template_name.to_sym]
-
+       Rails.logger.debug("--------------------------------------------#{data.inspect}")
       title << I18n.t("shared.chart.title.#{has_no_data ? 'no_data.' : ''}#{template_name}", data)
       data[:amount] = format_range(data[:amount]) if data[:amount].present?
 

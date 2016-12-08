@@ -155,7 +155,16 @@ $(document).ready(function (){
       },
       yAxis: [
         {
-          title: { enabled: false },
+          title: {
+            enabled: true,
+            text: gon.lari,
+            style: {
+              color: "#7F897D",
+              fontSize:"12px",
+              fontFamily: "firasans_r",
+              textShadow: "none"
+            }
+          },
           gridLineColor: "#eef0ee",
           gridLineWidth:1,
           style: {
@@ -167,7 +176,16 @@ $(document).ready(function (){
         },
         {
           linkedTo:0,
-          title: { enabled: false },
+          title: {
+            enabled: true,
+            text: gon.lari,
+            style: {
+              color: "#7F897D",
+              fontSize:"12px",
+              fontFamily: "firasans_r",
+              textShadow: "none"
+            }
+          },
           opposite: true,
           style: {
             color: "#7F897D",
