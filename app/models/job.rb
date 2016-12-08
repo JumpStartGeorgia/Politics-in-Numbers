@@ -227,7 +227,7 @@ class Job
               party_name = Party.clean_name(cells[6])
               p = Party.by_name(party_name, false)
               if p.class != Party
-                p = Party.create!(name: [party_name], title_translations: { ka: party_name, en: party_name.latinize.capitalize, ru: party_name.latinize.capitalize }, description: "საინიციატივო ჯგუფი #{party_name}", tmp_id: -99, type: Party.type_is(:initiative))
+                p = Party.create!(name: [party_name], title_translations: { ka: party_name, en: party_name.latinize.soft_titleize, ru: party_name.latinize.soft_titleize }, description: "საინიციატივო ჯგუფი #{party_name}", tmp_id: -99, type: Party.type_is(:initiative))
                 missing_parties << p._id
               end
               donor = Donor.find_by( first_name: cells[2], last_name: cells[3], tin: cells[4])
