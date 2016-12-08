@@ -12,6 +12,7 @@ $(document).ready(function (){
   var
     w = 0,
     h = 0,
+    decPoint = ".",
     explore = $("#explore"),
     explore_button = $("#explore_button"),
     finance_toggle = $("#finance_toggle"),
@@ -1174,7 +1175,11 @@ $(document).ready(function (){
           fontWeight:'normal'
         },
         formatter: function() {
-          return "<b>" + this.key + "</b>: " + Highcharts.numberFormat(this.y);
+          var tmp = Highcharts.numberFormat(this.y);
+          if(tmp.indexOf(decPoint) !== -1) {
+            tmp = tmp.trimr("0").trimr(".");
+          }
+          return "<b>" + this.key + "</b>: " + tmp;
         }
       }
     });
@@ -1392,7 +1397,8 @@ $(document).ready(function (){
   function init_highchart () {
     Highcharts.setOptions({
       lang: {
-        numericSymbols: gon.numericSymbols
+        numericSymbols: gon.numericSymbols,
+        thousandsSep: ","
       },
       colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
       credits: {
@@ -1403,6 +1409,7 @@ $(document).ready(function (){
         text: gon.app_name
       }
     });
+    decPoint = Highcharts.getOptions().lang.decimalPoint;
     (function(H) { // for highchart to recognize maxPointWidth property
         var each = H.each;
         H.wrap(H.seriesTypes.column.prototype, 'drawPoints', function(proceed) {

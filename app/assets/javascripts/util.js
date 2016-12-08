@@ -5,6 +5,7 @@
   if(!String.prototype.trim)
   {
     String.prototype.trim = function(c) {
+      c = escapeRegExp(c);
       var r = (!c) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^'+c+'+|'+c+'+$', 'g');
       return this.replace(r, '');
     };
@@ -12,6 +13,7 @@
   if(!String.prototype.triml)
   {
     String.prototype.triml = function(c) {
+      c = escapeRegExp(c);
       var r = (!c) ? new RegExp('^\\s+') : new RegExp('^'+c+'+');
       return this.replace(r, '');
     };
@@ -19,6 +21,7 @@
   if(!String.prototype.trimr)
   {
     String.prototype.trimr = function(c) {
+      c = escapeRegExp(c);
       var r = (!c) ? new RegExp('\\s+$') : new RegExp(c+'+$');
       return this.replace(r, '');
     };
@@ -38,6 +41,7 @@
   // }
 
 })();
+function escapeRegExp(string){ return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); } // $& means the whole matched string 
 function exist(v) { return typeof v !== 'undefined' && v !== null && v !== '';}
 function isNumber(v) { return /^\d+$/.test(v); }
 function isDate(v) { return v !== null; }

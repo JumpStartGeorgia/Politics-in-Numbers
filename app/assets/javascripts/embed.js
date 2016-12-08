@@ -241,7 +241,8 @@ $(document).ready(function (){
   function init_highchart () {
     Highcharts.setOptions({
       lang: {
-        numericSymbols: gon.numericSymbols
+        numericSymbols: gon.numericSymbols,
+        thousandsSep: ","
       },
       colors: [ "#D36135", "#DDCD37", "#5B85AA", "#F78E69", "#A69888", "#88D877", "#5D675B", "#A07F9F", "#549941", "#35617C", "#694966", "#B9C4B7"],
       credits: {

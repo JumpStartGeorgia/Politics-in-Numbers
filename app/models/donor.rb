@@ -601,7 +601,7 @@ class Donor
       tmp = [params.dig(:order, '0', :column), params.dig(:order, '0', :dir)]
       tmp[0] = Integer(tmp[0]) rescue nil
       sort = [ %w[full_name full_name tin nature give_date_order amount party monetary][tmp[0]], (tmp[1] == "asc" ? 1 : -1)] if tmp.all? &:present?
-
+      extend ActionView::Helpers::NumberHelper
       data = filter_table(pars, { q: q, sort: sort, skip: skip, limit: limit }).to_a
       if format == :csv
         data.map!{|m| [m[:full_name], m[:tin], m[:nature], m[:give_date], m[:amount], m[:party], m[:monetary] ] }
@@ -616,14 +616,14 @@ class Donor
           }
         }
       else
-        data.map!{|m| [nil, m[:full_name], m[:tin], m[:nature], m[:give_date], m[:amount], m[:party], m[:monetary] ] }
+        data.map!{|m| [nil, m[:full_name], m[:tin], m[:nature], m[:give_date], number_with_precision(m[:amount]), m[:party], m[:monetary] ] }
         data_meta = filter_table(pars, { meta: true, q: q })
 
         res = {
           draw: params[:draw].to_i,
           data: data,
-          total_amount: data_meta[:sum].round(2),
-          total_donations: data_meta[:count],
+          total_amount: number_with_precision(data_meta[:sum].round(2)),
+          total_donations: number_with_precision(data_meta[:count]),
           recordsTotal: Donor.donations_count,
           recordsFiltered: data_meta[:count]
         }

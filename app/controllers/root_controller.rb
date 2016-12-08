@@ -389,7 +389,7 @@ class RootController < ApplicationController
         "type" => "png",
         "constr" => "Chart",
         "width" => 1200,
-        "globaloptions" => "{ lang: { numericSymbols: #{t('shared.common.numericSymbols')} } }"
+        "globaloptions" => "{ lang: { numericSymbols: #{t('shared.common.numericSymbols')}, thousandsSep: ',' } }"
       }
 
     end

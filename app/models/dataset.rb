@@ -452,8 +452,18 @@ class Dataset
       }
       sid = ShortUri.explore_uri(f.merge({filter: "finance"}))
     end
+    extend ActionView::Helpers::NumberHelper
     res = {}
     if ["t", "a"].index(type).present?
+      if type == "a"
+        table.each_with_index {|e,i|
+          e.each_with_index {|ee,ii|
+            if (Float(ee) != nil rescue false)
+              table[i][ii] = number_with_precision(ee)
+            end
+          }
+        }
+      end
       res = {
         table: {
           data: table,
@@ -464,6 +474,11 @@ class Dataset
       }
     end
     if ["ca", "a", "co", "coa"].index(type).present?
+      ca.each_with_index {|e,i|
+        e[:data].each_with_index {|ee,ii|
+          ca[i][:data][ii] = ee.present? ? ee.round : 0
+        }
+      }
       res.merge!({
         ca: {
             categories: ca_categories,
