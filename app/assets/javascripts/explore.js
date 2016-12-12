@@ -30,7 +30,7 @@ $(document).ready(function (){
     finance_datatable,
     autocomplete = {
       push: function (autocomplete_id, key, value) {
-        console.log(autocomplete_id, key,value, "here");
+        // console.log(autocomplete_id, key,value);
         if(!this.hasOwnProperty(autocomplete_id)) {
           this[autocomplete_id] = {};
         }
@@ -38,7 +38,6 @@ $(document).ready(function (){
           $("[data-autocomplete-view='" + autocomplete_id + "']").append(li(key, value));
           this[autocomplete_id][key] = value;
         }
-        //console.log(autocomplete);
       },
       pop: function (autocomplete_id, key) {
         if(this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key)) {
@@ -49,9 +48,7 @@ $(document).ready(function (){
         }
       },
       clear: function (autocomplete_id) {
-        console.log("clear", autocomplete_id, autocomplete);
         if(this.hasOwnProperty(autocomplete_id)) {
-          console.log("here");
           $("[data-autocomplete-view='" + autocomplete_id + "'] li").remove();
           $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li .item").removeClass("selected");
           delete this[autocomplete_id];
@@ -155,14 +152,11 @@ $(document).ready(function (){
         });
         $(".autocomplete input").on("change paste keyup", this.onchange);
         $(".autocomplete input").on("click", function() {
-          //console.log("here");
           var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul");
           p.addClass("active");
           global_click_callback = function(target) {
             target = $(target);
-             //console.log("here", target.hasClass(".autocomplete"), target.closest(".autocomplete").length);
             if(!target.hasClass(".autocomplete") && !target.closest(".autocomplete").length) {
-               //console.log("inner");
               p.removeClass("active");
               global_click_callback = undefined;
               global_keyup_up_callback = undefined;
@@ -573,7 +567,6 @@ $(document).ready(function (){
         t.elem[element].parent().attr("data-on", turn_on);
         t.states[element] = turn_on;
         if(!turn_on) {
-          console.log("off", element, autocomplete);
           autocomplete.clear("finance-" + element);
         }
       },
@@ -848,7 +841,7 @@ $(document).ready(function (){
         chart.print();
       }
       else {
-        chart.exportChart({ type: mimes[type] });
+        chart.exportChartLocal({ type: mimes[type] });
       }
     });
     autocomplete.bind();
