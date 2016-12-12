@@ -1,4 +1,5 @@
 /* global $ gon Highcharts*/
+/* @flow */
 //= require jquery-ui/datepicker
 //= require dataTables.pagination.js
 //= require jquery-ui/tooltip

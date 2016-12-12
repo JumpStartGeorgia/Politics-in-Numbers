@@ -1,4 +1,4 @@
-
+/* @flow */
 
 (function(){
 
@@ -82,7 +82,7 @@ function copy (element) {
   element.select();
   if(document.execCommand("copy")) {
     var cp = $(element).next(".copied");
-    cp.fadeIn(function () { cp.fadeOut(); });
+    cp.fadeIn(function () { cp.fadeOut(3000); });
   }
 }
 // function copy (element) {
