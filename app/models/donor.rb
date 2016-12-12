@@ -854,6 +854,11 @@ class Donor
       }
       template_name = template_names[indexes[0]][indexes[1]]
       template = templates[template_name.to_sym]
+
+      if template_name == "top_5_donors" && data[:nature].present? # this title has nature as obj
+        data[:obj] = I18n.t("shared.chart.title.nature_#{data[:nature] == 0 ? 'individual' : 'organization'}")
+      end
+
       title << I18n.t("shared.chart.title.#{has_no_data ? 'no_data.' : ''}#{template_name}", data)
       data[:amount] = format_range(data[:amount]) if data[:amount].present?
 

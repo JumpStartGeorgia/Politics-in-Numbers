@@ -82,7 +82,7 @@ en:
       forgot_password: Forgot your password?
     chart:
       title:
-        top_5_donors: Top %{n} Donors for All Parties
+        top_5_donors: Top %{n} %{obj} Donors for All Parties
         top_5_parties: Top %{n} Parties/Candidates for All Donors
         top_5_donors_for_party: Top %{n} Donors for %{obj}
         last_5_donations_for_party: Last %{n} Donations for %{obj}
