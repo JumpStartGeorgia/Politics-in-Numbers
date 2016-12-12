@@ -333,7 +333,7 @@ class RootController < ApplicationController
 
   def donations_datatable_filter
     dt = Donor.explore_table(params, request.format)
-    if request.format.csv?
+    if request.format.csv? && dt.present?
       csv_file = CSV.generate do |csv|
         csv << dt[:table][:header]
         dt[:table][:data].each { |r| csv << r }

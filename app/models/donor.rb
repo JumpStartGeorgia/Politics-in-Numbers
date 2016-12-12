@@ -747,17 +747,16 @@ class Donor
           i+=1
         }
       }
+      compressed_filestream = Zip::OutputStream.write_buffer do |zp|
+        zp.put_next_entry "%s%s.xlsx" % [Helper.sanitize("#{filename_donation} ("), "#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)})"]
+        zp.print workbook.stream.string
+      end
+      compressed_filestream.rewind # not sure if close is needed compressed_filestream.close
 
-    compressed_filestream = Zip::OutputStream.write_buffer do |zp|
-      zp.put_next_entry "%s%s.xlsx" % [Helper.sanitize("#{filename_donation} ("), "#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)})"]
-      zp.print workbook.stream.string
-    end
-    compressed_filestream.rewind # not sure if close is needed compressed_filestream.close
-
-    { size: ActionController::Base.helpers.number_to_human_size(compressed_filestream.size) }
-    .merge(type == "file" ? {
-      file: compressed_filestream.read,
-      filename: "#{filename_donation}_#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)}_(pins.ge).zip" } : {})
+      { size: ActionController::Base.helpers.number_to_human_size(compressed_filestream.size) }
+      .merge(type == "file" ? {
+        file: compressed_filestream.read,
+        filename: "#{filename_donation}_#{I18n.l(min_date, format: :filename)}_#{I18n.l(max_date, format: :filename)}_(pins.ge).zip" } : {})
     end
   end
 

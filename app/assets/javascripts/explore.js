@@ -30,6 +30,7 @@ $(document).ready(function (){
     finance_datatable,
     autocomplete = {
       push: function (autocomplete_id, key, value) {
+        console.log(autocomplete_id, key,value, "here");
         if(!this.hasOwnProperty(autocomplete_id)) {
           this[autocomplete_id] = {};
         }
@@ -44,10 +45,13 @@ $(document).ready(function (){
           $("[data-autocomplete-view='" + autocomplete_id + "'] li[data-id='" + key + "']").remove();
           $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li .item[data-id='" + key + "']").removeClass("selected");
           delete this[autocomplete_id][key];
+          if($.isEmptyObject(this[autocomplete_id])) { delete this[autocomplete_id]; }
         }
       },
       clear: function (autocomplete_id) {
+        console.log("clear", autocomplete_id, autocomplete);
         if(this.hasOwnProperty(autocomplete_id)) {
+          console.log("here");
           $("[data-autocomplete-view='" + autocomplete_id + "'] li").remove();
           $("[data-autocomplete-id='" + autocomplete_id + "'] .dropdown li .item").removeClass("selected");
           delete this[autocomplete_id];
@@ -560,13 +564,18 @@ $(document).ready(function (){
         window.history.pushState(sid, null, gon.path + "/" + sid);
         this.download.attr("data-href", gon.path + "/" + sid + "?format=csv");
       },
-      set_sid: function(sid) {
+      set_sid: function (sid) {
         if(typeof sid !== "undefined") { this.sid = sid; }
       },
-      toggle: function(element, turn_on) {
+      toggle: function (element, turn_on) {
+        // console.log(element, turn_on);
         var t = this;
         t.elem[element].parent().attr("data-on", turn_on);
         t.states[element] = turn_on;
+        if(!turn_on) {
+          console.log("off", element, autocomplete);
+          autocomplete.clear("finance-" + element);
+        }
       },
       animate: function () {
         [finance_category.find("li div"), explore_button].forEach(function (d) {
@@ -1021,8 +1030,7 @@ $(document).ready(function (){
     }
   }
   function render_donation_table(table) {
-    console.log(table, donation.download);
-    //
+    // console.log(table, donation.download);
     var prev = undefined, alt_color = true,
       dt = donation_table.DataTable({
         processing: true,

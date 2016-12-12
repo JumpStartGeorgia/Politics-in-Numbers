@@ -536,7 +536,6 @@ class Dataset
     max_date = Date.new(1970,1,1)
 
     if type == "table"
-      require "#{Rails.root}/lib/js/helper.rb"
       table = []
       data.each_with_index{ |e, e_i|
         p = periods[e[:period_id]]
@@ -556,7 +555,6 @@ class Dataset
     elsif type == "file" || type == "info"
       sz = 0
       if data.present?
-        require "#{Rails.root}/lib/js/helper.rb"
         compressed_filestream = Zip::OutputStream.write_buffer do |zp|
           data.each_with_index{ |e, e_i|
             tmp_party = parties[e[:party_id]]
