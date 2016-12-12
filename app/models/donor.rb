@@ -384,7 +384,7 @@ class Donor
       tmp = params[:amount]
       if tmp.present? && tmp.class == Array && tmp.size == 2 && tmp.all?{|t| t.to_i.to_s == t }
         f[:amount] = tmp.map{|t| t.to_i }
-        title_options[:amount] = format_range(f[:amount])
+        title_options[:amount] = f[:amount]
       end
       f[:party] = Party.get_ids_by_slugs(params[:party])
 
@@ -405,7 +405,6 @@ class Donor
         title_options[:nature] = f[:nature]
       end
     end
-
     chart_subtitle = ""
     if f[:period].present? && f[:period][0] != -1 && f[:period][1] != -1
       chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
@@ -554,6 +553,7 @@ class Donor
         }
       }
     end
+
     has_no_data = total_amount == 0
     if ["ca", "a", "co", "coa"].index(type).present?
       res.merge!({
@@ -854,7 +854,6 @@ class Donor
       }
       template_name = template_names[indexes[0]][indexes[1]]
       template = templates[template_name.to_sym]
-       Rails.logger.debug("--------------------------------------------#{data.inspect}")
       title << I18n.t("shared.chart.title.#{has_no_data ? 'no_data.' : ''}#{template_name}", data)
       data[:amount] = format_range(data[:amount]) if data[:amount].present?
 
@@ -868,13 +867,9 @@ class Donor
             tmp = [I18n.t("shared.chart.title.monetary_donation",
              { s: I18n.t("shared.chart.title.monetary_#{data[:monetary].to_s}") })]
           end
-          if data[:amount].present?
-            if tmp.present?
-              tmp << I18n.t("shared.chart.title.of_amount", { s: data[:amount] })
-            else
-              tmp << [I18n.t("shared.chart.title.donation_of_amount", { s: data[:amount] })]
-            end
-          end
+
+          tmp << I18n.t("shared.chart.title.#{tmp.present? ? '' : 'donation_'}of_amount", { s: data[:amount] }) if data[:amount].present?
+
           title << tmp.join(" ") if tmp.present?
         elsif t == :for_parties && data[:parties].present?
           title << I18n.t("shared.chart.title.for_parties", { s: data[:parties].join(", ") })

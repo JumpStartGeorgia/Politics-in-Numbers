@@ -329,8 +329,12 @@ $(document).ready(function (){
               create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
             }
             else if(tp === "range") {
-              el.from.val(+v[0]);
-              el.to.val(+v[1]);
+              v.forEach(function (d, i) {
+                v[i] = +d;
+                if(v[i] < 1) { v[i] = null; }
+              });
+              el.from.val(v[0]);
+              el.to.val(v[1]);
               tmp = formatRange(v);
               create_list_item(el.from.parent().parent().find(".list"), tmp, tmp);
             }
@@ -719,8 +723,8 @@ $(document).ready(function (){
         else if(type === "range") {
           tmp = [];
           t.find(".input-group input[type='number']").each(function(i, d){
-            tmp2 = $(d).val();
-            tmp.push(tmp2 !== "" ? tmp2 : null);
+            tmp2 = +$(d).val();
+            tmp.push(tmp2 >= 1 ? tmp2 : null);
 
           });
           tmp = formatRange(tmp);
