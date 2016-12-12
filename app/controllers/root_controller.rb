@@ -32,7 +32,7 @@ class RootController < ApplicationController
     @fltr = pars[:filter]
 
     @categories = Category.non_virtual # required for object explore calls
-    gon.category_lists = []# Category.simple_tree_local(@categories.to_a, false)
+    gon.category_lists = Category.simple_tree_local(@categories.to_a, false)
     gon.main_categories = {}
     @categories.only_sym.each{|m| gon.main_categories[m[:sym]] = m.permalink }
     gon.main_categories_ids = gon.main_categories.map{|k,v| v}
@@ -352,8 +352,8 @@ class RootController < ApplicationController
     end
 
     def explore_filter_params
-      params.permit(:locale, :donation => [:monetary, :multiple, :nature, { donor: [], period: [], amount: [], party: []}],
-        :finance => [{ party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
+      params.permit(:locale, :donation => [:all, :monetary, :multiple, :nature, { donor: [], period: [], amount: [], party: []}],
+        :finance => [:all, { party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
     end
 
     def download_params

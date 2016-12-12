@@ -239,13 +239,13 @@ $(document).ready(function (){
       },
       data: {},
       sid: undefined,
-      get: function() {
-        var t = this, tp, tmp, tmp_v, tmp_d, tmp_o, lnk;
-        t.data = { filter: "donation" };;
-        Object.keys(this.elem).forEach(function(el){
+      get: function () {
+        var t = this, tp, tmp, tmp_v, tmp_d, lnk;
+        t.data = { filter: "donation" };
+        Object.keys(this.elem).forEach(function (el){
           var is_elem = ["period", "amount", "monetary", "nature"].indexOf(el) === -1;
 
-          (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function(m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
+          (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function (m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
             tmp = $(elem);
             tp = tmp.attr("data-type");
             if(tp === "autocomplete") {
@@ -373,7 +373,6 @@ $(document).ready(function (){
               t.find(".input-group input[type='checkbox']:checked").prop("checked", false);
             }
             list.empty();
-            event.stopPropagation();
         });
       },
       id: function() {
@@ -543,7 +542,6 @@ $(document).ready(function (){
               group.find("ul[data-type='campaign']").addClass("hidden");
             }
             list.empty();
-            event.stopPropagation();
         });
       },
       id: function() {
@@ -917,12 +915,13 @@ $(document).ready(function (){
       obj = js.is_donation ? donation : finance;
       tmp = obj.get();
       _id = obj.id();
+      if(tmp === null) { loader.fadeOut(); return; }
 
 
       if(!js.cache.hasOwnProperty(_id)) {
         var filters = {};
         delete tmp["filter"];
-        filters[obj.name] = tmp;
+        filters[obj.name] = $.isEmptyObject(tmp) ? { "all": true } : tmp;
         // console.log("-----------remote--------", _id, filters);
         $.ajax({
           url: gon.filter_path,
