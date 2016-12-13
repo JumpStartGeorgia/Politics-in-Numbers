@@ -560,7 +560,7 @@ $(document).ready(function (){
         js.sid = sid;
         this.sid = sid;
         window.history.pushState(sid, null, gon.path + "/" + sid);
-        this.download.attr("data-href", gon.path + "/" + sid + "?format=csv");
+        this.download.attr("href", gon.path + "/" + sid + "?format=csv");
       },
       set_sid: function (sid) {
         if(typeof sid !== "undefined") { this.sid = sid; }
@@ -884,11 +884,11 @@ $(document).ready(function (){
 
     });
 
-    $(document).tooltip({
-      content: function() { return $(this).attr("data-retitle"); },
-      items: "text[data-retitle]",
-      track: true
-    });
+    // $(document).tooltip({
+    //   content: function() { return $(this).attr("data-retitle"); },
+    //   items: "text[data-retitle]",
+    //   track: true
+    // });
 
     $(document).on("click", "[data-dialog]", function () {
       var t = $(this), pars = t.attr("data-dialog").split(";"),
@@ -1017,6 +1017,7 @@ $(document).ready(function (){
       finance_datatable = finance_table.DataTable({
         destroy: true,
         responsive: true,
+        order: [],
         //"aaData": table.data,
         // "aoColumns": table.header.map(function(m,i) {
         //   return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
@@ -1090,22 +1091,25 @@ $(document).ready(function (){
           type: 'bar',
           backgroundColor: bg,
           height: 60*(Math.round(resource.title.length/40)+1) + 40 * resource.series.length,
-          width: w > 992 ? Math.floor((view_content.width()-386)/2) : w - 12,
-          events: {
-            load: function () {
-              var tls = $(this.container).find(".highcharts-xaxis-labels text title"),
-                p = tls.parent();
-              p.attr("data-retitle", tls.text());
-              tls.remove();
-            }
-          }
+          width: w > 992 ? Math.floor((view_content.width()-386)/2) : w - 12//,
+          // events: {
+          //   load: function () {
+          //     var tls = $(this.container).find(".highcharts-xaxis-labels text title");
+          //     tls.each(function (tl) {
+          //       tl = $(tl);
+          //       tl.parent().attr("data-retitle", tl.text());
+          //       tl.remove();
+          //     });
+          //   }
+          // }
       },
       exporting: {
         buttons: {
           contextButton: {
             enabled: false
           }
-        }
+        },
+        scale: 1
       },
       title: {
         text: resource.title,
@@ -1134,8 +1138,9 @@ $(document).ready(function (){
             color: "#5d675b",
             fontSize:"14px",
             fontFamily: "firasans_book",
-            textShadow: 'none'
-          }
+            textShadow: 'none',
+            textOverflow: "none"
+          },
           // ,
           // formatter: function(a,b,c) {
           //   return this.value + "<title>hello</title>";
@@ -1190,20 +1195,34 @@ $(document).ready(function (){
   }
   function grouped_advanced_column_chart(elem, resource, bg) {
     // console.log("fca", resource);
+    var cat_max_len = 0,
+      groupedOptions = [],
+      groupedOptionsRotation = 0;
+    if(resource.categories[0].hasOwnProperty("categories")) {
+      resource.categories[0].categories.forEach(function (d, i) {
+        resource.categories[0].categories[i] = " " + d;
+        if(cat_max_len < d.length) {
+          cat_max_len = d.length;
+        }
+      });
+      groupedOptions = [{ rotation: 0 }, { rotation: -90 }];
+      groupedOptionsRotation = -90;
+    }
     js.share[elem] = encodeURI(resource.title + " | " + gon.app_name_long);
     $(elem).highcharts({
       chart: {
           type: 'column',
           backgroundColor: bg,
-          height: 400,
-          width: w > 992 ? Math.floor((view_content.width()-28)/2) : w - 12
+          height: 400 + cat_max_len*9,
+          width: view_content.width()-28 // w > 992 ? Math.floor((view_content.width()-28)/2) :
       },
       exporting: {
         buttons: {
           contextButton: {
             enabled: false
           }
-        }
+        },
+        scale: 1
       },
       title: {
         text: resource.title,
@@ -1227,14 +1246,17 @@ $(document).ready(function (){
         tickColor: "#5D675B",
 
         labels: {
+          groupedOptions: groupedOptions,
           style: {
             color: "#5d675b",
             fontSize:"14px",
             fontFamily: "firasans_book",
             textShadow: 'none'
           },
+          format: "⁣{value}", // there is an invisible character infront https://unicode-table.com/en/2063/, to have space infront of text for rotated labels
           //useHTML: true,
-          step:1
+          step:1,
+          rotation:groupedOptionsRotation
         }
       },
       yAxis: [

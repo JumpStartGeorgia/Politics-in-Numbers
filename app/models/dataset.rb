@@ -455,6 +455,7 @@ class Dataset
     extend ActionView::Helpers::NumberHelper
     res = {}
     if ["t", "a"].index(type).present?
+     table.sort!{|x,y| x[0] <=> y[0] }
       if type == "a"
         table.each_with_index {|e,i|
           e.each_with_index {|ee,ii|

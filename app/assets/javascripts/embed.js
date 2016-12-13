@@ -11,17 +11,17 @@ $(document).ready(function (){
     chart.highcharts({
       chart: {
         type: "bar",
-        backgroundColor: bg,
+        backgroundColor: bg//,
         // height: "100%",
         // width: w > 992 ? (view_content.width()-386)/2 : w - 12,
-        events: {
-          load: function () {
-            var tls = $(".highcharts-xaxis-labels text title"),
-              p = tls.parent();
-            p.attr("data-retitle", tls.text());
-            tls.remove();
-          }
-        }
+        // events: {
+        //   load: function () {
+        //     var tls = $(".highcharts-xaxis-labels text title"),
+        //       p = tls.parent();
+        //     p.attr("data-retitle", tls.text());
+        //     tls.remove();
+        //   }
+        // }
       },
       exporting: {
         buttons: {
@@ -249,11 +249,11 @@ $(document).ready(function (){
   }
 
   function bind () {
-    $(document).tooltip({
-      content: function () { return $(this).attr("data-retitle"); },
-      items: "text[data-retitle]",
-      track: true
-    });
+    // $(document).tooltip({
+    //   content: function () { return $(this).attr("data-retitle"); },
+    //   items: "text[data-retitle]",
+    //   track: true
+    // });
   }
 
   function init_highchart () {
