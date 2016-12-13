@@ -95,29 +95,6 @@ class Donor
     ).first
   end
 
-  def self.list_with_tin
-    # map = %Q{
-    #   function() {
-    #     emit(this.name, { likes: this.likes });
-    #   }
-    # }
-
-    # reduce = %Q{
-    #   function(key, values) {
-    #     var result = { likes: 0 };
-    #     values.forEach(function(value) {
-    #       result.likes += value.likes;
-    #     });
-    #     return result;
-    #   }
-    # }
-    # Band.map_reduce(map, reduce).out(inline: 1).each do |document|
-    #   p document # { "_id" => "Tool", "value" => { "likes" => 200 }}
-    # end
-
-    sorted.map{|t| [t.permalink, t.full_name, t.tin]}
-  end
-
   def self.donations_count
     result = collection.aggregate([
       { "$unwind": '$donations' },
@@ -127,6 +104,40 @@ class Donor
         }
       }
     ]).first[:total]
+  end
+
+  def self.mongodb_field_with_fallback(field)
+    fallbacks = {
+      en: [:en, :ka, :ru],
+      ka: [:ka, :en, :ru],
+      ru: [:ru, :ka, :en]
+    }
+    fallback = fallbacks[I18n.locale]
+    { "$ifNull": [ "$#{field}.#{fallback[0]}", { "$ifNull": [ "$#{field}.#{fallback[1]}", { "$ifNull": [ "$#{field}.#{fallback[2]}", "" ] } ] } ] }
+
+  end
+
+  def self.donors_by_ids(ids)
+    res = []
+    if ids.present?
+
+      options = []
+
+      options.push({ "$match": { "_id": { "$in": ids.map{|m| BSON::ObjectId(m)} } } })
+
+      options.push({
+        "$project": {
+          name: Donor.mongodb_field_with_fallback("full_name"),
+          tin: 1,
+          nature: 1,
+          donated_amount: 1
+        }
+       })
+      options.push({ "$sort": { donated_amount: -1, name: 1 } })
+
+      res = collection.aggregate(options).to_a
+    end
+    res
   end
 
   def self.filter(params)
@@ -186,16 +197,9 @@ class Donor
 
     options.push({ "$match": { "$and": matches } }) if !matches.blank?
 
-    fallbacks = {
-      en: [:en, :ka, :ru],
-      ka: [:ka, :en, :ru],
-      ru: [:ru, :ka, :en]
-    }
-    fallback = fallbacks[lang]
-    full_name = { "$ifNull": [ "$full_name.#{fallback[0]}", { "$ifNull": [ "$full_name.#{fallback[1]}", { "$ifNull": [ "$full_name.#{fallback[2]}", "" ] } ] } ] }
     options.push({
       "$project": {
-        name: full_name,
+        name: mongodb_field_with_fallback("full_name"),
         tin: 1,
         nature: 1,
         donated_amount: 1,
@@ -212,144 +216,6 @@ class Donor
     options.push({ "$sort": { donated_amount: -1, name: 1 } })
     collection.aggregate(options)
   end
-
-  def self.filter_table(params, opts = { meta: false, skip: nil, limit: nil, sort: nil, q: nil })
-    # Rails.logger.debug("****************************************#{opts}")
-    lang = I18n.locale
-    result = []
-
-    matches = []
-
-    matches.push({ "_id": { "$in": params[:donor].map{|m| BSON::ObjectId(m)} } }) if params[:donor].present?
-    matches.push({ "multiple": { "$eq": params[:multiple] } }) if params[:multiple].present? && params[:multiple] == true
-
-    if params[:party].present?
-      tmp = params[:party].map{|m| BSON::ObjectId(m) }
-      matches.push({ "donations.party_id": { "$in": tmp } })
-      ors = []
-      tmp.each{|e| ors.push({ "$eq": ["$$donation.party_id", e ] }) }
-    end
-
-    if params[:period].present?
-      tmp = params[:period][0]
-      matches.push({ "donations.give_date": { "$gte": tmp } }) if tmp.present? && tmp != -1
-
-      tmp = params[:period][1]
-      matches.push({ "donations.give_date": { "$lte": tmp } }) if tmp.present? && tmp != -1
-    end
-
-    if params[:amount].present?
-      tmp = params[:amount][0]
-      matches.push({ "donations.amount": { "$gte": tmp } }) if tmp.present? && tmp != -1
-
-      tmp = params[:amount][1]
-      matches.push({ "donations.amount": { "$lte": tmp } }) if tmp.present? && tmp != -1
-    end
-
-    tmp = params[:monetary]
-    matches.push({ "donations.monetary": { "$eq": tmp } }) if tmp.present? && tmp == true || tmp == false
-
-    tmp = params[:nature]
-    matches.push({ "nature": { "$eq": tmp } }) if tmp.present? && tmp == 0 || tmp == 1
-
-
-    options = []
-    options.push({ "$unwind": '$donations' })
-    options.push({ "$match": { "$and": matches } }) if !matches.blank?
-
-
-    fallbacks = {
-      en: [:en, :ka, :ru],
-      ka: [:ka, :en, :ru],
-      ru: [:ru, :ka, :en]
-    }
-    fallback = fallbacks[lang]
-    full_name = { "$ifNull": [ "$full_name.#{fallback[0]}", { "$ifNull": [ "$full_name.#{fallback[1]}", { "$ifNull": [ "$full_name.#{fallback[2]}", "" ] } ] } ] }
-
-
-    if opts[:meta]
-
-      options.push({
-        "$project": {
-          full_name: full_name,
-          tin: 1,
-          amount: "$donations.amount"
-        }
-      })
-      if opts[:q].present?
-        options.push({ "$match":
-          { "$or": [
-            { "full_name": { "$regex": "#{Regexp.quote(opts[:q])}", "$options": 'i'} },
-            { "tin": { "$regex": "#{Regexp.quote(opts[:q])}", "$options": 'i'} }
-          ] }
-        })
-      end
-      options.push({
-        "$group": {
-          "_id": nil,
-          "count": { "$sum": 1 },
-          "sum": { "$sum": "$amount" }
-        }
-      })
-      result = collection.aggregate(options).first
-      result = { count: 0, sum: 0 } unless result.present?
-    else
-      skip = opts[:skip]
-      limit = opts[:limit]
-
-      options.push({
-        "$lookup": {
-          from: "parties",
-          localField: "donations.party_id",
-          foreignField: "_id",
-          as: "party"
-        }
-      })
-      options.push({ "$unwind": '$party' })
-
-      party = { "$ifNull": [ "$party.title.#{fallback[0]}", { "$ifNull": [ "$party.title.#{fallback[1]}", { "$ifNull": [ "$party.title.#{fallback[2]}", "" ] } ] } ] }
-      monetary_trans = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
-      nature_trans = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
-      date_format = I18n.t("time.formats.date")
-      options.push({
-        "$project": {
-          full_name: full_name,
-          tin: 1,
-          nature: { "$cond": [ { "$eq": [ "$nature", 0 ] }, "#{nature_trans[0]}", "#{nature_trans[1]}" ] },
-          donated_amount: 1,
-          give_date: { "$dateToString": { "format": "#{date_format}", "date": "$donations.give_date" } },
-          give_date_order: "$donations.give_date",
-          amount: "$donations.amount",
-          monetary: { "$cond": [ { "$eq": [ "$donations.monetary", true ] }, "#{monetary_trans[0]}", "#{monetary_trans[1]}" ] },
-          party: party
-        }
-      })
-      if opts[:q].present?
-        options.push({ "$match":
-          { "$or": [
-            { "full_name": { "$regex": "#{Regexp.quote(opts[:q])}", "$options": 'i'} },
-            { "tin": { "$regex": "#{Regexp.quote(opts[:q])}", "$options": 'i'} }
-          ] }
-        })
-      end
-
-      if opts[:sort].present? && opts[:sort].length == 2
-        options.push({ "$sort": { "#{opts[:sort][0]}": opts[:sort][1] } })
-      else
-        options.push({ "$sort": { full_name: 1, tin: 1 } }) #donated_amount: -1, full_name: 1
-      end
-
-
-
-      options.push({ "$skip": skip }) if skip.present?
-      options.push({ "$limit": limit }) if limit.present?
-
-      result = collection.aggregate(options)
-    end
-    result
-  end
-
-
 
   def self.explore(params, type = "a", inner_pars = false, global_data = {})
     limiter = 5
@@ -405,6 +271,7 @@ class Donor
         title_options[:nature] = f[:nature]
       end
     end
+
     chart_subtitle = ""
     if f[:period].present? && f[:period][0] != -1 && f[:period][1] != -1
       chart_subtitle = "#{I18n.l(f[:period][0], format: :date)} - #{I18n.l(f[:period][1], format: :date)}"
@@ -414,111 +281,140 @@ class Donor
     end
 
 
-    data = filter(f).to_a
-    ca = []
-    cb = []
-    ca_n = 0
-    cb_n = 0
-    total_amount = 0
 
-    parties = {}
-    (global_data.key?(:parties) ? global_data[:parties] : Party.sorted.map { |m| [m.id, m.title, m.permalink, m.type == 0 && m.member == true] }).each{ |e| parties[e[0]] = { value: 0, name: e[1] } }
-
-    ca_meta_obj = { n: 0, obj: nil, objb: nil }
-    cb_meta_obj = { n: 0, obj: nil, objb: nil }
 
     ds = f[:donor].nil? ? 0 : f[:donor].length
     ps = f[:party].nil? ? 0 : f[:party].length
-
     # ds == 0 && ps == 0
     # ds == 0 && ps == 1
     # ds == 0 && ps > 1
     # ds == 1 && ps == 0
     # ds > 1 && ps == 0
     # ds >= 1 && ps >= 1
-
+    # above is schema for below statement
     chart_type = ds == 0 ? ( ps == 0 ? 0 : ( ps == 1 ? 1 : 2) ) : ( ps == 0 ? ( ds == 1 ? 3 : 4) : 5 )
 
-    recent_donations = []
+
+
+    data = filter(f).to_a
+
     parties_list = {}
-    donors_list = {}
+    parties = {}
+    (global_data.key?(:parties) ? global_data[:parties] : Party.sorted.map { |m| [m.id, m.title, m.permalink, m.type == 0 && m.member == true] }).each{ |e| parties[e[0]] = { value: 0, name: e[1] } }
+
+    if ps > 0 # filling parties_list with initial data
+      f[:party].each{ |e|
+        es = BSON::ObjectId(e)
+        parties_list[es] = { value: 0, name: parties[es][:name] } if parties[es].present?
+      }
+    else
+      parties.each{|k,v| parties_list[k] = { value: 0, name: v[:name] } }
+    end
+
+    all_donors = Donor.donors_by_ids(f[:donor])
+    partial = all_donors.length > 0
 
     n = 0
-    data.each{|e|
-      if chart_type == 3 || chart_type == 4
-        donors_list[e[:_id]] = { name: e[:name] }
-      end
-      e[:partial_donated_amount] = 0
+    if partial # recreating 'data' to include those donors that have no donations data
+      all_donors.each_with_index { |e,e_i|
+        dnr_index = data.index{|i| i[:_id] == e[:_id]}
+        all_donors[e_i][:donations] = dnr_index.present? ? data[dnr_index][:donations] : []
+      }
+      data = all_donors
+    end
 
+
+    total_amount = 0
+    recent_donations = []
+    donors_list = []
+
+    data.each{|e|
+
+      donors_list << e[:name] if [3,4].index(chart_type).present?
+
+      e[:partial_donated_amount] = 0
+      all_donors
       e[:donations].each { |ee|
         am = ee[:amount]
+
         parties[ee[:party_id]][:value] += am if chart_type == 0
 
-        if chart_type == 2 || chart_type == 3 || chart_type == 4 || chart_type == 5
-          if !parties_list[ee[:party_id]].present?
-            parties_list[ee[:party_id]] = { value: 0, name: parties[ee[:party_id]][:name] }
-          end
-          parties_list[ee[:party_id]][:value] += am
-        end
+        parties_list[ee[:party_id]][:value] += am if [2,3,4,5].index(chart_type).present?
 
         recent_donations.push({ date: ee[:give_date], out: { name: e[:name], value: am } }) if chart_type == 1
         recent_donations.push({ date: ee[:give_date], out: { name: parties[ee[:party_id]][:name], value: am } }) if chart_type == 3
 
         e[:partial_donated_amount] += am
+
         total_amount += am
+
         n  += 1
       }
       e[:partial_donated_amount] = e[:partial_donated_amount].round(2)
     }
-
     parties.each_pair { |k, v| parties[k][:value] = v[:value].round(2) }
     parties_list.each_pair { |k, v| parties_list[k][:value] = v[:value].round(2) }
     total_amount = total_amount.round(2)
 
+    # prepare data for both charts
+    ca = []
+    cb = []
+    ca_meta_obj = { n: 0, obj: nil, objb: nil }
+    cb_meta_obj = { n: 0, obj: nil, objb: nil }
+    labels = {
+      donors: I18n.t("shared.chart.label.donors"),
+      parties: I18n.t("shared.chart.label.parties"),
+      donations: I18n.t("shared.chart.label.donations")
+    }
     if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
-      if title_options.key?(:nature)
-        ca_meta_obj[:obj] = " " + I18n.t("shared.chart.title.nature_#{title_options[:nature] == 0 ? 'individual' : 'organization'}")
-      end
-      ca = pull_n(data, limiter, :donated_amount, "shared.chart.label.donors")
-      cb = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, "shared.chart.label.parties")
+      # if title_options.key?(:nature)
+      #   ca_meta_obj[:obj] = " " + I18n.t("shared.chart.title.nature_#{title_options[:nature] == 0 ? 'individual' : 'organization'}")
+      # end
+      ca = pull_n(data, limiter, :donated_amount, labels[:donors])
+      cb = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, labels[:parties])
 
     elsif chart_type == 1 # If select 1 party -> top 5 donors for party, last 5 donations for party
       tmp = parties[BSON::ObjectId(f[:party][0])][:name]
       ca_meta_obj[:obj] = tmp
       cb_meta_obj[:obj] = tmp
-      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donors")
-      cb = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
+      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[:donors])
+      cb = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, labels[:donations])
 
-    elsif chart_type == 2 || chart_type == 4 # If select > 1 party -> top 5 donors for parties, total donations for selected parties
+    elsif chart_type == 2 || chart_type == 4
+      # If select > 1 party -> top 5 donors for parties, total donations for selected parties
       # If select > 1 donor-> total donations for each donor, top 5 parties donated to
 
-       Rails.logger.debug("--------------------------------------------#{data.inspect}")
-      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.#{chart_type == 2 ? 'donors' : 'donations'}")
-      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.#{chart_type == 2 ? 'donations' : 'parties'}")
+       # Rails.logger.debug("--------------------------------------------#{data.inspect}")
+      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[chart_type == 2 ? :parties : :donors])
+      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, labels[chart_type == 2 ? :donations : :parties])
 
+       # Rails.logger.debug("--------------------------------------------#{ca.inspect}")
       ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ")# if chart_type == 4
-      cb_meta_obj[:obj] = chart_type == 4 ? donors_list.map{ |k,v| v[:name] }.join(", ") : cb.map{|m| m[0] }.join(", ")#
+      cb_meta_obj[:obj] = chart_type == 4 ? donors_list.join(", ") : cb.map{|m| m[0] }.join(", ")#
 
     elsif chart_type == 3 # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
 
-      ca = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, "shared.chart.label.donations")
-      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, "shared.chart.label.parties")
-      tmp = donors_list.map{|k,v| v[:name] }.join(", ")
+      ca = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, labels[:donations])
+      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, labels[:parties])
+      tmp = donors_list.join(", ")
       ca_meta_obj[:obj] = tmp # ca.map{|m| m[0] }.join(", ")
       cb_meta_obj[:obj] = tmp # cb.map{|m| m[0] }.join(", ")
 
     elsif chart_type == 5 # show selected donors sorted by who donated most and show selected parties sorted by who received most
 
-      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, "shared.chart.label.donations")
-      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, "shared.chart.label.donations")
+      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[:donations])
+      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, labels[:donations])
 
-      ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ")
-      ca_meta_obj[:objb] = cb.map{|m| m[0] }.join(", ")
+      tmp = ca.map{|m| m[0] }.join(", ")
+      tmp2 = cb.map{|m| m[0] }.join(", ")
+      ca_meta_obj[:obj] = tmp
+      ca_meta_obj[:objb] = tmp2
 
-      cb_meta_obj[:obj] = cb.map{|m| m[0] }.join(", ")
-      cb_meta_obj[:objb] = ca.map{|m| m[0] }.join(", ")
+      cb_meta_obj[:obj] = tmp2
+      cb_meta_obj[:objb] = tmp
 
     end
+
     ca_meta_obj[:n] = ca.size
     cb_meta_obj[:n] = cb.size
 
@@ -580,6 +476,135 @@ class Donor
       })
     end
     res
+  end
+
+  def self.filter_table(params, opts = { meta: false, skip: nil, limit: nil, sort: nil, q: nil })
+    # Rails.logger.debug("****************************************#{opts}")
+    lang = I18n.locale
+    result = []
+
+    matches = []
+
+    matches.push({ "_id": { "$in": params[:donor].map{|m| BSON::ObjectId(m)} } }) if params[:donor].present?
+    matches.push({ "multiple": { "$eq": params[:multiple] } }) if params[:multiple].present? && params[:multiple] == true
+
+    if params[:party].present?
+      tmp = params[:party].map{|m| BSON::ObjectId(m) }
+      matches.push({ "donations.party_id": { "$in": tmp } })
+      ors = []
+      tmp.each{|e| ors.push({ "$eq": ["$$donation.party_id", e ] }) }
+    end
+
+    if params[:period].present?
+      tmp = params[:period][0]
+      matches.push({ "donations.give_date": { "$gte": tmp } }) if tmp.present? && tmp != -1
+
+      tmp = params[:period][1]
+      matches.push({ "donations.give_date": { "$lte": tmp } }) if tmp.present? && tmp != -1
+    end
+
+    if params[:amount].present?
+      tmp = params[:amount][0]
+      matches.push({ "donations.amount": { "$gte": tmp } }) if tmp.present? && tmp != -1
+
+      tmp = params[:amount][1]
+      matches.push({ "donations.amount": { "$lte": tmp } }) if tmp.present? && tmp != -1
+    end
+
+    tmp = params[:monetary]
+    matches.push({ "donations.monetary": { "$eq": tmp } }) if tmp.present? && tmp == true || tmp == false
+
+    tmp = params[:nature]
+    matches.push({ "nature": { "$eq": tmp } }) if tmp.present? && tmp == 0 || tmp == 1
+
+
+    options = []
+    options.push({ "$unwind": '$donations' })
+    options.push({ "$match": { "$and": matches } }) if !matches.blank?
+
+
+    full_name = mongodb_field_with_fallback("full_name")
+
+    if opts[:meta]
+
+      options.push({
+        "$project": {
+          full_name: mongodb_field_with_fallback("full_name"),
+          tin: 1,
+          amount: "$donations.amount"
+        }
+      })
+      if opts[:q].present?
+        options.push({ "$match":
+          { "$or": [
+            { "full_name": { "$regex": "#{Regexp.quote(opts[:q])}", "$options": 'i'} },
+            { "tin": { "$regex": "#{Regexp.quote(opts[:q])}", "$options": 'i'} }
+          ] }
+        })
+      end
+      options.push({
+        "$group": {
+          "_id": nil,
+          "count": { "$sum": 1 },
+          "sum": { "$sum": "$amount" }
+        }
+      })
+      result = collection.aggregate(options).first
+      result = { count: 0, sum: 0 } unless result.present?
+    else
+      skip = opts[:skip]
+      limit = opts[:limit]
+
+      options.push({
+        "$lookup": {
+          from: "parties",
+          localField: "donations.party_id",
+          foreignField: "_id",
+          as: "party"
+        }
+      })
+      options.push({ "$unwind": '$party' })
+
+      party = mongodb_field_with_fallback("party.title")
+      monetary_trans = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
+      nature_trans = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
+      date_format = I18n.t("time.formats.date")
+      options.push({
+        "$project": {
+          full_name: full_name,
+          tin: 1,
+          nature: { "$cond": [ { "$eq": [ "$nature", 0 ] }, "#{nature_trans[0]}", "#{nature_trans[1]}" ] },
+          donated_amount: 1,
+          give_date: { "$dateToString": { "format": "#{date_format}", "date": "$donations.give_date" } },
+          give_date_order: "$donations.give_date",
+          amount: "$donations.amount",
+          monetary: { "$cond": [ { "$eq": [ "$donations.monetary", true ] }, "#{monetary_trans[0]}", "#{monetary_trans[1]}" ] },
+          party: party
+        }
+      })
+      if opts[:q].present?
+        options.push({ "$match":
+          { "$or": [
+            { "full_name": { "$regex": "#{Regexp.quote(opts[:q])}", "$options": 'i'} },
+            { "tin": { "$regex": "#{Regexp.quote(opts[:q])}", "$options": 'i'} }
+          ] }
+        })
+      end
+
+      if opts[:sort].present? && opts[:sort].length == 2
+        options.push({ "$sort": { "#{opts[:sort][0]}": opts[:sort][1] } })
+      else
+        options.push({ "$sort": { full_name: 1, tin: 1 } }) #donated_amount: -1, full_name: 1
+      end
+
+
+
+      options.push({ "$skip": skip }) if skip.present?
+      options.push({ "$limit": limit }) if limit.present?
+
+      result = collection.aggregate(options)
+    end
+    result
   end
 
   def self.explore_table(params, format = :json)
@@ -801,7 +826,7 @@ class Donor
         end
         grp_h[ek] += 1
       }
-      str = I18n.t(str)
+      # str = I18n.t(str)
       grp_a.each_with_index {|e,i|
         if grp_h[e[1]] > 1
           grp_a[i][0] = "#{grp_h[e[1]]} #{str}"
@@ -810,24 +835,24 @@ class Donor
     end
     def self.generate_title(data, indexes, has_no_data)
 
-#       top_5_donors: Top %{n}%{obj} Donors for All Parties -> No Donations for All Parties
-# top_5_parties: Top %{n} Parties/Candidates for All Donors -> No Donations for All Parties
+      # top_5_donors: Top %{n}%{obj} Donors for All Parties -> No Donations for All Parties
+      # top_5_parties: Top %{n} Parties/Candidates for All Donors -> No Donations for All Parties
 
-# top_5_donors_for_party: Top %{n} Donors for %{obj} -> No Donations for %{name}
-# last_5_donations_for_party: Last %{n} Donations for %{obj} -> No Donations for %{obj}
+      # top_5_donors_for_party: Top %{n} Donors for %{obj} -> No Donations for %{name}
+      # last_5_donations_for_party: Last %{n} Donations for %{obj} -> No Donations for %{obj}
 
-# top_5_donors_for_parties: Top %{n} Donors for %{obj} -> No Donations for %{name}
-# total_donations_for_parties: Total Donations for %{obj} -> No Donations for %{names}
+      # top_5_donors_for_parties: Top %{n} Donors for %{obj} -> No Donations for %{name}
+      # total_donations_for_parties: Total Donations for %{obj} -> No Donations for %{names}
 
 
-# last_5_donations_for_donor: Last %{n} Donations by %{obj} -> No Donations by %{obj}
-# top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj} No Parties Donated to by %{names}
+      # last_5_donations_for_donor: Last %{n} Donations by %{obj} -> No Donations by %{obj}
+      # top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj} No Parties Donated to by %{names}
 
-# total_donations_for_each_donor: Total Donations for %{obj} -> No donations for %{obj}
-# top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj} No Parties Donated to by %{names} ########
+      # total_donations_for_each_donor: Total Donations for %{obj} -> No donations for %{obj}
+      # top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj} No Parties Donated to by %{names} ########
 
-# donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb} -> No Donations by %{obj} to %{objb}
-# parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj} -> No Donations to %{objb} by %{obj}
+      # donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb} -> No Donations by %{obj} to %{objb}
+      # parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj} -> No Donations to %{objb} by %{obj}
 
 
       title = []
@@ -854,7 +879,7 @@ class Donor
       }
       template_name = template_names[indexes[0]][indexes[1]]
       template = templates[template_name.to_sym]
-
+       Rails.logger.debug("--------------------------------------------#{template_name}")
       if template_name == "top_5_donors" && data[:nature].present? # this title has nature as obj
         data[:obj] = I18n.t("shared.chart.title.nature_#{data[:nature] == 0 ? 'individual' : 'organization'}")
       end
