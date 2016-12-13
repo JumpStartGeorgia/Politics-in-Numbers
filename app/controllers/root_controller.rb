@@ -118,8 +118,8 @@ class RootController < ApplicationController
             tmp = []
             tmp_prev = ""
             e.reverse_each{|ee|
-              tmp.unshift(ee.present? ? ee : tmp_prev)
-              tmp_prev = ee
+              tmp.unshift(ee.nil? ? tmp_prev : ee)
+              tmp_prev = ee if !ee.nil?
             }
             csv << tmp
           }
