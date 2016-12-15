@@ -27,6 +27,11 @@ $(document).ready(function (){
     donation_total_donations = $("#donation_total_donations span"),
     donation_table = $("#donation_table table"),
     finance_table = $("#finance_table table"),
+    chart_ids = {
+      "da": "#donation_chart_1",
+      "db": "#donation_chart_2",
+      "fa": "#finance_chart"
+    },
     finance_datatable,
     autocomplete = {
       push: function (autocomplete_id, key, value) {
@@ -833,19 +838,26 @@ $(document).ready(function (){
       js.esid[js.is_donation ? "d" : "f"] = undefined;
     }
     $(".chart_download a").click(function(){
-      var t = $(this), type = t.attr("data-type"), p = t.parent().parent(), target = p.attr("data-target"),
-      chart = $(target).highcharts(),
-      mimes = {
-        "png": "image/png",
-        "jpeg": "image/jpeg",
-        "svg": "image/svg+xml",
-        "pdf": "application/pdf",
-      };
-      if(type === "print") {
+      var t = $(this),
+        f_type = t.attr("data-type"),
+        p = t.parent().parent(),
+        c_type = p.attr("data-chart"),
+        target = chart_ids[c_type],
+        chart = $(target).highcharts(),
+        mimes = {
+          "png": "image/png",
+          "jpeg": "image/jpeg",
+          "svg": "image/svg+xml",
+          "pdf": "application/pdf",
+        };
+
+      if(f_type === "print") {
         chart.print();
       }
       else {
-        chart.exportChartLocal({ type: mimes[type] });
+        var tmp_sid = (c_type[0] == "d" ? donation : finance).sid;
+        window.location.href = gon.chart_path + tmp_sid + "/" + c_type[1] + "/" + f_type;
+        // chart.exportChart({ type: mimes[type] });
       }
     });
     autocomplete.bind();
@@ -954,12 +966,12 @@ $(document).ready(function (){
     var is_data_ok = typeof data !== "undefined";
     if(is_data_ok) {
       if(partial === "donation") {
-        bar_chart("#donation_chart_1", data.ca, "#EBE187");
-        bar_chart("#donation_chart_2", data.cb, "#B8E8AD");
+        bar_chart(chart_ids.da, data.ca, "#EBE187");
+        bar_chart(chart_ids.db, data.cb, "#B8E8AD");
       }
       else {
         //grouped_column_chart("#finance_chart", data.ca, "#fff");
-        grouped_advanced_column_chart("#finance_chart", data.ca, "#fff");
+        grouped_advanced_column_chart(chart_ids.fa, data.ca, "#fff");
       }
       render_table(partial, data.table);
     }
@@ -1109,7 +1121,8 @@ $(document).ready(function (){
             enabled: false
           }
         },
-        scale: 1
+        scale: 1//,
+        // url: ""
       },
       title: {
         text: resource.title,
@@ -1253,7 +1266,7 @@ $(document).ready(function (){
             fontFamily: "firasans_book",
             textShadow: 'none'
           },
-          format: "⁣{value}", // there is an invisible character infront https://unicode-table.com/en/2063/, to have space infront of text for rotated labels
+          format: "⁣ {value}", // there is an invisible character infront of actual space https://unicode-table.com/en/2063/, to have space infront of text for rotated labels
           //useHTML: true,
           step:1,
           rotation:groupedOptionsRotation

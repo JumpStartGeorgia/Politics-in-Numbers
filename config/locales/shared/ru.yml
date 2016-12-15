@@ -127,6 +127,10 @@ ru:
         donors: Donors
         parties: Parties
         donations: Donations
+      filename:
+        finance: finances
+        donation: donations
+        missing: missing
     filters:
       donations: Пожертвования
       party_finances: Финансирование <br />партии

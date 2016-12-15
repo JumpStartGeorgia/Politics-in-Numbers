@@ -44,7 +44,7 @@ Rails.application.routes.draw do
     get '/embed_static/:id' => 'root#embed_static', as: :embed_static, constraints: lambda { |req| req.format == :json }
     get '/embed_test/:type/:id/:chart' => 'root#embed_test', as: :embed_test
     get '/share/:id/:chart' => 'root#share', as: :share
-    get '/img/:id/:chart' => 'root#img', as: :img
+    get '/chart/:id(/:chart)(/:file_type)' => 'root#chart', as: :chart
     get 'filter/donors' => 'root#donors_filter'
     get 'filter/donations' => 'root#donations_datatable_filter', constraints: lambda { |req| req.format == :json || req.format == :csv }
     # get 'select/parties' => 'root#select_parties'

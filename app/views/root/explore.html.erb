@@ -183,7 +183,7 @@
                 <div class="embed" data-dialog="embed;a" title="<%= t('.embed_chart') %>"><i></i></div>
                 <div class="download download_menu" title="<%= t('.download_chart') %>">
                   <i></i>
-                  <ul class="chart_download" data-target="#donation_chart_1">
+                  <ul class="chart_download" data-chart="da">
                     <li><a href="javascript:void(0);" data-type="print"><%= t('.export_type.print') %></a></li>
                     <li><a href="javascript:void(0);" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
                     <li><a href="javascript:void(0);" data-type="svg"><%= t('.export_type.svg') %></a></li>
@@ -206,7 +206,7 @@
                 <div class="embed" data-dialog="embed;b" title="<%= t('.embed_chart') %>"><i></i></div>
                 <div class="download download_menu" title="<%= t('.download_chart') %>">
                   <i></i>
-                  <ul class="chart_download" data-target="#donation_chart_2">
+                  <ul class="chart_download" data-chart="db">
                     <li><a href="javascript:void(0);" data-type="print"><%= t('.export_type.print') %></a></li>
                     <li><a href="javascript:void(0);" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
                     <li><a href="javascript:void(0);" data-type="svg"><%= t('.export_type.svg') %></a></li>
@@ -245,7 +245,7 @@
                 <a href='<%= "#{@finance_download_link}" %>' id="finance_csv_download" data-only="table" title="<%= t('.export_type.csv') %>"><i></i></a>
                 <div class="download_menu" data-only="chart" title="<%= t('.download_chart') %>">
                   <i></i>
-                  <ul class="chart_download" data-target="#finance_chart">
+                  <ul class="chart_download" data-chart="fa">
                     <li><a href="javascript:void(0);" data-type="print"><%= t('.export_type.print') %></a></li>
                     <li><a href="javascript:void(0);" data-type="pdf"><%= t('.export_type.pdf') %></a></li>
                     <li><a href="javascript:void(0);" data-type="svg"><%= t('.export_type.svg') %></a></li>
@@ -324,7 +324,7 @@
   </section>
 </dialog>
 <% content_for :custom_js,  "explore"  %>
-<% @custom_js = ["highcharts.js", "highcharts-exporting.js", "highcharts-offline-exporting.js", "highcharts-grouped-categories.js", "crypto.min.js"
+<% @custom_js = ["highcharts.js", "highcharts-grouped-categories.js", "crypto.min.js"
   # Warning uncomment this , "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5554a5643f1d9065"#,
   #"datatables.buttons.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/dataTables.buttons.min.js",
   #"datatables.buttons.html5.min.js", #"https://cdn.datatables.net/buttons/1.2.1/js/buttons.html5.min.js",

@@ -11,6 +11,7 @@
 /log/*
 !/log/.keep
 /tmp
+!/tmp/assets/.gitkeep
 
 /.gems
 /.env
