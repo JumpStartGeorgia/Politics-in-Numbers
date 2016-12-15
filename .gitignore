@@ -10,7 +10,10 @@
 # Ignore all logfiles and tempfiles.
 /log/*
 !/log/.keep
-/tmp
+
+/tmp/*
+!/tmp/assets
+/tmp/assets/*
 !/tmp/assets/.gitkeep
 
 /.gems
