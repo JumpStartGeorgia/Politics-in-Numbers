@@ -1163,25 +1163,32 @@ $(document).ready(function (){
       yAxis: { visible: false },
       legend: { enabled: false },
       plotOptions: {
-          bar: {
-              color:"#ffffff",
-              dataLabels: {
-                  enabled: true,
-                  padding: 6,
-                  style: {
-                    color: "#5d675b",
-                    fontSize:"14px",
-                    fontFamily: "firasans_r",
-                    textShadow: 'none'
-                  }
-              },
-              pointInterval:1,
-              pointWidth:17,
-              pointPadding: 0,
-              groupPadding: 0,
-              borderWidth: 0,
-              shadow: false
-          }
+        bar: {
+          color:"#ffffff",
+          dataLabels: {
+            enabled: true,
+            padding: 6,
+            style: {
+              color: "#5d675b",
+              fontSize:"14px",
+              fontFamily: "firasans_r",
+              textShadow: "none"
+            },
+            formatter: function () {
+              var tmp = Highcharts.numberFormat(this.y);
+              if(tmp.indexOf(decPoint) !== -1) {
+                tmp = tmp.trimr("0").trimr(decPoint);
+              }
+              return tmp == "0" ? gon.na : tmp;
+            }
+          },
+          pointInterval:1,
+          pointWidth:17,
+          pointPadding: 0,
+          groupPadding: 0,
+          borderWidth: 0,
+          shadow: false
+        }
       },
       series: [{ data: resource.series }],
       tooltip: {
@@ -1193,20 +1200,20 @@ $(document).ready(function (){
           color: "#5D675B",
           fontSize:"14px",
           fontFamily: "firasans_r",
-          textShadow: 'none',
-          fontWeight:'normal'
+          textShadow: "none",
+          fontWeight:"normal"
         },
-        formatter: function() {
+        formatter: function () {
           var tmp = Highcharts.numberFormat(this.y);
           if(tmp.indexOf(decPoint) !== -1) {
-            tmp = tmp.trimr("0").trimr(".");
+            tmp = tmp.trimr("0").trimr(decPoint);
           }
-          return "<b>" + this.key + "</b>: " + tmp;
+          return "<b>" + this.key + "</b>: " + (tmp == "0" ? gon.na : tmp);
         }
       }
     });
   }
-  function grouped_advanced_column_chart(elem, resource, bg) {
+  function grouped_advanced_column_chart (elem, resource, bg) {
     // console.log("fca", resource);
     var cat_max_len = 0,
       groupedOptions = [],

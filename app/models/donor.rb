@@ -307,20 +307,21 @@ class Donor
         es = BSON::ObjectId(e)
         parties_list[es] = { value: 0, name: parties[es][:name] } if parties[es].present?
       }
-    else
-      parties.each{|k,v| parties_list[k] = { value: 0, name: v[:name] } }
+    # else
+    #   parties.each{|k,v| parties_list[k] = { value: 0, name: v[:name] } }
     end
-
     all_donors = Donor.donors_by_ids(f[:donor])
     partial = all_donors.length > 0
-
     n = 0
     if partial # recreating 'data' to include those donors that have no donations data
+
       all_donors.each_with_index { |e,e_i|
         dnr_index = data.index{|i| i[:_id] == e[:_id]}
-        all_donors[e_i][:donations] = dnr_index.present? ? data[dnr_index][:donations] : []
+        if dnr_index.nil?
+          e[:donations] = []
+          data << e
+        end
       }
-      data = all_donors
     end
 
 
@@ -330,16 +331,18 @@ class Donor
 
     data.each{|e|
 
-      donors_list << e[:name] if [3,4].index(chart_type).present?
+      donors_list << e[:name]# if [3,4].index(chart_type).present?
 
       e[:partial_donated_amount] = 0
-      all_donors
       e[:donations].each { |ee|
         am = ee[:amount]
 
         parties[ee[:party_id]][:value] += am if chart_type == 0
 
-        parties_list[ee[:party_id]][:value] += am if [2,3,4,5].index(chart_type).present?
+        if [2,3,4,5].index(chart_type).present?
+          parties_list[ee[:party_id]] = { value: 0, name: parties[ee[:party_id]][:name] } if !parties_list[ee[:party_id]].present?
+          parties_list[ee[:party_id]][:value] += am
+        end
 
         recent_donations.push({ date: ee[:give_date], out: { name: e[:name], value: am } }) if chart_type == 1
         recent_donations.push({ date: ee[:give_date], out: { name: parties[ee[:party_id]][:name], value: am } }) if chart_type == 3
@@ -355,68 +358,57 @@ class Donor
     parties.each_pair { |k, v| parties[k][:value] = v[:value].round(2) }
     parties_list.each_pair { |k, v| parties_list[k][:value] = v[:value].round(2) }
     total_amount = total_amount.round(2)
+    has_no_data = total_amount == 0
 
     # prepare data for both charts
     ca = []
     cb = []
-    ca_meta_obj = { n: 0, obj: nil, objb: nil }
-    cb_meta_obj = { n: 0, obj: nil, objb: nil }
+    ca_title = { n: 0, obj: nil, objb: nil }
+    cb_title = { n: 0, obj: nil, objb: nil }
     labels = {
       donors: I18n.t("shared.chart.label.donors"),
       parties: I18n.t("shared.chart.label.parties"),
       donations: I18n.t("shared.chart.label.donations")
     }
     if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
-      # if title_options.key?(:nature)
-      #   ca_meta_obj[:obj] = " " + I18n.t("shared.chart.title.nature_#{title_options[:nature] == 0 ? 'individual' : 'organization'}")
-      # end
-      ca = pull_n(data, limiter, :donated_amount, labels[:donors])
-      cb = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, labels[:parties])
-
+      ca_tmp = pull_n(data, limiter, :donated_amount, labels[:donors])
+      cb_tmp = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, labels[:parties])
     elsif chart_type == 1 # If select 1 party -> top 5 donors for party, last 5 donations for party
       tmp = parties[BSON::ObjectId(f[:party][0])][:name]
-      ca_meta_obj[:obj] = tmp
-      cb_meta_obj[:obj] = tmp
-      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[:donors])
-      cb = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, labels[:donations])
+      ca_title[:obj] = cb_title[:obj] = tmp
+
+      ca_tmp = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[:donors])
+      cb_tmp = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, labels[:donations])
 
     elsif chart_type == 2 || chart_type == 4
       # If select > 1 party -> top 5 donors for parties, total donations for selected parties
       # If select > 1 donor-> total donations for each donor, top 5 parties donated to
 
-       # Rails.logger.debug("--------------------------------------------#{data.inspect}")
-      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[chart_type == 2 ? :parties : :donors])
-      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, labels[chart_type == 2 ? :donations : :parties])
+      ca_tmp = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[chart_type == 2 ? :parties : :donors])
+      cb_tmp = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, labels[chart_type == 2 ? :donations : :parties])
 
-       # Rails.logger.debug("--------------------------------------------#{ca.inspect}")
-      ca_meta_obj[:obj] = ca.map{|m| m[0] }.join(", ")# if chart_type == 4
-      cb_meta_obj[:obj] = chart_type == 4 ? donors_list.join(", ") : cb.map{|m| m[0] }.join(", ")#
+      ca_title[:obj] = chart_type == 4 ? ca_tmp[:title] : cb_tmp[:title]
+      cb_title[:obj] = chart_type == 4 ? donors_list.join(", ") : cb_tmp[:title]
 
     elsif chart_type == 3 # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
+      ca_tmp = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, labels[:donations])
+      cb_tmp = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, labels[:parties])
 
-      ca = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, labels[:donations])
-      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, labels[:parties])
-      tmp = donors_list.join(", ")
-      ca_meta_obj[:obj] = tmp # ca.map{|m| m[0] }.join(", ")
-      cb_meta_obj[:obj] = tmp # cb.map{|m| m[0] }.join(", ")
+      ca_title[:obj] = cb_title[:obj] = donors_list.join(", ")
 
     elsif chart_type == 5 # show selected donors sorted by who donated most and show selected parties sorted by who received most
+      ca_tmp = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[:donations])
+      cb_tmp = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, labels[:donations])
 
-      ca = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[:donations])
-      cb = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, labels[:donations])
-
-      tmp = ca.map{|m| m[0] }.join(", ")
-      tmp2 = cb.map{|m| m[0] }.join(", ")
-      ca_meta_obj[:obj] = tmp
-      ca_meta_obj[:objb] = tmp2
-
-      cb_meta_obj[:obj] = tmp2
-      cb_meta_obj[:objb] = tmp
-
+      ca_title[:obj] = cb_title[:obj] = ca_tmp[:title]
+      ca_title[:objb] = cb_title[:objb] = cb_tmp[:title]
     end
 
-    ca_meta_obj[:n] = ca.size
-    cb_meta_obj[:n] = cb.size
+    ca = ca_tmp[:data]
+    cb = cb_tmp[:data]
+
+    ca_title[:n] = ca.size
+    cb_title[:n] = cb.size
 
     if ["a"].index(type).present?
       f.keys.each{|e|
@@ -450,12 +442,11 @@ class Donor
       }
     end
 
-    has_no_data = total_amount == 0
     if ["ca", "a", "co", "coa"].index(type).present?
       res.merge!({
         ca: {
-          series: ca,
-          title: Donor.generate_title(ca_meta_obj.merge(title_options), [chart_type, 0], has_no_data),
+          series: has_no_data ? [] : ca,
+          title: Donor.generate_title(ca_title.merge(title_options), [chart_type, 0], has_no_data),
           subtitle: chart_subtitle
         }
       })
@@ -463,8 +454,8 @@ class Donor
     if ["cb", "a", "co", "cob"].index(type).present?
       res.merge!({
         cb: {
-          series: cb,
-          title: Donor.generate_title(cb_meta_obj.merge(title_options), [chart_type, 1], has_no_data),
+          series: has_no_data ? [] : cb,
+          title: Donor.generate_title(cb_title.merge(title_options), [chart_type, 1], has_no_data),
           subtitle: chart_subtitle
         }
       })
@@ -811,26 +802,22 @@ class Donor
     end
 
     def self.pull_n (data, n, key, str) # get n rows grouped by key from data, with counting distinct item count and if > 1 than output with str else just name
-      grp_h = { }
-      grp_a = []
+      grp_n = {}
       d_i = 0
-
       data.each_with_index{ |e, e_i|
         break if d_i >= n
         ek = e[key].round
-        if !grp_h.key?(ek)
-          break if e_i >= n
-          grp_h[ek] = 0
-          grp_a << [e[:name], ek]
+        if !grp_n.key?(ek)
+          grp_n[ek] = [e[:name]]
           d_i += 1
+        else
+          grp_n[ek] << e[:name]
         end
-        grp_h[ek] += 1
       }
-      # str = I18n.t(str)
-      grp_a.each_with_index {|e,i|
-        if grp_h[e[1]] > 1
-          grp_a[i][0] = "#{grp_h[e[1]]} #{str}"
-        end
+
+      {
+        data: grp_n.map { |k,v| [v.length > 1 ? "#{v.length} #{str}" : v[0], k] },
+        title: grp_n.map { |k,v| v.join(", ") }.join(", ")
       }
     end
     def self.generate_title(data, indexes, has_no_data)
@@ -877,6 +864,7 @@ class Donor
         donors_donations_sorted_by_amount:  [ :block ],
         parties_donations_sorted_by_amount: [ :block ],
       }
+
       template_name = template_names[indexes[0]][indexes[1]]
       template = templates[template_name.to_sym]
        Rails.logger.debug("--------------------------------------------#{template_name}")

@@ -82,6 +82,7 @@ class RootController < ApplicationController
       gon.lari = t('shared.common.lari')
       gon.gonned = true
       gon.chart_path = chart_path({id: ""})
+      gon.na = t('shared.common.na')
 
 
       @party_list = Party.sorted.map { |m| [m.id, m.title, m.permalink, m.type == 0 && m.member == true] }
@@ -349,7 +350,6 @@ class RootController < ApplicationController
           if (is_donation ? ["a", "b"] : ["a"]).index(chart).present?
             data = (is_donation ? Donor : Dataset).explore(Hash.transform_keys_to_symbols(shr.pars), "co" + chart, true)
             image = export_highchart(sid, chart, data, is_donation, file_type, false)
-             Rails.logger.fatal("fatal---------------------44-#{image}")
             if image[:ok]
               @missing = false
               image_stream = image[:data]
@@ -410,7 +410,8 @@ class RootController < ApplicationController
     def highchart_options_by_type (chart_type, file_type = "png")
 
       if chart_type == :bar
-        infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"bar\", \"backgroundColor\": \"_bg_\", }, \"title\": {\"text\": \"_title_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"18px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"subtitle\": {\"text\": \"_subtitle_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, \"xAxis\": {\"type\": \"category\", \"lineWidth\": 0, \"tickWidth\": 0, \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} } }, \"yAxis\": { \"visible\": false }, \"legend\": { \"enabled\": false }, \"plotOptions\": {\"bar\": {\"color\":\"#ffffff\", \"dataLabels\": {\"enabled\": true, \"padding\": 6, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"pointInterval\":1, \"pointWidth\":17, \"pointPadding\": 0, \"groupPadding\": 0, \"borderWidth\": 0, \"shadow\": false } }, \"series\": [{ \"data\": _series_}] }"
+        infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"bar\", \"backgroundColor\": \"_bg_\", }, \"title\": {\"text\": \"_title_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"18px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"subtitle\": {\"text\": \"_subtitle_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, \"xAxis\": {\"type\": \"category\", \"lineWidth\": 0, \"tickWidth\": 0, \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} } }, \"yAxis\": { \"visible\": false }, \"legend\": { \"enabled\": false }, \"plotOptions\": {\"bar\": {\"color\":\"#ffffff\", \"dataLabels\": {\"enabled\": true, \"padding\": 6, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"}, \"formatter\": _formatter_ }, \"pointInterval\":1, \"pointWidth\":17, \"pointPadding\": 0, \"groupPadding\": 0, \"borderWidth\": 0, \"shadow\": false } }, \"series\": [{ \"data\": _series_}] }"
+        infile.gsub!("_formatter_", "function () { var tmp = Highcharts.numberFormat(this.y); if(tmp.indexOf('.') !== -1) { tmp = tmp.trimr('0').trimr('.'); } return tmp == '0' ? '#{t('shared.common.na')}' : tmp; }")
       elsif chart_type == :column
         infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"column\", \"height\": _height_, \"backgroundColor\": \"#FFFFFF\"}, \"title\": {\"text\": \"_title_\", \"margin\": 40, \"style\": {\"fontFamily\":\"Fira Sans\", \"fontSize\":\"18px\", \"color\": \"#5d675b\"}, \"useHTML\": true }, \"xAxis\": {\"type\": \"category\", \"categories\": _categories_, \"gridLineColor\": \"#5D675B\", \"gridLineWidth\":1, \"gridLineDashStyle\": \"Dash\", \"lineWidth\": 1, \"lineColor\": \"#5D675B\", \"tickWidth\": 1, \"tickColor\": \"#5D675B\", \"labels\": {\"groupedOptions\": _grouped_options_, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\",  \"textShadow\": \"none\"}, \"format\": \"⁣ {value}\", \"step\":1, \"rotation\": _rotation_ } }, \"yAxis\": [{\"title\": { \"enabled\": true, \"text\": \"#{I18n.t('shared.common.lari')}\", \"style\": {\"color\": \"#7F897D\", \"fontSize\": \"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\" } }, \"gridLineColor\": \"#eef0ee\", \"gridLineWidth\":1, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, {\"linkedTo\":0, \"title\": { \"enabled\": true, \"text\": \"#{I18n.t('shared.common.lari')}\", \"style\": {\"color\": \"#7F897D\", \"fontSize\": \"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\" } }, \"opposite\": true, \"style\": {\"color\": \"#7F897D\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} } ], \"legend\": {\"enabled\": true, \"symbolWidth\":10, \"symbolHeight\":10, \"shadow\": false, \"itemStyle\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"plotOptions\": {\"column\":{\"maxPointWidth\": 40 } }, \"series\": _series_}"
       end
@@ -473,7 +474,7 @@ class RootController < ApplicationController
       tmp_path = "#{Rails.root}/tmp/assets/#{image_name}"
       jsn["outfile"] = tmp_path if is_pdf
 
-      # Rails.logger.fatal("fatal----------------------#{jsn}")
+      Rails.logger.fatal("fatal----------------------#{jsn}")
       # jsn["width"] = 1200 if return_url
       # FileUtils.mkdir_p(image_abs_dir) unless File.directory?(image_abs_dir)
 

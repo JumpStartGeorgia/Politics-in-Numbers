@@ -57,6 +57,7 @@ en:
       numericSymbols: [ "k" , "M" , "G" , "T" , "P" , "E"]
       no_result_found_for: "No Results Found for"
       lari: Lari
+      na: "n/a"
     locale:
       short:
         en: En

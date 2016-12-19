@@ -57,6 +57,7 @@ ka:
       numericSymbols: [ null , "მლნ" , "მლრდ" , "ტრილ" , "კვადრ" , "E"]
       no_result_found_for: "No Results Found for"
       lari: ლარი
+      na: "n/a"
     locale:
       short:
         en: En
