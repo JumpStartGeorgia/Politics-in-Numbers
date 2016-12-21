@@ -22,7 +22,30 @@ $(document).ready(function (){
     finance_category = $("#finance_category"),
     view_content = $(".view-content"),
     view_not_found = $(".not-found"),
-    loader = $(".view-loader"),
+    loader = {
+      el: $(".view-loader"),
+      _type: "circle",
+      set: function () {
+        this.el.attr("data-type", this._type);
+        this.type();
+      },
+      start: function () {
+        this.set();
+        this.el.fadeIn();
+      },
+      stop: function () { this.el.fadeOut(); },
+      retype: function (tp) {
+        this.type(tp);
+        this.set();
+        return this;
+      },
+      show: function () {
+        this.set();
+        this.el.show();
+      },
+      hide: function () { this.el.hide(); },
+      type: function (tp) { this._type = (typeof tp === "undefined" || ["circle", "message", "empty"].indexOf(tp) === -1) ? "circle" : tp; return this; }
+    },
     donation_total_amount = $("#donation_total_amount span"),
     donation_total_donations = $("#donation_total_donations span"),
     donation_table = $("#donation_table table"),
@@ -482,14 +505,15 @@ $(document).ready(function (){
             }
           });
         });
-        at_least_one = false;
+        var at_least_one = false;
         t.categories.forEach(function(d){
           if(t.data.hasOwnProperty(d)) {
             at_least_one = true;
             return;
           }
         });
-        if(!at_least_one) { t.animate(); return null; }
+
+        if(!at_least_one) { loader.retype("message"); t.animate(); return null; }
         return t.data;
       },
       set_by_url: function() {
@@ -583,7 +607,7 @@ $(document).ready(function (){
       },
       animate: function () {
         [finance_category.find("li div"), explore_button].forEach(function (d) {
-          d.one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() { $(this).removeClass("swing animated"); })
+          d.one("webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend", function() { $(this).removeClass("swing animated"); })
           .addClass("swing animated");
         });
       }
@@ -696,16 +720,18 @@ $(document).ready(function (){
     h = $(window).height();
   }
   function bind() {
-    window.onpopstate = function(event) {
-       //console.log("onpopstate location: " + window.location + ", state: " + JSON.stringify(event.state));
-    };
-    filter_extended.find(".filter-toggle").click(function(){
+    // window.onpopstate = function (event) {
+    //    //console.log("onpopstate location: " + window.location + ", state: " + JSON.stringify(event.state));
+    // };
+    filter_extended.find(".filter-toggle").click(function (){
       filter_extended.toggleClass("active");
-      loader.removeClass("hidden");
+      console.log("here");
+      loader.type("empty").show();
+
       event.stopPropagation();
     });
-    filter_extended.find(".filter-header .close").click(function(){
-      loader.addClass("hidden");
+    filter_extended.find(".filter-header .close").click(function (){
+      loader.hide();
       filter_extended.toggleClass("active");
     });
     filter_extended.find(".filter-input .toggle, .filter-input input").on("click change", function(){
@@ -915,7 +941,7 @@ $(document).ready(function (){
   }
 
   function filter() {
-    loader.fadeIn();
+    loader.start();
     //console.log("start filter", js.is_donation);
     var tmp, cacher_id, _id, _id, finance_id, obj;
 
@@ -935,7 +961,7 @@ $(document).ready(function (){
       obj = js.is_donation ? donation : finance;
       tmp = obj.get();
       _id = obj.id();
-      if(tmp === null) { loader.fadeOut(); return; }
+      if(tmp === null) { return; }
 
 
       if(!js.cache.hasOwnProperty(_id)) {
@@ -980,7 +1006,7 @@ $(document).ready(function (){
     else {
       view_not_found.removeClass("hidden");
     }
-    loader.fadeOut();
+    loader.stop();
   }
 
   function render_table(type, table) {

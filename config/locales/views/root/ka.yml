@@ -102,6 +102,7 @@ ka:
       financial_assets: ფინანსური სახსრები
       debts: ვალდებულებები
       campaign: კამპანია
+      loader_missing_category: Please select a Party Finance Type at the top.
       export_type:
         print: ბეჭდვა
         pdf: Pdf

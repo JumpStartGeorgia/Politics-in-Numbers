@@ -173,7 +173,10 @@
       </div>
     </div>
     <div class="view-content content">
-      <div class="view-loader hidden"></div>
+      <div class="view-loader hidden" data-type="circle">
+        <div class="circle"></div>
+        <div class="message"><%= t('.loader_missing_category') %></div>
+      </div>
       <div class="panes" >
         <div class="pane" data-type="donation">
           <div class="charts">
