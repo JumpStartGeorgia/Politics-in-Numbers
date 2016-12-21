@@ -69,7 +69,7 @@ function debounce(func, wait, immediate) {
     if (callNow) func.apply(context, args);
   };
 };
-
+var global_click_callback, global_keyup_up_callback, global_keyup_down_callback;
 $(document).ready(function (){
   var nav = false;
   $(".navbar-toggle").click(function (event){

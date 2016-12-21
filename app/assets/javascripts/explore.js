@@ -64,16 +64,13 @@ $(document).ready(function (){
       },
       onchange: debounce(function (event) {
         var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul"), autocomplete_id = p.attr("data-autocomplete-id");
-        if(event.type === "keyup" && event.keyCode === 40) {
-          // ul.find("li:first").addClass("focus").focus();
-
-          global_keyup_up_callback = function() {
+        if(event.type === "keyup" && event.keyCode === 40 && typeof global_keyup_down_callback === "undefined") {
+          global_keyup_up_callback = function () {
             var tmp = ul.find("li.focus").removeClass("focus").prev();
             if(!tmp.length) { tmp = ul.find("li:last"); }
             tmp.addClass("focus").focus();
           };
-          global_keyup_down_callback = function() {
-            //console.log("down");
+          global_keyup_down_callback = function () {
             var tmp = ul.find("li.focus").removeClass("focus").next();
             if(!tmp.length) { tmp = ul.find("li:first"); }
             tmp.addClass("focus").focus();
@@ -90,13 +87,14 @@ $(document).ready(function (){
                 url: p.attr("data-url"),
                 dataType: "json",
                 data: { q: v },
-                success: function(data) {
+                success: function (data) {
                   var html = "";
                   // console.log("back", data);
-                  data.forEach(function(d) {
+                  data.forEach(function (d) {
                     html += "<li><div class='item" + (autocomplete.has(autocomplete_id, d[0]) ? " selected" : "") + "' data-id='" + d[0] + "' data-extra='" + d[2] + "'>" + d[1] + "</li>";
                   });
                   ul.html(html);//.addClass("active");
+                  ul.find("> li").attr("tabindex", 5);
                 },
                 complete: function () {
                   ul.removeClass("loading");
@@ -156,18 +154,22 @@ $(document).ready(function (){
           }
         });
         $(".autocomplete input").on("change paste keyup", this.onchange);
-        $(".autocomplete input").on("click", function() {
-          var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul");
+        $(".autocomplete input").on("click", function () {
+          var p = $(this).parent(), p_id = p.attr("data-autocomplete-id");
           p.addClass("active");
-          global_click_callback = function(target) {
+          if(typeof global_click_callback === "function") {
+            global_click_callback();
+          }
+          global_click_callback = function (target) {
             target = $(target);
-            if(!target.hasClass(".autocomplete") && !target.closest(".autocomplete").length) {
-              p.removeClass("active");
+            var target_parent = target.hasClass(".autocomplete") ? target : target.closest(".autocomplete");
+            if(!(target_parent.length && target_parent.attr("data-autocomplete-id") == p_id)) {
+              p.removeClass("active").find("li.focus").removeClass("focus");
               global_click_callback = undefined;
               global_keyup_up_callback = undefined;
               global_keyup_down_callback = undefined;
             }
-          }
+          };
           event.stopPropagation();
         });
 
@@ -1030,6 +1032,7 @@ $(document).ready(function (){
         destroy: true,
         responsive: true,
         order: [],
+        // bAutoWidth: false,
         //"aaData": table.data,
         // "aoColumns": table.header.map(function(m,i) {
         //   return { "title": m, "sClass": table.classes[i], "visible": i != 0 };
@@ -1047,6 +1050,7 @@ $(document).ready(function (){
         serverSide: true,
         responsive: true,
         destroy: true,
+        // bAutoWidth: false,
         ajax: {
           url: gon.donations_filter_path,
           data: function ( d ) {

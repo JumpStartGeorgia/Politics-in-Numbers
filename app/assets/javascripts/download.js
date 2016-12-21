@@ -52,7 +52,7 @@ $(document).ready(function (){
       },
       onchange: debounce(function(event) {
         var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul"), autocomplete_id = p.attr("data-autocomplete-id");
-        if(event.type === "keyup" && event.keyCode === 40) {
+        if(event.type === "keyup" && event.keyCode === 40 && typeof global_keyup_down_callback === "undefined") {
           // ul.find("li:first").addClass("focus").focus();
 
           global_keyup_up_callback = function() {
@@ -115,7 +115,7 @@ $(document).ready(function (){
                   data.forEach(function(d) {
                     html += "<li data-id='" + d[1] + "'" + (autocomplete.has(autocomplete_id, d[1]) ? "class='selected'" : "") + " tabindex='1'>" + d[0] + "</li>";
                   });
-                  p.find("ul").html(html).addClass("active");
+                  p.find("ul").html(html).addClass("active").find("> li").attr("tabindex", 5);;
                   //console.log("ajax success");
                 }
               });
@@ -140,19 +140,26 @@ $(document).ready(function (){
         });
         $(".autocomplete input").on("change paste keyup", this.onchange);
         $(".autocomplete input").on("click", function() {
-          var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul");
+          var p = $(this).parent(), p_id = p.attr("data-autocomplete-id");
           p.addClass("active");
-          global_click_callback = function(target) {
+          if(typeof global_click_callback === "function") {
+            global_click_callback();
+          }
+          global_click_callback = function (target) {
             target = $(target);
-            if(!target.hasClass(".autocomplete") && !target.closest(".autocomplete").length) {
-              p.removeClass("active");
+            var target_parent = target.hasClass(".autocomplete") ? target : target.closest(".autocomplete");
+            if(!(target_parent.length && target_parent.attr("data-autocomplete-id") == p_id)) {
+              p.removeClass("active").find("li.focus").removeClass("focus");
               global_click_callback = undefined;
               global_keyup_up_callback = undefined;
               global_keyup_down_callback = undefined;
             }
-          }
+          };
           event.stopPropagation();
         });
+
+
+
 
         $(document).on("click keypress", ".autocomplete .dropdown li .item", function(event) {
           if(event.type === "keypress" && event.keyCode !== 13) { return; }
