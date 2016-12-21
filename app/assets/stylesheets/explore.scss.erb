@@ -563,7 +563,7 @@
         width:100%;
 
         > li {
-          .item { padding:8px 10px; }
+          .item, .item-disabled { padding:8px 10px; }
           li {
             .item { padding:8px 2px; }
           }
@@ -572,7 +572,7 @@
           font:14px firasans_book;
           color:#F78E69;
           cursor:pointer;
-          .item {
+          .item, .item-disabled {
             position:relative;
             text-align:left;
             width:100%;
@@ -581,7 +581,7 @@
             // }
 
           }
-          &.l1 .item { padding-left:23px; }
+          &.l1 .item, &.l1 .item-disabled { padding-left:23px; }
           &.l2 .item { padding-left:26px; }
           &.l3 .item { padding-left:29px; }
           &.l4 .item { padding-left:32px; }

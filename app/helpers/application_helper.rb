@@ -47,11 +47,23 @@ module ApplicationHelper
     field_locales = obj.send("#{field}_translations").keys.map{|k|"#{k.upcase}"}
     "<div class='available-locales'><span>#{field_locales.join(' | ')}</span></div>"
   end
-  def generate_li_list(arr=[], tabindex = 5) # format[[id,value]]
+  def generate_li_list(arr=[], grouped = nil) # format[[id,value]]
     html = ""
-    arr.each{|e|
-      html += "<li tabindex='5'><div class='item' data-id='#{e[0]}'>#{e[1]}</div></li>"
-    }
+    if !grouped.present?
+      arr.each{|e|
+        html += "<li tabindex='5'><div class='item' data-id='#{e[0]}'>#{e[1]}</div></li>"
+      }
+    else
+      htmls = { }
+      arr.each{|e|
+        grouper = e[grouped[:index]]
+        htmls[grouper] = "" if !htmls.key?(grouper)
+        htmls[grouper] += "<li class='l2' tabindex='5'><div class='item' data-id='#{e[0]}'>#{e[1]}</div></li>"
+      }
+      grouped[:order].each { |e|
+        html += '<li class="l1 collapse"><div class="tree-toggle"></div><div class="item-disabled">' + grouped[:titles][e] + '</div><ul>' + htmls[e] + "</ul>"
+      }
+    end
     html.html_safe
   end
 

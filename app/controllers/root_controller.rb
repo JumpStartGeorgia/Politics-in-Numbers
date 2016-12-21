@@ -85,7 +85,7 @@ class RootController < ApplicationController
       gon.na = t('shared.common.na')
 
 
-      @party_list = Party.sorted.map { |m| [m.id, m.title, m.permalink, m.type == 0 && m.member == true] }
+      @party_list = Party.sorted.map { |m| [m.id, m.title, m.permalink, m.type == 0 && m.member == true, m.type] }
       gon.party_list = Party.list_from(@party_list)
 
       gon.donor_list = Donor.list(donation_pars[:donor]) if donation_pars.key?(:donor)

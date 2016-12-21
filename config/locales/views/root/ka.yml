@@ -57,6 +57,8 @@ ka:
       time_period: პერიოდი
       amount: რაოდენობა
       party: პარტია
+      parties: Parties
+      candidates: Candidates
       party_candidate: პარტია/კანდიდატი
       donation_type: შემოწირულობის ტიპი
       donated_multiple_parties: ერთზე მეტ პარტიას შეწირა?

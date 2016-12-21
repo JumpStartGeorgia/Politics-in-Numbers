@@ -2,18 +2,47 @@
 ru:
   root:
     index:
-      summary: Откуда получают и на что тратят деньги политические партии? Узнайте и сравните доходы и расходы, во сколько обходится предвыборная кампания, какие пожертвования получают, каким имуществом обладают и какие заработали долги.Ответы на интересующие вас вопросы в проекте «Политика в цифрах». Мы составили для вас единую базу данных. Здесь всё о финансировании политических объединений в Грузии. Статистика составлялась согласно официальным источникам.
-      filter_summary: Сравните финансирование<br />партий по категорям
-      go_explore: Исследуй!
+      summary: Do you want to know where the political parties get money from? Politics in Numbers has all the official data about the party finances. You can see and compare political party income and expenses, campaign funds, donations, assets, financial obligations and other interesting details.
+      filter_summary: You can explore data by<br />categories and compare them
+      go_explore: Go Explore!
     about:
-      title: О нас
+      title: About
       methodology: Methodology
       donations: Donations
       party_finances: Party Finances
-      sponsors: Sponsors/Partners
+      sponsors: Sponsors and Partners
+      alt:
+        js: "JumpStart Georgia"
+        us: "U.S. Department of State"
+        us_embassy: "Embassy of the Unites States Georgia"
+        dcn: "Digital Communication Network"
+        sao: "State Audit Office of Georgia"
     media:
       title: In Media
       no_media: No mentions of Politics in Number in the media have been recorded yet.
+    download:
+      title: Download
+      filters: Filters
+      filter_donations: Donations
+      filter_finance: Party Finances
+      filter_toggle: Toggle to add new filtering option
+      filter_close: Close Filter Window
+      filter_item_close: Remove item from filter
+      filter_clear: Remove all items from filter
+      time: Time
+      annual: Annual
+      campaign: Campaign
+      from: From
+      to: To
+      reset: RESET
+      filter_submit: GENERATE
+      download: Download
+      filename_donation: Donations
+      search: Search
+      filename: Name
+      filename_period: Period
+      file_size: File Size
+      filename_finance: PartyFinances
     explore:
       title: Explore
       category: Category
@@ -28,6 +57,9 @@ ru:
       time_period: Time Period
       amount: Amount
       party: Party
+      parties: Parties
+      candidates: Candidates
+      party_candidate: Party/Candidate
       donation_type: Donation Type
       donated_multiple_parties: Donated to multipled parties?
       donor_nature: Donor Type
@@ -61,6 +93,15 @@ ru:
       search: Search
       table_length: Show _MENU_ entries
       not_found: Your requested data could not be found
+      income: Income
+      income_campaign: Income Campaign
+      expenses: Expenses
+      expenses_campaign: Expenses Campaign
+      reform_expenses: Reforms Fund Expenses
+      property_assets: Property Assets
+      financial_assets: Financial Assets
+      debts: Debts
+      campaign: Campaign
       export_type:
         print: Print
         pdf: Pdf document
