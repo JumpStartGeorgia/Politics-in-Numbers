@@ -1266,7 +1266,7 @@ $(document).ready(function (){
     var cat_max_len = 0,
       groupedOptions = [],
       groupedOptionsRotation = 0;
-    if(resource.categories[0].hasOwnProperty("categories")) {
+    if(resource.categories.length && resource.categories[0].hasOwnProperty("categories") && resource.categories[0].categories.length > 1) {
       resource.categories[0].categories.forEach(function (d, i) {
         resource.categories[0].categories[i] = " " + d;
         if(cat_max_len < d.length) {

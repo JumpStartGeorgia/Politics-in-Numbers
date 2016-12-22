@@ -410,10 +410,10 @@ class RootController < ApplicationController
     def highchart_options_by_type (chart_type, file_type = "png")
 
       if chart_type == :bar
-        infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"bar\", \"backgroundColor\": \"_bg_\", }, \"title\": {\"text\": \"_title_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"18px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"subtitle\": {\"text\": \"_subtitle_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, \"xAxis\": {\"type\": \"category\", \"lineWidth\": 0, \"tickWidth\": 0, \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} } }, \"yAxis\": { \"visible\": false }, \"legend\": { \"enabled\": false }, \"plotOptions\": {\"bar\": {\"color\":\"#ffffff\", \"dataLabels\": {\"enabled\": true, \"padding\": 6, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"}, \"formatter\": _formatter_ }, \"pointInterval\":1, \"pointWidth\":17, \"pointPadding\": 0, \"groupPadding\": 0, \"borderWidth\": 0, \"shadow\": false } }, \"series\": [{ \"data\": _series_}] }"
+        infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"bar\", \"backgroundColor\": \"_bg_\", \"width\": _width_, \"height\": _height_ }, \"title\": {\"text\": \"_title_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"18px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"subtitle\": {\"text\": \"_subtitle_\", \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, \"xAxis\": {\"type\": \"category\", \"lineWidth\": 0, \"tickWidth\": 0, \"labels\": {\"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} } }, \"yAxis\": { \"visible\": false }, \"legend\": { \"enabled\": false }, \"plotOptions\": {\"bar\": {\"color\":\"#ffffff\", \"dataLabels\": {\"enabled\": true, \"padding\": 6, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"}, \"formatter\": _formatter_ }, \"pointInterval\":1, \"pointWidth\":17, \"pointPadding\": 0, \"groupPadding\": 0, \"borderWidth\": 0, \"shadow\": false } }, \"series\": [{ \"data\": _series_}] }"
         infile.gsub!("_formatter_", "function () { var tmp = Highcharts.numberFormat(this.y); if(tmp.indexOf('.') !== -1) { tmp = tmp.trimr('0').trimr('.'); } return tmp == '0' ? '#{t('shared.common.na')}' : tmp; }")
       elsif chart_type == :column
-        infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"column\", \"height\": _height_, \"backgroundColor\": \"#FFFFFF\"}, \"title\": {\"text\": \"_title_\", \"margin\": 40, \"style\": {\"fontFamily\":\"Fira Sans\", \"fontSize\":\"18px\", \"color\": \"#5d675b\"}, \"useHTML\": true }, \"xAxis\": {\"type\": \"category\", \"categories\": _categories_, \"gridLineColor\": \"#5D675B\", \"gridLineWidth\":1, \"gridLineDashStyle\": \"Dash\", \"lineWidth\": 1, \"lineColor\": \"#5D675B\", \"tickWidth\": 1, \"tickColor\": \"#5D675B\", \"labels\": {\"groupedOptions\": _grouped_options_, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\",  \"textShadow\": \"none\"}, \"format\": \"⁣ {value}\", \"step\":1, \"rotation\": _rotation_ } }, \"yAxis\": [{\"title\": { \"enabled\": true, \"text\": \"#{I18n.t('shared.common.lari')}\", \"style\": {\"color\": \"#7F897D\", \"fontSize\": \"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\" } }, \"gridLineColor\": \"#eef0ee\", \"gridLineWidth\":1, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, {\"linkedTo\":0, \"title\": { \"enabled\": true, \"text\": \"#{I18n.t('shared.common.lari')}\", \"style\": {\"color\": \"#7F897D\", \"fontSize\": \"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\" } }, \"opposite\": true, \"style\": {\"color\": \"#7F897D\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} } ], \"legend\": {\"enabled\": true, \"symbolWidth\":10, \"symbolHeight\":10, \"shadow\": false, \"itemStyle\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"plotOptions\": {\"column\":{\"maxPointWidth\": 40 } }, \"series\": _series_}"
+        infile = "{ _colors_, _credits_, \"chart\": {\"type\": \"column\", \"backgroundColor\": \"#FFFFFF\", \"width\": _width_, \"height\": _height_ }, \"title\": {\"text\": \"_title_\", \"margin\": 40, \"style\": {\"fontFamily\":\"Fira Sans\", \"fontSize\":\"18px\", \"color\": \"#5d675b\"}, \"useHTML\": true }, \"xAxis\": {\"type\": \"category\", \"categories\": _categories_, \"gridLineColor\": \"#5D675B\", \"gridLineWidth\":1, \"gridLineDashStyle\": \"Dash\", \"lineWidth\": 1, \"lineColor\": \"#5D675B\", \"tickWidth\": 1, \"tickColor\": \"#5D675B\", \"labels\": {\"groupedOptions\": _grouped_options_, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\",  \"textShadow\": \"none\"}, \"format\": \"⁣ {value}\", \"step\":1, \"rotation\": _rotation_ } }, \"yAxis\": [{\"title\": { \"enabled\": true, \"text\": \"#{I18n.t('shared.common.lari')}\", \"style\": {\"color\": \"#7F897D\", \"fontSize\": \"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\" } }, \"gridLineColor\": \"#eef0ee\", \"gridLineWidth\":1, \"style\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\"} }, {\"linkedTo\":0, \"title\": { \"enabled\": true, \"text\": \"#{I18n.t('shared.common.lari')}\", \"style\": {\"color\": \"#7F897D\", \"fontSize\": \"12px\", \"fontFamily\": \"Fira Sans\", \"fontWeight\": \"100\", \"textShadow\": \"none\" } }, \"opposite\": true, \"style\": {\"color\": \"#7F897D\", \"fontSize\":\"12px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} } ], \"legend\": {\"enabled\": true, \"symbolWidth\":10, \"symbolHeight\":10, \"shadow\": false, \"itemStyle\": {\"color\": \"#5d675b\", \"fontSize\":\"14px\", \"fontFamily\": \"Fira Sans\", \"textShadow\": \"none\"} }, \"plotOptions\": {\"column\":{\"maxPointWidth\": 40 } }, \"series\": _series_}"
       end
       infile.gsub!("_colors_", "colors: [ \"#D36135\", \"#DDCD37\", \"#5B85AA\", \"#F78E69\", \"#A69888\", \"#88D877\", \"#5D675B\", \"#A07F9F\", \"#549941\", \"#35617C\", \"#694966\", \"#B9C4B7\"]")
       infile.gsub!("_credits_", "credits: {enabled: true, text: \"pins.ge\"}")
@@ -423,7 +423,7 @@ class RootController < ApplicationController
         "infile" => infile,
         "type" => file_type,
         "constr" => "Chart",
-        "width" => 1200,
+        # "width" => 1200,
         "globaloptions" => "{ lang: { numericSymbols: #{numericSymbols}, thousandsSep: ',' } }"
       }
 
@@ -453,6 +453,8 @@ class RootController < ApplicationController
         jsn["infile"].gsub!("_bg_", chart == "a" ? "#EBE187" : "#B8E8AD")
         jsn["infile"].gsub!("_subtitle_", data[k][:subtitle])
         jsn["infile"].gsub!("_series_", data[k][:series].to_s)
+        jsn["infile"].gsub!("_width_", "1200")
+        jsn["infile"].gsub!("_height_", "628")
       else
         cats = data[k][:categories]
 
@@ -469,12 +471,13 @@ class RootController < ApplicationController
 
         jsn["infile"].gsub!("_grouped_options_", !rotated ? "[]" : "[{ \"rotation\": 0 }, { \"rotation\": -90 }]")
         jsn["infile"].gsub!("_rotation_", (!rotated ? "0" : "-90"))
-        jsn["infile"].gsub!("_height_", (400 + cat_max_len*9).to_s)
+        jsn["infile"].gsub!("_width_", rotated && cats[0].dig(:categories).length > 6 ? "2400" : "1200")
+        jsn["infile"].gsub!("_height_", (628 + cat_max_len*9).to_s)
       end
       tmp_path = "#{Rails.root}/tmp/assets/#{image_name}"
       jsn["outfile"] = tmp_path if is_pdf
 
-      Rails.logger.fatal("fatal----------------------#{jsn}")
+      # Rails.logger.fatal("fatal----------------------#{jsn}")
       # jsn["width"] = 1200 if return_url
       # FileUtils.mkdir_p(image_abs_dir) unless File.directory?(image_abs_dir)
 
