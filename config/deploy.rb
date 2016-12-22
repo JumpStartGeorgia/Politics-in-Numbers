@@ -323,7 +323,7 @@ task deploy: :environment do
       set :bundle_options, "#{bundle_options} --quiet"
     end
     # invoke :'phantomjs_highcharts:stop'
-    invoke :'delayed_job:stop'
+    #invoke :'delayed_job:stop'
     invoke :'deploy:check_revision'
     invoke :'deploy:assets:decide_whether_to_precompile'
     invoke :'deploy:assets:local_precompile' if precompile_assets
@@ -338,7 +338,7 @@ task deploy: :environment do
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
     # invoke :'phantomjs_highcharts:start'
-    invoke :'delayed_job:start'
+    #invoke :'delayed_job:start'
 
     to :launch do
       invoke :'whenever:update'
