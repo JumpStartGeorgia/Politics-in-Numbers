@@ -86,6 +86,7 @@ $(document).ready(function (){
         return this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key);
       },
       onchange: debounce(function (event) {
+        console.log("onchange");
         var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul"), autocomplete_id = p.attr("data-autocomplete-id");
         if(event.type === "keyup" && event.keyCode === 40 && typeof global_keyup_down_callback === "undefined") {
           global_keyup_up_callback = function () {
@@ -101,61 +102,71 @@ $(document).ready(function (){
           global_keyup_down_callback();
         }
         else {
-          if(v.length >= 3 && t.data("previous") !== v) {
+          if(t.data("previous") !== v) {
             t.data("previous", v);
 
             if(p.is("[data-url]")) {
-              ul.addClass("loading");
-              $.ajax({
-                url: p.attr("data-url"),
-                dataType: "json",
-                data: { q: v },
-                success: function (data) {
-                  var html = "";
-                  // console.log("back", data);
-                  data.forEach(function (d) {
-                    html += "<li><div class='item" + (autocomplete.has(autocomplete_id, d[0]) ? " selected" : "") + "' data-id='" + d[0] + "' data-extra='" + d[2] + "'>" + d[1] + "</li>";
-                  });
-                  ul.html(html);//.addClass("active");
-                  ul.find("> li").attr("tabindex", 5);
-                },
-                complete: function () {
-                  ul.removeClass("loading");
-                }
-              });
-            }
-            else if(p.is("[data-local]")) {
-              ul.find("li").hide();
-              var regex = new RegExp(".*" + v + ".*", "i"),
-                local = p.attr("data-local"),
-                multilevel = finance.categories.indexOf(local) !== -1,
-                list = multilevel ? gon.category_lists[local] : gon[local + "_list"], to_show = [];
-              if(multilevel) {
-                list.forEach(function(d) {
-                  if(d[1].match(regex) !== null) {
-                    to_show.push(d[0]);
-                    if(d[2] !== -1) {
-                      var d2 = d[2];
-                      while(d2 !== -1) {
-                        to_show.push(d2);
-                        d2 = list.filter(function (ll) { return ll[0] === d2; })[0][2];
-                      }
-                    }
-                    to_show.forEach(function(ts) {
-                      ul.find("li .item[data-id='" + ts + "']").parent().show();
+              if(v.length >= 3) {
+                ul.addClass("loading");
+                $.ajax({
+                  url: p.attr("data-url"),
+                  dataType: "json",
+                  data: { q: v },
+                  success: function (data) {
+                    var html = "";
+                    // console.log("back", data);
+                    data.forEach(function (d) {
+                      html += "<li><div class='item" + (autocomplete.has(autocomplete_id, d[0]) ? " selected" : "") + "' data-id='" + d[0] + "' data-extra='" + d[2] + "'>" + d[1] + "</li>";
                     });
+                    ul.html(html);//.addClass("active");
+                    ul.find("> li").attr("tabindex", 5);
+                  },
+                  complete: function () {
+                    ul.removeClass("loading");
                   }
                 });
               }
               else {
-                list.forEach(function(d) {
-                  if((d[1] + (d.length === 3 ? d[2] : "")).match(regex) !== null) {
-                    to_show.push(d[0]);
-                  }
-                });
-                to_show.forEach(function(ts) {
-                  ul.find("li .item[data-id='" + ts + "']").parent().show();
-                });
+                ul.html("");
+              }
+            }
+            else if(p.is("[data-local]")) {
+              if(v.length >= 3) {
+                ul.find("li .item[data-id]").parent().hide();
+                var regex = new RegExp(".*" + v + ".*", "i"),
+                  local = p.attr("data-local"),
+                  multilevel = finance.categories.indexOf(local) !== -1,
+                  list = multilevel ? gon.category_lists[local] : gon[local + "_list"], to_show = [];
+                if(multilevel) {
+                  list.forEach(function (d) {
+                    if(d[1].match(regex) !== null) {
+                      to_show.push(d[0]);
+                      if(d[2] !== -1) {
+                        var d2 = d[2];
+                        while(d2 !== -1) {
+                          to_show.push(d2);
+                          d2 = list.filter(function (ll) { return ll[0] === d2; })[0][2];
+                        }
+                      }
+                      to_show.forEach(function (ts) {
+                        ul.find("li .item[data-id='" + ts + "']").parent().show();
+                      });
+                    }
+                  });
+                }
+                else {
+                  list.forEach(function (d) {
+                    if((d[1] + (d.length === 3 ? d[2] : "")).match(regex) !== null) {
+                      to_show.push(d[0]);
+                    }
+                  });
+                  to_show.forEach(function (ts) {
+                    ul.find("li .item[data-id='" + ts + "']").parent().show();
+                  });
+                }
+              }
+              else {
+                ul.find("li .item[data-id]").parent().show();
               }
             }
           }
@@ -181,7 +192,7 @@ $(document).ready(function (){
           var p = $(this).parent(), p_id = p.attr("data-autocomplete-id");
           p.addClass("active");
           if(typeof global_click_callback === "function") {
-            global_click_callback();
+            global_click_callback(this);
           }
           global_click_callback = function (target) {
             target = $(target);
@@ -389,7 +400,9 @@ $(document).ready(function (){
              list = t.find(".list");
 
             if(type === "autocomplete") {
-              autocomplete.clear(t.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"));
+              var tmp = t.find(".autocomplete[data-autocomplete-id]");
+              autocomplete.clear(tmp.attr("data-autocomplete-id"));
+              tmp.find("input").val(null).trigger("change");
               if(typeof global_click_callback === "function") { global_click_callback(); }
             }
             else if(type === "period") {
@@ -564,7 +577,9 @@ $(document).ready(function (){
             list = t.find(".list");
 
             if(type === "autocomplete") {
-              autocomplete.clear(t.find(".autocomplete[data-autocomplete-id]").attr("data-autocomplete-id"));
+              var tmp = t.find(".autocomplete[data-autocomplete-id]");
+              autocomplete.clear(tmp.attr("data-autocomplete-id"));
+              tmp.find("input").val(null).trigger("change");
               if(typeof global_click_callback === "function") { global_click_callback(); }
             }
             else if(type === "period_mix") {
@@ -598,11 +613,13 @@ $(document).ready(function (){
       },
       toggle: function (element, turn_on) {
         // console.log(element, turn_on);
-        var t = this;
-        t.elem[element].parent().attr("data-on", turn_on);
+        var t = this, p = t.elem[element].parent();
+        p.attr("data-on", turn_on);
         t.states[element] = turn_on;
         if(!turn_on) {
+          var tmp = p.find(".autocomplete[data-autocomplete-id='finance-" + element + "']");
           autocomplete.clear("finance-" + element);
+          tmp.find("input").val(null).trigger("change");
         }
       },
       animate: function () {
@@ -723,9 +740,8 @@ $(document).ready(function (){
     // window.onpopstate = function (event) {
     //    //console.log("onpopstate location: " + window.location + ", state: " + JSON.stringify(event.state));
     // };
-    filter_extended.find(".filter-toggle").click(function (){
+    filter_extended.find(".filter-toggle").click(function (){  // 'Filter' label button used in small screens
       filter_extended.toggleClass("active");
-      console.log("here");
       loader.type("empty").show();
 
       event.stopPropagation();
@@ -790,7 +806,9 @@ $(document).ready(function (){
       }
     });
     filter_extended.find(".filter-input button.clear").click(function () {
-      autocomplete.clear($(this).parent().attr("data-autocomplete-id"));
+      var tmp = $(this).parent();
+      autocomplete.clear(tmp.attr("data-autocomplete-id"));
+      tmp.find("input").val(null).trigger("change");
     });
     $(window).on("resize", function(){
       resize();

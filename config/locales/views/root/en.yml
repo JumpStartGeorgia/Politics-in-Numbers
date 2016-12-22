@@ -53,6 +53,7 @@ en:
       filter_close: Close Filter Window
       filter_item_close: Remove item from filter
       filter_clear: Remove all items from filter
+      filter_autocomplete_title: Please enter at least 3 characters to perform a search
       donor: ID/Name
       time_period: Time Period
       amount: Amount
@@ -102,7 +103,7 @@ en:
       financial_assets: Financial Assets
       debts: Debts
       campaign: Campaign
-      loader_missing_category: Please select a Party Finance Type at the top.
+      loader_missing_category: Please select a Party Finance type at the top.
       export_type:
         print: Print
         pdf: Pdf document

@@ -53,6 +53,7 @@ ka:
       filter_close: ფილტრის დახურვა
       filter_item_close: ფილტრიდან ამოშლა
       filter_clear: ფილტრის გასუფთავება
+      filter_autocomplete_title: Please enter at least 3 characters to perform a search
       donor: პ.ნ./სახელი
       time_period: პერიოდი
       amount: რაოდენობა
@@ -102,7 +103,7 @@ ka:
       financial_assets: ფინანსური სახსრები
       debts: ვალდებულებები
       campaign: კამპანია
-      loader_missing_category: Please select a Party Finance Type at the top.
+      loader_missing_category: Please select a Party Finance type at the top.
       export_type:
         print: ბეჭდვა
         pdf: Pdf
