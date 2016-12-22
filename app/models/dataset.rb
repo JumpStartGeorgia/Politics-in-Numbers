@@ -236,6 +236,8 @@ class Dataset
         parties_list[p_id] = { name: parties[BSON::ObjectId(p_id)][:name], data: [] }
       end
     }
+    parties_list = parties_list.sort{|x,y| x[1][:name] <=> y[1][:name] }.to_h
+
 
     tmp = []
     period_list.each{|k,v| tmp.push({ id: v[:id], name: v[:name], date: v[:date], type: v[:type] }) }
@@ -260,8 +262,6 @@ class Dataset
         }
       }
     }
-
-
 
     data_sum = 0
     data.each{|e|

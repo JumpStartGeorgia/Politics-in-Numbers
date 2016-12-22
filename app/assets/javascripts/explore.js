@@ -86,7 +86,6 @@ $(document).ready(function (){
         return this.hasOwnProperty(autocomplete_id) && this[autocomplete_id].hasOwnProperty(key);
       },
       onchange: debounce(function (event) {
-        console.log("onchange");
         var t = $(this), v = t.val(), p = t.parent(), ul = p.find("ul"), autocomplete_id = p.attr("data-autocomplete-id");
         if(event.type === "keyup" && event.keyCode === 40 && typeof global_keyup_down_callback === "undefined") {
           global_keyup_up_callback = function () {
