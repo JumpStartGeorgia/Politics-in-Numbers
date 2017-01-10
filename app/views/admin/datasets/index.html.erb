@@ -23,7 +23,7 @@
     <tbody>
       <% @items.each do |item| %>
         <tr>
-          <td><%= item.party.name %></td>
+          <td><%= item.party.title %></td>
           <td class="text-right"><%= item.period.title %></td>
           <td><%= item.source_file_name %></td>
           <td class="state-<%= item.current_state_sym %> text-center"><%= item.current_state %></td>

@@ -168,7 +168,7 @@ namespace :populate do
 
       donorset = Donorset.new({ source: File.open(f) })
       donorset.save
-      lg.info donorset.errors.inspect
+      # lg.info donorset.errors.inspect
       Job.donorset_file_process(donorset._id, User.all[0]._id)
     }
     lg.close
