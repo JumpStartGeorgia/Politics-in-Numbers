@@ -17,7 +17,8 @@ namespace :populate do
       "#{msg}\n"
     end
 
-    Dataset.destroy_all # only for dev
+    # Dataset.destroy_all # only for dev
+    # Period.destroy_all
 
     I18n.locale = :en
 
@@ -40,7 +41,11 @@ namespace :populate do
       tmp_id = tmp_id[0]
 
       prt = Party.find_by(tmp_id: tmp_id)
-      per = Period.find_or_create_by({start_date: Date.strptime("01.01.#{year}", "%d.%m.%Y"), type: Period.type_is(:annual)})
+      per_title = "#{year}"
+      per = Period.find_or_create_by({start_date: Date.strptime("01.01.#{year}", "%d.%m.%Y"), type: Period.type_is(:annual)}) do |rec|
+        rec.title_translations = { ka: per_title, en: per_title }
+        rec.description_translations = { ka: "წლიური #{per_title}", en: "Annual #{per_title}" }
+      end
 
       dataset = nil
       if prt.present? && per.present?
@@ -54,9 +59,8 @@ namespace :populate do
         lg.info "File #{filenames[f_i]}, Period for id #{year} is missing" if per.nil?
         next
       end
-
-      lg.close
     }
+    lg.close
   end
 
   desc "Read and upload all election files"
@@ -69,7 +73,7 @@ namespace :populate do
       "#{msg}\n"
     end
 
-    Dataset.destroy_all # only for dev
+    # Dataset.destroy_all # only for dev
 
     I18n.locale = :en
 
@@ -112,7 +116,11 @@ namespace :populate do
       tmp_id = tmp_id[0]
 
       prt = Party.find_by(tmp_id: tmp_id)
-      per = Period.find_or_create_by({ start_date: start_date, end_date: end_date, type: Period.type_is(:election) })
+      per_title = "#{I18n.l(start_date, format: :filename)}_#{I18n.l(end_date, format: :filename)}"
+      per = Period.find_or_create_by({ start_date: start_date, end_date: end_date, type: Period.type_is(:election)}) do |rec|
+        rec.title_translations = { ka: per_title, en: per_title }
+        rec.description_translations = { ka: "კამპანია #{per_title}", en: "Campaign #{per_title}" }
+      end
 
       dataset = nil
       if prt.present? && per.present?
@@ -140,7 +148,7 @@ namespace :populate do
       "#{msg}\n"
     end
 
-    Donorset.destroy_all # only for dev
+    # Donorset.destroy_all # only for dev
 
     I18n.locale = :en
 

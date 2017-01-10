@@ -72,16 +72,6 @@ if User.where(email: email).count == 0
   #u.api_keys.create
 end
 
-email = 'antarya@gmail.com'
-if User.where(email: email).count == 0
-  puts 'Creating antarya user'
-  #User.where(email: email).destroy
-  u = User.new(email: email, encrypted_password: "$2a$10$/bJUUzr2GhJRj6WyojabVO4rGS/xwPQGgTlmazxfdmNz82cEftWQC", role_id: Role.first._id)#, is_user: false)
-  u.save(validate: false)
-  #u.api_keys.create
-end
-
-
 # puts "Populate page content data"
 # PageContent.create(name: 'about', title_translations: {'en' => 'About', 'ka' => 'about'}, content_translations: {
 #   'en' =>  %q(
