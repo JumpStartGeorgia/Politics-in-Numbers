@@ -438,7 +438,7 @@ DEPENDENCIES
   launchy (~> 2.4.3)
   less-rails (~> 2.8.0)
   locales_export_import (~> 0.4.2)
-  mina (~> 0.3.3)
+  mina (~> 0.3.8)
   mina-multistage (~> 1.0.1)
   momentjs-rails
   mongoid (~> 5.1.0)
