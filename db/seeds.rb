@@ -257,12 +257,12 @@ workbook[0].each_with_index { |row, row_i|
 
 periods_data = [
   # type 'annual' 'election'
-  { type: Period.type_is(:annual), start_date: '01.01.2012', end_date: '31.01.2012', title_translations: { ka: "2012" }, description_translations: { ka: "2012 description" }},
-  { type: Period.type_is(:annual), start_date: '01.01.2013', end_date: '31.01.2013', title_translations: { ka: "2013" }, description_translations: { ka: "2013 description" }},
-  { type: Period.type_is(:annual), start_date: '01.01.2014', end_date: '31.01.2014', title_translations: { ka: "2014" }, description_translations: { ka: "2014 description" }},
-  { type: Period.type_is(:annual), start_date: '01.01.2015', end_date: '31.01.2015', title_translations: { ka: "2015" }, description_translations: { ka: "2015 description" }},
-  { type: Period.type_is(:election), start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "election 2015" }, description_translations: { ka: "election 2015" }},
-  { type: Period.type_is(:election), start_date: '01.01.2016', end_date: '31.03.2016', title_translations: { ka: "election 2016" }, description_translations: { ka: "election 2016" }}
+  # { type: Period.type_is(:annual), start_date: '01.01.2012', end_date: '31.01.2012', title_translations: { ka: "2012" }, description_translations: { ka: "2012 description" }},
+  # { type: Period.type_is(:annual), start_date: '01.01.2013', end_date: '31.01.2013', title_translations: { ka: "2013" }, description_translations: { ka: "2013 description" }},
+  # { type: Period.type_is(:annual), start_date: '01.01.2014', end_date: '31.01.2014', title_translations: { ka: "2014" }, description_translations: { ka: "2014 description" }},
+  # { type: Period.type_is(:annual), start_date: '01.01.2015', end_date: '31.01.2015', title_translations: { ka: "2015" }, description_translations: { ka: "2015 description" }},
+  # { type: Period.type_is(:election), start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "election 2015" }, description_translations: { ka: "election 2015" }},
+  # { type: Period.type_is(:election), start_date: '01.01.2016', end_date: '31.03.2016', title_translations: { ka: "election 2016" }, description_translations: { ka: "election 2016" }}
   #{ type: 'election', start_date: '01.01.2015', end_date: '31.03.2015', title_translations: { ka: "2015 election" }, description_translations: { ka: "2015 election description" }}
 ]
 
@@ -669,14 +669,14 @@ puts "Creating phase ----------------------"
     # puts "    #{party.name} was added"
   end
 
-  puts "  Period meta data"
-  periods_data.each_with_index do |d,i|
-    d[:start_date] = Date.strptime(d[:start_date], "%d.%m.%Y")
-    d[:end_date] = Date.strptime(d[:end_date], "%d.%m.%Y")
+  # puts "  Period meta data"
+  # periods_data.each_with_index do |d,i|
+  #   d[:start_date] = Date.strptime(d[:start_date], "%d.%m.%Y")
+  #   d[:end_date] = Date.strptime(d[:end_date], "%d.%m.%Y")
 
-    period = Period.create!(d)
-    # puts "    #{period.type} #{period.title} was added"
-  end
+  #   period = Period.create!(d)
+  #   # puts "    #{period.type} #{period.title} was added"
+  # end
 
   puts "  Detail data"
   details_data.each_with_index{ |d,i|

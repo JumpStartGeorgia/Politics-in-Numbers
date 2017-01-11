@@ -8,7 +8,6 @@ namespace :delayed_job do
   desc 'Start delayed_job'
   task start: :environment do
     queue %(echo "-----> Start delayed_job")
-    queue %(echo "-----> Start delayed_job#{full_current_path}--#{rails_env}--#{delayed_job}--#{delayed_job_additional_params}--#{delayed_job_processes}--#{full_shared_path}--#{delayed_job_pid_dir}")
     queue! %(cd #{full_current_path} && RAILS_ENV=#{rails_env} #{delayed_job} #{delayed_job_additional_params} start -n #{delayed_job_processes} --pid-dir='#{full_shared_path}/#{delayed_job_pid_dir}')
   end
 
