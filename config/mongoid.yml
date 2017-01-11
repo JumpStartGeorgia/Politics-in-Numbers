@@ -1,0 +1,45 @@
+default: &default
+  hosts:
+    - localhost:27017
+  options:
+
+options: &options
+  options:
+    raise_not_found_error: false
+
+#--------------------------------
+
+development:
+  logger: false
+  clients:
+    default:
+      database: <%= ENV["DB_NAME"] %>
+      <<: *default
+  <<: *options
+
+staging:
+  clients:
+    default:
+      database: <%= ENV["DB_NAME"] %>
+      username: <%= ENV["DB_USER"] %>
+      password: <%= ENV["DB_PASSWORD"] %>
+      <<: *default
+  <<: *options
+
+production:
+  clients:
+    default:
+      database: <%= ENV["DB_NAME"] %>
+      username: <%= ENV["DB_USER"] %>
+      password: <%= ENV["DB_PASSWORD"] %>
+      <<: *default
+  <<: *options
+
+test:
+  clients:
+    default:
+      database: <%= ENV["TEST_DB_NAME"] %>
+      username: <%= ENV["TEST_DB_USER"] %>
+      password: <%= ENV["TEST_DB_PASSWORD"] %>
+      <<: *default
+  <<: *options
