@@ -12,7 +12,7 @@ namespace :populate do
 
     log_path = "#{Rails.root}/log/tasks"
     FileUtils.mkpath(log_path)
-    lg = Logger.new File.new("#{log_path}/populate_annual.log", 'w')
+    lg = Logger.new File.open("#{log_path}/populate_annual.log", 'a')
     lg.formatter = proc do |severity, datetime, progname, msg|
       "#{msg}\n"
     end
@@ -32,9 +32,11 @@ namespace :populate do
       end
     }
 
-
+    lg.info "----------------------------------"
+    lg.info "#{files.length} - files to process (#{Time.now})"
+    lg.info "----------------------------------"
     files.each_with_index {|f,f_i|
-      lg.info filenames[f_i]
+      lg.info filenames[f_i]+" >>>"
 
       tmp_id = filenames[f_i].split(".")
       year = tmp_id[1]
@@ -49,17 +51,20 @@ namespace :populate do
 
       dataset = nil
       if prt.present? && per.present?
-        party_id = prt._id
-        period_id = per._id
-        dataset = Dataset.new({party_id: party_id, period_id: period_id, source: File.open(f) })
-        dataset.save
-        Job.dataset_file_process(dataset._id, User.all[0]._id, []) # [admin_dataset_url(id: "_id")])
+        if !Dataset.where({party_id: prt._id, period_id: per._id}).present?
+          dataset = Dataset.new({party_id: prt._id, period_id: period_id = per._id, source: File.open(f) })
+          dataset.save
+          Job.dataset_file_process(dataset._id, User.all[0]._id, []) # [admin_dataset_url(id: "_id")])
+        else
+          lg.info "  - already processed"
+        end
       else
-        lg.info "File #{filenames[f_i]}, Party for id #{tmp_id} is missing" if prt.nil?
-        lg.info "File #{filenames[f_i]}, Period for id #{year} is missing" if per.nil?
+        lg.info "  - party for id #{tmp_id} is missing" if prt.nil?
+        lg.info "  - period for id #{year} is missing" if per.nil?
         next
       end
     }
+    lg.info "----------------------------------"
     lg.close
   end
 
@@ -68,7 +73,7 @@ namespace :populate do
 
     log_path = "#{Rails.root}/log/tasks"
     FileUtils.mkpath(log_path)
-    lg = Logger.new File.new("#{log_path}/populate_election.log", 'w')
+    lg = Logger.new File.open("#{log_path}/populate_election.log", 'a')
     lg.formatter = proc do |severity, datetime, progname, msg|
       "#{msg}\n"
     end
@@ -102,10 +107,13 @@ namespace :populate do
       end
     }
 
-    puts files.length
-      ps = []
+    # puts files.length
+    ps = []
+    lg.info "----------------------------------"
+    lg.info "#{files.length} - files to process (#{Time.now})"
+    lg.info "----------------------------------"
     files.each_with_index {|f,f_i|
-      lg.info filenames[f_i]
+      lg.info filenames[f_i]+" >>>"
 
       tmp_id = filenames[f_i].split("_")
       periods = tmp_id[1].split("-")
@@ -124,16 +132,21 @@ namespace :populate do
 
       dataset = nil
       if prt.present? && per.present?
-        dataset = Dataset.new({party_id: prt._id, period_id: period_id = per._id, source: File.open(f) })
-        dataset.save
-        Job.dataset_file_process(dataset._id, User.all[0]._id, [])
+        if !Dataset.where({party_id: prt._id, period_id: per._id}).present?
+          dataset = Dataset.new({party_id: prt._id, period_id: period_id = per._id, source: File.open(f) })
+          dataset.save
+          Job.dataset_file_process(dataset._id, User.all[0]._id, [])
+        else
+          lg.info "  - already processed"
+        end
       else
-        lg.info "File #{filenames[f_i]}, Party for id #{tmp_id} is missing" if prt.nil?
-        lg.info "File #{filenames[f_i]}, Period for id #{tmp_id} is missing" if per.nil?
+        lg.info "  - party for id #{tmp_id} is missing" if prt.nil?
+        lg.info "  - period for id #{year} is missing" if per.nil?
         next
       end
 
     }
+    lg.info "----------------------------------"
     # puts ps.inspect
     lg.close
   end
