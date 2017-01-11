@@ -338,7 +338,6 @@ task deploy: :environment do
     invoke :'rails:generate_robots'
     invoke :'deploy:cleanup'
     # invoke :'phantomjs_highcharts:start'
-    invoke :'delayed_job:start'
 
     to :launch do
       invoke :'whenever:update'
@@ -378,6 +377,7 @@ task deploy: :environment do
         else
           invoke :'puma:restart'
         end
+        invoke :'delayed_job:start'
         invoke :'phantomjs_highcharts:restart'
         invoke :finished_deploy_message
       end
