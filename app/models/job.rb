@@ -3,10 +3,11 @@ class Job
   class << self
     def _dataset_file_process(item_id, user_id, links)
       #lg = Delayed::Worker.logger
-      lg = Logger.new File.new('log/category.log', 'a')
+      lg = Logger.new File.new('log/dataset.log', 'a')
       lg.formatter = proc do |severity, datetime, progname, msg|
         "#{msg}\n"
       end
+      lg.info "---------------------------------#{item_id}-(#{Time.now})"
       begin
         @dataset = Dataset.find(item_id)
         @user = User.find(user_id)
@@ -34,7 +35,7 @@ class Job
         sheets.each_with_index { |w, wi|
           missed_sheets << w if !workbook_sheets.include? w
         }
-        lg.info "----------------------------------"
+        
         lg.info "File: #{@dataset.source_file_name}"
         lg.info "Extra sheets: #{extra_sheets.join(', ')}" if extra_sheets.present?
         lg.info "Missing sheets: #{missed_sheets.join(', ')}" if missed_sheets.present?
@@ -195,6 +196,7 @@ class Job
         lg.formatter = proc do |severity, datetime, progname, msg|
           "#{msg}\n"
         end
+        lg.info "---------------------------------#{item_id}-(#{Time.now})"        
         @donorset = Donorset.find(item_id)
         # donors = []
         @user = User.find(user_id)
