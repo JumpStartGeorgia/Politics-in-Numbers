@@ -1144,12 +1144,14 @@ $(document).ready(function (){
   }
   function bar_chart(elem, resource, bg) {
     // console.log("chart", elem, resource);
+    var ln = 0;
+    resource.series.forEach(function (d) { ln += Math.round(d[0].length/15)+1; });
     js.share[elem] = encodeURI(resource.title + "( " + resource.subtitle + " )" + " | " + gon.app_name_long);
     $(elem).highcharts({
       chart: {
           type: 'bar',
           backgroundColor: bg,
-          height: 60*(Math.round(resource.title.length/40)+1) + 40 * resource.series.length,
+          height: 60*(Math.round(resource.title.length/40)+1) + ln*24,
           width: w > 992 ? Math.floor((view_content.width()-386)/2) : w - 12//,
           // events: {
           //   load: function () {

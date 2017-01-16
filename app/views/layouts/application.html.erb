@@ -25,8 +25,9 @@
         <%= javascript_include_tag "#{t}" %>
       <% } %>
     <% end %>
-    <!-- WARNING uncomment on deploy -->
+    <% if Rails.env.production? || Rails.env.staging? %>
     <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-580f27dcfc0589c4"></script>
+    <% end  %>
     <% if content_for? :custom_js %>
       <%= javascript_include_tag "#{yield(:custom_js)}"  %>
     <% end %>
