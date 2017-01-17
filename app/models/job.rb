@@ -35,7 +35,7 @@ class Job
         sheets.each_with_index { |w, wi|
           missed_sheets << w if !workbook_sheets.include? w
         }
-        
+
         lg.info "File: #{@dataset.source_file_name}"
         lg.info "Extra sheets: #{extra_sheets.join(', ')}" if extra_sheets.present?
         lg.info "Missing sheets: #{missed_sheets.join(', ')}" if missed_sheets.present?
@@ -196,7 +196,7 @@ class Job
         lg.formatter = proc do |severity, datetime, progname, msg|
           "#{msg}\n"
         end
-        lg.info "---------------------------------#{item_id}-(#{Time.now})"        
+        lg.info "---------------------------------#{item_id}-(#{Time.now})"
         @donorset = Donorset.find(item_id)
         # donors = []
         @user = User.find(user_id)
@@ -204,7 +204,8 @@ class Job
         (raise Exception.new(I18n.t("notifier.job.donorset_file_process.operator_not_found"));) if @user.nil?
         headers_map = [
           ["N", "თარიღი", "ფიზიკური პირის სახელი", "ფიზიკური პირის გვარი", "ფიზიკური პირის პირადი N", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ],
-          ["N", "თარიღი", "სახელი/ სამართლებრივი ფორმა", "გვარი / იურიდიული პირის დასახელება", "პირადი ნომერი / საიდ. კოდი", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
+          ["N", "თარიღი", "სახელი/ სამართლებრივი ფორმა", "გვარი / იურიდიული პირის დასახელება", "პირადი ნომერი / საიდ. კოდი", "შემოწირ. თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ],
+          ["N", "თარიღი", "სახელი / სამ. ფორმა", "გვარი / დასახელება", "საიდ. კოდი / პირადი N", "თანხის ოდენობა", "პარტიის დასახელება", "შენიშვნა" ]
         ]
         ln = headers_map[0].length
 
@@ -232,11 +233,22 @@ class Job
                 p = Party.create!(name: [party_name], title_translations: { ka: party_name, en: party_name.latinize.soft_titleize, ru: party_name.latinize.soft_titleize }, description: "საინიციატივო ჯგუფი #{party_name}", tmp_id: -99, type: Party.type_is(:initiative))
                 missing_parties << p._id
               end
-              donor = Donor.find_by( first_name: cells[2], last_name: cells[3], tin: cells[4])
-              if !donor.present?
-                donor = Donor.create!( first_name_translations: { ka: cells[2], en: cells[2].latinize.soft_titleize }, last_name_translations: { ka: cells[3] }.merge(cells[3].present? ? { en: cells[3].latinize.soft_titleize } : {}), tin: cells[4], nature: cells[3].present? ? 0 : 1 ) # individual or organization
+
+              fname = cells[2]
+              lname = cells[3]
+              nature_value = cells[3].present? ? 0 : 1
+              comment = cells[7].present? ? cells[7] : ""
+              if comment.include?("იურიდიული პირის შემოწირულება")
+                nature_value = 1
+                fname = "#{fname} #{lname}"
+                lname = nil
               end
-              donor.donations.create!(give_date: cells[1], amount: cells[5].round(2), party_id: p._id, comment: cells[7], monetary: cells[7] != "არაფულადი", donorset_id: @donorset.id )
+
+              donor = Donor.find_by( first_name: fname, last_name: lname, tin: cells[4])
+              if !donor.present?
+                donor = Donor.create!( first_name_translations: { ka: fname, en: fname.latinize.soft_titleize }, last_name_translations: { ka: lname }.merge(lname.present? ? { en: lname.latinize.soft_titleize } : {}), tin: cells[4], nature: nature_value ) # individual or organization
+              end
+              donor.donations.create!(give_date: cells[1], amount: cells[5].round(2), party_id: p._id, comment: comment, monetary: !comment.include?("არაფულადი"), donorset_id: @donorset.id )
               # donor.save
             end
           end
