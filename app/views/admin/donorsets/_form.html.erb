@@ -1,4 +1,4 @@
-<%= semantic_form_for([:admin, @item]) do |f| %>
+<%= semantic_form_for([:admin, @item],  html: {:multipart => true }) do |f| %>
   <%= f.semantic_errors *f.object.errors.keys %>
 
   <%= f.inputs class: "row" do %>
