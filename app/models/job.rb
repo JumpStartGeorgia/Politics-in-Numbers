@@ -14,7 +14,7 @@ class Job
 
         (raise Exception.new(I18n.t("notifier.job.dataset_file_process.dataset_not_found"))) if @dataset.nil?
         (raise Exception.new(I18n.t("notifier.job.dataset_file_process.operator_not_found"));) if @user.nil?
-
+        version = @dataset.version
         sheets = ["1", "2", "3", "4" , "4.1" , "4.2" , "4.3" , "4.4" , "5" , "5.1" , "5.2" , "5.3" , "5.4", "5.5", "6" , "6.1" , "7", "8", "8.1" , "9" , "9.1" , "9.2" , "9.3", "9.4" , "9.5", "9.6", "9.7", "9.7.1",  "Validation"] # 9.71 = 9.8
         sheets_abbr = ["FF1", "FF2", "FF3", "FF4" , "FF4.1" , "FF4.2" , "FF4.3" , "FF4.4" , "FF5" , "FF5.1" , "FF5.2" , "FF5.3" , "FF5.4" , "FF5.5" , "FF6" , "FF6.1" , "FF7", "FF8", "FF8.1" , "FF9" , "FF9.1" , "FF9.2" , "FF9.3", "FF9.4" , "FF9.5", "FF9.6", "FF9.7", "FF9.7.1", "V"]
 
@@ -43,33 +43,71 @@ class Job
         cell_refs = 0
         Category.non_virtual.each { |item|
           val = 0
-          item.forms.each_with_index { |form, form_i|
-            cell_refs += 1
-            cell = item.cells[form_i]
-            code = item.codes && item.codes[form_i]
-            if sheets_abbr.include? form
-              #abbr_index = sheets_abbr.index(form)
-              address = RubyXL::Reference.ref2ind(cell)
-              is_code = true
-              if code.present?
-                cd = deep_present(workbook, [workbook_sheets_map[form], address[0], 0])
-                cd = cd.present? ? cd.value.to_s : ""
-                if code != cd
-
-                  lg.info("#{item.title}/#{form}/#{cell}/#{code} but is #{cd}") if !missed_sheets.map{|r| "FF#{r}"}.include?(form)
-                  is_code = false
+          meta = item.pointer(version)
+          if meta.present? && meta.forms.present?
+            retry_again = false
+            meta.forms.each_with_index { |form, form_i|
+              cell_refs += 1
+              cell = meta.cells[form_i]
+              code = meta.codes && meta.codes[form_i]
+              if sheets_abbr.include? form
+                #abbr_index = sheets_abbr.index(form)
+                address = RubyXL::Reference.ref2ind(cell)
+                is_code = true
+                if code.present?
+                  cd = deep_present(workbook, [workbook_sheets_map[form], address[0], 0])
+                  cd = cd.present? ? cd.value.to_s : ""
+                  if code != cd
+                    is_code = false
+                  end
                 end
+                if is_code
+                  val_tmp = deep_present(workbook, [workbook_sheets_map[form], address[0], address[1]])
+                  val += val_tmp.present? ? val_tmp.value.to_f : 0.0
+                  good_codes += 1
+                else
+                  retry_again = true
+                  break
+                end
+                #lg.info "#{form}#{cell}#{val}"
+              else
+                lg.info "Missing form: #{form}"
               end
-              if is_code
-                val_tmp = deep_present(workbook, [workbook_sheets_map[form], address[0], address[1]])
-                val += val_tmp.present? ? val_tmp.value.to_f : 0.0
-                good_codes += 1
-              end
-              #lg.info "#{form}#{cell}#{val}"
-            else
-              lg.info "Missing form: #{form}"
+            }
+          end
+          if retry_again
+            val = 0
+            meta = item.pointer(version-1)
+            if meta.present? && meta.forms.present?
+              retry_again = false
+              meta.forms.each_with_index { |form, form_i|
+                cell_refs += 1
+                cell = meta.cells[form_i]
+                code = meta.codes && meta.codes[form_i]
+                if sheets_abbr.include? form
+                  #abbr_index = sheets_abbr.index(form)
+                  address = RubyXL::Reference.ref2ind(cell)
+                  is_code = true
+                  if code.present?
+                    cd = deep_present(workbook, [workbook_sheets_map[form], address[0], 0])
+                    cd = cd.present? ? cd.value.to_s : ""
+                    if code != cd
+                      lg.info("#{item.title}/#{form}/#{cell}/#{code} but is #{cd}") if !missed_sheets.map{|r| "FF#{r}"}.include?(form)
+                      is_code = false
+                    end
+                  end
+                  if is_code
+                    val_tmp = deep_present(workbook, [workbook_sheets_map[form], address[0], address[1]])
+                    val += val_tmp.present? ? val_tmp.value.to_f : 0.0
+                    good_codes += 1
+                  end
+                  #lg.info "#{form}#{cell}#{val}"
+                else
+                  lg.info "Missing form: #{form}"
+                end
+              }
             end
-          }
+          end
           @dataset.category_datas << CategoryData.new({ value: val, category_id: item._id })
         }
         lg.info "Category codes: #{good_codes}/#{cell_refs}"
@@ -86,7 +124,7 @@ class Job
         @dataset.category_datas << virtual_category_datas
 
         lg.info "Virtual Categories: #{virtual_category_datas.length}"
-
+        lg.info "Loading Details:"
         Detail.each{ |item|
           table = []
           #next if item.code != "FF4.1"
@@ -162,7 +200,7 @@ class Job
                   end
                   table << cells
                 else
-                  lg.info "bad row #{cells.join('; ')}"
+                  lg.info "bad row #{cells.join('; ')}" if cells.join('; ') != "; ; ; "
                 end
 
               end

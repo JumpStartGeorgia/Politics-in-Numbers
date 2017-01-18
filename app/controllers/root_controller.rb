@@ -40,7 +40,7 @@ class RootController < ApplicationController
     donation_pars = {}
     finance_pars = {
       income: [gon.main_categories[:income]],
-      party: Party.where(:tmp_id.in => [1,2]).map{|m| m.permalink },
+      party: Party.where(:tmp_id.in => [1,2,10]).map{|m| m.permalink },
       period: Period.annual.limit(3).map{|m| m.permalink }
     }
     if !(@fltr.present? && ["finance", "donation"].index(@fltr).present?)

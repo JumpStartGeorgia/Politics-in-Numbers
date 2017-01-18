@@ -17,6 +17,7 @@ class Dataset
   field :period_id, type: BSON::ObjectId
   field :state, type: Integer, default: 0
   field :del, type: Boolean, default: false
+  field :version, type: Integer, default: 1 # before 2016 was 1 version for 2016 structure of categories changed a little bit so version is 2
 
   default_scope ->{ where(del: false) }
 #  before_source_post_process :source_post_process
@@ -25,7 +26,7 @@ class Dataset
     :url => '/system/:class/:attachment/:id/:style.:extension'
 
 
-  validates_presence_of :party_id, :period_id
+  validates_presence_of :party_id, :period_id, :version
   validates_attachment :source, presence: true, content_type: { content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }, size: { in: 0..25.megabytes }
   validates_inclusion_of :state, in: [0, 1, 2]
 

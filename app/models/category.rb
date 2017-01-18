@@ -6,6 +6,8 @@ class Category
 
   # has_many :category_data
 
+  embeds_many :pointers
+
   field :title, type: String, localize: true
   field :description, type: String, localize: true
   field :level, type: Integer
@@ -18,10 +20,10 @@ class Category
   field :forms, type: Array
   field :cells, type: Array
   field :codes, type: Array
+  field :order, type: Integer
   field :languages, type: Array
   field :default_language, type: String
   #field :tmp_id, type: Integer
-  field :order, type: Integer
   field :sym, type: Symbol
 
   slug :title, history: true, localize: true
@@ -81,6 +83,15 @@ class Category
     return ids.map{ |m| cats[m][:title] }
   end
 
+  def pointer(version)
+    version = [1,2].include?(version) ? version : 1
+    pnt = self.pointers.where(version: version).first
+    while pnt.nil? && version > 0
+      version -= 1
+      pnt = self.pointers.where(version: version).first
+    end
+    pnt
+  end
 
   def self.main_category_id(cats, id)
     # Rails.logger.debug("--------------------------------------------#{cats[id].inspect} #{id}")
