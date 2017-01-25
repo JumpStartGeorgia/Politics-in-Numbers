@@ -56,6 +56,7 @@ en:
       filter_autocomplete_title: Please enter at least 3 characters to perform a search
       donor: ID/Name
       time_period: Time Period
+      grouped: Group Records by Donor
       amount: Amount
       party: Party
       parties: Parties

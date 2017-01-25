@@ -150,6 +150,10 @@ class Donor
     matches.push({ "_id": { "$in": params[:donor].map{|m| BSON::ObjectId(m)} } }) if params[:donor].present?
     matches.push({ "multiple": { "$eq": params[:multiple] } }) if params[:multiple].present? && params[:multiple] == true
 
+    if params[:grouped].present? && params[:multiple] == true
+      matches.push({ "multiple": { "$eq": params[:multiple] } })
+    end
+
     if params[:party].present?
       tmp = params[:party].map{|m| BSON::ObjectId(m) }
       matches.push({ "donations.party_id": { "$in": tmp } })
@@ -226,11 +230,13 @@ class Donor
       multiple: nil,
       period: [-1,-1],
       amount: [-1,-1],
-      nature: nil
+      nature: nil,
+      grouped: nil
     }
     title_options = {}
 
     if inner_pars
+      f[:grouped] = true if !params[:grouped].present? # compability for old queries, so by default is grouped
       f = params
       title_options = f
     else
@@ -269,6 +275,11 @@ class Donor
       if tmp == "0" || tmp == "1"
         f[:nature] = tmp == "0" ? 0 : 1
         title_options[:nature] = f[:nature]
+      end
+
+      if params[:grouped] == "true"
+        f[:grouped] = true
+        title_options[:grouped] = true
       end
     end
 

@@ -247,6 +247,7 @@ $(document).ready(function (){
       types: {
         donor: "autocomplete",
         period: "period",
+        grouped: "checkbox",
         amount: "range",
         party: "autocomplete",
         monetary: "radio",
@@ -260,6 +261,7 @@ $(document).ready(function (){
           from: $("#donation_period_from"),
           to: $("#donation_period_to")
         },
+        grouped: $("#donation_grouped_yes"),
         amount: {
           from: $("#donation_amount_from"),
           to: $("#donation_amount_to")
@@ -286,6 +288,7 @@ $(document).ready(function (){
           (is_elem ? [t.elem[el]] : Object.keys(t.elem[el]).map(function (m){ return t.elem[el][m]; })).forEach(function(elem, elem_i){
             tmp = $(elem);
             tp = tmp.attr("data-type");
+            // console.log(tmp, tp, el);
             if(tp === "autocomplete") {
               lnk = tmp.attr("data-autocomplete-view");
               if(autocomplete.hasOwnProperty(lnk)) {
@@ -985,7 +988,7 @@ $(document).ready(function (){
         var filters = {};
         delete tmp["filter"];
         filters[obj.name] = $.isEmptyObject(tmp) ? { "all": true } : tmp;
-        // console.log("-----------remote--------", _id, filters);
+        console.log("-----------remote--------", _id, filters);
         $.ajax({
           url: gon.filter_path,
           dataType: 'json',

@@ -377,11 +377,11 @@ class RootController < ApplicationController
   private
 
     def explore_params
-      params.permit([:id, :filter, :monetary, :multiple, :nature, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
+      params.permit([:id, :filter, :monetary, :multiple, :nature, :grouped, :locale, :format, { donor: [], period: [], amount: [], party: [], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: [] }])
     end
 
     def explore_filter_params
-      params.permit(:locale, :donation => [:all, :monetary, :multiple, :nature, { donor: [], period: [], amount: [], party: []}],
+      params.permit(:locale, :donation => [:all, :monetary, :multiple, :nature, :grouped, { donor: [], period: [], amount: [], party: []}],
         :finance => [:all, { party: [], period:[], income: [], income_campaign: [], expenses: [], expenses_campaign: [], reform_expenses: [], property_assets: [], financial_assets: [], debts: []  }])
     end
 
