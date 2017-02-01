@@ -54,8 +54,8 @@ module StarterTemplate
     #   I18n.fallbacks = I18n::Locale::Fallbacks.new(en: :ka, ka: :en, ru: :ka)
     #   # I18n.fallbacks = I18n::Locale::Fallbacks.new(en: :ka, ka: :en)
     # end
-    # config.log_level = :fatal
-    #config.mongoid.logger = nil #Logger.new($stdout, :info)
+    config.log_level = :fatal
+    # config.mongoid.logger = nil #Logger.new($stdout, :info)
     config.middleware.use Rack::Deflater
   end
 end

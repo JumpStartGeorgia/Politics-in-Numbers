@@ -83,17 +83,13 @@ en:
       forgot_password: Forgot your password?
     chart:
       title:
-        top_5_donors: Top %{n} %{obj} Donors for All Parties
-        top_5_parties: Top %{n} Parties/Candidates for All Donors
-        top_5_donors_for_party: Top %{n} Donors for %{obj}
-        last_5_donations_for_party: Last %{n} Donations for %{obj}
-        top_5_donors_for_parties: Top %{n} Donors for %{obj}
-        total_donations_for_parties: Total Donations for %{obj}
-        last_5_donations_for_donor: Last %{n} Donations by %{obj}
-        top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj}
-        total_donations_for_each_donor: Total Donations for %{obj}
-        donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb}
-        parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj}
+        top_n_for_all_parties: Top %{n} %{obj} %{label} for All Parties
+        top_n_parties: Top %{n} Parties/Candidates for All Donors
+        top_n_for: Top %{n} %{label} for %{obj}
+        last_n_donations_for: Last %{n} Donations for %{obj}
+        top_or_total_n_donations_for: "%{label} %{n} Donations for %{obj}"
+        top_or_total_n_donations_by_to: "%{label} %{n} Donations by %{obj} to %{objb}"
+        last_n_donations_by_to: Last %{n} Donations by %{obj} to %{objb}
         to_multiple: Have donated to multiple parties
         monetary_donation: "%{s} donation"
         monetary_true: Monetary
@@ -106,18 +102,15 @@ en:
         from_donors_who: from %{s} Donors who
         nature_individual: Individual
         nature_organization: Organization
+        grouped_by_donors: Grouped by Donors
         no_data:
-          top_5_donors: No Donations for All Parties
-          top_5_parties: No Donations for All Parties
-          top_5_donors_for_party: No Donations for %{obj}
-          last_5_donations_for_party: No Donations for %{obj}
-          top_5_donors_for_parties: No Donations for %{obj}
-          total_donations_for_parties: No Donations for %{obj}
-          last_5_donations_for_donor: No Donations by %{obj}
-          top_5_parties_donated_to: No Parties Donated to by %{obj}
-          total_donations_for_each_donor: No donations for %{obj}
-          donors_donations_sorted_by_amount: No Donations by %{obj} to %{objb}
-          parties_donations_sorted_by_amount: No Donations to %{objb} by %{obj}
+          top_n_for_all_parties: No %{label} for All Parties
+          top_n_parties: No Donations for All Parties
+          top_n_for: No %{label} for %{obj}
+          last_n_donations_for: No Donations for %{obj}
+          top_or_total_n_donations_for: No Donations for %{obj}
+          top_or_total_n_donations_by_to: "%{label} %{n} Donations by %{obj} to %{objb}"
+          last_n_donations_by_to: Last %{n} Donations by %{obj} to %{objb}
       finance:
         title:
           party_donations_for: "Party - Donations for"
@@ -126,9 +119,13 @@ en:
           time_period_annual: "Annual"
           time_period_campaign: "Campaign"
       label:
+        donor: Donor
         donors: Donors
-        parties: Parties
+        donation: Donation
         donations: Donations
+        parties: Parties
+        top: Top
+        total: Total
       filename:
         finance: finances
         donation: donations

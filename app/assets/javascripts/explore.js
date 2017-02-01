@@ -1088,9 +1088,14 @@ $(document).ready(function (){
       });
     }
   }
-  function render_donation_table(table) {
+  function render_donation_table (table) {
     // console.log(table, donation.download);
+    if($.fn.dataTable.isDataTable(donation_table)) {
+      donation_table.DataTable().destroy();
+      donation_table.empty();
+    }
     var prev = undefined, alt_color = true,
+      header = table.grouped ? table.header.filter(function (f, i){ return table.grouped_header[i] == 1; }) : table.header,
       dt = donation_table.DataTable({
         processing: true,
         serverSide: true,
@@ -1111,7 +1116,7 @@ $(document).ready(function (){
           }
         },
         order: [],
-        "aoColumns": table.header.map(function(m,i) { return { "title": m, "sClass": table.classes[i], orderable: i != 0 }; }),
+        "aoColumns": header.map(function (m, i) { return { "title": m, "sClass": table.classes[i], orderable: i != 0 }; }),
         "info": false,
         dom: "<'#DataTables_Table_0_download'>fltrp",
         createdRow: function ( row, data, index ) {
@@ -1119,7 +1124,7 @@ $(document).ready(function (){
             alt_color = !alt_color;
           }
           if(alt_color) {
-            $(row).addClass('alt');
+            $(row).addClass("alt");
           }
           prev = data[2];
         }

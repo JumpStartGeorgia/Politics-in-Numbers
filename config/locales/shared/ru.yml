@@ -105,6 +105,7 @@ ru:
         from_donors_who: from %{s} Donors who
         nature_individual: Individual
         nature_organization: Organization
+        grouped_by_donors: Grouped by Donors
         no_data:
           top_5_donors: No Donations for All Parties
           top_5_parties: No Donations for All Parties

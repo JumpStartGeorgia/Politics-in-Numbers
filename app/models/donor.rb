@@ -15,7 +15,7 @@ class Donor
   field :last_name, type: String, localize: true
   field :full_name, type: String, localize: true
   field :tin, type: String
-  field :donated_amount, type: Float
+  #field :donated_amount, type: Float
   field :nature, type: Integer, default: 0
   field :multiple, type: Boolean, default: false # if donated to multiple parties
   field :color, type: String, default: "##{SecureRandom.hex(3)}"
@@ -66,7 +66,7 @@ class Donor
     #   donated_amount: da,
     #   multiple:
     # )
-    self.set(donated_amount: da)
+    #self.set(donated_amount: da)
     self.set(multiple: tmp_party_ids.uniq.size > 1)
     # save
   end
@@ -129,11 +129,11 @@ class Donor
         "$project": {
           name: Donor.mongodb_field_with_fallback("full_name"),
           tin: 1,
-          nature: 1,
-          donated_amount: 1
+          # nature: 1,
+          # donated_amount: 1
         }
        })
-      options.push({ "$sort": { donated_amount: -1, name: 1 } })
+      # options.push({ "$sort": { donated_amount: -1, name: 1 } })
 
       res = collection.aggregate(options).to_a
     end
@@ -149,10 +149,6 @@ class Donor
 
     matches.push({ "_id": { "$in": params[:donor].map{|m| BSON::ObjectId(m)} } }) if params[:donor].present?
     matches.push({ "multiple": { "$eq": params[:multiple] } }) if params[:multiple].present? && params[:multiple] == true
-
-    if params[:grouped].present? && params[:multiple] == true
-      matches.push({ "multiple": { "$eq": params[:multiple] } })
-    end
 
     if params[:party].present?
       tmp = params[:party].map{|m| BSON::ObjectId(m) }
@@ -176,17 +172,19 @@ class Donor
       end
     end
 
-    if params[:amount].present?
-      tmp = params[:amount][0]
-      if tmp.present? && tmp != -1
-        matches.push({ "donations.amount": { "$gte": tmp } })
-        conditions.push({"$gte": [ "$$donation.amount", tmp ]})
-      end
+    if params[:grouped] == false
+      if params[:amount].present?
+        tmp = params[:amount][0]
+        if tmp.present? && tmp != -1
+          matches.push({ "donations.amount": { "$gte": tmp } })
+          conditions.push({"$gte": [ "$$donation.amount", tmp ]})
+        end
 
-      tmp = params[:amount][1]
-      if tmp.present? && tmp != -1
-        matches.push({ "donations.amount": { "$lte": tmp } })
-        conditions.push({"$lte": [ "$$donation.amount", tmp ]})
+        tmp = params[:amount][1]
+        if tmp.present? && tmp != -1
+          matches.push({ "donations.amount": { "$lte": tmp } })
+          conditions.push({"$lte": [ "$$donation.amount", tmp ]})
+        end
       end
     end
 
@@ -206,7 +204,7 @@ class Donor
         name: mongodb_field_with_fallback("full_name"),
         tin: 1,
         nature: 1,
-        donated_amount: 1,
+        #donated_amount: 1,
         donations: {
           "$filter": {
             input: "$donations",
@@ -217,12 +215,17 @@ class Donor
         }
       }
      })
-    options.push({ "$sort": { donated_amount: -1, name: 1 } })
+
+    # options.push({ "$sort": { amount: -1, name: 1 } }) #donated_amount: -1,
+    # puts "-------------------#{options}"
     collection.aggregate(options)
+
+#     single: on chart multiple same donor showing donations that are greater then amount
+#     combined: on chart one donor but showing only if sum of donations are greater then amount
+# different is in single case
   end
 
   def self.explore(params, type = "a", inner_pars = false, global_data = {})
-    limiter = 5
     default_f = {
       donor: nil,
       party: nil,
@@ -231,12 +234,11 @@ class Donor
       period: [-1,-1],
       amount: [-1,-1],
       nature: nil,
-      grouped: nil
+      grouped: true
     }
     title_options = {}
-
     if inner_pars
-      f[:grouped] = true if !params[:grouped].present? # compability for old queries, so by default is grouped
+      params[:grouped] = true if ![true, false].include? params[:grouped] # compability for old queries, so by default is grouped
       f = params
       title_options = f
     else
@@ -277,10 +279,10 @@ class Donor
         title_options[:nature] = f[:nature]
       end
 
-      if params[:grouped] == "true"
-        f[:grouped] = true
-        title_options[:grouped] = true
-      end
+      grouped = params[:grouped] == "true"
+      f[:grouped] = grouped
+      title_options[:grouped] = grouped
+
     end
 
     chart_subtitle = ""
@@ -292,7 +294,8 @@ class Donor
     end
 
 
-
+    grouped = f[:grouped]
+    single = !grouped
 
     ds = f[:donor].nil? ? 0 : f[:donor].length
     ps = f[:party].nil? ? 0 : f[:party].length
@@ -308,6 +311,7 @@ class Donor
 
 
     data = filter(f).to_a
+    # puts "-----------------------#{data[0]}#{data[1]}#{data[2]}"
 
     parties_list = {}
     parties = {}
@@ -335,16 +339,32 @@ class Donor
       }
     end
 
-
     total_amount = 0
     recent_donations = []
     donors_list = []
 
+    # puts "--------------------------#{data.inspect}"
+
+
+    if grouped
+      data.each{|e| # calculate sum of all donations for each donor
+        e[:partial_donated_amount] = 0
+        e[:donations].each { |ee|
+          e[:partial_donated_amount] += ee[:amount]
+        }
+        e[:partial_donated_amount] = e[:partial_donated_amount].round(2)
+      }
+      if f[:amount].present? # if filtering by amount apply to sum of all donations for each donor
+        tmp = f[:amount][0]
+        data.delete_if { |d| d[:partial_donated_amount] < tmp } if tmp.present? && tmp != -1
+        tmp = f[:amount][1]
+        data.delete_if { |d| d[:partial_donated_amount] > tmp } if tmp.present? && tmp != -1
+      end
+    end
+
     data.each{|e|
 
       donors_list << e[:name]# if [3,4].index(chart_type).present?
-
-      e[:partial_donated_amount] = 0
       e[:donations].each { |ee|
         am = ee[:amount]
 
@@ -355,21 +375,20 @@ class Donor
           parties_list[ee[:party_id]][:value] += am
         end
 
-        recent_donations.push({ date: ee[:give_date], out: { name: e[:name], value: am } }) if chart_type == 1
-        recent_donations.push({ date: ee[:give_date], out: { name: parties[ee[:party_id]][:name], value: am } }) if chart_type == 3
-
-        e[:partial_donated_amount] += am
+        recent_donations.push({ date: ee[:give_date], out: { name: e[:name], value: am } }) if [0,1,2,3,4].include?(chart_type)
+        # recent_donations.push({ date: ee[:give_date], out: { name: e[:name], value: am } }) if chart_type == 1
+        # recent_donations.push({ date: ee[:give_date], out: { name: parties[ee[:party_id]][:name], value: am } }) if chart_type == 3
 
         total_amount += am
 
-        n  += 1
       }
-      e[:partial_donated_amount] = e[:partial_donated_amount].round(2)
     }
+
     parties.each_pair { |k, v| parties[k][:value] = v[:value].round(2) }
     parties_list.each_pair { |k, v| parties_list[k][:value] = v[:value].round(2) }
     total_amount = total_amount.round(2)
     has_no_data = total_amount == 0
+
 
     # prepare data for both charts
     ca = []
@@ -377,42 +396,94 @@ class Donor
     ca_title = { n: 0, obj: nil, objb: nil }
     cb_title = { n: 0, obj: nil, objb: nil }
     labels = {
+      donor: I18n.t("shared.chart.label.donor"),
       donors: I18n.t("shared.chart.label.donors"),
       parties: I18n.t("shared.chart.label.parties"),
-      donations: I18n.t("shared.chart.label.donations")
+      donation: I18n.t("shared.chart.label.donation"),
+      donations: I18n.t("shared.chart.label.donations"),
+      top: I18n.t("shared.chart.label.top"),
+      total: I18n.t("shared.chart.label.total")
     }
-    if chart_type == 0 # If select anything other than party and donor -> charts show the top 5
-      ca_tmp = pull_n(data, limiter, :donated_amount, labels[:donors])
-      cb_tmp = pull_n(parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, limiter, :value, labels[:parties])
-    elsif chart_type == 1 # If select 1 party -> top 5 donors for party, last 5 donations for party
-      tmp = parties[BSON::ObjectId(f[:party][0])][:name]
-      ca_title[:obj] = cb_title[:obj] = tmp
+    puts "********************************************   #{chart_type} #{donors_list} #{type}"
 
-      ca_tmp = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[:donors])
-      cb_tmp = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, labels[:donations])
+    if chart_type == 0 # If select anything other than party and donor
 
-    elsif chart_type == 2 || chart_type == 4
-      # If select > 1 party -> top 5 donors for parties, total donations for selected parties
-      # If select > 1 donor-> total donations for each donor, top 5 parties donated to
+      ca_tmp = pull_n(
+        grouped ?
+          [data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, :partial_donated_amount, labels[:donors]] :
+          [recent_donations.sort{ |x,y| y[:out][:value] <=> x[:out][:value] }.map{|m| m[:out] }, :value, labels[:donations]]
+      )
+      cb_tmp = pull_n([parties.sort_by { |k, v| -1*v[:value] }.map{|k,v| v }, :value, labels[:parties]])
 
-      ca_tmp = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[chart_type == 2 ? :parties : :donors])
-      cb_tmp = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, labels[chart_type == 2 ? :donations : :parties])
+      ca_title[:label] = labels[ca_tmp[:data].length == 1 ? (grouped ? :donor : :donation) : (grouped ? :donors : :donations)]
 
-      ca_title[:obj] = chart_type == 4 ? ca_tmp[:title] : cb_tmp[:title]
-      cb_title[:obj] = chart_type == 4 ? donors_list.join(", ") : cb_tmp[:title]
+    elsif chart_type == 1 # If select 1 party
 
-    elsif chart_type == 3 # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
-      ca_tmp = pull_n(recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, limiter, :value, labels[:donations])
-      cb_tmp = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:name] <=> x[:name] }, limiter, :value, labels[:parties])
+      ca_tmp = pull_n(
+        grouped ?
+          [data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, :partial_donated_amount, labels[:donors]] :
+          [recent_donations.sort{ |x,y| y[:out][:value] <=> x[:out][:value] }.map{|m| m[:out] }, :value, labels[:donations]]
 
-      ca_title[:obj] = cb_title[:obj] = donors_list.join(", ")
+      )
+      cb_tmp = pull_n([recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, :value, labels[:donations]])
+
+      ca_title[:obj] = cb_title[:obj] = parties[BSON::ObjectId(f[:party][0])][:name]
+      ca_title[:label] = labels[ca_tmp[:data].length == 1 ? (grouped ? :donor : :donation) : (grouped ? :donors : :donations)]
+
+    elsif chart_type == 2 # If select > 1 party
+
+      ca_tmp = pull_n(
+        grouped ?
+          [data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, :partial_donated_amount, labels[:donors]] :
+          [recent_donations.sort{ |x,y| y[:out][:value] <=> x[:out][:value] }.map{|m| m[:out] }, :value, labels[:donations]]
+      )
+      cb_tmp = pull_n([recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, :value, labels[:donations]])
+
+      ca_title[:obj] = cb_title[:obj] = parties_list.map{|k,v| v[:name] }.sort{ |x,y| y <=> x }.join(", ")
+      ca_title[:label] = labels[ca_tmp[:data].length == 1 ? (grouped ? :donor : :donation) : (grouped ? :donors : :donations)]
+
+    elsif chart_type == 3 # If select 1 donor
+
+      ca_tmp = pull_n(
+        grouped ?
+          [data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, :partial_donated_amount, labels[:donors]] :
+          [recent_donations.sort{ |x,y| y[:out][:value] <=> x[:out][:value] }.map{|m| m[:out] }, :value, labels[:donations]]
+      )
+
+      cb_tmp = pull_n([recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, :value, labels[:donations]])
+
+      ca_title[:obj] = cb_title[:obj] = donors_list.sort{ |x,y| y <=> x }.join(", ")
+      ca_title[:label] = labels[grouped ? :total : :top]
+
+    elsif chart_type == 4 # If select > 1 donor
+
+      ca_tmp = pull_n(
+        grouped ?
+          [data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, :partial_donated_amount, labels[:donors]] :
+          [recent_donations.sort{ |x,y| y[:out][:value] <=> x[:out][:value] }.map{|m| m[:out] }, :value, labels[:donations]]
+      )
+
+      cb_tmp = pull_n([recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, :value, labels[:donations]])
+
+      ca_title[:obj] = cb_title[:obj] = donors_list.sort{ |x,y| y <=> x }.join(", ")
+      ca_title[:label] = labels[grouped ? :total : :top]
+
 
     elsif chart_type == 5 # show selected donors sorted by who donated most and show selected parties sorted by who received most
-      ca_tmp = pull_n(data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, limiter, :partial_donated_amount, labels[:donations])
-      cb_tmp = pull_n(parties_list.map{|k,v| v }.sort{ |x,y| y[:value] <=> x[:value] }, limiter, :value, labels[:donations])
 
-      ca_title[:obj] = cb_title[:obj] = ca_tmp[:title]
-      ca_title[:objb] = cb_title[:objb] = cb_tmp[:title]
+      ca_tmp = pull_n(
+        grouped ?
+          [data.sort{ |x,y| y[:partial_donated_amount] <=> x[:partial_donated_amount] }, :partial_donated_amount, labels[:parties]] :
+          [recent_donations.sort{ |x,y| y[:out][:value] <=> x[:out][:value] }.map{|m| m[:out] }, :value, labels[:donations]]
+      )
+
+      cb_tmp = pull_n([recent_donations.sort{ |x,y| y[:date] <=> x[:date] }.map{|m| m[:out] }, :value, labels[:donations]])
+
+      ca_title[:obj] = cb_title[:obj] = donors_list.sort{ |x,y| y <=> x }.join(", ")
+      ca_title[:obj] = cb_title[:obj] = parties_list.map{|k,v| v[:name] }.sort{ |x,y| y <=> x }.join(", ")
+
+      ca_title[:label] = labels[grouped ? :total : :top]
+
     end
 
     ca = ca_tmp[:data]
@@ -448,7 +519,9 @@ class Donor
             human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
             Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
             Donation.human_attribute_name(:monetary)],
-          classes: ["no-padding", "", "center", "center", "center", "right", "", "center"]
+          classes: ["no-padding", "", "center", "center", "center", "right", "", "center"],
+          grouped: grouped,
+          grouped_header: [1, 1, 1, 1, 0, 1, 0, 0]
         }
       }
     end
@@ -457,7 +530,7 @@ class Donor
       res.merge!({
         ca: {
           series: has_no_data ? [] : ca,
-          title: Donor.generate_title(ca_title.merge(title_options), [chart_type, 0], has_no_data),
+          title: Donor.generate_title(ca_title.merge(title_options), [chart_type, 0], grouped, has_no_data),
           subtitle: chart_subtitle
         }
       })
@@ -466,7 +539,7 @@ class Donor
       res.merge!({
         cb: {
           series: has_no_data ? [] : cb,
-          title: Donor.generate_title(cb_title.merge(title_options), [chart_type, 1], has_no_data),
+          title: Donor.generate_title(cb_title.merge(title_options), [chart_type, 1], grouped, has_no_data),
           subtitle: chart_subtitle
         }
       })
@@ -477,6 +550,7 @@ class Donor
         pars: f
       })
     end
+    # Rails.logger.fatal("fatal----------------------#{res}")
     res
   end
 
@@ -505,12 +579,14 @@ class Donor
       matches.push({ "donations.give_date": { "$lte": tmp } }) if tmp.present? && tmp != -1
     end
 
-    if params[:amount].present?
-      tmp = params[:amount][0]
-      matches.push({ "donations.amount": { "$gte": tmp } }) if tmp.present? && tmp != -1
+    if params[:grouped] == false
+      if params[:amount].present?
+        tmp = params[:amount][0]
+        matches.push({ "donations.amount": { "$gte": tmp } }) if tmp.present? && tmp != -1
 
-      tmp = params[:amount][1]
-      matches.push({ "donations.amount": { "$lte": tmp } }) if tmp.present? && tmp != -1
+        tmp = params[:amount][1]
+        matches.push({ "donations.amount": { "$lte": tmp } }) if tmp.present? && tmp != -1
+      end
     end
 
     tmp = params[:monetary]
@@ -551,39 +627,104 @@ class Donor
           "sum": { "$sum": "$amount" }
         }
       })
+
+      if params[:grouped] == true
+        sub_match = []
+        if params[:amount].present?
+          tmp = params[:amount][0]
+          if tmp.present? && tmp != -1
+            sub_match.push({ "sum": { "$gte": tmp } })
+          end
+
+          tmp = params[:amount][1]
+          if tmp.present? && tmp != -1
+            sub_match.push({ "sum": { "$lte": tmp } })
+          end
+        end
+        options.push(sub_match) if sub_match.present?
+      end
+
       result = collection.aggregate(options).first
       result = { count: 0, sum: 0 } unless result.present?
     else
       skip = opts[:skip]
       limit = opts[:limit]
 
-      options.push({
-        "$lookup": {
-          from: "parties",
-          localField: "donations.party_id",
-          foreignField: "_id",
-          as: "party"
-        }
-      })
-      options.push({ "$unwind": '$party' })
-
-      party = mongodb_field_with_fallback("party.title")
-      monetary_trans = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
       nature_trans = [I18n.t("mongoid.attributes.donor.nature_values.individual"), I18n.t("mongoid.attributes.donor.nature_values.organization")]
-      date_format = I18n.t("time.formats.date")
-      options.push({
-        "$project": {
-          full_name: full_name,
-          tin: 1,
-          nature: { "$cond": [ { "$eq": [ "$nature", 0 ] }, "#{nature_trans[0]}", "#{nature_trans[1]}" ] },
-          donated_amount: 1,
-          give_date: { "$dateToString": { "format": "#{date_format}", "date": "$donations.give_date" } },
-          give_date_order: "$donations.give_date",
-          amount: "$donations.amount",
-          monetary: { "$cond": [ { "$eq": [ "$donations.monetary", true ] }, "#{monetary_trans[0]}", "#{monetary_trans[1]}" ] },
-          party: party
-        }
-      })
+      if params[:grouped] == true
+         Rails.logger.fatal("fatal----------------------grouped#{}")
+        # options.push({
+        #   "$project": {
+        #     name: mongodb_field_with_fallback("full_name"),
+        #     tin: 1,
+        #     nature: 1,
+        #     donations: {
+        #       "$filter": {
+        #         input: "$donations",
+        #         as: "donation",
+        #         cond: { "$and": conditions }
+        #       }
+        #     }
+        #   }
+        # })
+        options.push({
+          "$group": {
+            _id: { id: "$_id", full_name: full_name, tin: "$tin", nature: { "$cond": [ { "$eq": [ "$nature", 0 ] }, "#{nature_trans[0]}", "#{nature_trans[1]}" ] } }, #, donated_amount: "$donated_amount"
+            amount: { "$sum": "$donations.amount" } }
+        })
+        sub_match = []
+        if params[:amount].present?
+          tmp = params[:amount][0]
+          if tmp.present? && tmp != -1
+            sub_match.push({ "amount": { "$gte": tmp } })
+          end
+
+          tmp = params[:amount][1]
+          if tmp.present? && tmp != -1
+            sub_match.push({ "amount": { "$lte": tmp } })
+          end
+        end
+        options.push(sub_match) if sub_match.present?
+        options.push(
+          {
+            "$project": {
+              _id: "$_id.id",
+              full_name: "$_id.full_name",
+              tin: "$_id.tin",
+              nature: "$_id.nature",
+              amount: "$amount"
+            }
+          }
+        )
+      else
+        Rails.logger.fatal("fatal----------------------ungrouped#{}")
+        options.push({
+          "$lookup": {
+            from: "parties",
+            localField: "donations.party_id",
+            foreignField: "_id",
+            as: "party"
+          }
+        })
+        options.push({ "$unwind": '$party' })
+
+        party = mongodb_field_with_fallback("party.title")
+        monetary_trans = [I18n.t("mongoid.attributes.donation.monetary_values.t"), I18n.t("mongoid.attributes.donation.monetary_values.f")]
+        date_format = I18n.t("time.formats.date")
+        options.push({
+          "$project": {
+            full_name: full_name,
+            tin: 1,
+            nature: { "$cond": [ { "$eq": [ "$nature", 0 ] }, "#{nature_trans[0]}", "#{nature_trans[1]}" ] },
+            give_date: { "$dateToString": { "format": "#{date_format}", "date": "$donations.give_date" } },
+            give_date_order: "$donations.give_date",
+            amount: "$donations.amount",
+            monetary: { "$cond": [ { "$eq": [ "$donations.monetary", true ] }, "#{monetary_trans[0]}", "#{monetary_trans[1]}" ] },
+            party: party
+          }
+        })
+
+      end
       if opts[:q].present?
         options.push({ "$match":
           { "$or": [
@@ -603,19 +744,21 @@ class Donor
 
       options.push({ "$skip": skip }) if skip.present?
       options.push({ "$limit": limit }) if limit.present?
-
+      Rails.logger.fatal("fatal----------------------#{options}")
       result = collection.aggregate(options)
     end
     result
+
   end
 
   def self.explore_table(params, format = :json)
-    # Rails.logger.fatal("fatal----------------------#{params}")
     res = {}
     sid = params[:sid]
     shr = ShortUri.by_sid(sid, :explore) if sid.present?
     if shr.present?
       pars = Hash.transform_keys_to_symbols(shr.pars)
+      pars[:grouped] = true if ![true, false].include? pars[:grouped] # compability for old queries, so by default is grouped
+      grouped = pars[:grouped]
       q = params.dig(:search, :value)
 
       if format == :json
@@ -628,23 +771,32 @@ class Donor
 
       tmp = [params.dig(:order, '0', :column), params.dig(:order, '0', :dir)]
       tmp[0] = Integer(tmp[0]) rescue nil
-      sort = [ %w[full_name full_name tin nature give_date_order amount party monetary][tmp[0]], (tmp[1] == "asc" ? 1 : -1)] if tmp.all? &:present?
+      sort = [ (grouped ? %w[full_name full_name tin nature amount] : %w[full_name full_name tin nature give_date_order amount party monetary])[tmp[0] ], (tmp[1] == "asc" ? 1 : -1)] if tmp.all? &:present?
       extend ActionView::Helpers::NumberHelper
+
+      # Rails.logger.fatal("fatal----------------------#{pars}")
       data = filter_table(pars, { q: q, sort: sort, skip: skip, limit: limit }).to_a
+      # Rails.logger.fatal("fatal----------------------#{data.inspect}")
       if format == :csv
-        data.map!{|m| [m[:full_name], m[:tin], m[:nature], m[:give_date], m[:amount], m[:party], m[:monetary] ] }
+        grouped ? data.map!{|m| [m[:full_name], m[:tin], m[:nature], m[:amount] ] } :
+                  data.map!{|m| [m[:full_name], m[:tin], m[:nature], m[:give_date], m[:amount], m[:party], m[:monetary] ] }
 
         res = {
           table: {
             data: data,
-            header: [human_attribute_name(:name), human_attribute_name(:tin),
+            header: grouped ?
+              [human_attribute_name(:name), human_attribute_name(:tin),
+              human_attribute_name(:nature), Donation.human_attribute_name(:amount)] :
+
+              [human_attribute_name(:name), human_attribute_name(:tin),
               human_attribute_name(:nature), Donation.human_attribute_name(:give_date),
               Donation.human_attribute_name(:amount), Donation.human_attribute_name(:party),
               Donation.human_attribute_name(:monetary)]
           }
         }
       else
-        data.map!{|m| [nil, m[:full_name], m[:tin], m[:nature], m[:give_date], number_with_precision(m[:amount]), m[:party], m[:monetary] ] }
+        grouped ? data.map!{|m| [nil, m[:full_name], m[:tin], m[:nature], number_with_precision(m[:amount]) ] } :
+                  data.map!{|m| [nil, m[:full_name], m[:tin], m[:nature], m[:give_date], number_with_precision(m[:amount]), m[:party], m[:monetary] ] }
         data_meta = filter_table(pars, { meta: true, q: q })
 
         res = {
@@ -655,6 +807,7 @@ class Donor
           recordsTotal: Donor.donations_count,
           recordsFiltered: data_meta[:count]
         }
+         # Rails.logger.fatal("fatal----------------------#{res}")
       end
     end
     res
@@ -812,78 +965,59 @@ class Donor
       self.full_name_translations = tmp
     end
 
-    def self.pull_n (data, n, key, str) # get n rows grouped by key from data, with counting distinct item count and if > 1 than output with str else just name
+    def self.pull_n (v) # get n rows grouped by key from data, with counting distinct item count and if > 1 than output with str else just name
+      data, key, str = v
+      n = 5 # limiter
       grp_n = {}
       d_i = 0
       data.each_with_index{ |e, e_i|
-        break if d_i >= n
+
         ek = e[key].round
         if !grp_n.key?(ek)
+          break if d_i >= n
           grp_n[ek] = [e[:name]]
           d_i += 1
         else
           grp_n[ek] << e[:name]
         end
       }
-
       {
         data: grp_n.map { |k,v| [v.length > 1 ? "#{v.length} #{str}" : v[0], k] },
         title: grp_n.map { |k,v| v.join(", ") }.join(", ")
       }
     end
-    def self.generate_title(data, indexes, has_no_data)
-
-      # top_5_donors: Top %{n}%{obj} Donors for All Parties -> No Donations for All Parties
-      # top_5_parties: Top %{n} Parties/Candidates for All Donors -> No Donations for All Parties
-
-      # top_5_donors_for_party: Top %{n} Donors for %{obj} -> No Donations for %{name}
-      # last_5_donations_for_party: Last %{n} Donations for %{obj} -> No Donations for %{obj}
-
-      # top_5_donors_for_parties: Top %{n} Donors for %{obj} -> No Donations for %{name}
-      # total_donations_for_parties: Total Donations for %{obj} -> No Donations for %{names}
-
-
-      # last_5_donations_for_donor: Last %{n} Donations by %{obj} -> No Donations by %{obj}
-      # top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj} No Parties Donated to by %{names}
-
-      # total_donations_for_each_donor: Total Donations for %{obj} -> No donations for %{obj}
-      # top_5_parties_donated_to: Top %{n} Parties Donated to by %{obj} No Parties Donated to by %{names} ########
-
-      # donors_donations_sorted_by_amount: Top Donations by %{obj} to %{objb} -> No Donations by %{obj} to %{objb}
-      # parties_donations_sorted_by_amount: Top Donations to %{objb} by %{obj} -> No Donations to %{objb} by %{obj}
-
+    def self.generate_title(data, indexes, grouped, has_no_data)
 
       title = []
       template_names = [
-        ["top_5_donors", "top_5_parties"], # If select anything other than party and donor -> charts show the top 5
-        ["top_5_donors_for_party", "last_5_donations_for_party"], # If select 1 party -> top 5 donors for party, last 5 donations for party
-        ["top_5_donors_for_parties", "total_donations_for_parties"], # If select > 1 party -> top 5 donors for parties, total donations for selected parties
-        ["last_5_donations_for_donor", "top_5_parties_donated_to"], # If select 1 donor-> last 5 donations for donor, top 5 parties donated to
-        ["total_donations_for_each_donor", "top_5_parties_donated_to"], # If select > 1 donor-> total donations for each donor, top 5 parties donated to
-        ["donors_donations_sorted_by_amount", "parties_donations_sorted_by_amount"] # show selected donors sorted by who donated most and show selected parties sorted by who received most
+        ["top_n_for_all_parties", "top_n_parties"], # not by party and donor
+        ["top_n_for", "last_n_donations_for"], # 1 party
+        ["top_n_for", "last_n_donations_for"], # > 1 party
+        ["top_or_total_n_donations_for", "last_n_donations_for"], # 1 donor
+        ["top_or_total_n_donations_for", "last_n_donations_for"], # > 1 donor
+        ["top_or_total_n_donations_by_to", "last_n_donations_by_to"] # > 1 party and > 1 donor
       ]
+
       templates = {
-        top_5_donors:                       [ :block ],
-        top_5_parties:                      [ :receiving_monetary_amount, :from_donors ],
-        top_5_donors_for_party:             [ :block ],
-        last_5_donations_for_party:         [ :block ],
-        top_5_donors_for_parties:           [ :block ],
-        total_donations_for_parties:        [ :block ],
-        last_5_donations_for_donor:         [ :block ],
-        top_5_parties_donated_to:           [ :block ],
-        total_donations_for_each_donor:     [ :block ],
-        donors_donations_sorted_by_amount:  [ :block ],
-        parties_donations_sorted_by_amount: [ :block ],
+        top_n_for_all_parties:              [ :block ],
+        top_n_parties:                      [ :receiving_monetary_amount, :from_donors ],
+        top_n_for:                          [ :block ],
+        last_n_donations_for:               [ :block ],
+        top_or_total_n_donations_for:       [ :block ],
+        top_or_total_n_donations_by_to:     [ :block ],
+        last_n_donations_by_to:             [ :block ]
       }
 
       template_name = template_names[indexes[0]][indexes[1]]
       template = templates[template_name.to_sym]
-       Rails.logger.debug("--------------------------------------------#{template_name}")
-      if template_name == "top_5_donors" && data[:nature].present? # this title has nature as obj
+      # Rails.logger.debug("--------------------------------------------#{template_name}")
+      if template_name == "top_n_for_all_parties" && data[:nature].present? # this title has nature as obj
         data[:obj] = I18n.t("shared.chart.title.nature_#{data[:nature] == 0 ? 'individual' : 'organization'}")
       end
 
+      data[:n] = "" if grouped && (template_name == "top_or_total_n_donations_for" || template_name == "top_or_total_n_donations_by_to")
       title << I18n.t("shared.chart.title.#{has_no_data ? 'no_data.' : ''}#{template_name}", data)
+      title << I18n.t("shared.chart.title.grouped_by_donors") if grouped
       data[:amount] = format_range(data[:amount]) if data[:amount].present?
 
       template.each { |t|
@@ -925,42 +1059,6 @@ class Donor
       }
 
       title.join("<br/>")
-
-        #-------------------------------------------------------------------------------
-        #--------------------------- top_5_donors
-
-          # Top {{n}} {{nature}} Donors
-          # {{block}}
-
-        #--------------------------- top_5_parties
-
-          # Top {{n}} Parties/Candidates
-          # Receiving {{monetary}} donation {{amount}}
-          # from {{nature}} Donors {{who}}
-          # {{multiple}}
-
-        # all below have {{block}}
-        #--------------------------- top_5_donors_for_party
-          # Top {{n}} Donors for {{parties}}
-        #--------------------------- last_5_donations_for_party
-          # Last {{n}} Donations for {{party}}
-        #--------------------------- top_5_donors_for_parties
-          # Top {{n}} Donors for {{parties}}
-        #--------------------------- total_donations_for_parties
-          # Total Donations for {{parties}}
-        #--------------------------- last_5_donations_for_donor
-          # Last {{n}} Donations for {{donor}}
-        #--------------------------- top_5_parties_donated_to
-          # Top {{n}} Parties Donated to by {{donor}}
-        #--------------------------- total_donations_for_each_donor
-          # Total Donations for {{donors}}
-        #--------------------------- donors_donations_sorted_by_amount
-          # Top Donations by {{donors}} to {{parties}}
-        #--------------------------- parties_donations_sorted_by_amount
-          # Top Donations to {{parties}} by {{donors}}
-
-
-        #---------------------------
 
     end
     def self.format_range (range)

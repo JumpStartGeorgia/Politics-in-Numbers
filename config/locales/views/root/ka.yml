@@ -56,6 +56,8 @@ ka:
       filter_autocomplete_title: Please enter at least 3 characters to perform a search
       donor: პ.ნ./სახელი
       time_period: პერიოდი
+      grouped: Group Records by Donor
+      grouped_title: Select Yes to combine all donors records into one record. Do not select to get each donation as a separate record.
       amount: რაოდენობა
       party: პარტია
       parties: Parties
