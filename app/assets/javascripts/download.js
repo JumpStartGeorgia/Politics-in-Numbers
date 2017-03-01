@@ -592,10 +592,19 @@ $(document).ready(function (){
 
     $(document).on("click", "#download_toggle_all", function () {
       var t = $(this), state = t.is(":checked");
-      $(view_table_object.$("tr", {"filter": "applied"}))
-        .find("td input[type='checkbox'] + label")
-        .trigger("click");
-      t.next("label").trigger("click");
+
+      view_table_object
+        .rows({ filter : 'applied'})
+        .nodes()
+        .to$()
+        .find("td input[type='checkbox']").prop("checked", state);
+
+      t.prop("checked", state);
+
+      // $(view_table_object.$("tr", {"filter": "applied"}))
+      //   .find("td input[type='checkbox'] + label")
+      //   .trigger("click");
+      // t.next("label").trigger("click");
     });
     $(document).on("click", "#download_button", function () {
       var tp = "finance", tmp = [];
@@ -649,8 +658,7 @@ $(document).ready(function (){
     }
   }
   function filter_callback(id, filters) {
-    console.log(id, filters, js);
-      console.log("here");
+    // console.log(id, filters, js);
     if(js.cache.hasOwnProperty(id) && js.cache[id].hasOwnProperty("table")) {
       view_not_found.addClass("hidden");
       render_table(js.cache[id].table);
@@ -671,7 +679,7 @@ $(document).ready(function (){
   }
   // TODO set by url is not working
   function render_table(table) {
-    console.log("table data", table, table.header);
+    // console.log("table data", table, table.header);
     // if(type === "donation") {
       //view_content.html("new tab");
       //var prev = undefined, alt_color = true,

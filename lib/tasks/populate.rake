@@ -270,7 +270,9 @@ namespace :populate do
     lg.close
   end
 
-  desc "Read and upload new election files from folder"
+
+
+desc "Read and upload new election files from folder"
   task :reelections, [:part] => :environment do |t, args|
     part = args[:part]
     if part.present?
@@ -340,6 +342,76 @@ namespace :populate do
       }
       lg.info "----------------------------------"
       # puts ps.inspect
+      lg.close
+    end
+  end
+
+
+  desc "Read and upload new annuals files from folder"
+  task :reannuals, [:part] => :environment do |t, args|
+    part = args[:part]
+    if part.present?
+
+      log_path = "#{Rails.root}/log/tasks"
+      FileUtils.mkpath(log_path)
+      lg = Logger.new File.open("#{log_path}/reannuals.log", 'a')
+      lg.formatter = proc do |severity, datetime, progname, msg|
+        "#{msg}\n"
+      end
+
+
+      I18n.locale = :en
+
+      files = []
+      filenames = []
+
+      upload_path = Rails.public_path.join("upload/reannuals/#{part}")
+      Dir.entries(upload_path).each {|f|
+        if File.file?("#{upload_path}/#{f}") && f != ".gitkeep"
+          files << "#{upload_path}/#{f}"
+          filenames << f.to_s.gsub(".xlsx","")
+        end
+      }
+
+      ps = []
+      lg.info "----------------------------------"
+      lg.info "#{files.length} - files to process (#{Time.now})"
+      lg.info "----------------------------------"
+      files.each_with_index {|f,f_i|
+        lg.info filenames[f_i]+" >>>"
+
+        tmp_id = filenames[f_i].split(".")
+
+        year = tmp_id[1]
+        start_date =  Date.strptime("01.01.#{year}", "%d.%m.%Y")
+
+        tmp_id = tmp_id[0]
+
+
+        prt = Party.find_by(tmp_id: tmp_id)
+        per_title = "#{year}"
+        per = Period.find_or_create_by({start_date: start_date, type: Period.type_is(:annual)}) do |rec|
+          rec.title_translations = { ka: per_title, en: per_title }
+          rec.description_translations = { ka: "წლიური #{per_title}", en: "Annual #{per_title}" }
+        end
+
+        dataset = nil
+        if prt.present? && per.present?
+          if !Dataset.where({party_id: prt._id, period_id: per._id}).present?
+            dataset = Dataset.new({party_id: prt._id, period_id: period_id = per._id, source: File.open(f), version: 2}) #[4,5,9,10,15,23,34,36].include?(tmp_id.to_i) ? 1 :
+            dataset.save
+            Job.dataset_file_process(dataset._id, User.all[0]._id, [])
+          else
+            lg.info "  - already processed"
+          end
+        else
+          lg.info "  - party for id #{tmp_id} is missing" if prt.nil?
+          lg.info "  - period for id #{year} is missing" if per.nil?
+          next
+        end
+
+      }
+      lg.info "----------------------------------"
       lg.close
     end
   end
