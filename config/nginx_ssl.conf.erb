@@ -70,7 +70,7 @@ server {
   client_body_buffer_size 10k;
   client_header_buffer_size 8k;
   client_max_body_size 8m;
-  large_client_header_buffers 4 8k;
+  large_client_header_buffers 4 10k;
 
   # when serving user-supplied content, include a X-Content-Type-Options: nosniff header along with the Content-Type: header,
   # to disable content-type sniffing on some browsers.
