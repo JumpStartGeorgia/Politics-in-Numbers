@@ -532,7 +532,7 @@ class Dataset
     data = download_filter(f).to_a
     parties = {}
     periods = {}
-    Party.members.each{|e| parties[e.id] = e.title }
+    Party.each{|e| parties[e.id] = e.title } # members
     Period.each{|e| periods[e.id] = { tp: e.current_type, sd: e.start_date, ed: e.end_date } }
     min_date = Date.new(2050,1,1)
     max_date = Date.new(1970,1,1)
